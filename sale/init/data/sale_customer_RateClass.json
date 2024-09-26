@@ -6,79 +6,71 @@
             {
                 "id": 1,
                 "name": "T1",
-                "state": "instance",
-                "deleted": false,
-                "modified": "2021-10-11T13:35:18+02:00",
-                "creator": 1,
-                "created": "2021-10-11T13:35:18+02:00",
-                "modifier": 0,
-                "description": "Institutions reconnues CWB"
+                "description": "Institutions privilégiées (reconnues CWB)"
             },
             {
                 "id": 2,
                 "name": "T2",
-                "state": "instance",
-                "deleted": false,
-                "modified": "2021-10-11T13:35:18+02:00",
-                "creator": 1,
-                "created": "2021-10-11T13:35:18+02:00",
-                "modifier": 0,
-                "description": "Autres associations sociales"
+                "description": "Groupements"
             },
             {
                 "id": 3,
                 "name": "T3",
-                "state": "instance",
-                "deleted": false,
-                "modified": "2021-10-11T13:35:18+02:00",
-                "creator": 1,
-                "created": "2021-10-11T13:35:18+02:00",
-                "modifier": 0,
-                "description": "Travailleurs Kaleo"
+                "description": "Réseau Organisation"
             },
             {
                 "id": 4,
                 "name": "T4",
-                "state": "instance",
-                "deleted": false,
-                "modified": "2021-10-11T13:35:18+02:00",
-                "creator": 1,
-                "created": "2021-10-11T13:35:18+02:00",
-                "modifier": 0,
                 "description": "Grand public"
             },
             {
                 "id": 5,
                 "name": "T5",
-                "state": "instance",
-                "deleted": false,
-                "modified": "2021-10-11T13:35:18+02:00",
-                "creator": 1,
-                "created": "2021-10-11T13:35:18+02:00",
-                "modifier": 0,
                 "description": "Ecoles primaires et secondaires"
             },
             {
                 "id": 6,
                 "name": "T6",
-                "state": "instance",
-                "deleted": false,
-                "modified": "2021-10-11T13:35:18+02:00",
-                "creator": 1,
-                "created": "2021-10-11T13:35:18+02:00",
-                "modifier": 0,
-                "description": "TO \/ Partenaires"
+                "description": "TO partenaires"
             },
             {
                 "id": 7,
                 "name": "T7",
-                "state": "instance",
-                "deleted": false,
-                "modified": "2021-10-11T13:35:18+02:00",
-                "creator": 1,
-                "created": "2021-10-11T13:35:18+02:00",
-                "modifier": 0,
                 "description": "Ecoles maternelles"
+            }
+        ]
+    },
+    {
+        "name": "sale\\customer\\RateClass",
+        "lang": "en",
+        "data": [
+            {
+                "id": 1,
+                "description": "Privileged institutions (recognized by CWB)"
+            },
+            {
+                "id": 2,
+                "description": "Groups"
+            },
+            {
+                "id": 3,
+                "description": "Network Organization"
+            },
+            {
+                "id": 4,
+                "description": "General public"
+            },
+            {
+                "id": 5,
+                "description": "Primary and secondary schools"
+            },
+            {
+                "id": 6,
+                "description": "Partner TOs"
+            },
+            {
+                "id": 7,
+                "description": "Kindergarten schools"
             }
         ]
     }
