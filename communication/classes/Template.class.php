@@ -40,7 +40,6 @@ class Template extends Model {
                 'type'              => 'many2one',
                 'foreign_object'    => 'communication\TemplateCategory',
                 'description'       => "The category the template belongs to.",
-                'onupdate'          => 'onupdateCategoryId',
                 'required'          => true,
                 'dependents'        => ['name']
             ],
