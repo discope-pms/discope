@@ -1,24 +1,25 @@
 <?php
 /*
     This file is part of Symbiose Community Edition <https://github.com/yesbabylon/symbiose>
-    Some Rights Reserved, Yesbabylon SRL, 2020-2021
+    Some Rights Reserved, Yesbabylon SRL, 2020-2024
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 namespace communication;
+
 use equal\orm\Model;
 
 class Template extends Model {
-    public static function getColumns() {
-        /**
-         */
 
+    public static function getColumns() {
         return [
+
             'name' => [
                 'type'              => 'computed',
                 'result_type'       => 'string',
                 'description'       => "Code of the template (allows duplicates).",
                 'function'          => 'calcName',
                 'store'             => true,
+                'instant'           => true,
                 'readonly'          => true
             ],
 
@@ -26,7 +27,7 @@ class Template extends Model {
                 'type'              => 'string',
                 'description'       => "Code of the template (allows duplicates).",
                 'required'          => true,
-                'onupdate'          => 'onupdateCode'
+                'dependents'        => ['name']
             ],
 
             'description' => [
@@ -39,58 +40,42 @@ class Template extends Model {
                 'type'              => 'many2one',
                 'foreign_object'    => 'communication\TemplateCategory',
                 'description'       => "The category the template belongs to.",
-                'onupdate'          => 'communication\Template::onupdateCategoryId',
-                'required'          => true
+                'onupdate'          => 'onupdateCategoryId',
+                'required'          => true,
+                'dependents'        => ['name']
             ],
 
             'type' => [
                 'type'              => 'string',
-                'selection'         => [ 'quote', 'option', 'contract', 'funding', 'invoice' ],
-                'description'       => 'The context in which the template is meant to be used.',
-                'onupdate'          => 'communication\Template::onupdateType'
+                'selection'         => [ 'quote', 'option', 'contract', 'funding', 'invoice', 'guest' ],
+                'description'       => "The context in which the template is meant to be used.",
+                'dependents'        => ['name']
             ],
 
             'parts_ids' => [
                 'type'              => 'one2many',
                 'foreign_object'    => 'communication\TemplatePart',
                 'foreign_field'     => 'template_id',
-                'description'       => 'List of templates parts related to the template.'
+                'description'       => "List of templates parts related to the template."
             ],
 
             'attachments_ids' => [
                 'type'              => 'one2many',
                 'foreign_object'    => 'communication\TemplateAttachment',
                 'foreign_field'     => 'template_id',
-                'description'       => 'List of attachments related to the template, if any.'
+                'description'       => "List of attachments related to the template, if any."
             ]
 
         ];
     }
 
-    public static function calcName($om, $oids, $lang) {
+    public static function calcName($self) {
         $result = [];
-
-        $templates = $om->read(__CLASS__, $oids, ['code', 'type', 'category_id.name'], $lang);
-
-        foreach($templates as $oid => $template) {
-            $result[$oid] = $template['category_id.name'].'.'.$template['type'].'.'.$template['code'];
+        $self->read(['code', 'type', 'category_id' => ['name']]);
+        foreach($self as $id => $template) {
+            $result[$id] = $template['category_id']['name'].'.'.$template['type'].'.'.$template['code'];
         }
+
         return $result;
     }
-
-    public static function onupdateCode($orm, $oids, $values, $lang) {
-        $orm->write(__CLASS__, $oids, ['name' => null], $lang);
-        $orm->read(__CLASS__, $oids, ['name'], $lang);
-    }
-
-    public static function onupdateType($orm, $oids, $values, $lang) {
-        $orm->write(__CLASS__, $oids, ['name' => null], $lang);
-        $orm->read(__CLASS__, $oids, ['name'], $lang);
-    }
-
-    public static function onupdateCategoryId($orm, $oids, $values, $lang) {
-        $orm->write(__CLASS__, $oids, ['name' => null], $lang);
-        $orm->read(__CLASS__, $oids, ['name'], $lang);
-    }
-
 }

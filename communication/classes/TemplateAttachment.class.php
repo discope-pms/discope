@@ -1,18 +1,18 @@
 <?php
 /*
     This file is part of Symbiose Community Edition <https://github.com/yesbabylon/symbiose>
-    Some Rights Reserved, Yesbabylon SRL, 2020-2021
+    Some Rights Reserved, Yesbabylon SRL, 2020-2024
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 namespace communication;
+
 use equal\orm\Model;
 
 class TemplateAttachment extends Model {
-    public static function getColumns() {
-        /**
-         */
 
+    public static function getColumns() {
         return [
+
             'name' => [
                 'type'              => 'string',
                 'description'       => "Code of the attachment.",
@@ -38,9 +38,19 @@ class TemplateAttachment extends Model {
                 'foreign_object'    => 'core\Lang',
                 'description'       => "Language of the attachment (related document).",
                 'default'           => 1
+            ],
+
+            // #todo - use 2 fields : has_booking_type (bool) + booking_type_id (many2one)
+            'attachment_type' => [
+                'type'              => 'string',
+                'selection'         => [
+                    'all',
+                    'schools',
+                    'individuals',
+                    'groups'
+                ]
             ]
 
         ];
     }
-
 }
