@@ -136,3 +136,18 @@ To avoid side effects (test that works at the time of test creation but stops wo
 As a general rule, every booking created as part of a test must:  
 * Pass the controller check corresponding to its status.
 * Be viewable and editable via the front-end (when the rollback is commented out).
+
+## Circe-CI pipeline
+
+1) Create a Circle-CI account with your email address : https://app.circleci.com/
+2) Link your GitHub acount using OAuth, via [User Settings > Account Integrations]
+3) Connect to the Discope-PMS pipleine
+
+As member of the "discope-pms" organizarion and collaborator of the "discope" repository, circle-ci should display "discope-pms" amongst your organizations 
+
+* Go to your Dashboard: https://app.circleci.com/home/
+* Select "discope-pms" organization 
+* Click on "Setup a Project"
+* Select Discope
+
+Now you should be able to see the pipeline at : https://app.circleci.com/pipelines/github/discope-pms/discope
