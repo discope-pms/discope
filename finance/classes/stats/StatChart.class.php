@@ -1,14 +1,14 @@
 <?php
 /*
-    This file is part of Symbiose Community Edition <https://github.com/yesbabylon/symbiose>
-    Some Rights Reserved, Yesbabylon SRL, 2020-2021
-    Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
+    This file is part of the Discope property management software.
+    Author: Yesbabylon SRL, 2020-2024
+    License: GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 namespace finance\stats;
 use equal\orm\Model;
 
 class StatChart extends Model {
-    
+
     public static function getName() {
         return "Chart of Accounts";
     }
@@ -25,7 +25,6 @@ class StatChart extends Model {
                 'description'       => "Name of the chart of accounts."
             ],
 
-            /* owner organisation */
             'organisation_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'identity\Identity',
@@ -38,7 +37,7 @@ class StatChart extends Model {
                 'foreign_object'    => 'finance\stats\StatSection',
                 'foreign_field'     => 'stat_chart_id',
                 'description'       => "Sections that are related to this stat chart."
-            ]            
+            ]
         ];
     }
 

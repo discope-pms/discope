@@ -1,8 +1,8 @@
 <?php
 /*
-    This file is part of Symbiose Community Edition <https://github.com/yesbabylon/symbiose>
-    Some Rights Reserved, Yesbabylon SRL, 2020-2021
-    Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
+    This file is part of the Discope property management software.
+    Author: Yesbabylon SRL, 2020-2024
+    License: GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 namespace finance\accounting;
 use equal\orm\Model;
@@ -30,7 +30,7 @@ class AccountingJournal extends Model {
 
             'description' => [
                 'type'              => 'string',
-                'description'       => 'Verbose detail of the role of the journale.',
+                'description'       => 'Verbose detail of the role of the journal.',
                 'multilang'         => true
             ],
 
@@ -55,14 +55,14 @@ class AccountingJournal extends Model {
 
             'organisation_id' => [
                 'type'              => 'many2one',
-                'foreign_object'    => \identity\Identity::getType(),
+                'foreign_object'    => '\identity\Identity',
                 'description'       => "The organisation the journal belongs to.",
                 'default'           => 1
             ],
 
             'accounting_entries_ids' => [
                 'type'              => 'one2many',
-                'foreign_object'    => AccountingEntry::getType(),
+                'foreign_object'    => 'finance\accounting\AccountingEntry',
                 'foreign_field'     => 'journal_id',
                 'description'       => 'Accounting entries relating to the journal.',
                 'ondetach'          => 'null'
@@ -71,12 +71,11 @@ class AccountingJournal extends Model {
         ];
     }
 
-    public static function calcName($om, $oids, $lang) {
+    public static function calcName($self) {
         $result = [];
-        $journals = $om->read(__CLASS__, $oids, ['code', 'organisation_id.name'], $lang);
-
-        foreach($journals as $oid => $journal) {
-            $result[$oid] = $journal['code'].' - '.$journal['organisation_id.name'];
+        $self->read(['code','organisation_id' => ['name']]);
+        foreach($self as $id => $journal) {
+            $result[$id] =  $journal['code'].' - '.$journal['organisation_id']['name'];
         }
         return $result;
     }

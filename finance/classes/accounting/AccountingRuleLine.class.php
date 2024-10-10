@@ -1,8 +1,8 @@
 <?php
 /*
-    This file is part of Symbiose Community Edition <https://github.com/yesbabylon/symbiose>
-    Some Rights Reserved, Yesbabylon SRL, 2020-2021
-    Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
+    This file is part of the Discope property management software.
+    Author: Yesbabylon SRL, 2020-2024
+    License: GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 namespace finance\accounting;
 use equal\orm\Model;
@@ -57,14 +57,11 @@ class AccountingRuleLine extends Model {
     }
 
 
-    public static function calcAccount($om, $oids, $lang) {
+    public static function calcAccount($self) {
         $result = [];
-
-        $res = $om->read(get_called_class(), $oids, ['account_id.code']);
-        if($res > 0 && count($res)) {
-            foreach($res as $oid => $odata) {
-                $result[$oid] = $odata['account_id.code'];
-            }
+        $self->read(['account_id' => ['code']]);
+        foreach($self as $id => $line) {
+            $result[$id] = $line['code'];
         }
         return $result;
     }

@@ -1,8 +1,10 @@
 {
     "name": "Accounting menu",
     "access": {
-      "groups": ["finance.default.user"]
-   },
+        "groups": [
+            "finance.default.user"
+        ]
+    },
     "layout": {
         "items": [
             {
@@ -19,9 +21,20 @@
                         "description": "",
                         "route": "/",
                         "context": {
-                            "entity": "lodging\\sale\\booking\\BankStatement",
+                            "entity": "sale\\booking\\BankStatement",
                             "view": "list.reconciled",
-                            "domain": [["status", "=", "reconciled"], ["is_exported", "=", false]]
+                            "domain": [
+                                [
+                                    "status",
+                                    "=",
+                                    "reconciled"
+                                ],
+                                [
+                                    "is_exported",
+                                    "=",
+                                    false
+                                ]
+                            ]
                         }
                     },
                     {
@@ -31,38 +44,7 @@
                         "description": "",
                         "route": "/",
                         "context": {
-                            "entity": "lodging\\sale\\booking\\BankStatement",
-                            "view": "list.default"
-                        }
-                    }
-                ]
-            },
-            {
-                "id": "item.exports",
-                "label": "Exports",
-                "description": "",
-                "icon":"import_export",
-                "type": "parent",
-                "children": [
-                    {
-                        "id": "item.exports.downloads",
-                        "type": "entry",
-                        "label": "Exports to download",
-                        "description": "",
-                        "route": "/",
-                        "context": {
-                            "entity": "lodging\\documents\\Export",
-                            "view": "list.downloads"
-                        }
-                    },
-                    {
-                        "id": "item.exports.all",
-                        "type": "entry",
-                        "label": "All exports",
-                        "description": "",
-                        "route": "/",
-                        "context": {
-                            "entity": "lodging\\documents\\Export",
+                            "entity": "sale\\booking\\BankStatement",
                             "view": "list.default"
                         }
                     }
@@ -82,7 +64,7 @@
                         "description": "",
                         "route": "/invoices",
                         "context": {
-                            "entity": "lodging\\finance\\accounting\\Invoice",
+                            "entity": "finance\\accounting\\Invoice",
                             "view": "list.default"
                         }
                     }
@@ -102,9 +84,13 @@
                         "description": "",
                         "route": "/",
                         "context": {
-                            "entity": "lodging\\sale\\booking\\Funding",
+                            "entity": "sale\\booking\\Funding",
                             "view": "list.default",
-                            "domain": ["due_amount", "<", 0]
+                            "domain": [
+                                "due_amount",
+                                "<",
+                                0
+                            ]
                         }
                     },
                     {
@@ -114,9 +100,13 @@
                         "description": "",
                         "route": "/",
                         "context": {
-                            "entity": "lodging\\sale\\booking\\BankStatementLine",
+                            "entity": "sale\\booking\\BankStatementLine",
                             "view": "list.default",
-                            "domain": ["status", "=", "to_refund"]
+                            "domain": [
+                                "status",
+                                "=",
+                                "to_refund"
+                            ]
                         }
                     }
                 ]
@@ -144,7 +134,7 @@
                         "label": "Accounting rules",
                         "description": "",
                         "context": {
-                            "entity": "lodging\\finance\\accounting\\AccountingRule",
+                            "entity": "finance\\accounting\\AccountingRule",
                             "view": "list.default"
                         }
                     },
@@ -156,7 +146,11 @@
                         "context": {
                             "entity": "finance\\accounting\\AccountChartLine",
                             "view": "list.default",
-                            "domain": ["account_chart_id", "=", 1]
+                            "domain": [
+                                "account_chart_id",
+                                "=",
+                                1
+                            ]
                         }
                     },
                     {
@@ -165,7 +159,7 @@
                         "label": "Accounting journals",
                         "description": "",
                         "context": {
-                            "entity": "lodging\\finance\\accounting\\AccountingJournal",
+                            "entity": "finance\\accounting\\AccountingJournal",
                             "view": "list.default"
                         }
                     }
