@@ -98,18 +98,42 @@
             "label": "Blocages",
             "description": "",
             "help": ""
+        },
+        "center_id": {
+            "label": "Centre",
+            "description": "Le centre auquel appartient le logement.",
+            "help": ""
+        },
+        "color": {
+            "label": "Couleur",
+            "description": "Couleur pour l'affichage dans le planning.",
+            "help": ""
+        },
+        "sojourn_type_id": {
+            "label": "Type de séjour",
+            "description": "Type de séjour par défaut auquel se rapporte le logement.",
+            "help": ""
         }
     },
     "view": {
         "form.default": {
             "name": "Unité locative",
             "description": "Une unité locative est une ressource qui peut être louée à un client.",
+            "actions": {
+                "action.cleaned": {
+                    "label": "Marquer comme nettoyée",
+                    "description": "L'unité locative sera marquée comme nettoyée."
+                }
+            },
             "layout": {
                 "section.rental_units": {
-                    "label": "Détails"
+                    "label": "Géneral"
                 },
                 "section.children_section": {
                     "label": "Sous-unités"
+                },
+                "section.repairs": {
+                    "label": "Maintenance & Réparation"
                 }
             }
         },
