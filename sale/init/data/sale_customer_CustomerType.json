@@ -5,68 +5,59 @@
         "data": [
             {
                 "id": 1,
-                "name": "Particulier (personne physique)",
-                "state": "instance",
-                "deleted": false,
-                "modified": "2021-10-11T13:35:18+02:00",
-                "creator": 1,
-                "created": "2021-10-11T13:35:18+02:00",
-                "modifier": 0,
                 "code": "I",
                 "description": "Particulier (personne physique)",
                 "rate_class_id": null
             },
             {
                 "id": 2,
-                "name": "Ind\u00e9pendant",
-                "state": "instance",
-                "deleted": false,
-                "modified": "2021-10-11T13:35:18+02:00",
-                "creator": 1,
-                "created": "2021-10-11T13:35:18+02:00",
-                "modifier": 0,
                 "code": "SE",
-                "description": "Ind\u00e9pendant",
+                "description": "Indépendant",
                 "rate_class_id": null
             },
             {
                 "id": 3,
-                "name": "Soci\u00e9t\u00e9",
-                "state": "instance",
-                "deleted": false,
-                "modified": "2021-10-11T13:35:18+02:00",
-                "creator": 1,
-                "created": "2021-10-11T13:35:18+02:00",
-                "modifier": 0,
                 "code": "C",
-                "description": "Soci\u00e9t\u00e9",
+                "description": "Société",
                 "rate_class_id": null
             },
             {
                 "id": 4,
-                "name": "Association ou \u00c9cole (asbl, association de fait ou autre)",
-                "state": "instance",
-                "deleted": false,
-                "modified": "2021-10-11T13:35:18+02:00",
-                "creator": 1,
-                "created": "2021-10-11T13:35:18+02:00",
-                "modifier": 0,
                 "code": "NP",
-                "description": "Association ou \u00c9cole (asbl, association de fait ou autre)",
+                "description": "Association ou École (asbl, association de fait ou autre)",
                 "rate_class_id": null
             },
             {
                 "id": 5,
-                "name": "Administration publique",
-                "state": "instance",
-                "deleted": false,
-                "modified": "2021-10-11T13:35:18+02:00",
-                "creator": 1,
-                "created": "2021-10-11T13:35:18+02:00",
-                "modifier": 0,
                 "code": "PA",
                 "description": "Administration publique",
                 "rate_class_id": null
+            }
+        ]
+    },
+    {
+        "name": "sale\\customer\\CustomerType",
+        "lang": "en",
+        "data": [
+            {
+                "id": 1,
+                "description": "Individual (natural person)"
+            },
+            {
+                "id": 2,
+                "description": "Self-employed"
+            },
+            {
+                "id": 3,
+                "description": "Company"
+            },
+            {
+                "id": 4,
+                "description": "Association or School (non-profit, informal association, or other)"
+            },
+            {
+                "id": 5,
+                "description": "Public administration"
             }
         ]
     }

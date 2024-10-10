@@ -6,46 +6,48 @@
             {
                 "id": 1,
                 "name": "BS",
-                "state": "instance",
-                "deleted": false,
-                "modified": "2021-10-11T13:35:27+02:00",
-                "creator": 1,
-                "created": "2021-10-11T13:35:27+02:00",
-                "modifier": 0,
-                "description": "Basse\u00a0saison"
+                "description": "Basse saison"
             },
             {
                 "id": 2,
                 "name": "MS",
-                "state": "instance",
-                "deleted": false,
-                "modified": "2021-10-11T13:35:27+02:00",
-                "creator": 1,
-                "created": "2021-10-11T13:35:27+02:00",
-                "modifier": 0,
-                "description": "Moyenne\u00a0saison"
+                "description": "Moyenne saison"
             },
             {
                 "id": 3,
                 "name": "HS",
-                "state": "instance",
-                "deleted": false,
-                "modified": "2021-10-11T13:35:27+02:00",
-                "creator": 1,
-                "created": "2021-10-11T13:35:27+02:00",
-                "modifier": 0,
-                "description": "Haute\u00a0saison"
+                "description": "Haute saison"
             },
             {
                 "id": 4,
                 "name": "THS",
-                "state": "instance",
-                "deleted": false,
-                "modified": "2021-10-11T13:35:27+02:00",
-                "creator": 1,
-                "created": "2021-10-11T13:35:27+02:00",
-                "modifier": 0,
-                "description": "Tr\u00e8s\u00a0haute\u00a0saison"
+                "description": "Très haute saison"
+            }
+        ]
+    },
+    {
+        "name": "sale\\season\\SeasonType",
+        "lang": "en",
+        "data": [
+            {
+                "id": 1,
+                "name": "LS",
+                "description": "Low season"
+            },
+            {
+                "id": 2,
+                "name": "MS",
+                "description": "Mid season"
+            },
+            {
+                "id": 3,
+                "name": "HS",
+                "description": "High season"
+            },
+            {
+                "id": 4,
+                "name": "VHS",
+                "description": "Very high season"
             }
         ]
     }
