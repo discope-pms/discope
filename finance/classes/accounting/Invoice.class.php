@@ -1,8 +1,8 @@
 <?php
 /*
-    This file is part of Symbiose Community Edition <https://github.com/yesbabylon/symbiose>
-    Some Rights Reserved, Yesbabylon SRL, 2020-2021
-    Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
+    This file is part of the Discope property management software.
+    Author: Yesbabylon SRL, 2020-2024
+    License: GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 namespace finance\accounting;
 use equal\orm\Model;
@@ -117,7 +117,7 @@ class Invoice extends Model {
 
             'partner_id' => [
                 'type'              => 'many2one',
-                'foreign_object'    => \identity\Partner::getType(),
+                'foreign_object'    => '\identity\Partner',
                 'description'       => "The counter party organization the invoice relates to.",
                 'required'          => true
             ],
@@ -146,7 +146,7 @@ class Invoice extends Model {
                 'foreign_field'     => 'invoice_id',
                 'description'       => 'Detailed lines of the invoice.',
                 'ondetach'          => 'delete',
-                'onupdate'          => 'onupdateInvoiceLinesIds'
+                'dependencies'      => ['total', 'price']
             ],
 
             'invoice_line_groups_ids' => [
@@ -155,12 +155,12 @@ class Invoice extends Model {
                 'foreign_field'     => 'invoice_id',
                 'description'       => 'Groups of lines of the invoice.',
                 'ondetach'          => 'delete',
-                'onupdate'          => 'onupdateInvoiceLineGroupsIds'
+                'dependencies'      => ['total', 'price']
             ],
 
             'accounting_entries_ids' => [
                 'type'              => 'one2many',
-                'foreign_object'    => AccountingEntry::getType(),
+                'foreign_object'    => 'finance\accounting\AccountingEntry',
                 'foreign_field'     => 'invoice_id',
                 'description'       => 'Accounting entries relating to the lines of the invoice.',
                 'ondetach'          => 'delete'
@@ -197,40 +197,34 @@ class Invoice extends Model {
         ];
     }
 
-    public static function calcIsPaid($om, $oids, $lang) {
+    public static function calcIsPaid($self) {
         $result = [];
-        // #memo - fundings_ids targets all fundings relating to invoice: this includes the installments
-        // we need to limit the check to the direct funding, if any
-        $invoices = $om->read(get_called_class(), $oids, ['status', 'price', 'funding_id.paid_amount'], $lang);
-        if($invoices > 0) {
-            foreach($invoices as $oid => $invoice) {
-                $result[$oid] = false;
-                if($invoice['status'] != 'invoice') {
-                    // proforma invoices cannot be marked as paid
-                    continue;
-                }
-                if($invoice['price'] == 0) {
-                    // mark the invoice as paid, whatever its funding
-                    $result[$oid] = true;
-                    continue;
-                }
-                if($invoice['funding_id.paid_amount'] && $invoice['funding_id.paid_amount'] == $invoice['price']) {
-                    $result[$oid] = true;
-                }
+        $self -> read(['status', 'price', 'funding_id' =>['paid_amount']]);
+        foreach($self as $id => $invoice) {
+            $result[$id] = false;
+            if($invoice['status'] != 'invoice') {
+                continue;
+            }
+            if($invoice['price'] == 0) {
+                $result[$id] = true;
+                continue;
+            }
+            if($invoice['funding_id'].['paid_amount'] && $invoice['funding_id'].['paid_amount'] == $invoice['price']) {
+                $result[$id] = true;
             }
         }
         return $result;
     }
 
-    public static function calcPaymentReference($om, $oids, $lang) {
+    public static function calcPaymentReference($self): array {
         $result = [];
-        $invoices = $om->read(get_called_class(), $oids, ['number']);
-        foreach($invoices as $oid => $invoice) {
-            $number = intval($invoice['number']);
-            // arbitrary value : 155 for balance (final) invoice
-            $code_ref = 155;
-            $result[$oid] = self::_get_payment_reference($code_ref, $number);
+        $self->read(['invoice_number']);
+        foreach($self as $id => $invoice) {
+            $invoice_number = intval($invoice['invoice_number']);
+            $code_ref = 200;
+            $result[$id] = self::_get_payment_reference($code_ref, $invoice_number);
         }
+
         return $result;
     }
 
@@ -241,7 +235,6 @@ class Invoice extends Model {
 
         foreach($invoices as $oid => $invoice) {
 
-            // no code is generated for proforma
             if($invoice['status'] == 'proforma') {
                 $result[$oid] = '[proforma]';
                 continue;
@@ -268,64 +261,58 @@ class Invoice extends Model {
         return $result;
     }
 
-    public static function calcPrice($om, $oids, $lang) {
+    public static function calcTotal($self): array {
         $result = [];
+        $self->read(['invoice_lines_ids' => ['total']]);
+        foreach($self as $id => $invoice) {
+            $result[$id] = array_reduce($invoice['invoice_lines_ids']->get(true), function ($c, $a) {
+                return $c + $a['total'];
+            }, 0.0);
+        }
 
-        $invoices = $om->read(get_called_class(), $oids, ['invoice_lines_ids.price'], $lang);
+        return $result;
+    }
 
-        foreach($invoices as $oid => $invoice) {
-            $price = array_reduce((array) $invoice['invoice_lines_ids.price'], function ($c, $a) {
+    public static function calcPrice($self): array {
+        $result = [];
+        $self->read(['invoice_lines_ids' => ['price']]);
+        foreach($self as $id => $invoice) {
+            $price = array_reduce($invoice['invoice_lines_ids']->get(true), function ($c, $a) {
                 return $c + $a['price'];
             }, 0.0);
-            $result[$oid] = round($price, 2);
+
+            $result[$id] = round($price, 2);
         }
+
         return $result;
     }
 
-    public static function calcTotal($om, $oids, $lang) {
+    public static function calcDueDate($self): array {
         $result = [];
-
-        $invoices = $om->read(get_called_class(), $oids, ['invoice_lines_ids.total'], $lang);
-
-        foreach($invoices as $oid => $invoice) {
-            $total = array_reduce((array) $invoice['invoice_lines_ids.total'], function ($c, $a) {
-                return $c + round($a['total'], 2);
-            }, 0.0);
-            $result[$oid] = round($total, 2);
-        }
-        return $result;
-    }
-
-    public static function calcDueDate($om, $oids, $lang) {
-        $result = [];
-
-        $invoices = $om->read(get_called_class(), $oids, ['created', 'payment_terms_id.delay_from', 'payment_terms_id.delay_count'], $lang);
-        if($invoices > 0) {
-            foreach($invoices as $oid => $invoice) {
-                $from = $invoice['payment_terms_id.delay_from'];
-                $delay = $invoice['payment_terms_id.delay_count'];
-                $origin = $invoice['created'];
-                switch($from) {
-                    case 'created':
-                        $due_date = $origin + ($delay*24*3600);
-                        break;
-                    case 'next_month':
-                    default:
-                        $due_date = strtotime(date("Y-m-t", $origin)) + ($delay*24*3600);
-                        break;
-                }
-                $result[$oid] = $due_date;
+        $self->read(['emission_date', 'payment_terms_id' => ['delay_from', 'delay_count']]);
+        foreach($self as $id => $invoice) {
+            if(!isset($invoice['emission_date'], $invoice['payment_terms_id']['delay_from'], $invoice['payment_terms_id']['delay_count'])) {
+                continue;
             }
+
+            $from = $invoice['payment_terms_id']['delay_from'];
+            $delay = $invoice['payment_terms_id']['delay_count'];
+            $emission_date = $invoice['emission_date'];
+
+            switch($from) {
+                case 'created':
+                    $due_date = $emission_date + ($delay * 86400);
+                    break;
+                case 'next_month':
+                default:
+                    $due_date = strtotime(date('Y-m-t', $emission_date)) + ($delay * 86400);
+                    break;
+            }
+
+            $result[$id] = $due_date;
         }
+
         return $result;
-    }
-
-    public static function onupdateInvoiceLinesIds($om, $oids, $values, $lang) {
-        $om->update(__CLASS__, $oids, ['price' => null, 'total' => null]);
-    }
-
-    public static function onupdateInvoiceLineGroupsIds($om, $oids, $values, $lang) {
-        $om->update(__CLASS__, $oids, ['price' => null, 'total' => null]);
     }
 
     public static function onupdateStatus($om, $oids, $values, $lang) {
