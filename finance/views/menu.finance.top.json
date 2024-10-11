@@ -1,8 +1,10 @@
 {
     "name": "Accounting menu",
     "access": {
-      "groups": ["finance.default.user"]
-   },
+        "groups": [
+            "finance.default.user"
+        ]
+    },
     "layout": {
         "items": [
             {
@@ -13,7 +15,7 @@
                 "type": "entry",
                 "route": "/",
                 "context": {
-                    "entity": "lodging\\sale\\booking\\Invoice",
+                    "entity": "sale\\booking\\Invoice",
                     "view": "dashboard.default"
                 }
             },
@@ -25,13 +27,17 @@
                 "type": "entry",
                 "route": "/invoices",
                 "context": {
-                    "entity": "lodging\\sale\\booking\\Invoice",
+                    "entity": "sale\\booking\\Invoice",
                     "view": "list.default",
                     "order": "id",
                     "sort": "desc",
-                    "domain": ["status", "=", "quote"]
+                    "domain": [
+                        "status",
+                        "=",
+                        "quote"
+                    ]
                 }
-            }                          
+            }
         ]
     }
 }

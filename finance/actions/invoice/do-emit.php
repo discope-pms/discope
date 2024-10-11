@@ -8,10 +8,10 @@
 use finance\accounting\Invoice;
 
 list($params, $providers) = announce([
-    'description'   => "Sets booking as checked out.",
+    'description'   => "Sets invoice as invoiced.",
     'params'        => [
         'id' =>  [
-            'description'   => 'Identifier of the booking for which the composition has to be generated.',
+            'description'   => 'Identifier of the invoice.',
             'type'          => 'integer',
             'min'           => 1,
             'required'      => true
@@ -26,19 +26,14 @@ list($params, $providers) = announce([
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'     => ['context', 'orm', 'auth'] 
+    'providers'     => ['context']
 ]);
 
-/**
- * @var \equal\php\Context                  $context
- * @var \equal\orm\ObjectManager            $orm
- * @var \equal\auth\AuthenticationManager   $auth
- */
-list($context, $orm, $auth) = [$providers['context'], $providers['orm'], $providers['auth']];
 
-// emit the invoice : changing status will trigger an invoice number assignation
+$context = $providers['context'];
+
 Invoice::id($params['id'])->update(['status' => 'invoice']);
 
 $context->httpResponse()
-        ->status(204)        
+        ->status(204)
         ->send();
