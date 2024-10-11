@@ -48,7 +48,7 @@ class User extends \core\User {
 
             'centers_ids' => [
                 'type'              => 'many2many',
-                'foreign_object'    => 'lodging\identity\Center',
+                'foreign_object'    => 'identity\Center',
                 'foreign_field'     => 'users_ids',
                 'rel_table'         => 'lodging_identity_rel_center_user',
                 'rel_foreign_key'   => 'center_id',
@@ -58,7 +58,7 @@ class User extends \core\User {
 
             'center_offices_ids' => [
                 'type'              => 'many2many',
-                'foreign_object'    => 'lodging\identity\CenterOffice',
+                'foreign_object'    => 'identity\CenterOffice',
                 'foreign_field'     => 'users_ids',
                 'rel_table'         => 'lodging_identity_rel_center_office_user',
                 'rel_foreign_key'   => 'center_office_id',
