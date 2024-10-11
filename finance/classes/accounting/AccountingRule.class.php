@@ -5,6 +5,7 @@
     License: GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 namespace finance\accounting;
+
 use equal\orm\Model;
 
 class AccountingRule extends Model {
@@ -43,7 +44,7 @@ class AccountingRule extends Model {
 
             'accounting_rule_line_ids' => [
                 'type'              => 'one2many',
-                'foreign_object'    => '\finance\accounting\AccountingRuleLine',
+                'foreign_object'    => 'finance\accounting\AccountingRuleLine',
                 'foreign_field'     => 'accounting_rule_id',
                 'description'       => "Lines that are related to this rule."
             ],
@@ -56,7 +57,7 @@ class AccountingRule extends Model {
 
             'vat_rule_id' => [
                 'type'              => 'many2one',
-                'foreign_object'    => '\finance\tax\VatRule',
+                'foreign_object'    => 'finance\tax\VatRule',
                 'description'       => "VAT rule the line is related to.",
                 'dependents'        => ['prices_ids' => ['vat_rate']]
             ],
@@ -66,9 +67,13 @@ class AccountingRule extends Model {
                 'foreign_object'    => 'sale\price\Price',
                 'foreign_field'     => 'accounting_rule_id',
                 'description'       => "Prices that relate to the accounting rule."
+            ],
+
+            'code_legacy' => [
+                'type'              => 'string',
+                'description'       => "Old name of the accounting rule."
             ]
 
         ];
     }
-
 }
