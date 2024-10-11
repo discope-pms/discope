@@ -1,8 +1,8 @@
 <?php
 /*
-    This file is part of Symbiose Community Edition <https://github.com/yesbabylon/symbiose>
-    Some Rights Reserved, Yesbabylon SRL, 2020-2021
-    Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
+    This file is part of the Discope property management software.
+    Author: Yesbabylon SRL, 2020-2024
+    License: GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 namespace hr\employee;
 
@@ -23,7 +23,6 @@ class Role extends \equal\orm\Model {
             'name' => [
                 'type'              => 'string',
                 'description'       => 'Official Name of the role.',
-                'multilang'         => true,
                 'required'          => true
             ],
 
@@ -36,8 +35,8 @@ class Role extends \equal\orm\Model {
 
             'description' => [
                 'type'              => 'string',
-                'description'       => 'Details about the role.',
-                'multilang'         => true
+                'usage'             => 'text/plain',
+                'description'       => 'Details about the role.'
             ]
 
         ];

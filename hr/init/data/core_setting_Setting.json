@@ -1,0 +1,19 @@
+[
+    {
+        "name": "core\\setting\\Setting",
+        "lang": "en",
+        "data": [
+            {
+                "id": 20001,
+                "code": "daily_work_hours",
+                "title": "Number of hours worked per day",
+                "package": "hr",
+                "form_control": "select",
+                "section_id": 1,
+                "description": "Number of hours worked per day at the organisation",
+                "help": "",
+                "type": "float"
+            }
+        ]
+    }
+]

@@ -13,8 +13,9 @@
             },
             {
                 "type": "field",
-                "value": "code",
-                "width": "10%",
+                "label": "Identity",
+                "value": "partner_identity_id",
+                "width": "20%",
                 "sortable": true
             },
             {
@@ -22,13 +23,6 @@
                 "label": "Role",
                 "value": "role_id",
                 "width": "15%",
-                "sortable": true
-            },
-            {
-                "type": "field",
-                "label": "Identity",
-                "value": "partner_identity_id",
-                "width": "20%",
                 "sortable": true
             },
             {

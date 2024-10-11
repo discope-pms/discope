@@ -17,11 +17,6 @@
                 "type": "field",
                 "value": "year",
                 "width": "20%"
-            },
-            {
-                "type": "field",
-                "value": "extref_AT_id",
-                "width": "20%"
             }
         ]
     }

@@ -15,7 +15,7 @@
                                             {
                                                 "type": "field",
                                                 "value": "code",
-                                                "width": "50%",
+                                                "width": "30%",
                                                 "widget": {
                                                     "heading": true
                                                 }
@@ -23,7 +23,7 @@
                                             {
                                                 "type": "field",
                                                 "value": "name",
-                                                "width": "50%"
+                                                "width": "70%"
                                             },
                                             {
                                                 "type": "field",

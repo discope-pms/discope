@@ -5,14 +5,19 @@
         "items": [
             {
                 "type": "field",
-                "value": "code",
-                "width": "25%",
+                "value": "name",
+                "width": "33%",
                 "sortable": true
             },
             {
                 "type": "field",
+                "value": "code",
+                "width": "33%"
+            },
+            {
+                "type": "field",
                 "value": "description",
-                "width": "75%"
+                "width": "33%"
             }
 
         ]
