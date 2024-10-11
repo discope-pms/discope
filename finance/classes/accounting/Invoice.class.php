@@ -199,7 +199,7 @@ class Invoice extends Model {
 
     public static function calcIsPaid($self) {
         $result = [];
-        $self -> read(['status', 'price', 'funding_id' =>['paid_amount']]);
+        $self->read(['status', 'price', 'funding_id' => ['paid_amount']]);
         foreach($self as $id => $invoice) {
             $result[$id] = false;
             if($invoice['status'] != 'invoice') {
@@ -319,7 +319,7 @@ class Invoice extends Model {
         if(isset($values['status']) && $values['status'] == 'invoice') {
             // reset invoice number and set emission date
             $om->update(__CLASS__, $oids, ['number' => null, 'date' => time()], $lang);
-            // generate an invoice number (force immediate recomuting)
+            // generate an invoice number (force immediate re-computing)
             $om->read(__CLASS__, $oids, ['number'], $lang);
             // generate accounting entries
             $invoices_accounting_entries = self::_generateAccountingEntries($om, $oids, [], $lang);
@@ -333,8 +333,8 @@ class Invoice extends Model {
     }
 
     /**
-     * Check wether an object can be updated, and perform some additional operations if necessary.
-     * This method can be overriden to define a more precise set of tests.
+     * Check whether an object can be updated, and perform some additional operations if necessary.
+     * This method can be overridden to define a more precise set of tests.
      *
      * @param  \equal\orm\ObjectManager   $om         ObjectManager instance.
      * @param  array                      $oids       List of objects identifiers.
@@ -367,7 +367,7 @@ class Invoice extends Model {
     }
 
     /**
-     * Check wether the invoice can be deleted.
+     * Check whether the invoice can be deleted.
      *
      * @param  \equal\orm\ObjectManager    $om         ObjectManager instance.
      * @param  array                       $oids       List of objects identifiers.
