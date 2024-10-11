@@ -18,7 +18,7 @@ use equal\orm\Domain;
         ],
         'center_office_id' => [
             'type'              => 'many2one',
-            'foreign_object'    => 'lodging\identity\CenterOffice',
+            'foreign_object'    => 'identity\CenterOffice',
             'description'       => "Office the message relates to (for targeting the users)."
         ],
         'booking_id' => [

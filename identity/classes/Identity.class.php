@@ -1,10 +1,12 @@
 <?php
 /*
     This file is part of Symbiose Community Edition <https://github.com/yesbabylon/symbiose>
-    Some Rights Reserved, Yesbabylon SRL, 2020-2021
+    Some Rights Reserved, Yesbabylon SRL, 2020-2024
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 namespace identity;
+
+use equal\data\DataGenerator;
 use equal\orm\Model;
 
 /**
@@ -100,10 +102,11 @@ class Identity extends Model {
                 'onupdate'          => 'onupdateName'
             ],
             'short_name' => [
-                'type'          => 'string',
-                'description'   => 'Usual name to be used as a memo for identifying the organisation (acronym or short name).',
+                'type'              => 'string',
+                'description'       => 'Usual name to be used as a memo for identifying the organisation (acronym or short name).',
                 'visible'           => [ ['type', '<>', 'I'] ],
-                'onupdate'          => 'onupdateName'
+                'onupdate'          => 'onupdateName',
+                'generation'        => 'generateShortName'
             ],
             'has_vat' => [
                 'type'              => 'boolean',
@@ -195,9 +198,9 @@ class Identity extends Model {
             // Any Identity can have several contacts
             'contacts_ids' => [
                 'type'              => 'one2many',
-                'foreign_object'    => 'identity\Partner',
+                'foreign_object'    => 'identity\Contact',
                 'foreign_field'     => 'owner_identity_id',
-                'domain'            => [ ['partner_identity_id', '<>', 'object.id'], ['relationship', '=', 'contact'] ],
+                'domain'            => [ ['partner_identity_id', '<>', 'object.id'] ],
                 'description'       => 'List of contacts related to the organisation (not necessarily employees), if any.'
             ],
 
@@ -212,7 +215,7 @@ class Identity extends Model {
 
             'address_dispatch' => [
                 'type'              => 'string',
-                'description'       => 'Optional info for mail dispatch (appartment, box, floor, ...).'
+                'description'       => 'Optional info for mail dispatch (apartment, box, floor, ...).'
             ],
 
             'address_city' => [
@@ -239,13 +242,19 @@ class Identity extends Model {
 
             /*
                 Additional official contact details.
-                For individuals these are personnal contact details, whereas for companies these are official (registered) details.
+                For individuals these are personal contact details, whereas for companies these are official (registered) details.
             */
             'email' => [
                 'type'              => 'string',
                 'usage'             => 'email',
                 'onupdate'          => 'onupdateEmail',
                 'description'       => "Identity main email address."
+            ],
+
+            'email_secondary' => [
+                'type'              => 'string',
+                'usage'             => 'email',
+                'description'       => "Identity secondary email address."
             ],
 
             'phone' => [
@@ -347,7 +356,7 @@ class Identity extends Model {
 
             'lang_id' => [
                 'type'              => 'many2one',
-                'foreign_object'    => \core\Lang::getType(),
+                'foreign_object'    => 'core\Lang',
                 'description'       => "Preferred language of the identity.",
                 'default'           => 2,
                 'onupdate'          => 'onupdateLangId'
@@ -378,6 +387,21 @@ class Identity extends Model {
                 'type'              => 'boolean',
                 'default'           => false,
                 'description'       => 'Mark a customer with a disturbances history.'
+            ],
+
+            // fields related to bookings
+            'bookings_ids' => [
+                'type'              => 'one2many',
+                'foreign_object'    => 'lodging\sale\booking\Booking',
+                'foreign_field'     => 'customer_identity_id',
+                'description'       => 'List of bookings relating to the identity.'
+            ],
+
+            'invoices_ids' => [
+                'type'              => 'one2many',
+                'foreign_object'    => 'lodging\sale\booking\Invoice',
+                'foreign_field'     => 'customer_identity_id',
+                'description'       => 'List of invoices relating to the identity (as customer).'
             ]
 
         ];
@@ -644,5 +668,9 @@ class Identity extends Model {
                 ]
             ]
         ];
+    }
+
+    public static function generateShortName() {
+        return DataGenerator::legalName();
     }
 }

@@ -1,0 +1,31 @@
+{
+    "name": "Contact",
+    "plural": "Contacts",
+    "description": "Les relations contact sont un lien entre deux Identités.",
+    "model": {
+        "type": {
+            "label": "Type",
+            "description": "Le type de contact, dépend de ses responsabilités.",
+            "selection": {
+                "booking": "Réservation",
+                "invoice": "Facture",
+                "contract": "Contrat",
+                "sojourn": "Séjour"
+            },
+            "help": ""
+        }
+    },
+    "view": {
+        "form.default": {
+            "name": "Contact",
+            "description": "Formulaire de base pour afficher un contact",
+            "layout": {}
+        },
+        "list.default": {
+            "name": "Contacts",
+            "description": "Liste partenaires contacts.",
+            "layout": {}
+        }
+    },
+    "error": {}
+}

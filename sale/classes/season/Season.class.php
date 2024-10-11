@@ -49,7 +49,7 @@ class Season extends Model {
 
             'center_category_id' => [
                 'type'              => 'many2one',
-                'foreign_object'    => 'lodging\identity\CenterCategory',
+                'foreign_object'    => 'identity\CenterCategory',
                 'description'       => "Center category targeted by season.",
                 'required'          => true
             ],

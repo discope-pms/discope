@@ -1,6 +1,9 @@
 {
-    "name": "Identity",
-    "description": "An identity is any kind of person: moral (organisation) or physical (individual).",
+    "name": "Center",
+    "description": "A center is an accommodation establishment providing overnight lodging, and holding one or more rental units.",
+    "access": {
+        "groups": ["booking.default.user"]
+     },
     "layout": {
         "groups": [
             {
@@ -10,50 +13,47 @@
                             {
                                 "columns": [
                                     {
-                                        "width": "66%",
+                                        "width": "100%",
                                         "items": [
                                             {
                                                 "type": "field",
-                                                "value": "legal_name",
-                                                "width": "50%"
-                                            },
-                                            {
-                                                "type": "field",
-                                                "value": "short_name",
-                                                "width": "50%"
-                                            },
-                                            {
-                                                "type": "field",
-                                                "value": "firstname",
-                                                "width": "50%"
-                                            },
-                                            {
-                                                "type": "field",
-                                                "value": "lastname",
-                                                "width": "50%"
-                                            }
-                                        ]
-                                    },
-                                    {
-                                        "width": "33%",
-                                        "items": [
-                                            {
-                                                "type": "field",
-                                                "value": "type_id",
-                                                "width": "100%",
+                                                "label": "Center Name",
+                                                "value": "name",
+                                                "width": "24%",
                                                 "widget": {
-                                                    "header": {
-                                                        "actions": {
-                                                            "ACTION.CREATE": false,
-                                                            "ACTION.OPEN": false
-                                                        }
-                                                    }
+                                                    "heading": true
                                                 }
                                             },
                                             {
                                                 "type": "field",
-                                                "value": "type",
-                                                "visible": false
+                                                "value": "code_alpha",
+                                                "width": "8%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "analytic_section_id",
+                                                "width": "16%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "label": "Organization",
+                                                "value": "organisation_id",
+                                                "width": "24%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "center_office_id",
+                                                "width": "24%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "legal_name",
+                                                "width": "25%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "sojourn_type_id",
+                                                "width": "25%"
                                             }
                                         ]
                                     }
@@ -66,168 +66,50 @@
             {
                 "sections": [
                     {
-                        "id": "section.identity_info",
-                        "label": "General info",
+                        "label": "Details",
+                        "id": "section.details",
                         "rows": [
                             {
                                 "columns": [
                                     {
                                         "width": "33%",
-                                        "align": "left",
                                         "items": [
                                             {
-                                                "type": "field",
-                                                "value": "registration_number",
-                                                "width": "50%"
-                                            },
-                                            {
-                                                "type": "field",
-                                                "value": "citizen_identification",
-                                                "width": "50%"
-                                            },
-                                            {
-                                                "type": "field",
-                                                "label": "Language",
-                                                "value": "lang_id",
-                                                "width": "50%"
-                                            },
-                                            {
-                                                "type": "field",
-                                                "value": "has_vat",
-                                                "width": "50%",
-                                                "label": "Subject to VAT",
-                                                "help": "Do the company have a VAT number?"
-                                            },
-                                            {
-                                                "type": "field",
-                                                "value": "vat_number",
-                                                "width": "50%"
-                                            },
-                                            {
-                                                "type": "field",
-                                                "value": "title",
-                                                "width": "50%"
-                                            },
-                                            {
-                                                "type": "field",
-                                                "value": "gender",
-                                                "width": "50%"
-                                            },
-                                            {
-                                                "type": "field",
-                                                "value": "date_of_birth",
-                                                "width": "50%"
-                                            },
-                                            {
-                                                "type": "field",
-                                                "value": "bank_account_iban",
-                                                "width": "100%"
-                                            },
-                                            {
-                                                "type": "field",
-                                                "value": "bank_account_bic",
-                                                "width": "50%"
-                                            }
-                                        ]
-                                    },
-                                    {
-                                        "width": "33%",
-                                        "align": "left",
-                                        "items": [
-                                            {
-                                                "type": "field",
-                                                "value": "email",
-                                                "width": "100%"
-                                            },
-                                            {
-                                                "type": "field",
-                                                "value": "email_secondary",
-                                                "width": "100%"
-                                            },
-                                            {
-                                                "type": "field",
-                                                "value": "phone",
-                                                "width": "100%"
-                                            },
-                                            {
-                                                "type": "field",
-                                                "value": "mobile",
-                                                "width": "100%"
-                                            },
-                                            {
-                                                "type": "field",
-                                                "value": "website",
+                                                "id": "details.address",
+                                                "type": "label",
+                                                "value": "Address",
                                                 "width": "100%"
                                             }
                                         ]
                                     },
                                     {
                                         "width": "33%",
-                                        "align": "left",
                                         "items": [
                                             {
-                                                "type": "field",
-                                                "value": "reference_partner_id",
-                                                "label": "Person of reference",
-                                                "width": "100%",
-                                                "domain": ["owner_identity_id", "=", "object.id"]
-                                            },
-                                            {
-                                                "type": "field",
-                                                "value": "user_id",
+                                                "id": "details.identification",
+                                                "type": "label",
+                                                "value": "Identification",
                                                 "width": "100%"
-                                            },
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "width": "33%",
+                                        "items": [
                                             {
-                                                "type": "field",
-                                                "value": "has_parent",
-                                                "width": "100%"
-                                            },
-                                            {
-                                                "type": "field",
-                                                "value": "parent_id",
+                                                "id": "details.contact",
+                                                "type": "label",
+                                                "value": "Contact",
                                                 "width": "100%"
                                             }
                                         ]
                                     }
                                 ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "section.settings",
-                        "label": "Settings",
-                        "rows": [
+                            },
                             {
                                 "columns": [
                                     {
-                                        "width": "100%",
-                                        "align": "left",
-                                        "items": [
-                                            {
-                                                "type": "field",
-                                                "value": "signature",
-                                                "width": "50%"
-                                            },
-                                            {
-                                                "type": "field",
-                                                "value": "description",
-                                                "width": "50%"
-                                            }
-                                        ]
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "section.identity_main_address",
-                        "label": "Main address",
-                        "rows": [
-                            {
-                                "columns": [
-                                    {
-                                        "width": "50%",
-                                        "align": "left",
+                                        "width": "33%",
                                         "items": [
                                             {
                                                 "type": "field",
@@ -260,24 +142,98 @@
                                                 "width": "50%"
                                             }
                                         ]
+                                    },
+                                    {
+                                        "width": "33%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "use_office_details",
+                                                "width": "100%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "registration_number",
+                                                "width": "100%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "manager_id",
+                                                "width": "100%"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "width": "33%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "email",
+                                                "width": "100%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "phone",
+                                                "width": "50%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "fax",
+                                                "width": "50%"
+                                            }
+                                        ]
                                     }
                                 ]
                             }
                         ]
                     },
                     {
-                        "id": "section.identity_addresses",
-                        "label": "Other addresses",
+                        "label": "Settings",
+                        "id": "section.settings",
                         "rows": [
                             {
                                 "columns": [
                                     {
-                                        "width": "100%",
-                                        "align": "left",
+                                        "width": "50%",
                                         "items": [
                                             {
                                                 "type": "field",
-                                                "value": "addresses_ids",
+                                                "value": "price_list_category_id",
+                                                "width": "100%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "discount_list_category_id",
+                                                "width": "100%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "autosale_list_category_id",
+                                                "width": "100%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "season_category_id",
+                                                "width": "100%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "template_category_id",
+                                                "width": "100%"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "width": "50%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "pos_default_customer_id",
+                                                "width": "100%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "has_citytax_school",
                                                 "width": "100%"
                                             }
                                         ]
@@ -287,8 +243,8 @@
                         ]
                     },
                     {
-                        "id": "section.identity_contacts",
-                        "label": "Contacts",
+                        "label": "Categories",
+                        "id": "section.categories",
                         "rows": [
                             {
                                 "columns": [
@@ -297,7 +253,7 @@
                                         "items": [
                                             {
                                                 "type": "field",
-                                                "value": "contacts_ids",
+                                                "value": "categories_ids",
                                                 "width": "100%"
                                             }
                                         ]
@@ -307,8 +263,8 @@
                         ]
                     },
                     {
-                        "id": "section.identity_relations",
-                        "label": "Relations",
+                        "label": "Rental units",
+                        "id": "section.rental_units",
                         "rows": [
                             {
                                 "columns": [
@@ -317,7 +273,30 @@
                                         "items": [
                                             {
                                                 "type": "field",
-                                                "value": "partners_ids",
+                                                "value": "rental_units_ids",
+                                                "width": "100%",
+                                                "widget": {
+                                                    "limit": 100
+                                                }
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "label": "Users",
+                        "id": "section.users",
+                        "rows": [
+                            {
+                                "columns": [
+                                    {
+                                        "width": "100%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "users_ids",
                                                 "width": "100%"
                                             }
                                         ]
@@ -327,8 +306,8 @@
                         ]
                     },
                     {
-                        "id": "section.identity_booking_bookings",
-                        "label": "Bookings",
+                        "label": "Product families",
+                        "id": "section.product_families",
                         "rows": [
                             {
                                 "columns": [
@@ -337,7 +316,7 @@
                                         "items": [
                                             {
                                                 "type": "field",
-                                                "value": "bookings_ids",
+                                                "value": "product_families_ids",
                                                 "width": "100%"
                                             }
                                         ]
@@ -347,8 +326,8 @@
                         ]
                     },
                     {
-                        "id": "section.identity_booking_invoices",
-                        "label": "Invoices",
+                        "label": "Product groups",
+                        "id": "section.product_groups",
                         "rows": [
                             {
                                 "columns": [
@@ -357,7 +336,47 @@
                                         "items": [
                                             {
                                                 "type": "field",
-                                                "value": "invoices_ids",
+                                                "value": "product_groups_ids",
+                                                "width": "100%"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "label": "Meters",
+                        "id": "section.consumptions.meters",
+                        "rows": [
+                            {
+                                "columns": [
+                                    {
+                                        "width": "100%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "consumptions_meters_ids",
+                                                "width": "100%"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "label": "Repairs & Maintenance",
+                        "id": "section.repairings_ids",
+                        "rows": [
+                            {
+                                "columns": [
+                                    {
+                                        "width": "100%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "repairings_ids",
                                                 "width": "100%"
                                             }
                                         ]

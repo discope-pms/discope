@@ -112,7 +112,7 @@ class RentalUnit extends Model {
 
             'center_id' => [
                 'type'              => 'many2one',
-                'foreign_object'    => 'lodging\identity\Center',
+                'foreign_object'    => 'identity\Center',
                 'description'       => 'The center to which belongs the rental unit.'
             ],
 

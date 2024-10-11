@@ -232,6 +232,12 @@
                 },
                 "section.identity_description": {
                     "label": "Description"
+                },
+                "section.identity_booking_bookings": {
+                    "label": "Réservations"
+                },
+                "section.identity_booking_invoices": {
+                    "label": "Factures"
                 }
             }
         },

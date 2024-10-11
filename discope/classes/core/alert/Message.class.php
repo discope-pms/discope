@@ -14,7 +14,7 @@ class Message extends \core\alert\Message {
             'center_office_id' => [
                 'type'              => 'computed',
                 'result_type'       => 'many2one',
-                'foreign_object'    => 'lodging\identity\CenterOffice',
+                'foreign_object'    => 'identity\CenterOffice',
                 'description'       => "Office the message relates to (for targeting the users).",
                 'store'             => true,
                 'function'          => 'calcCenterOfficeId'

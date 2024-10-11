@@ -4,6 +4,7 @@
     Author: Yesbabylon SRL, 2020-2024
     License: GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
+
 use equal\orm\Domain;
 
 [$params, $providers] = eQual::announce([
@@ -31,7 +32,7 @@ use equal\orm\Domain;
         ],
         'center_office_id' => [
             'type'              => 'many2one',
-            'foreign_object'    => 'lodging\identity\CenterOffice',
+            'foreign_object'    => 'identity\CenterOffice',
             'description'       => "Office the invoice relates to (for center management)."
         ]
     ],
