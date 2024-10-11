@@ -1,7 +1,7 @@
 <?php
 /*
     This file is part of Symbiose Community Edition <https://github.com/yesbabylon/symbiose>
-    Some Rights Reserved, Yesbabylon SRL, 2020-2021
+    Some Rights Reserved, Yesbabylon SRL, 2020-2024
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 namespace identity;
@@ -44,8 +44,28 @@ class User extends \core\User {
                 'foreign_object'    => 'identity\Identity',
                 'description'       => "The organisation the user relates to.",
                 'default'           => 1
-            ]
+            ],
 
+            'centers_ids' => [
+                'type'              => 'many2many',
+                'foreign_object'    => 'lodging\identity\Center',
+                'foreign_field'     => 'users_ids',
+                'rel_table'         => 'lodging_identity_rel_center_user',
+                'rel_foreign_key'   => 'center_id',
+                'rel_local_key'     => 'user_id',
+                'description'       => "The centers the user belongs to."
+            ],
+
+            'center_offices_ids' => [
+                'type'              => 'many2many',
+                'foreign_object'    => 'lodging\identity\CenterOffice',
+                'foreign_field'     => 'users_ids',
+                'rel_table'         => 'lodging_identity_rel_center_office_user',
+                'rel_foreign_key'   => 'center_office_id',
+                'rel_local_key'     => 'user_id',
+                'onupdate'          => 'onupdateCenterOfficesIds',
+                'description'       => "The center offices the user belongs to."
+            ]
 
         ];
     }
@@ -64,4 +84,23 @@ class User extends \core\User {
         return $result;
     }
 
+    public static function onupdateCenterOfficesIds($self) {
+        $self->read(['centers_ids', 'center_offices_ids' => ['centers_ids']]);
+
+        foreach($self as $id => $user) {
+            // pass-1 remove previous centers_ids
+            User::id($id)->update([
+                'centers_ids' => array_map(function($id) { return "-$id";}, $user['centers_ids'])
+            ]);
+
+            // pass-2 add new centers_ids
+            $centers_ids = [];
+            foreach($user['center_offices_ids'] as $office) {
+                $centers_ids = array_merge($centers_ids, $office['centers_ids']);
+            }
+            User::id($id)->update([
+                'centers_ids' => $centers_ids
+            ]);
+        }
+    }
 }
