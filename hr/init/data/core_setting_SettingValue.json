@@ -1,0 +1,14 @@
+[
+    {
+        "name": "core\\setting\\SettingValue",
+        "lang": "en",
+        "data": [
+            {
+                "id": 20001,
+                "setting_id": 20001,
+                "name": "hr.locale.daily_work_hours",
+                "value": 7.6
+            }
+        ]
+    }
+]

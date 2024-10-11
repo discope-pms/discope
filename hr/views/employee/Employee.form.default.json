@@ -10,68 +10,117 @@
                             {
                                 "columns": [
                                     {
-                                        "width": "50%",
+                                        "width": "100%",
                                         "items": [
                                             {
                                                 "type": "field",
                                                 "label": "Name",
                                                 "value": "name",
                                                 "width": "33%",
+                                                "visible": ["state", "<>", "draft"],
                                                 "widget": {
                                                     "heading": true,
                                                     "readonly": true
                                                 }
-                                            },
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "sections": [
+                    {
+                        "label": "General info",
+                        "id": "section.info",
+                        "rows": [
+                            {
+                                "columns": [
+                                    {
+                                        "width": "33%",
+                                        "items": [
                                             {
                                                 "type": "field",
                                                 "label": "Identity",
                                                 "value": "partner_identity_id",
-                                                "width": "66%"
+                                                "width": "100%"
                                             },
                                             {
                                                 "type": "field",
-                                                "value": "code",
-                                                "width": "33%"
-                                            },
-                                            {
-                                                "type": "field",
+                                                "label": "Role",
                                                 "value": "role_id",
-                                                "width": "33%"
+                                                "width": "50%"
                                             },
                                             {
                                                 "type": "field",
                                                 "value": "is_active",
-                                                "width": "33%"
+                                                "width": "50%"
                                             }
                                         ]
                                     },
                                     {
-                                        "width": "50%",
+                                        "width": "33%",
+                                        "items": []
+                                    },
+                                    {
+                                        "width": "33%",
                                         "items": [
                                             {
-                                                "type": "label",
-                                                "value": "",
+                                                "type": "field",
+                                                "value": "date_start",
+                                                "width": "50%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "date_end",
+                                                "visible": ["state", "<>", "draft"],
                                                 "width": "50%"
                                             },
                                             {
                                                 "type": "field",
                                                 "value": "email",
                                                 "width": "50%",
-                                                "widget": {
-                                                    "heading": true
-                                                }
-                                            },
-                                            {
-                                                "type": "label",
-                                                "value": "",
-                                                "width": "50%"
+                                                "visible": ["state", "<>", "draft"]
                                             },
                                             {
                                                 "type": "field",
                                                 "value": "mobile",
                                                 "width": "50%",
+                                                "visible": ["state", "<>", "draft"]
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "label": "Absences",
+                        "id": "section.absences",
+                        "visible": ["state", "<>", ["draft"]],
+                        "rows": [
+                            {
+                                "columns": [
+                                    {
+                                        "width": "100%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "absences_ids",
+                                                "width": "100%",
                                                 "widget": {
-                                                    "heading": true
+                                                    "view": "list.default",
+                                                    "header": {
+                                                        "selection": {
+                                                            "default" : false
+                                                        },
+                                                        "actions": {
+                                                            "ACTION.CREATE": false
+                                                        }
+                                                    }
                                                 }
                                             }
                                         ]

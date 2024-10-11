@@ -1,10 +1,12 @@
 <?php
 /*
-    This file is part of Symbiose Community Edition <https://github.com/yesbabylon/symbiose>
-    Some Rights Reserved, Yesbabylon SRL, 2020-2021
-    Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
+    This file is part of the Discope property management software.
+    Author: Yesbabylon SRL, 2020-2024
+    License: GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 namespace hr\absence;
+
+use core\setting\Setting;
 
 class Absence extends \equal\orm\Model {
 
@@ -74,35 +76,38 @@ class Absence extends \equal\orm\Model {
                     'hours'
                 ],
                 'description'       => 'The units in which the quantity is expressed.',
-                'default'           => 'hours'
+                'default'           => 'hours',
+                'dependents'        => ['duration']
             ],
 
             'qty' => [
                 'type'              => 'float',
-                'usage'             => 'numeric/real:5.2',
-                'description'       => 'Amount of units expressed in `measure_unit`.',
-                'required'          => true
+                'usage'             => 'number/real:2',
+                'description'       => 'Amount of units expressed in measure_unit.',
+                'required'          => true,
+                'dependents'        => ['duration']
             ],
 
             'duration' => [
                 'type'              => 'computed',
                 'result_type'       => 'float',
                 'function'          => 'calcDuration',
-                'usage'             => 'numeric/real:5.2',
-                'description'       => 'Duration in hours (computed).'
+                'usage'             => 'number/real:3',
+                'description'       => 'Duration in hours (computed).',
+                'store'             => true,
+                'instant'           => true,
             ]
 
         ];
     }
 
 
-    public static function calcDuration($orm, $oids, $lang) {
+    public static function calcDuration($self) {
         $result = [];
-        $res = $orm->read(self::getType(), $oids, ['measure_unit', 'qty'], $lang);
-        foreach($res as $oid => $odata) {
-            // #todo - settings / HR : number of working hours within a day
-            $hours_per_day = 7.6;
-            $result[$oid] =  ($odata['measure_unit'] == 'fullday')?$odata['qty']*$hours_per_day:$odata['qty'];
+        $self ->read(['measure_unit', 'qty']);
+        foreach($self as $id => $absence) {
+            $hours_per_day = Setting::get_value('hr', 'locale', 'daily_work_hours');
+            $result[$id] =  ($absence['measure_unit'] == 'fullday') ? $absence['qty'] * $hours_per_day : $absence['qty'];
         }
         return $result;
     }

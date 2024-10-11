@@ -13,6 +13,13 @@
             },
             {
                 "type": "field",
+                "label": "employee",
+                "value": "employee_id",
+                "width": "25%",
+                "sortable": true
+            },
+            {
+                "type": "field",
                 "value": "day_part",
                 "width": "15%"
             },
@@ -21,13 +28,6 @@
                 "label": "code",
                 "value": "code_id",
                 "width": "25%"
-            },
-            {
-                "type": "field",
-                "label": "employee",
-                "value": "employee_id",
-                "width": "25%",
-                "sortable": true
             },
             {
                 "type": "field",

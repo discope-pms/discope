@@ -6,19 +6,14 @@
             {
                 "type": "field",
                 "value": "code",
-                "width": "15%",
+                "width": "50%",
                 "sortable": true
             },
             {
                 "type": "field",
                 "value": "name",
-                "width": "25%",
+                "width": "50%",
                 "sortable": true
-            },
-            {
-                "type": "field",
-                "value": "description",
-                "width": "85%"
             }
         ]
     }
