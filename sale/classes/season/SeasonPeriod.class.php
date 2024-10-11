@@ -1,10 +1,11 @@
 <?php
 /*
     This file is part of Symbiose Community Edition <https://github.com/yesbabylon/symbiose>
-    Some Rights Reserved, Yesbabylon SRL, 2020-2021
+    Some Rights Reserved, Yesbabylon SRL, 2020-2024
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 namespace sale\season;
+
 use equal\orm\Model;
 
 class SeasonPeriod extends Model {
@@ -18,7 +19,6 @@ class SeasonPeriod extends Model {
     }
 
     public static function getColumns() {
-
         return [
 
             'date_from' => [
@@ -26,7 +26,7 @@ class SeasonPeriod extends Model {
                 'description'       => "Date (included) at which the season starts.",
                 'required'          => true,
                 'default'           => time(),
-                'onupdate'          => 'onupdateDateFrom'
+                'dependent'         => ['month', 'year']
             ],
 
             'date_to' => [
@@ -41,7 +41,8 @@ class SeasonPeriod extends Model {
                 'foreign_object'    => 'sale\season\Season',
                 'description'       => "The season the period belongs to.",
                 'required'          => true,
-                'onupdate'          => 'onupdateSeasonId'
+                'onupdate'          => 'onupdateSeasonId',
+                'dependent'         => ['season_category_id']
             ],
 
             'season_type_id' => [
@@ -57,7 +58,8 @@ class SeasonPeriod extends Model {
                 'usage'             => 'date/month',
                 'description'       => "The month during which the season starts.",
                 'function'          => 'calcMonth',
-                'store'             => true
+                'store'             => true,
+                'instant'           => true
             ],
 
             'year' => [
@@ -66,7 +68,8 @@ class SeasonPeriod extends Model {
                 'usage'             => 'date/year',
                 'description'       => "The Year the season is part of.",
                 'function'          => 'calcYear',
-                'store'             => true
+                'store'             => true,
+                'instant'           => true
             ],
 
             'season_category_id' => [
@@ -74,48 +77,43 @@ class SeasonPeriod extends Model {
                 'result_type'       => 'integer',
                 'description'       => "The category the season relates to.",
                 'function'          => 'calcSeasonCategoryId',
-                'store'             => true
+                'store'             => true,
+                'instant'           => true
             ]
 
         ];
     }
 
-    public static function onupdateDateFrom($om, $oids, $values, $lang) {
-        $om->write(__CLASS__, $oids, ['month' => null, 'year' => null]);
-        // force immediate re-computing
-        $om->read(__CLASS__, $oids, ['month', 'year']);
-    }
-
-    public static function onupdateSeasonId($om, $oids, $values, $lang) {
-        $om->write(__CLASS__, $oids, ['season_category_id' => null]);
-        // force immediate re-computing
-        $om->read(__CLASS__, $oids, ['season_category_id']);
-    }
-
-    public static function calcMonth($om, $oids, $lang) {
+    public static function calcMonth($self) {
         $result = [];
-        $periods = $om->read(__CLASS__, $oids, ['date_from']);
-        foreach($periods as $oid => $odata) {
-            $result[$oid] = date('n', $odata['date_from']);
+        $self->read(['date_from']);
+
+        foreach($self as $id => $period) {
+            $result[$id] = date('n', $period['date_from']);
         }
+
         return $result;
     }
 
-    public static function calcYear($om, $oids, $lang) {
+    public static function calcYear($self) {
         $result = [];
-        $periods = $om->read(__CLASS__, $oids, ['date_from']);
-        foreach($periods as $oid => $odata) {
-            $result[$oid] = date('Y', $odata['date_from']);
+        $self->read(['date_from']);
+
+        foreach($self as $id => $period) {
+            $result[$id] = date('Y', $period['date_from']);
         }
+
         return $result;
     }
 
-    public static function calcSeasonCategoryId($om, $oids, $lang) {
+    public static function calcSeasonCategoryId($self) {
         $result = [];
-        $periods = $om->read(__CLASS__, $oids, ['season_id.season_category_id']);
-        foreach($periods as $oid => $odata) {
-            $result[$oid] = $odata['season_id.season_category_id'];
+        $self->read(['season_id' => ['season_category_id']]);
+
+        foreach($self as $id => $odata) {
+            $result[$id] = $odata['season_id']['season_category_id'];
         }
+
         return $result;
     }
 

@@ -1,18 +1,18 @@
 <?php
 /*
     This file is part of Symbiose Community Edition <https://github.com/yesbabylon/symbiose>
-    Some Rights Reserved, Yesbabylon SRL, 2020-2021
+    Some Rights Reserved, Yesbabylon SRL, 2020-2024
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 namespace sale\season;
+
 use equal\orm\Model;
 
 class Season extends Model {
-    public static function getColumns() {
-        /**
-         */
 
+    public static function getColumns() {
         return [
+
             'name' => [
                 'type'              => 'string',
                 'description'       => "Short mnemo of the season.",
@@ -31,7 +31,7 @@ class Season extends Model {
                 'foreign_object'    => 'sale\season\SeasonCategory',
                 'description'       => "The category the season relates to.",
                 'required'          => true,
-                'onupdate'          => 'onupdateSeasonCategoryId'
+                'dependent'         => ['season_periods_ids' => ['season_category_id']]
             ],
 
             'has_rate_class' => [
@@ -43,25 +43,25 @@ class Season extends Model {
             'rate_class_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\customer\RateClass',
-                'description'       => "The rate class that applies to this Season defintion.",
+                'description'       => "The rate class that applies to this Season definition.",
                 'visible'           => ['has_rate_class', '=', true]
+            ],
+
+            'center_category_id' => [
+                'type'              => 'many2one',
+                'foreign_object'    => 'lodging\identity\CenterCategory',
+                'description'       => "Center category targeted by season.",
+                'required'          => true
             ],
 
             'season_periods_ids' => [
                 'type'              => 'one2many',
                 'foreign_object'    => 'sale\season\SeasonPeriod',
                 'foreign_field'     => 'season_id',
-                'description'       => 'Periods that are part of the season (on a yearly basis).',
+                'description'       => "Periods that are part of the season (on a yearly basis).",
                 'ondetach'          => 'delete'
             ]
 
         ];
-    }
-
-    public static function onupdateSeasonCategoryId($om, $oids, $values, $lang) {
-        $seasons = $om->read(self::getType(), $oids, ['season_periods_ids']);
-        foreach($seasons as $season) {
-            $om->update(SeasonPeriod::getType(), $season['season_periods_ids'], ['season_category_id' => null]);
-        }
     }
 }
