@@ -30,7 +30,7 @@ list($params, $providers) = announce([
 ]);
 
 
-$context = [$providers['context']];
+$context = $providers['context'];
 
 Invoice::id($params['id'])->update(['status' => 'invoice']);
 

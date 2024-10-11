@@ -209,7 +209,7 @@ class Invoice extends Model {
                 $result[$id] = true;
                 continue;
             }
-            if($invoice['funding_id'].['paid_amount'] && $invoice['funding_id'].['paid_amount'] == $invoice['price']) {
+            if($invoice['funding_id']['paid_amount'] && $invoice['funding_id']['paid_amount'] == $invoice['price']) {
                 $result[$id] = true;
             }
         }
@@ -218,9 +218,9 @@ class Invoice extends Model {
 
     public static function calcPaymentReference($self): array {
         $result = [];
-        $self->read(['invoice_number']);
+        $self->read(['number']);
         foreach($self as $id => $invoice) {
-            $invoice_number = intval($invoice['invoice_number']);
+            $invoice_number = intval($invoice['number']);
             $code_ref = 200;
             $result[$id] = self::_get_payment_reference($code_ref, $invoice_number);
         }

@@ -61,7 +61,7 @@ class AccountingRuleLine extends Model {
         $result = [];
         $self->read(['account_id' => ['code']]);
         foreach($self as $id => $line) {
-            $result[$id] = $line['code'];
+            $result[$id] = $line['account_id']['code'];
         }
         return $result;
     }
