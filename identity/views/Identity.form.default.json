@@ -66,8 +66,8 @@
             {
                 "sections": [
                     {
-                        "label": "General info",
                         "id": "section.identity_info",
+                        "label": "General info",
                         "rows": [
                             {
                                 "columns": [
@@ -141,6 +141,11 @@
                                             },
                                             {
                                                 "type": "field",
+                                                "value": "email_secondary",
+                                                "width": "100%"
+                                            },
+                                            {
+                                                "type": "field",
                                                 "value": "phone",
                                                 "width": "100%"
                                             },
@@ -189,8 +194,8 @@
                         ]
                     },
                     {
-                        "label": "Settings",
                         "id": "section.settings",
+                        "label": "Settings",
                         "rows": [
                             {
                                 "columns": [
@@ -215,8 +220,8 @@
                         ]
                     },
                     {
-                        "label": "Main address",
                         "id": "section.identity_main_address",
+                        "label": "Main address",
                         "rows": [
                             {
                                 "columns": [
@@ -261,8 +266,8 @@
                         ]
                     },
                     {
-                        "label": "Other addresses",
                         "id": "section.identity_addresses",
+                        "label": "Other addresses",
                         "rows": [
                             {
                                 "columns": [
@@ -282,8 +287,8 @@
                         ]
                     },
                     {
-                        "label": "Contacts",
                         "id": "section.identity_contacts",
+                        "label": "Contacts",
                         "rows": [
                             {
                                 "columns": [
@@ -302,8 +307,8 @@
                         ]
                     },
                     {
-                        "label": "Relations",
                         "id": "section.identity_relations",
+                        "label": "Relations",
                         "rows": [
                             {
                                 "columns": [
@@ -313,6 +318,46 @@
                                             {
                                                 "type": "field",
                                                 "value": "partners_ids",
+                                                "width": "100%"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "section.identity_booking_bookings",
+                        "label": "Bookings",
+                        "rows": [
+                            {
+                                "columns": [
+                                    {
+                                        "width": "100%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "bookings_ids",
+                                                "width": "100%"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "section.identity_booking_invoices",
+                        "label": "Invoices",
+                        "rows": [
+                            {
+                                "columns": [
+                                    {
+                                        "width": "100%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "invoices_ids",
                                                 "width": "100%"
                                             }
                                         ]
