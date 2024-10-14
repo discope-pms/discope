@@ -1,18 +1,18 @@
 <?php
 /*
     This file is part of Symbiose Community Edition <https://github.com/yesbabylon/symbiose>
-    Some Rights Reserved, Yesbabylon SRL, 2020-2021
+    Some Rights Reserved, Yesbabylon SRL, 2020-2024
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 namespace sale\price;
+
 use equal\orm\Model;
 
 class PriceList extends Model {
-    public static function getColumns() {
-        /**
-         */
 
+    public static function getColumns() {
         return [
+
             'name' => [
                 'type'              => 'string',
                 'description'       => "Short label to ease identification of the list.",
@@ -50,7 +50,8 @@ class PriceList extends Model {
                 ],
                 'description'       => 'Status of the list.',
                 'onupdate'          => 'onupdateStatus',
-                'default'           => 'pending'
+                'default'           => 'pending',
+                'dependents'        => ['is_active', 'prices_ids' => ['is_active']]
             ],
 
             // needed for retrieving prices without checking the dates
@@ -61,6 +62,7 @@ class PriceList extends Model {
                 'description'       => "Is the pricelist currently applicable? ",
                 'help'              => "When this flag is set to true, it means the list is eligible for future bookings. i.e. with a 'date_to' in the future and 'published'.",
                 'store'             => true,
+                'instant'           => true,
                 'readonly'          => true
             ],
 
@@ -113,7 +115,6 @@ class PriceList extends Model {
         return $result;
     }
 
-
     public static function calcPricesCount($om, $oids, $lang) {
         $result = [];
         $lists = $om->read(self::getType(), $oids, ['prices_ids']);
@@ -139,22 +140,24 @@ class PriceList extends Model {
         }
     }
 
-    public static function onupdateStatus($om, $oids, $values, $lang) {
-        $pricelists = $om->read(self::getType(), $oids, ['status', 'prices_ids']);
-        $om->update(self::getType(), $oids, ['is_active' => null]);
-        // immediate re-compute (required by subsequent re-computations of prices is_active flag)
-        $om->read(self::getType(), $oids, ['is_active']);
+    public static function onupdateStatus($self) {
+        /**
+         * @var \equal\cron\Scheduler $cron
+         */
+        ['cron' => $cron] = \eQual::inject(['cron']);
 
-        if($pricelists > 0) {
-            $providers = \eQual::inject(['cron']);
-            $cron = $providers['cron'];
+        $self->read(['status', 'prices_ids']);
 
-            foreach($pricelists as $pid => $pricelist) {
-                // immediate re-compute prices is_active flag
-                $om->update('sale\price\Price', $pricelist['prices_ids'], ['is_active' => null]);
-                $om->read('sale\price\Price', $pricelist['prices_ids'], ['is_active']);
+        foreach($self as $id => $pricelist) {
+            if($pricelist['status'] === 'published') {
+                // add a task to the CRON for updating status of bookings waiting for the pricelist
+                $cron->schedule(
+                    "booking.is_tbc.confirm",
+                    time() + 60,
+                    'sale_pricelist_check-bookings',
+                    ['id' => $id]
+                );
             }
         }
     }
-
 }

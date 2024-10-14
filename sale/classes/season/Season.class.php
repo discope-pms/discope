@@ -31,7 +31,7 @@ class Season extends Model {
                 'foreign_object'    => 'sale\season\SeasonCategory',
                 'description'       => "The category the season relates to.",
                 'required'          => true,
-                'dependent'         => ['season_periods_ids' => ['season_category_id']]
+                'dependents'        => ['season_periods_ids' => ['season_category_id']]
             ],
 
             'has_rate_class' => [
