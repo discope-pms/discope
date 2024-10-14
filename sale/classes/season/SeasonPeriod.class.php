@@ -26,7 +26,7 @@ class SeasonPeriod extends Model {
                 'description'       => "Date (included) at which the season starts.",
                 'required'          => true,
                 'default'           => time(),
-                'dependent'         => ['month', 'year']
+                'dependents'        => ['month', 'year']
             ],
 
             'date_to' => [
@@ -42,7 +42,7 @@ class SeasonPeriod extends Model {
                 'description'       => "The season the period belongs to.",
                 'required'          => true,
                 'onupdate'          => 'onupdateSeasonId',
-                'dependent'         => ['season_category_id']
+                'dependents'        => ['season_category_id']
             ],
 
             'season_type_id' => [
