@@ -7,6 +7,7 @@
 namespace finance\accounting;
 use equal\orm\Model;
 use core\setting\Setting;
+use lodging\sale\catalog\Product;
 
 class Invoice extends Model {
 
@@ -85,7 +86,7 @@ class Invoice extends Model {
                 'type'              => 'many2one',
                 'foreign_object'    => self::getType(),
                 'description'       => "Credit note that was created for cancelling the invoice, if any.",
-                'visible'           => ['status', '=', 'cancelled']
+                'visible'           => [[['status', '=', 'cancelled']], [['type', '=', 'credit_note']]]
             ],
 
             'payment_status' => [
@@ -113,6 +114,11 @@ class Invoice extends Model {
                 'type'              => 'datetime',
                 'description'       => 'Emission date of the invoice.',
                 'default'           => time()
+            ],
+
+            'customer_id' => [
+                'type'              => 'alias',
+                'alias'             => 'partner_id'
             ],
 
             'partner_id' => [
@@ -146,7 +152,7 @@ class Invoice extends Model {
                 'foreign_field'     => 'invoice_id',
                 'description'       => 'Detailed lines of the invoice.',
                 'ondetach'          => 'delete',
-                'dependencies'      => ['total', 'price']
+                'dependent'         => ['total', 'price']
             ],
 
             'invoice_line_groups_ids' => [
@@ -155,7 +161,7 @@ class Invoice extends Model {
                 'foreign_field'     => 'invoice_id',
                 'description'       => 'Groups of lines of the invoice.',
                 'ondetach'          => 'delete',
-                'dependencies'      => ['total', 'price']
+                'dependent'         => ['total', 'price']
             ],
 
             'accounting_entries_ids' => [
@@ -192,10 +198,112 @@ class Invoice extends Model {
                 'type'              => 'boolean',
                 'description'       => 'Mark the invoice as exported (part of an export to elsewhere).',
                 'default'           => false
-            ]
+            ],
+
+            'display_price' => [
+                'type'              => 'computed',
+                'result_type'       => 'float',
+                'function'          => 'calcDisplayPrice',
+                'usage'             => 'amount/money:2',
+                'store'             => true,
+                'description'       => "Final tax-included amount used for display (inverted for credit notes)."
+            ],
+
+            'accounting_price' => [
+                'type'              => 'computed',
+                'result_type'       => 'float',
+                'function'          => 'calcAccountingPrice',
+                'usage'             => 'amount/money:4',
+                'description'       => "Total tax-included price to record for accounting.",
+                'store'             => true
+            ],
+
+            'accounting_total' => [
+                'type'              => 'computed',
+                'result_type'       => 'float',
+                'function'          => 'calcAccountingTotal',
+                'usage'             => 'amount/money:4',
+                'description'       => "Total tax-excluded price to record for accounting related outputs.",
+                'store'             => true
+            ],
 
         ];
     }
+
+
+    public static function calcAccountingPrice($self) {
+        $result = [];
+
+        $self->read(['organisation_id', 'is_deposit', 'invoice_lines_ids' => ['id','price', 'product_id', 'downpayment_invoice_id'=>['id','status']]]);
+        foreach($self as $id => $invoice) {
+            $downpayment_product_id = 0;
+            $downpayment_sku = Setting::get_value('sale', 'invoice', 'downpayment.sku.'.$invoice['organisation_id']);
+            if($downpayment_sku) {
+                $products_ids = Product::search(['sku', '=', $downpayment_sku])->ids();
+                if($products_ids) {
+                    $downpayment_product_id = reset($products_ids);
+                }
+            }
+
+            $price = 0;
+            foreach($invoice['invoice_lines_ids'] as $lid => $line) {
+                if($line['product_id'] == $downpayment_product_id) {
+                    if($invoice['is_deposit']) {
+                        $price += $line['price'];
+                    }
+                    else {
+                        if(isset($line['downpayment_invoice_id']['id']) &&
+                            $line['downpayment_invoice_id']['status'] == 'invoice')
+                        {
+                            $price += $line['price'];
+                        }
+                    }
+                }
+                else {
+                    $price += $line['price'];
+                }
+            }
+            $result[$id] = round($price, 2);
+        }
+        return $result;
+    }
+
+
+    public static function calcAccountingTotal($self) {
+        $result = [];
+
+        $self->read(['organisation_id', 'is_deposit', 'invoice_lines_ids' => ['id','total', 'product_id', 'downpayment_invoice_id'=>['id','status']]]);
+        foreach($self as $oid => $invoice) {
+            $downpayment_product_id = 0;
+            $downpayment_sku = Setting::get_value('sale', 'invoice', 'downpayment.sku.'.$invoice['organisation_id']);
+            if($downpayment_sku) {
+                $products_ids = Product::search(['sku', '=', $downpayment_sku])->ids();
+                if($products_ids) {
+                    $downpayment_product_id = reset($products_ids);
+                }
+            }
+
+            $total = 0;
+            foreach($invoice['invoice_lines_ids'] as $lid => $line) {
+                if($line['product_id'] == $downpayment_product_id) {
+                    if($invoice['is_deposit']) {
+                        $total += round($line['total'], 2);
+                    }
+                    else {
+                        if(isset($line['downpayment_invoice_id']['id']) &&  $line['downpayment_invoice_id']['status'] == 'invoice') {
+                            $total += round($line['total'], 2);
+                        }
+                    }
+                }
+                else {
+                    $total += round($line['total'], 2);
+                }
+            }
+            $result[$oid] = round($total, 2);
+        }
+        return $result;
+    }
+
 
     public static function calcIsPaid($self) {
         $result = [];
@@ -228,32 +336,29 @@ class Invoice extends Model {
         return $result;
     }
 
-    public static function calcNumber($om, $oids, $lang) {
+    public static function calcNumber($self) {
         $result = [];
 
-        $invoices = $om->read(get_called_class(), $oids, ['status', 'organisation_id'], $lang);
-
-        foreach($invoices as $oid => $invoice) {
+        $self->read(['status', 'date', 'organisation_id', 'center_office_id' => 'code']);
+        foreach($self as $id => $invoice) {
 
             if($invoice['status'] == 'proforma') {
-                $result[$oid] = '[proforma]';
+                $result[$id] = '[proforma]';
                 continue;
             }
 
-            $result[$oid] = '';
-
-            $organisation_id = $invoice['organisation_id'];
-
             $format = Setting::get_value('finance', 'invoice', 'invoice.sequence_format', '%05d{sequence}');
-            $year = Setting::get_value('finance', 'invoice', 'invoice.fiscal_year');
-            $sequence = Setting::get_value('sale', 'invoice', 'invoice.sequence.'.$organisation_id);
+            $fiscal_year = Setting::get_value('finance', 'invoice', 'fiscal_year');
+            $year = date('Y', $invoice['date']);
+            $sequence = Setting::get_value('lodging', 'invoice', 'sequence.'.$invoice['center_office_id.code']);
 
-            if($sequence) {
-                Setting::set_value('sale', 'invoice', 'invoice.sequence.'.$organisation_id, $sequence + 1);
+            if(intval($year) == intval($fiscal_year) && $sequence) {
+                Setting::set_value('lodging', 'invoice', 'sequence.'.$invoice['center_office_id.code'], $sequence + 1);
 
-                $result[$oid] = Setting::parse_format($format, [
+                $result[$id] = Setting::parse_format($format, [
                     'year'      => $year,
-                    'org'       => $organisation_id,
+                    'office'    => $invoice['center_office_id']['code'],
+                    'org'       => $invoice['organisation_id'],
                     'sequence'  => $sequence
                 ]);
             }
@@ -315,20 +420,80 @@ class Invoice extends Model {
         return $result;
     }
 
+    public static function calcDisplayPrice($self) {
+        $result = [];
+        $self->read(['type', 'price']);
+
+        foreach($self as $id => $invoice) {
+            if($invoice['type'] == 'invoice') {
+                $result[$id] = $invoice['price'];
+            }
+            else {
+                $result[$id] = -$invoice['price'];
+            }
+        }
+
+        return $result;
+    }
+
+
+    /**
+     * Handler triggered after a status change occurred.
+     */
     public static function onupdateStatus($om, $oids, $values, $lang) {
+        // a number must be assigned to the invoice (if not already set)
         if(isset($values['status']) && $values['status'] == 'invoice') {
-            // reset invoice number and set emission date
-            $om->update(__CLASS__, $oids, ['number' => null, 'date' => time()], $lang);
-            // generate an invoice number (force immediate re-computing)
-            $om->read(__CLASS__, $oids, ['number'], $lang);
-            // generate accounting entries
-            $invoices_accounting_entries = self::_generateAccountingEntries($om, $oids, [], $lang);
-            // create new entries objects
-            foreach($invoices_accounting_entries as $oid => $accounting_entries) {
-                foreach($accounting_entries as $entry) {
-                    $om->create(AccountingEntry::getType(), $entry);
+
+            // pass-1 - assign invoice number and check the date consistency
+            $invoices = $om->read(self::getType(), $oids, ['number', 'date', 'center_office_id', 'organisation_id'], $lang);
+
+            foreach($invoices as $oid => $invoice) {
+                // #memo - we don't want to assign a new number to invoiced and cancelled invoices
+                if($invoice['number'] != '[proforma]') {
+                    continue;
+                }
+                // find most recent invoice emitted by the center office
+                $last_invoices_ids = $om->search(self::getType(), [['center_office_id', '=', $invoice['center_office_id']], ['status', '<>', 'proforma']], ['date' => 'desc'], 0, 1);
+                if($last_invoices_ids > 0 && count($last_invoices_ids)) {
+                    $last_invoice_id = reset($last_invoices_ids);
+                    $res = $om->read(self::getType(), $last_invoice_id, ['date']);
+                    if($res > 0 && count($res)) {
+                        $last_invoice = reset($res);
+                        // if date is before last update, set invoice date to the last invoice date
+                        if($last_invoice['date'] > $invoice['date']) {
+                            $om->update(self::getType(), $oid, ['date' => $last_invoice['date']], $lang);
+                        }
+                    }
+                }
+                // reset invoice number
+                $om->update(self::getType(), $oid, ['number' => null], $lang);
+                // trigger number assignment
+                $om->read(self::getType(), $oid, ['number'], $lang);
+            }
+
+            // pass-2 - generate accounting entries
+            foreach($invoices as $oid => $invoice) {
+                // #memo - we don't want to update entries of an existing invoice
+                if($invoice['number'] != '[proforma]') {
+                    continue;
+                }
+
+                // generate accounting entries
+                $invoices_accounting_entries = self::_generateAccountingEntries($om, $oid, [], $lang);
+
+                $res = $om->search('finance\accounting\AccountingJournal', [['center_office_id', '=', $invoice['center_office_id']], ['type', '=', 'sales']]);
+                $journal_id = reset($res);
+
+                if($journal_id && isset($invoices_accounting_entries[$oid])) {
+                    $accounting_entries = $invoices_accounting_entries[$oid];
+                    // create new entries objects and assign to the sale journal relating to the center_office_id
+                    foreach($accounting_entries as $entry) {
+                        $entry['journal_id'] = $journal_id;
+                        $om->create(\finance\accounting\AccountingEntry::getType(), $entry);
+                    }
                 }
             }
+
         }
     }
 

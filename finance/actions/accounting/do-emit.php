@@ -1,8 +1,8 @@
 <?php
 /*
-    This file is part of Symbiose Community Edition <https://github.com/yesbabylon/symbiose>
-    Some Rights Reserved, Yesbabylon SRL, 2020-2021
-    Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
+    This file is part of the Discope property management software.
+    Author: Yesbabylon SRL, 2020-2024
+    License: GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 
 use finance\accounting\Invoice;
@@ -32,7 +32,22 @@ list($params, $providers) = announce([
 
 $context = $providers['context'];
 
-Invoice::id($params['id'])->update(['status' => 'invoice']);
+$invoice = Invoice::id($params['id'])->read(['id', 'state','status','invoice_lines_ids'])->first(true);
+
+
+if(!$invoice) {
+    throw new Exception("unknown_invoice", QN_ERROR_UNKNOWN_OBJECT);
+}
+
+if($invoice['state'] != 'instance' || $invoice['status'] != 'proforma') {
+    throw new Exception("incompatible_status", QN_ERROR_INVALID_PARAM);
+}
+
+if(count($invoice['invoice_lines_ids']) <= 0) {
+    throw new Exception("empty_invoice", QN_ERROR_INVALID_PARAM);
+}
+
+Invoice::id($invoice['id'])->update(['status' => 'invoice']);
 
 $context->httpResponse()
         ->status(204)
