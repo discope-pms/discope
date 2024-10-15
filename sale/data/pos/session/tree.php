@@ -1,35 +1,37 @@
 <?php
 /*
     This file is part of Symbiose Community Edition <https://github.com/yesbabylon/symbiose>
-    Some Rights Reserved, Yesbabylon SRL, 2020-2021
+    Some Rights Reserved, Yesbabylon SRL, 2020-2024
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 
 use sale\pos\CashdeskSession;
 
-// announce script and fetch parameters values
-list($params, $providers) = announce([
-    'description'	=>	"Provide a fully loaded tree for a given CashdeskSession.",
-    'params' 		=>	[
+[$params, $providers] = announce([
+    'description'	=> "Provide a fully loaded tree for a given CashdeskSession.",
+    'params' 		=> [
         'id' => [
-            'description'   => 'Identifier of the session for which the tree is requested.',
             'type'          => 'integer',
+            'description'   => "Identifier of the session for which the tree is requested.",
             'required'      => true
         ]
     ],
-    'access' => [
-        'visibility'        => 'protected',
-        'groups'            => ['pos.default.user'],
+    'access'        => [
+        'visibility'    => 'protected',
+        'groups'        => ['pos.default.user'],
     ],
-    'response' => [
-        'content-type'      => 'application/json',
-        'charset'           => 'utf-8',
-        'accept-origin'     => '*'
+    'response'      => [
+        'content-type'  => 'application/json',
+        'charset'       => 'utf-8',
+        'accept-origin' => '*'
     ],
-    'providers' => ['context']
+    'providers'     => ['context']
 ]);
 
-list($context) = [$providers['context']];
+/**
+ * @var \equal\php\Context  $context
+ */
+['context' => $context] = $providers;
 
 $tree = [
     'id',
@@ -51,17 +53,15 @@ $tree = [
     ]
 ];
 
-$cashdesksessions = CashdeskSession::id($params['id'])
+$cashdesk_session = CashdeskSession::id($params['id'])
     ->read($tree)
     ->adapt('json')
-    ->get(true);
+    ->first(true);
 
-if(!$cashdesksessions || !count($cashdesksessions)) {
-    throw new Exception("unknown_order", QN_ERROR_UNKNOWN_OBJECT);
+if(is_null($cashdesk_session)) {
+    throw new Exception("unknown_cashdesk_session", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
-$cashdesksession = reset($cashdesksessions);
-
 $context->httpResponse()
-        ->body($cashdesksession)
+        ->body($cashdesk_session)
         ->send();
