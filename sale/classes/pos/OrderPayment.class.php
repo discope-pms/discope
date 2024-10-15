@@ -56,7 +56,7 @@ class OrderPayment extends Model {
                 'foreign_field'     => 'order_payment_id',
                 'ondetach'          => 'null',
                 'description'       => "The order lines selected for the payment.",
-                'onupdate'          => 'onupdateOrderLinesIds'
+                'dependents'        => ['total_due']
             ],
 
             'order_payment_parts_ids' => [
@@ -65,7 +65,7 @@ class OrderPayment extends Model {
                 'foreign_field'     => 'order_payment_id',
                 'description'       => "The parts that relate to the payment.",
                 'ondetach'          => 'delete',
-                'onupdate'          => 'onupdateOrderPaymentPartsIds'
+                'dependents'        => ['total_paid']
             ],
 
             'total_paid' => [
@@ -185,85 +185,71 @@ class OrderPayment extends Model {
         }
     }
 
-    public static function onupdateOrderPaymentPartsIds($om, $ids, $values, $lang) {
-        $om->write(__CLASS__, $ids, ['total_paid' => null], $lang);
-    }
-
-    public static function onupdateOrderLinesIds($om, $ids, $values, $lang) {
-        $om->write(__CLASS__, $ids, ['total_due' => null], $lang);
-    }
-
-    public static function calcTotalPaid($om, $ids, $lang) {
+    public static function calcTotalPaid($self) {
         $result = [];
-        $payments = $om->read(self::getType(), $ids, ['order_payment_parts_ids'], $lang);
-        if($payments > 0) {
-            foreach($payments as $id => $payment) {
-                $result[$id] = 0.0;
-                $parts = $om->read(OrderPaymentPart::getType(), $payment['order_payment_parts_ids'], ['status', 'amount'], $lang);
-                foreach($parts as $part) {
-                    if($part['status'] == 'paid') {
-                        $result[$id] += $part['amount'];
-                    }
-                }
-                $result[$id] = round($result[$id], 2);
-            }
-        }
-        return $result;
-    }
-
-    public static function calcTotalDue($om, $ids, $lang) {
-        $result = [];
-        $payments = $om->read(__CLASS__, $ids, ['order_lines_ids.price'], $lang);
-        if($payments > 0) {
-            foreach($payments as $oid => $payment) {
-                $result[$oid] = 0.0;
-                foreach((array) $payment['order_lines_ids.price'] as $line) {
-                    $result[$oid] += $line['price'];
-                }
-                $result[$oid] = round($result[$oid], 2);
-            }
-        }
-        return $result;
-    }
-
-    public static function calcTotalChange($om, $ids, $lang) {
-        $result = [];
-        $payments = $om->read(__CLASS__, $ids, ['total_due', 'total_paid'], $lang);
-        if($payments > 0) {
-            foreach($payments as $id => $payment) {
-                $result[$id] = 0.0;
-                if($payment['total_due'] > 0) {
-                    $result[$id] = -round($payment['total_paid'] - $payment['total_due'], 2);
+        $self->read(['order_payment_parts_ids' => ['status', 'amount']]);
+        foreach($self as $id => $payment) {
+            $result[$id] = 0.0;
+            foreach($payment['order_payment_parts_ids'] as $part) {
+                if($part['status'] == 'paid') {
+                    $result[$id] += $part['amount'];
                 }
             }
         }
+
         return $result;
     }
 
-    public static function calcIsExported($om, $ids, $lang) {
+    public static function calcTotalDue($self) {
         $result = [];
-        $payments = $om->read(self::getType(), $ids, ['payments_ids.is_exported']);
-        foreach($payments as $id => $order_payment) {
-            foreach((array) $order_payment['payments_ids.is_exported'] as $pid => $payment) {
+        $self->read(['order_lines_ids' => ['price']]);
+        foreach($self as $id => $payment) {
+            $result[$id] = 0.0;
+            foreach($payment['order_lines_ids'] as $line) {
+                $result[$id] += $line['price'];
+            }
+            $result[$id] = round($result[$id], 2);
+        }
+
+        return $result;
+    }
+
+    public static function calcTotalChange($self) {
+        $result = [];
+        $self->read(['total_due', 'total_paid']);
+        foreach($self as $id => $payment) {
+            $result[$id] = 0.0;
+            if($payment['total_due'] > 0) {
+                $result[$id] = -round($payment['total_paid'] - $payment['total_due'], 2);
+            }
+        }
+
+        return $result;
+    }
+
+    public static function calcIsExported($self) {
+        $result = [];
+        $self->read(['payments_ids' => ['is_exported']]);
+        foreach($self as $id => $order_payment) {
+            foreach($order_payment['payments_ids'] as $payment) {
                 if($payment['is_exported']) {
                     $result[$id] = true;
                     break;
                 }
             }
         }
+
         return $result;
     }
 
-    public static function candelete($om, $ids) {
-        $payments = $om->read(self::getType(), $ids, [ 'order_id.status' ]);
-
-        if($payments > 0) {
-            foreach($payments as $id => $payment) {
-                if($payment['order_id.status'] == 'paid') {
-                    return ['status' => ['non_removable' => 'Payments from paid orders cannot be deleted.']];
-                }
+    public static function candelete($self) {
+        $self->read(['order_id' => ['status']]);
+        foreach($self as $payment) {
+            if($payment['order_id']['status'] === 'paid') {
+                return ['status' => ['non_removable' => 'Payments from paid orders cannot be deleted.']];
             }
         }
+
         // ignore parent `candelete()`
         return [];
     }

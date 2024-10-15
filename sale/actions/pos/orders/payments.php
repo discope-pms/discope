@@ -28,6 +28,9 @@ use lodging\sale\booking\Payment;
     'providers'     => ['context']
 ]);
 
+/**
+ * @var \equal\php\Context $context
+ */
 ['context' => $context] = $providers;
 
 $result = [
