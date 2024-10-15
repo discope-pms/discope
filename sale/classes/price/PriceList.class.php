@@ -141,9 +141,7 @@ class PriceList extends Model {
     }
 
     public static function onupdateStatus($self) {
-        /**
-         * @var \equal\cron\Scheduler $cron
-         */
+        /** @var \equal\cron\Scheduler $cron */
         ['cron' => $cron] = \eQual::inject(['cron']);
 
         $self->read(['status', 'prices_ids']);

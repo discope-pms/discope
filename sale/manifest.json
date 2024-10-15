@@ -5,5 +5,10 @@
         "identity",
         "finance"
     ],
-    "apps": ["sale", "pos"]
+    "apps": ["sale", "pos"],
+    "requires": {
+        "dompdf/dompdf": "^3.0",
+        "twig/twig": "^2.0",
+        "twig/intl-extra": "^3.3"
+    }
 }

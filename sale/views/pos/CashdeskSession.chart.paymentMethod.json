@@ -4,8 +4,9 @@
     "access": {
         "groups": ["pos.default.user"]
     },
+    "domain": ["center_office_id", "in", "user.center_offices_ids"],
     "layout": {
-        "entity": "sale\\pay\\Payment",
+        "entity": "lodging\\sale\\pay\\Payment",
         "type": "pie",
         "group_by": "field",
         "field": "payment_method",
