@@ -1,83 +1,83 @@
 {
-	"name": "Session de Caisse",
-	"plural": "Sessions de Caisse",
-	"description": "",
-	"model": {
-		"amount": {
-			"label": "Montant d'ouverture",
-			"description": "Espèces dans la caisse à l'ouverture de la session.",
-			"help": ""
-		},
-		"user_id": {
-			"label": "Utilisateur",
-			"description": "Utilisateur rattaché à la session.",
-			"help": ""
-		},
-		"cashdesk_id": {
-			"label": "Caisse",
-			"description": "Caisse correspondante à la session.",
-			"help": ""
-		},
-		"center_id": {
-			"label": "Centre",
-			"description": "Centre auquel est assignée la caisse.",
-			"help": ""
-		},
-		"orders_ids": {
-			"label": "Commandes",
-			"description": "Commandes clients enrgistrées dans la session.",
-			"help": ""
-		},
-		"link_sheet": {
-			"label": "Feuille de caisse",
-			"description": "Lien vers l'export de la feuille de caisse.",
-			"help": ""
-		},
-		"amount_opening": {
-			"label": "Montant d'ouverture",
-			"description": "Liquidités renseignées dans la caisse à l'ouverture'.",
-			"help": ""
-		},
-		"amount_closing": {
-			"label": "Montant de fermeture",
-			"description": "Liquidités renseignées dans la caisse lors de la fermeture.",
-			"help": ""
-		}
-	},
-	"view": {
-		"form.default": {
-			"name": "Session de Caisse",
-			"description": "",
+    "name": "Session de Caisse",
+    "plural": "Sessions de Caisse",
+    "description": "",
+    "model": {
+        "amount": {
+            "label": "Montant d'ouverture",
+            "description": "Espèces dans la caisse à l'ouverture de la session.",
+            "help": ""
+        },
+        "user_id": {
+            "label": "Utilisateur",
+            "description": "Utilisateur rattaché à la session.",
+            "help": ""
+        },
+        "cashdesk_id": {
+            "label": "Caisse",
+            "description": "Caisse correspondante à la session.",
+            "help": ""
+        },
+        "center_id": {
+            "label": "Centre",
+            "description": "Centre auquel est assignée la caisse.",
+            "help": ""
+        },
+        "orders_ids": {
+            "label": "Commandes",
+            "description": "Commandes clients enrgistrées dans la session.",
+            "help": ""
+        },
+        "link_sheet": {
+            "label": "Feuille de caisse",
+            "description": "Lien vers l'export de la feuille de caisse.",
+            "help": ""
+        },
+        "amount_opening": {
+            "label": "Montant d'ouverture",
+            "description": "Liquidités renseignées dans la caisse à l'ouverture'.",
+            "help": ""
+        },
+        "amount_closing": {
+            "label": "Montant de fermeture",
+            "description": "Liquidités renseignées dans la caisse lors de la fermeture.",
+            "help": ""
+        }
+    },
+    "view": {
+        "form.default": {
+            "name": "Session de Caisse",
+            "description": "",
             "routes": {
-				"section.orders": {
-					"label": "Commandes"
-				},
-				"section.operations": {
-					"label": "Opérations"
-				},
-				"section.notes": {
-					"label": "Notes de fermeture"
-				},
+                "section.orders": {
+                    "label": "Commandes"
+                },
+                "section.operations": {
+                    "label": "Opérations"
+                },
+                "section.notes": {
+                    "label": "Notes de fermeture"
+                },
                 "session.close": {
                     "label": "Fermer la session"
                 }
             },
-			"layout": {}
-		},
-		"list.default": {
-			"name": "Sessions de Caisse",
-			"description": "Liste des sessions de Caisse.",
-			"layout": {}
-		},
-		"dashboard.default": {
-			"name": "Caisse",
-			"description": "",
-			"layout": {}
-		}
-	},
-	"error": {
-		"status": {
-			"already_open": "Une session est déjà ouverte pour cette caisse."
-		}
-	}
+            "layout": {}
+        },
+        "list.default": {
+            "name": "Sessions de Caisse",
+            "description": "Liste des sessions de Caisse.",
+            "layout": {}
+        },
+        "dashboard.default": {
+            "name": "Caisse",
+            "description": "",
+            "layout": {}
+        }
+    },
+    "error": {
+        "status": {
+            "already_open": "Une session est déjà ouverte pour cette caisse."
+        }
+    }
 }
