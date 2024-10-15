@@ -1,8 +1,8 @@
 <?php
 /*
-    This file is part of Symbiose Community Edition <https://github.com/yesbabylon/symbiose>
-    Some Rights Reserved, Yesbabylon SRL, 2020-2021
-    Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
+    This file is part of the Discope property management software.
+    Author: Yesbabylon SRL, 2020-2024
+    License: GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 namespace sale\discount;
 use equal\orm\Model;
@@ -73,17 +73,11 @@ class DiscountList extends Model {
         ];
     }
 
-    public static function onupdateDiscountClassId($om, $oids, $values, $lang) {
-        $om->write(__CLASS__, $oids, ['rate_class_id' => null]);
-        // force immediate re-computing
-        $om->read(__CLASS__, $oids, ['rate_class_id']);
-    }
-
-    public static function calcRateClassId($om, $oids, $lang) {
+    public static function calcRateClassId($self) {
         $result = [];
-        $lists = $om->read(__CLASS__, $oids, ['discount_class_id.rate_class_id']);
-        foreach($lists as $oid => $list) {
-            $result[$oid] = $list['discount_class_id.rate_class_id'];
+        $self->read(['discount_class_id' =>'rate_class_id']);
+        foreach($self as $oid => $list) {
+            $result[$oid] = $list['discount_class_id']['rate_class_id'];
         }
         return $result;
     }
