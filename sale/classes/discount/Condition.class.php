@@ -1,8 +1,8 @@
 <?php
 /*
-    This file is part of Symbiose Community Edition <https://github.com/yesbabylon/symbiose>
-    Some Rights Reserved, Yesbabylon SRL, 2020-2021
-    Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
+    This file is part of the Discope property management software.
+    Author: Yesbabylon SRL, 2020-2024
+    License: GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 namespace sale\discount;
 use equal\orm\Model;
@@ -23,11 +23,13 @@ class Condition extends Model {
             'operand' => [
                 'type'              => 'string',
                 'selection'         => [
-                                            'season', 
-                                            'nb_pers', 
-                                            'duration', 
-                                            'count_booking_24'
-                                       ],
+                    'season',
+                    'nb_pers',
+                    'nb_children',
+                    'nb_adults',
+                    'duration',
+                    'count_booking_24'
+                ],
                 'required'          => true
             ],
 
@@ -53,13 +55,13 @@ class Condition extends Model {
         ];
     }
 
-    public static function getDisplayName($om, $oids, $lang) {
+    public static function getDisplayName($self) {
         $result = [];
-        $res = $om->read(__CLASS__, $oids, ['operand', 'operator', 'value']);
-        foreach($res as $oid => $odata) {
-            $result[$oid] = "{$odata['operand']} {$odata['operator']} {$odata['value']}";
+        $self->read(['operand', 'operator', 'value']);
+        foreach($self as $id => $condition) {
+            $result[$id] = "{$condition['operand']} {$condition['operator']} {$condition['value']}";
         }
-        return $result;              
+        return $result;
     }
 
 
