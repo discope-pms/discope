@@ -48,7 +48,9 @@ $tests = [
 
             $booking_data = ModelFactory::create(Booking::class, [
                     "values" => [
+                        "description"         => "Test Booking 1",
                         "center_office_id"    => $center_office['id'],
+                        "status"              => "quote",
                         "price"               => 100
                     ]
                 ]);
@@ -122,6 +124,7 @@ $tests = [
                 ])
                 ->delete(true);
 
+            Booking::search(['description', 'like', '%'. "Test Booking 1".'%'])->delete(true);
             Funding::id($funding['id'])->delete(true);
 
         }
