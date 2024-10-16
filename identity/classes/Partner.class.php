@@ -1,16 +1,17 @@
 <?php
 /*
     This file is part of Symbiose Community Edition <https://github.com/yesbabylon/symbiose>
-    Some Rights Reserved, Yesbabylon SRL, 2020-2021
+    Some Rights Reserved, Yesbabylon SRL, 2020-2024
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 namespace identity;
+
 use equal\orm\Model;
 
 class Partner extends Model {
 
     public static function getName() {
-        return 'Partner';
+        return "Partner";
     }
 
     public static function getDescription() {
@@ -22,10 +23,11 @@ class Partner extends Model {
 
             'name' => [
                 'type'              => 'computed',
-                'function'          => 'calcName',
                 'result_type'       => 'string',
+                'description'       => "The display name of the partner (related organisation name).",
                 'store'             => true,
-                'description'       => 'The display name of the partner (related organisation name).'
+                'instant'           => true,
+                'function'          => 'calcName',
             ],
 
             'owner_identity_id' => [
@@ -38,9 +40,10 @@ class Partner extends Model {
             'partner_identity_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => Identity::getType(),
-                'description'       => 'The targeted identity (the partner).',
+                'description'       => "The targeted identity (the partner).",
                 'onupdate'          => 'onupdatePartnerIdentityId',
-                'required'          => true
+                'required'          => true,
+                'dependents'        => ['name', 'title', 'phone', 'mobile', 'email']
             ],
 
             'relationship' => [
@@ -53,63 +56,63 @@ class Partner extends Model {
                     'payer',
                     'other'
                 ],
-                'description'       => 'The kind of partnership that exists between the identities.'
+                'description'       => "The kind of partnership that exists between the identities."
             ],
 
             // if partner is a contact, keep the organisation (s)he is a contact from
             'partner_organisation_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'identity\Identity',
-                'description'       => 'Target organisation which the contact is working for.',
+                'description'       => "Target organisation which the contact is working for.",
                 'visible'           => [ ['relationship', '=', 'contact'] ]
             ],
 
             // if partner is a contact, keep its 'position' within the
             'partner_position' => [
                 'type'              => 'string',
-                'description'       => 'Position of the contact (natural person) within the target organisation (legal person), e.g. \'director\', \'CEO\', \'Regional manager\'.',
+                'description'       => "Position of the contact (natural person) within the target organisation (legal person), e.g. 'director', 'CEO', 'Regional manager'.",
                 'visible'           => [ ['relationship', '=', 'contact'] ]
             ],
 
             // if partner is a customer, it can have an external reference (e.g. reference assigned by previous software)
             'customer_external_ref' => [
                 'type'              => 'string',
-                'description'       => 'External reference for customer, if any.',
+                'description'       => "External reference for customer, if any.",
                 'visible'           => ['relationship', '=', 'customer']
             ],
 
             // #memo - email remains related to identity
             'email' => [
                 'type'              => 'computed',
-                'function'          => 'calcEmail',
                 'result_type'       => 'string',
                 'usage'             => 'email',
-                'description'       => 'Email of the contact (from Identity).'
+                'function'          => 'calcEmail',
+                'description'       => "Email of the contact (from Identity)."
             ],
 
             // #memo - phone remains related to identity
             'phone' => [
                 'type'              => 'computed',
-                'function'          => 'calcPhone',
                 'result_type'       => 'string',
                 'usage'             => 'phone',
-                'description'       => 'Phone number of the contact (from Identity).'
+                'function'          => 'calcPhone',
+                'description'       => "Phone number of the contact (from Identity)."
             ],
 
             // #memo - mobile remains related to identity
             'mobile' => [
                 'type'              => 'computed',
-                'function'          => 'calcMobile',
                 'result_type'       => 'string',
                 'usage'             => 'phone',
-                'description'       => 'Mobile phone number of the contact (from Identity).'
+                'function'          => 'calcMobile',
+                'description'       => "Mobile phone number of the contact (from Identity)."
             ],
 
             'title' => [
                 'type'              => 'computed',
-                'function'          => 'calcTitle',
                 'result_type'       => 'string',
-                'description'       => 'Title of the contact (from Identity).'
+                'function'          => 'calcTitle',
+                'description'       => "Title of the contact (from Identity)."
                 // #memo - title origin remains the related identity
             ],
 
@@ -122,7 +125,7 @@ class Partner extends Model {
 
             'is_active' => [
                 'type'              => 'boolean',
-                'description'       => 'Mark the partner as active.',
+                'description'       => "Mark the partner as active.",
                 'default'           => true
             ]
         ];
@@ -134,93 +137,59 @@ class Partner extends Model {
         ];
     }
 
-    public static function onupdatePartnerIdentityId($om, $oids, $values, $lang) {
-        $res = $om->read(get_called_class(), $oids, [ 'partner_identity_id.lang_id' ], $lang);
-        if($res > 0 && count($res) ) {
-            foreach($res as $oid => $odata) {
-                $om->write(get_called_class(), $oids, [ 'lang_id' => $odata['partner_identity_id.lang_id'] ], $lang);
-            }
+    public static function onupdatePartnerIdentityId($self) {
+        $self->read(['partner_identity_id' => ['lang_id']]);
+        foreach($self as $id => $partner) {
+            Partner::id($id)->update([
+                'lang_id' => $partner['partner_identity_id']['lang_id'] ?? 1
+            ]);
         }
-        $om->write(get_called_class(), $oids, [ 'name' => null, 'title' => null, 'phone' => null, 'email' => null ], $lang);
-        // force immediate re-computing of the name
-        $om->read(get_called_class(), $oids, [ 'name' ], $lang);
     }
 
-    public static function calcName($om, $oids, $lang) {
-        $result = [];
-        $partners = $om->read(self::getType(), $oids, ['partner_identity_id.name'], $lang);
-        foreach($partners as $oid => $partner) {
-            if(isset($partner['partner_identity_id.name'])) {
-                $result[$oid] = $partner['partner_identity_id.name'];
-            }
-        }
-        return $result;
+    public static function calcName($self) {
+        return self::calcFieldOnIdentity($self, 'name');
     }
 
-    public static function calcEmail($om, $oids, $lang) {
-        $result = [];
-        $partners = $om->read(get_called_class(), $oids, ['partner_identity_id.email'], $lang);
-        foreach($partners as $oid => $partner) {
-            $result[$oid] = '';
-            if(isset($partner['partner_identity_id.email'])) {
-                $result[$oid] = $partner['partner_identity_id.email'];
-            }
-        }
-        return $result;
+    public static function calcEmail($self) {
+        return self::calcFieldOnIdentity($self, 'email');
     }
 
-    public static function calcPhone($om, $oids, $lang) {
-        $result = [];
-        $partners = $om->read(get_called_class(), $oids, ['partner_identity_id.phone'], $lang);
-        foreach($partners as $oid => $partner) {
-            $result[$oid] = '';
-            if(isset($partner['partner_identity_id.phone'])) {
-                $result[$oid] = $partner['partner_identity_id.phone'];
-            }
-        }
-        return $result;
+    public static function calcPhone($self) {
+        return self::calcFieldOnIdentity($self, 'phone');
     }
 
-    public static function calcMobile($om, $oids, $lang) {
-        $result = [];
-        $partners = $om->read(get_called_class(), $oids, ['partner_identity_id.mobile'], $lang);
-        foreach($partners as $oid => $partner) {
-            $result[$oid] = '';
-            if(isset($partner['partner_identity_id.mobile'])) {
-                $result[$oid] = $partner['partner_identity_id.mobile'];
-            }
-        }
-        return $result;
+    public static function calcMobile($self) {
+        return self::calcFieldOnIdentity($self, 'mobile');
     }
 
-    public static function calcTitle($om, $oids, $lang) {
-        $result = [];
-        $partners = $om->read(get_called_class(), $oids, ['partner_identity_id.title'], $lang);
-        foreach($partners as $oid => $partner) {
-            $result[$oid] = '';
-            if(isset($partner['partner_identity_id.title'])) {
-                $result[$oid] = $partner['partner_identity_id.title'];
-            }
-        }
-        return $result;
+    public static function calcTitle($self) {
+        return self::calcFieldOnIdentity($self, 'title');
     }
 
     /**
-     * Signature for single object change from views.
-     *
-     * @param  Object   $om        Object Manager instance.
-     * @param  Array    $event     Associative array holding changed fields as keys, and their related new values.
-     * @param  Array    $values    Copy of the current (partial) state of the object (fields depend on the view).
-     * @param  String   $lang      Language (char 2) in which multilang field are to be processed.
-     * @return Array    Associative array mapping fields with their resulting values.
+     * Returns value of given field for relation partner_identity_id
      */
-    public static function onchange($om, $event, $values, $lang='en') {
+    public static function calcFieldOnIdentity($self, $field) {
+        $result = [];
+        $self->read(['partner_identity_id' => [$field]]);
+        foreach($self as $id => $partner) {
+            if(isset($partner['partner_identity_id'][$field])) {
+                $result[$id] = $partner['partner_identity_id'][$field];
+            }
+        }
+
+        return $result;
+    }
+
+    public static function onchange($event, $values) {
         $result = [];
 
         if(isset($event['partner_identity_id'])) {
-            $identities = $om->read('identity\Identity', $event['partner_identity_id'], ['name']);
-            if($identities > 0) {
-                $identity = reset($identities);
+            $identity = Identity::id($event['partner_identity_id'])
+                ->read(['name'])
+                ->first();
+
+            if(isset($identity['name'])) {
                 $result['name'] = $identity['name'];
             }
         }
