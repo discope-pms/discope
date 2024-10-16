@@ -7,7 +7,7 @@
 namespace finance\accounting;
 use equal\orm\Model;
 use core\setting\Setting;
-use lodging\sale\catalog\Product;
+use sale\catalog\Product;
 
 class Invoice extends Model {
 
