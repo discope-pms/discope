@@ -1,7 +1,7 @@
 {
     "name": "Famille",
     "plural": "Familles",
-    "description": "",
+    "description": "Une famille de produits est un groupe de produits fabriqués sous la même marque. Les familles soutiennent la hiérarchie.",
     "model": {
         "name": {
             "label": "Nom",
@@ -22,6 +22,11 @@
             "label": "Chemin",
             "description": "Chemin complet de la famille avec les ancêtres.",
             "help": ""
+        },
+        "centers_ids": {
+            "label": "Centres",
+            "description": "Liste des catégories auxquelles appartient le centre.",
+            "help": "Liste des catégories auxquelles appartient le centre, le cas échéant."
         }
     },
     "view": {
@@ -29,14 +34,17 @@
             "name": "Famille",
             "description": "Une famille de produits est un groupe de produits vendus sous la même marque.",
             "layout": {
-                "section.family_section": {
-                    "label": "Détails"
+                "section.family_info": {
+                    "label": "Info Géneral"
                 },
-                "section.children_section": {
+                "section.product_model": {
+                    "label": "Produits"
+                },
+                "section.children_ids": {
                     "label": "Sous-familles"
                 },
-                "section.product_models": {
-                    "label": "Produits"
+                "section.centers_ids": {
+                    "label": "Centres"
                 }
             }
         },

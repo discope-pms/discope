@@ -9,24 +9,25 @@ use equal\orm\Model;
 
 class PackLine extends Model {
 
+    public static function getDescription() {
+        return "A Pack Line corresponds to the relation between a 'pack' product (bundle) and another product that it includes. It is equivalent of M2M table between Product and itself.";
+    }
+
     public static function getColumns() {
-        /**
-         * A Pack Line corresponds to the relation between a 'pack' product (bundle) and another product that it includes.
-         * It is equivalent of M2M table between Product and itself.
-         */
         return [
+
             'name' => [
                 'type'              => 'computed',
-                'function'          => 'sale\catalog\PackLine::calcName',
                 'result_type'       => 'string',
-                'store'             => true,
-                'description'       => 'The display name of the pack line.'
+                'description'       => "The display name of the pack line.",
+                'function'          => 'calcName',
+                'store'             => true
             ],
 
             'parent_product_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\catalog\Product',
-                'description'       => "The Product (pack) this line belongs to.",
+                'description'       => "The Product this line belongs to.",
                 'required'          => true
             ],
 
@@ -35,7 +36,7 @@ class PackLine extends Model {
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\catalog\Product',
                 'description'       => "The Product this line refers to.",
-                'onupdate'          => 'sale\catalog\PackLine::onupdateChildProductId'
+                'onupdate'          => 'onupdateChildProductId'
             ],
 
             'child_product_model_id' => [
@@ -43,7 +44,7 @@ class PackLine extends Model {
                 'foreign_object'    => 'sale\catalog\ProductModel',
                 'description'       => "The Product Model the line refers to.",
                 'required'          => true,
-                'onupdate'          => 'sale\catalog\PackLine::onupdateChildProductModelId'
+                'dependents'        => ['name']
             ],
 
             'has_own_qty' => [
@@ -85,25 +86,23 @@ class PackLine extends Model {
         // $om->update(__CLASS__, $oids, [ 'name' => null ], $lang);
     }
 
-    public static function onupdateChildProductModelId($om, $oids, $values, $lang) {
-        $om->update(__CLASS__, $oids, [ 'name' => null ], $lang);
-    }
-
-    public static function calcName($om, $oids, $lang) {
+    public static function calcName($self) {
         $result = [];
-        $lines = $om->read(__CLASS__, $oids, ['child_product_model_id.name']);
-        foreach($oids as $oid) {
-            $result[$oid] = $lines[$oid]['child_product_model_id.name'];
+        $self->read(['child_product_model_id' => ['name']]);
+        foreach($self as $id => $pack_line) {
+            $result[$id] = $pack_line['child_product_model_id']['name'];
         }
+
         return $result;
     }
 
-    public static function calcCanSell($om, $oids, $lang) {
+    public static function calcCanSell($self) {
         $result = [];
-        $lines = $om->read(__CLASS__, $oids, ['child_product_id.can_sell']);
-        foreach($lines as $lid => $line) {
-            $result[$lid] = $line['child_product_id.can_sell'];
+        $self->read(['child_product_id' => ['can_sell']]);
+        foreach($self as $id => $line) {
+            $result[$id] = $line['child_product_id']['can_sell'];
         }
+
         return $result;
     }
 
