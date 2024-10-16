@@ -1,6 +1,6 @@
 {
-    "name": "Group",
-    "description": "",
+    "name": "Product Model",
+    "description": "Product Models act as common denominator for products variants (referred to as \"Products\").",
     "access": {
         "groups": ["pos.default.user", "sale.default.user"]
     },
@@ -9,24 +9,25 @@
             {
                 "sections": [
                     {
+                        "label": "General info",
+                        "id": "section.product_model",
                         "rows": [
                             {
                                 "columns": [
                                     {
-                                        "width": "100%",
+                                        "width": "50%",
                                         "items": [
                                             {
                                                 "type": "field",
                                                 "value": "name",
-                                                "width": "50%",
+                                                "width": "100%",
                                                 "widget": {
                                                     "heading": true
                                                 }
                                             },
                                             {
                                                 "type": "field",
-                                                "label": "Center",
-                                                "value": "center_id",
+                                                "value": "can_sell",
                                                 "width": "50%"
                                             }
                                         ]
@@ -34,38 +35,10 @@
                                 ]
                             }
                         ]
-                    }
-                ]
-            },
-            {
-                "sections": [
-                    {
-                        "id": "section.product_models",
-                        "label": "Product Models",
-                        "rows": [
-                            {
-                                "columns": [
-                                    {
-                                        "width": "100%",
-                                        "items": [
-                                            {
-                                                "type": "field",
-                                                "value": "product_models_ids",
-                                                "width": "100%",
-                                                "widget": {
-                                                    "domain": ["can_sell", "=", true]
-                                                }
-                                            }
-                                        ]
-                                    }
-                                ]
-                            }
-
-                        ]
                     },
                     {
-                        "id": "section.products",
                         "label": "Products",
+                        "id": "section.products",
                         "rows": [
                             {
                                 "columns": [
@@ -75,9 +48,33 @@
                                             {
                                                 "type": "field",
                                                 "value": "products_ids",
+                                                "width": "100%"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "label": "Groups",
+                        "id": "section.groups_section",
+                        "rows": [
+                            {
+                                "columns": [
+                                    {
+                                        "width": "100%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "groups_ids",
                                                 "width": "100%",
                                                 "widget": {
-                                                    "domain": ["can_sell", "=", true]
+                                                    "header": {
+                                                        "actions": {
+                                                            "ACTION.CREATE": false
+                                                        }
+                                                    }
                                                 }
                                             }
                                         ]

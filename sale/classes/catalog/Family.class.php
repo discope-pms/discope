@@ -1,10 +1,11 @@
 <?php
 /*
     This file is part of Symbiose Community Edition <https://github.com/yesbabylon/symbiose>
-    Some Rights Reserved, Yesbabylon SRL, 2020-2021
+    Some Rights Reserved, Yesbabylon SRL, 2020-2024
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 namespace sale\catalog;
+
 use equal\orm\Model;
 
 class Family extends Model {
@@ -13,13 +14,13 @@ class Family extends Model {
         return "Product Family";
     }
 
-    public static function getColumns() {
-        /**
-         * A Product Family is a group of goods produced under the same brand.
-         * Families support hierarchy.
-         */
+    public static function getDescription() {
+        return "A Product Family is a group of goods produced under the same brand. Families support hierarchy.";
+    }
 
+    public static function getColumns() {
         return [
+
             'name' => [
                 'type'              => 'string',
                 'description'       => "Name of the product family. A family is a group of goods produced under the same brand.",
@@ -30,7 +31,8 @@ class Family extends Model {
             'children_ids' => [ 
                 'type'              => 'one2many', 
                 'foreign_object'    => 'sale\catalog\Family', 
-                'foreign_field'     => 'parent_id'
+                'foreign_field'     => 'parent_id',
+                'description'       => "List of family's children families."
             ],
 
             'parent_id' => [
@@ -44,7 +46,7 @@ class Family extends Model {
                 'function'          => 'sale\catalog\Family::getPath',
                 'result_type'       => 'string',
                 'store'             => true,
-                'description'       => 'Full path of the family with ancestors.'
+                'description'       => "Full path of the family with ancestors."
             ],
 
             'product_models_ids' => [
@@ -52,6 +54,16 @@ class Family extends Model {
                 'foreign_object'    => 'sale\catalog\ProductModel',
                 'foreign_field'     => 'family_id',
                 'description'       => "Product models which current product belongs to the family."
+            ],
+
+            'centers_ids' => [
+                'type'              => 'many2many',
+                'foreign_object'    => 'identity\Center',
+                'foreign_field'     => 'product_families_ids',
+                'rel_table'         => 'sale_product_family_rel_identity_center',
+                'rel_foreign_key'   => 'center_id',
+                'rel_local_key'     => 'family_id',
+                'description'       => "Centers the family belongs to."
             ]
 
         ];

@@ -36,7 +36,7 @@ class OrderLine extends Model {
 
             'product_id' => [
                 'type'              => 'many2one',
-                'foreign_object'    => 'lodging\sale\catalog\Product',
+                'foreign_object'    => 'sale\catalog\Product',
                 'description'       => "The product (SKU) the line relates to.",
                 'onupdate'          => 'onupdateProductId'
             ],
