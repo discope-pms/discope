@@ -9,6 +9,8 @@
             {
                 "sections": [
                     {
+                        "id": "section.ageranges_list",
+                        "label": "General Info",
                         "rows": [
                             {
                                 "columns": [
@@ -41,7 +43,27 @@
                                             {
                                                 "type": "field",
                                                 "value": "description",
-                                                "width": "100%"                                                
+                                                "width": "100%"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "section.discounts_section",
+                        "label": "Discounts",
+                        "rows": [
+                            {
+                                "columns": [
+                                    {
+                                        "width": "100%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "discounts_ids",
+                                                "width": "100%"
                                             }
                                         ]
                                     }

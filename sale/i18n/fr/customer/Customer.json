@@ -62,6 +62,16 @@
             "label": "Tour opérateur",
             "description": "Le client est un Tour Opérateur ou une OTA.",
             "help": ""
+        },
+        "bookings_ids": {
+            "label": "Réservations",
+            "description": "Les réservations du client.",
+            "help": ""
+        },
+        "email_secondary": {
+            "label": "Email secondaire",
+            "description": "Adresse e-mail secondaire.",
+            "help": ""
         }
     },
     "view": {
@@ -83,5 +93,9 @@
             "layout": {}
         }
     },
-    "error": {}
+    "error": {
+        "bookings_ids": {
+            "non_removable_customer": "Les clients liés à des réservations ne peuvent pas être supprimés."
+        }
+    }
 }

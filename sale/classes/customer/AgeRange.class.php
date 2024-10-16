@@ -1,11 +1,11 @@
 <?php
 /*
     This file is part of Symbiose Community Edition <https://github.com/yesbabylon/symbiose>
-    Some Rights Reserved, Yesbabylon SRL, 2020-2021
+    Some Rights Reserved, Yesbabylon SRL, 2020-2024
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
-
 namespace sale\customer;
+
 use equal\orm\Model;
 
 class AgeRange extends Model {
@@ -19,8 +19,8 @@ class AgeRange extends Model {
     }
 
     public static function getColumns() {
-
         return [
+
             'name' => [
                 'type'              => 'string',
                 'required'          => true,
@@ -50,6 +50,16 @@ class AgeRange extends Model {
                 'type'              => 'boolean',
                 'description'       => "Can the age range be used in bookings?",
                 'default'           => true
+            ],
+
+            'discounts_ids' => [
+                'type'              => 'many2many',
+                'foreign_object'    => 'sale\discount\Discount',
+                'foreign_field'     => 'age_ranges_ids',
+                'rel_table'         => 'lodging_sale_discount_rel_agerange_discount',
+                'rel_foreign_key'   => 'discount_id',
+                'rel_local_key'     => 'age_range_id',
+                'description'       => "The conditions that apply to the discount."
             ]
 
         ];
@@ -60,7 +70,7 @@ class AgeRange extends Model {
         return [
             'age_from' =>  [
                 'out_of_range' => [
-                    'message'       => 'Age must be an integer between 0 and 99.',
+                    'message'       => "Age must be an integer between 0 and 99.",
                     'function'      => function ($age_from, $values) {
                         return ($age_from >= 0 && $age_from <= 99);
                     }
@@ -68,7 +78,7 @@ class AgeRange extends Model {
             ],
             'age_to' =>  [
                 'out_of_range' => [
-                    'message'       => 'Age must be an integer between 0 and 99.',
+                    'message'       => "Age must be an integer between 0 and 99.",
                     'function'      => function ($age_to, $values) {
                         return ($age_to >= 0 && $age_to <= 99);
                     }
