@@ -18,7 +18,7 @@
                         "description": "",
                         "route": "/",
                         "context": {
-                            "entity": "lodging\\sale\\booking\\BankStatement",
+                            "entity": "sale\\pay\\BankStatement",
                             "view": "list.default",
                             "order": "date",
                             "sort": "desc",
@@ -32,7 +32,7 @@
                         "description": "",
                         "route": "/",
                         "context": {
-                            "entity": "lodging\\sale\\booking\\BankStatement",
+                            "entity": "sale\\pay\\BankStatement",
                             "view": "list.default",
                             "order": "date",
                             "sort": "desc"
@@ -45,7 +45,7 @@
                         "description": "",
                         "route": "/",
                         "context": {
-                            "entity": "lodging\\sale\\booking\\BankStatementLine",
+                            "entity": "sale\\booking\\BankStatementLine",
                             "view": "list.default",
                             "order": "date",
                             "sort": "desc",

@@ -1,8 +1,8 @@
 <?php
 /*
-    This file is part of Symbiose Community Edition <https://github.com/yesbabylon/symbiose>
-    Some Rights Reserved, Yesbabylon SRL, 2020-2021
-    Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
+    This file is part of the Discope property management software.
+    Author: Yesbabylon SRL, 2020-2024
+    License: GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 namespace sale\pay;
 use equal\orm\Model;
@@ -21,7 +21,7 @@ class BankStatementLine extends Model {
 
             'payments_ids' => [
                 'type'              => 'one2many',
-                'foreign_object'    => Payment::getType(),
+                'foreign_object'    => 'sale\pay\Payment',
                 'foreign_field'     => 'statement_line_id',
                 'description'       => 'The list of payments this line relates to .',
                 'onupdate'          => 'onupdatePaymentsIds',
@@ -48,9 +48,8 @@ class BankStatementLine extends Model {
 
             'customer_id' => [
                 'type'              => 'many2one',
-                'foreign_object'    => 'identity\Partner',
-                'domain'            => ['relationship', '=', 'customer'],
-                'description'       => 'The customer the payment relates to, if known.',
+                'foreign_object'    => 'sale\customer\Customer',
+                'description'       => 'The customer the line relates to, if known (set at status change).',
                 'readonly'          => true
             ],
 
@@ -101,7 +100,13 @@ class BankStatementLine extends Model {
                 'description'       => 'Status of the line.',
                 'default'           => 'pending',
                 'onupdate'          => 'onupdateStatus',
-            ]
+            ],
+
+            'center_office_id' => [
+                'type'              => 'many2one',
+                'foreign_object'    => 'identity\CenterOffice',
+                'description'       => 'Center office related to the statement (based on account number).',
+            ],
 
         ];
     }
@@ -154,20 +159,16 @@ class BankStatementLine extends Model {
         }
     }
 
-    public static function calcRemainingAmount($om, $oids, $lang) {
+    public static function calcRemainingAmount($self) {
         $result = [];
-        $lines = $om->read(self::getType(), $oids, ['payments_ids', 'amount'], $lang);
-        if($lines > 0) {
-            foreach($lines as $lid => $line) {
-                $sum = 0.0;
-                $payments = $om->read(Payment::getType(), $line['payments_ids'], ['amount'], $lang);
-                if($payments > 0 && count($payments)) {
-                    foreach($payments as $pid => $payment) {
-                        $sum += $payment['amount'];
-                    }
-                }
-                $result[$lid] = $line['amount'] - $sum;
+        $self->read(['payments_ids', 'amount']);
+        foreach($self as $lid => $line) {
+            $sum = 0.0;
+            $payments = Payment::ids(['payments_ids'])->read(['amount'])->get(true);
+            foreach($payments as $pid => $payment) {
+                $sum += $payment['amount'];
             }
+            $result[$lid] = $line['amount'] - $sum;
         }
         return $result;
     }

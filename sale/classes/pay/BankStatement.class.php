@@ -1,8 +1,8 @@
 <?php
 /*
-    This file is part of Symbiose Community Edition <https://github.com/yesbabylon/symbiose>
-    Some Rights Reserved, Yesbabylon SRL, 2020-2021
-    Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
+    This file is part of the Discope property management software.
+    Author: Yesbabylon SRL, 2020-2024
+    License: GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 namespace sale\pay;
 use equal\orm\Model;
@@ -90,65 +90,63 @@ class BankStatement extends Model {
                 'function'          => 'calcBankAccountIban',
                 'description'       => 'IBAN representation of the account number.',
                 'store'             => true
+            ],
+
+            'center_office_id' => [
+                'type'              => 'many2one',
+                'foreign_object'    => 'identity\CenterOffice',
+                'description'       => 'Center office related to the statement (based on account number).'
             ]
 
         ];
     }
 
-    public static function calcName($om, $oids, $lang) {
+    public static function calcName($self) {
         $result = [];
-        $statements = $om->read(get_called_class(), $oids, ['bank_account_number', 'date', 'old_balance', 'new_balance']);
-        foreach($statements as $oid => $statement) {
-            $result[$oid] = sprintf("%s - %s - %s - %s", $statement['bank_account_number'], date('Ymd', $statement['date']), $statement['old_balance'], $statement['new_balance']);
+        $self->read(['center_office_id' => ['name'], 'date', 'old_balance', 'new_balance']);
+        foreach($self as $oid => $statement) {
+            $result[$oid] = sprintf("%s - %s - %s - %s", $statement['center_office_id']['name'], date('Ymd', $statement['date']), $statement['old_balance'], $statement['new_balance']);
         }
         return $result;
     }
 
-    public static function calcBankAccountIban($om, $oids, $lang) {
-        $result = [];
-        $statements = $om->read(get_called_class(), $oids, ['bank_account_number', 'bank_account_bic']);
 
-        foreach($statements as $oid => $statement) {
-            $result[$oid] = self::convertBbanToIban($statement['bank_account_number']);
+    public static function calcBankAccountIban($self) {
+        $result = [];
+        $self->read(['bank_account_number']);
+        foreach($self as $id => $statement) {
+            $result[$id] = self::convertBbanToIban($statement['bank_account_number']);
         }
         return $result;
     }
 
-    public static function calcStatus($om, $oids, $lang) {
+    public static function calcStatus($self) {
         $result = [];
-        $statements = $om->read(get_called_class(), $oids, ['statement_lines_ids.status']);
-
-        if($statements > 0) {
-            foreach($statements as $sid => $statement) {
-                $is_reconciled = true;
-                foreach((array) $statement['statement_lines_ids.status'] as $lid => $line) {
-                    if( !in_array($line['status'], ['reconciled', 'ignored']) ) {
+        $self->read(['statement_lines_ids' => ['id', 'status']]);
+        foreach ($self as $sid => $statement) {
+            $is_reconciled = true;
+            if (isset($statement['statement_lines_ids']) && is_array($statement['statement_lines_ids'])) {
+                foreach ($statement['statement_lines_ids'] as $line) {
+                    if (!in_array($line['status'], ['reconciled', 'ignored'])) {
                         $is_reconciled = false;
                         break;
                     }
                 }
-                $result[$sid] = ($is_reconciled)?'reconciled':'pending';
+            } else {
+                $is_reconciled = false;
             }
+            $result[$sid] = $is_reconciled ? 'reconciled' : 'pending';
         }
+
         return $result;
     }
 
-    public static function convertBbanToIban($account_number) {
 
-        /*
-            account number already has IBAN format
-        */
+    public static function convertBbanToIban($account_number,$country_code = 'BE') {
 
         if( !is_numeric(substr($account_number, 0, 2)) ) {
             return $account_number;
         }
-
-        /*
-            if code is not a country code, then convert BBAN to IBAN
-        */
-
-        // create numeric code of the target country
-        $country_code = 'BE';
 
         $code_alpha = $country_code;
         $code_num = '';
@@ -162,7 +160,7 @@ class BankStatement extends Model {
         $check_digits = substr($account_number, -2);
         $dummy = intval($check_digits.$check_digits.$code_num.'00');
         $control = 98 - ($dummy % 97);
-        return trim(sprintf("BE%02d%s", $control, $account_number));
+        return trim(sprintf("%s%02d%s", $country_code, $control, $account_number));
     }
 
 

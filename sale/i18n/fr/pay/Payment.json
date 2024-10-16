@@ -39,7 +39,7 @@
                 "voucher": "Chèque cadeau (voucher)",
                 "cash": "Espèces",
                 "bank_card": "Carte bancaire",
-                "wire_transfer": "Virement bancaire"
+                "booking": "Réservation"
             },
             "help": ""
         },
@@ -71,7 +71,12 @@
                 "paid": "Payé"
             },
             "help": ""
-        }
+        },
+        "booking_id": {
+			"label": "Réservation",
+			"description": "La réservation lié au financement.",
+			"help": ""
+		}
     },
     "view": {
         "form.default": {

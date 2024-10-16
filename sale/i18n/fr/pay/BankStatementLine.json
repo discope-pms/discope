@@ -39,8 +39,8 @@
             "help": "",
             "selection": {
                 "pending": "à traiter",
-                "ignored": "ignorée",
-                "reconciled": "réconciliée",
+                "ignored": "ignoré",
+                "reconciled": "réconcilié",
                 "to_refund": "à rembourser"
             }
         },

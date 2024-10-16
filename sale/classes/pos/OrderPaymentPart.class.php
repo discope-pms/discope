@@ -6,7 +6,7 @@
 */
 namespace sale\pos;
 
-class OrderPaymentPart extends \sale\booking\Payment {
+class OrderPaymentPart extends \sale\pay\Payment {
 
     public function getTable() {
         return 'sale_pos_orderpaymentpart';
