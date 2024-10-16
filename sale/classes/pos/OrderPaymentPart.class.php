@@ -10,7 +10,7 @@ use lodging\sale\booking\Booking;
 use lodging\sale\booking\Funding;
 use lodging\sale\booking\Invoice;
 
-class OrderPaymentPart extends \sale\booking\Payment {
+class OrderPaymentPart extends \sale\pay\Payment {
 
     public function getTable() {
         return 'sale_pos_orderpaymentpart';
@@ -172,14 +172,11 @@ class OrderPaymentPart extends \sale\booking\Payment {
         }
     }
 
-    public static function candelete($om, $ids) {
-        $parts = $om->read(self::getType(), $ids, [ 'order_id.status' ]);
-
-        if($parts > 0) {
-            foreach($parts as $id => $part) {
-                if($part['order_id.status'] == 'paid') {
-                    return ['status' => ['non_removable' => 'Payments from paid orders cannot be deleted.']];
-                }
+    public static function candelete($self) {
+        $self->read([ 'order_id'=>['status']]);
+        foreach($self as $id => $part) {
+            if($part['order_id']['status'] == 'paid') {
+                return ['status' => ['non_removable' => 'Payments from paid orders cannot be deleted.']];
             }
         }
         // ignore parent `candelete()`

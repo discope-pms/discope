@@ -1,12 +1,13 @@
 <?php
 /*
-    This file is part of Symbiose Community Edition <https://github.com/yesbabylon/symbiose>
-    Some Rights Reserved, Yesbabylon SRL, 2020-2021
-    Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
+    This file is part of the Discope property management software.
+    Author: Yesbabylon SRL, 2020-2024
+    License: GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 namespace sale\pay;
 use equal\orm\Model;
 use core\setting\Setting;
+use sale\booking\Booking;
 
 class Funding extends Model {
 
@@ -21,6 +22,23 @@ class Funding extends Model {
                 'store'             => true
             ],
 
+            'amount_share' => [
+                'type'              => 'computed',
+                'result_type'       => 'float',
+                'usage'             => 'amount/percent',
+                'function'          => 'calcAmountShare',
+                'store'             => true,
+                'description'       => "Share of the payment over the total due amount (booking)."
+            ],
+
+            'booking_id' => [
+                'type'              => 'many2one',
+                'foreign_object'    => 'sale\booking\Booking',
+                'description'       => 'Booking the contract relates to.',
+                'ondelete'          => 'cascade',        // delete funding when parent booking is deleted
+                'required'          => true
+            ],
+
             'description' => [
                 'type'              => 'string',
                 'description'       => "Optional description to identify the funding."
@@ -28,8 +46,9 @@ class Funding extends Model {
 
             'payments_ids' => [
                 'type'              => 'one2many',
-                'foreign_object'    => Payment::getType(),
-                'foreign_field'     => 'funding_id'
+                'foreign_object'    => 'sale\pay\Payment',
+                'foreign_field'     => 'funding_id',
+                'dependents'         => ['is_paid', 'paid_amount']
             ],
 
             'type' => [
@@ -53,7 +72,7 @@ class Funding extends Model {
                 'usage'             => 'amount/money:2',
                 'description'       => 'Amount expected for the funding (computed based on VAT incl. price).',
                 'required'          => true,
-                'onupdate'          => 'onupdateDueAmount'
+                'dependents'        => ['name', 'amount_share']
             ],
 
             'due_date' => [
@@ -85,12 +104,6 @@ class Funding extends Model {
                 'store'             => true,
             ],
 
-            'amount_share' => [
-                'type'              => 'float',
-                'usage'             => 'amount/percent',
-                'description'       => "Share of the payment over the total due amount."
-            ],
-
             'payment_deadline_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\pay\PaymentDeadline',
@@ -103,26 +116,63 @@ class Funding extends Model {
                 'foreign_object'    => 'finance\accounting\Invoice',
                 'ondelete'          => 'null',
                 'description'       => 'The invoice targeted by the funding, if any.',
-                'help'              => 'As a convention, this field is set when a funding relates to an invoice: either because the funding has been invoiced (downpayment or balance invoice), or because it is an installment (deduced from the due amount)'
+                'help'              => 'As a convention, this field is set when a funding relates to an invoice: either because the funding has been invoiced (downpayment or balance invoice), or because it is an installment (deduced from the due amount)',
+                'visible'           => ['type', '=', 'invoice']
             ],
 
             'payment_reference' => [
-                'type'              => 'string',
+                'type'              => 'computed',
+                'result_type'       => 'string',
+                'function'          => 'calcPaymentReference',
                 'description'       => 'Message for identifying the purpose of the transaction.',
-                'default'           => ''
+                'store'             => true
+            ],
+
+            'center_office_id' => [
+                'type'              => 'many2one',
+                'foreign_object'    => 'identity\CenterOffice',
+                'description'       => "The center office the booking relates to.",
+                'required'          => true
             ]
+
         ];
     }
 
 
-    public static function calcName($om, $oids, $lang) {
+    public static function calcName($self) {
         $result = [];
-        $fundings = $om->read(get_called_class(), $oids, ['payment_deadline_id.name', 'due_amount'], $lang);
+        $self->read(['due_amount', 'booking_id' => ['name']]);
+        foreach($self as $id => $funding) {
+            $result[$id] = $funding['booking_id']['name'].'    '.Setting::format_number_currency($funding['due_amount']);
+        }
 
-        if($fundings > 0) {
-            foreach($fundings as $oid => $funding) {
-                $result[$oid] = Setting::format_number_currency($funding['due_amount']).'    '.$funding['payment_deadline_id.name'];
+        return $result;
+    }
+
+    public static function calcAmountShare($self) {
+        $result = [];
+        $self->read(['booking_id' => ['price'], 'due_amount']);
+
+        foreach($self as $id => $funding) {
+            $total = round($funding['booking_id']['price'],2);
+            if($total == 0) {
+                $share = 1;
             }
+            else {
+                $share = round(abs($funding['due_amount']) / abs($total), 2);
+            }
+            $sign = ($funding['due_amount'] < 0)?-1:1;
+            $result[$id] = $share * $sign;
+        }
+
+        return $result;
+    }
+
+    public static function calcPaymentReference($om, $ids, $lang) {
+        $result = [];
+        $fundings = $om->read(self::getType(), $ids, ['booking_id.payment_reference'], $lang);
+        foreach($fundings as $id => $funding) {
+            $result[$id] = $funding['booking_id.payment_reference'];
         }
         return $result;
     }
@@ -154,57 +204,74 @@ class Funding extends Model {
         return $result;
     }
 
-    public static function onupdateDueAmount($om, $oids, $values, $lang) {
-        // reset the name
-        $om->update(self::getType(), $oids, ['name' => null], $lang);
+    public static function onupdatePaymentDeadlineId($self) {
+        $self->read(['payment_deadline_id' => ['name']]);
+        foreach ($self as $id => $funding) {
+            if (isset($funding['payment_deadline_id']['name']) && strlen($funding['payment_deadline_id']['name']) > 0) {
+                Funding::id($id)->update(['description' => $funding['payment_deadline_id']['name']]);
+            }
+        }
     }
 
+
+    
     /**
-     * Update the description according to the deadline, when set.
+     * Check wether an object can be created.
+     * These tests come in addition to the unique constraints returned by method `getUnique()`.
+     * Checks wheter the sum of the fundings of a booking remains lower than the price of the booking itself.
      *
      * @param  \equal\orm\ObjectManager     $om         ObjectManager instance.
-     * @param  array                        $oids       List of objects identifiers.
-     * @param  array                        $values     Associative array holding the new values to be assigned.
+     * @param  array                        $values     Associative array holding the values to be assigned to the new instance (not all fields might be set).
      * @param  string                       $lang       Language in which multilang fields are being updated.
+     * @return array            Returns an associative array mapping fields with their error messages. An empty array means that object has been successfully processed and can be created.
      */
-    public static function onupdatePaymentDeadlineId($om, $oids, $values, $lang) {
-        $fundings = $om->read(self::getType(), $oids, ['payment_deadline_id.name'], $lang);
-        if($fundings > 0) {
-            foreach($fundings as $oid => $funding) {
-                if($funding['payment_deadline_id.name'] && strlen($funding['payment_deadline_id.name']) > 0) {
-                    $om->update(self::getType(), $oid, ['description' => $funding['payment_deadline_id.name']], $lang);
+    public static function cancreate($om, $values, $lang) {
+        if(isset($values['booking_id']) && isset($values['due_amount'])) {
+            $bookings = $om->read(Booking::getType(), $values['booking_id'], ['price', 'fundings_ids.due_amount'], $lang);
+            if($bookings > 0 && count($bookings)) {
+                $booking = reset($bookings);
+                $fundings_price = (float) $values['due_amount'];
+                foreach((array) $booking['fundings_ids.due_amount'] as $fid => $funding) {
+                    $fundings_price += (float) $funding['due_amount'];
+                }
+                if($fundings_price > $booking['price'] && abs($booking['price']-$fundings_price) >= 0.0001) {
+                    return ['status' => ['exceded_price' => 'Sum of the fundings cannot be higher than the booking total.']];
                 }
             }
         }
+        return parent::cancreate($om, $values, $lang);
     }
 
+
     /**
-     * Check wether an object can be updated, and perform some additional operations if necessary.
-     * This method can be overriden to define a more precise set of tests.
+     * Check wether an object can be updated.
+     * These tests come in addition to the unique constraints returned by method `getUnique()`.
+     * Checks wheter the sum of the fundings of each booking remains lower than the price of the booking itself.
      *
      * @param  \equal\orm\ObjectManager     $om         ObjectManager instance.
      * @param  array                        $oids       List of objects identifiers.
      * @param  array                        $values     Associative array holding the new values to be assigned.
      * @param  string                       $lang       Language in which multilang fields are being updated.
-     * @return array    Returns an associative array mapping fields with their error messages. An empty array means that object has been successfully processed and can be updated.
+     * @return array            Returns an associative array mapping fields with their error messages. An empty array means that object has been successfully processed and can be updated.
      */
     public static function canupdate($om, $oids, $values, $lang) {
-        // handle exceptions for fields that can always be updated
-        $allowed = ['is_paid', 'invoice_id'];
-        $count_non_allowed = 0;
+        if(isset($values['due_amount'])) {
+            $fundings = $om->read(self::getType(), $oids, ['booking_id'], $lang);
 
-        foreach($values as $field => $value) {
-            if(!in_array($field, $allowed)) {
-                ++$count_non_allowed;
-            }
-        }
-
-        if($count_non_allowed > 0) {
-            $fundings = $om->read(self::getType(), $oids, ['is_paid', 'due_amount', 'paid_amount', 'payments_ids'], $lang);
             if($fundings > 0) {
-                foreach($fundings as $funding) {
-                    if($funding['is_paid'] && $funding['due_amount'] == $funding['paid_amount'] && count($funding['payments_ids'])) {
-                        return ['is_paid' => ['non_editable' => 'No change is allowed once the funding has been fully paid.']];
+                foreach($fundings as $fid => $funding) {
+                    $bookings = $om->read(Booking::getType(), $funding['booking_id'], ['price', 'fundings_ids.due_amount'], $lang);
+                    if($bookings > 0 && count($bookings)) {
+                        $booking = reset($bookings);
+                        $fundings_price = (float) $values['due_amount'];
+                        foreach((array) $booking['fundings_ids.due_amount'] as $oid => $odata) {
+                            if($oid != $fid) {
+                                $fundings_price += (float) $odata['due_amount'];
+                            }
+                        }
+                        if($fundings_price > $booking['price'] && abs($booking['price']-$fundings_price) >= 0.0001) {
+                            return ['status' => ['exceeded_price' => "Sum of the fundings cannot be higher than the booking total."]];
+                        }
                     }
                 }
             }
@@ -212,29 +279,20 @@ class Funding extends Model {
         return parent::canupdate($om, $oids, $values, $lang);
     }
 
-    /**
-     * Check wether the identity can be deleted.
-     *
-     * @param  \equal\orm\ObjectManager    $om        ObjectManager instance.
-     * @param  array                       $ids       List of objects identifiers.
-     * @return array                       Returns an associative array mapping fields with their error messages. An empty array means that object has been successfully processed and can be deleted.
-     */
-    public static function candelete($om, $ids) {
-        $fundings = $om->read(self::getType(), $ids, [ 'is_paid', 'paid_amount', 'invoice_id', 'invoice_id.status', 'payments_ids' ]);
 
-        if($fundings > 0) {
-            foreach($fundings as $id => $funding) {
-                if( $funding['is_paid'] || $funding['paid_amount'] != 0 || ($funding['payments_ids'] && count($funding['payments_ids']) > 0) ) {
-                    return ['payments_ids' => ['non_removable_funding' => 'Funding paid or partially paid cannot be deleted.']];
-                }
-                if( !is_null($funding['invoice_id']) && $funding['invoice_id.status'] == 'invoice' ) {
-                    return ['invoice_id' => ['non_removable_funding' => 'Funding relating to an invoice cannot be deleted.']];
-                }
+    public static function candelete($self) {
+        $self->read(['is_paid', 'paid_amount', 'invoice_id' => ['status', 'type'], 'payments_ids']);
+        foreach($self as $funding) {
+            if($funding['is_paid'] || $funding['paid_amount'] != 0 || count($funding['payments_ids']) > 0) {
+                return ['payments_ids' => ['non_removable_funding' => 'Funding paid or partially paid cannot be deleted.']];
+            }
+            if(isset($funding['invoice_id']['status']) && $funding['invoice_id']['status'] == 'invoice' && $funding['invoice_id']['type'] == 'invoice') {
+                return ['invoice_id' => ['non_removable_funding' => 'Funding relating to an invoice cannot be deleted.']];
             }
         }
-        return parent::candelete($om, $ids);
-    }
 
+        return parent::candelete($self);
+    }
 
     /**
      * Hook invoked before object deletion for performing object-specific additional operations.
@@ -254,19 +312,9 @@ class Funding extends Model {
         parent::ondelete($om, $oids);
     }
 
-    /**
-     * Signature for single object change from views.
-     *
-     * @param  \equal\orm\ObjectManager     $om        Object Manager instance.
-     * @param  Array                        $event     Associative array holding changed fields as keys, and their related new values.
-     * @param  Array                        $values    Copy of the current (partial) state of the object (fields depend on the view).
-     * @param  String                       $lang      Language (char 2) in which multilang field are to be processed.
-     * @return Array    Associative array mapping fields with their resulting values.
-     */
-    public static function onchange($om, $event, $values, $lang='en') {
+    public static function onchange($event, $values) {
         $result = [];
 
-        // if 'is_paid' is set manually, adapt 'paid_mount' consequently
         if(isset($event['is_paid'])) {
             $result['paid_amount'] = $values['due_amount'];
         }

@@ -14,8 +14,8 @@
             "help": ""
         },
         "statement_lines_ids": {
-            "label": "Transaction",
-            "description": "Les lignes de transaction qui sont affectées à l'extrait.",
+            "label": "Lignes du relevé bancaire",
+            "description": "Les lignes du relevé bancaire.",
             "help": ""
         },
         "bank_account_bic": {
@@ -51,6 +51,11 @@
                 "pending": "à traiter",
                 "reconciled": "réconcilié"
             }
+        },
+        "center_office_id": {
+            "label": "Equipe de gestion",
+            "description": "Le centre de gestion des relevés bancaires.",
+            "help": ""
         }
     },
     "view": {
