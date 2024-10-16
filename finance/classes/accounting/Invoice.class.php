@@ -7,7 +7,7 @@
 namespace finance\accounting;
 use equal\orm\Model;
 use core\setting\Setting;
-use lodging\sale\catalog\Product;
+use sale\catalog\Product;
 
 class Invoice extends Model {
 
@@ -152,7 +152,7 @@ class Invoice extends Model {
                 'foreign_field'     => 'invoice_id',
                 'description'       => 'Detailed lines of the invoice.',
                 'ondetach'          => 'delete',
-                'dependent'         => ['total', 'price']
+                'dependents'         => ['total', 'price']
             ],
 
             'invoice_line_groups_ids' => [
@@ -161,7 +161,7 @@ class Invoice extends Model {
                 'foreign_field'     => 'invoice_id',
                 'description'       => 'Groups of lines of the invoice.',
                 'ondetach'          => 'delete',
-                'dependent'         => ['total', 'price']
+                'dependents'         => ['total', 'price']
             ],
 
             'accounting_entries_ids' => [
@@ -305,20 +305,26 @@ class Invoice extends Model {
     }
 
 
-    public static function calcIsPaid($self) {
+    public static function calcIsPaid($om, $oids, $lang) {
         $result = [];
-        $self->read(['status', 'price', 'funding_id' => ['paid_amount']]);
-        foreach($self as $id => $invoice) {
-            $result[$id] = false;
-            if($invoice['status'] != 'invoice') {
-                continue;
-            }
-            if($invoice['price'] == 0) {
-                $result[$id] = true;
-                continue;
-            }
-            if($invoice['funding_id']['paid_amount'] && $invoice['funding_id']['paid_amount'] == $invoice['price']) {
-                $result[$id] = true;
+        // #memo - fundings_ids targets all fundings relating to invoice: this includes the installments
+        // we need to limit the check to the direct funding, if any
+        $invoices = $om->read(get_called_class(), $oids, ['status', 'price', 'funding_id.paid_amount'], $lang);
+        if($invoices > 0) {
+            foreach($invoices as $oid => $invoice) {
+                $result[$oid] = false;
+                if($invoice['status'] != 'invoice') {
+                    // proforma invoices cannot be marked as paid
+                    continue;
+                }
+                if($invoice['price'] == 0) {
+                    // mark the invoice as paid, whatever its funding
+                    $result[$oid] = true;
+                    continue;
+                }
+                if($invoice['funding_id.paid_amount'] && $invoice['funding_id.paid_amount'] == $invoice['price']) {
+                    $result[$oid] = true;
+                }
             }
         }
         return $result;
@@ -350,10 +356,11 @@ class Invoice extends Model {
             $format = Setting::get_value('finance', 'invoice', 'invoice.sequence_format', '%05d{sequence}');
             $fiscal_year = Setting::get_value('finance', 'invoice', 'fiscal_year');
             $year = date('Y', $invoice['date']);
-            $sequence = Setting::get_value('lodging', 'invoice', 'sequence.'.$invoice['center_office_id.code']);
+            $sequence = Setting::get_value('lodging', 'invoice', 'sequence.'.$invoice['center_office_id']['code']);
+
 
             if(intval($year) == intval($fiscal_year) && $sequence) {
-                Setting::set_value('lodging', 'invoice', 'sequence.'.$invoice['center_office_id.code'], $sequence + 1);
+                Setting::set_value('lodging', 'invoice', 'sequence.'.$invoice['center_office_id']['code'], $sequence + 1);
 
                 $result[$id] = Setting::parse_format($format, [
                     'year'      => $year,

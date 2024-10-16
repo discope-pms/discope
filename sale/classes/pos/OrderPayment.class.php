@@ -1,23 +1,24 @@
 <?php
 /*
     This file is part of Symbiose Community Edition <https://github.com/yesbabylon/symbiose>
-    Some Rights Reserved, Yesbabylon SRL, 2020-2021
+    Some Rights Reserved, Yesbabylon SRL, 2020-2024
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 namespace sale\pos;
+
 use equal\orm\Model;
 
 class OrderPayment extends Model {
 
     public static function getColumns() {
-
         return [
 
             'order_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => Order::getType(),
-                'description'       => 'The order the line relates to.',
-                'onupdate'          => 'onupdateOrderId'
+                'description'       => "The order the line relates to.",
+                'onupdate'          => 'onupdateOrderId',
+                'ondelete'          => 'cascade'
             ],
 
             'status' => [
@@ -39,7 +40,7 @@ class OrderPayment extends Model {
 
             'funding_id' => [
                 'type'              => 'many2one',
-                'foreign_object'    => 'sale\pay\Funding',
+                'foreign_object'    => 'lodging\sale\booking\Funding',
                 'description'       => 'The funding the line relates to, if any.',
                 'visible'           => ['has_funding', '=', true],
                 'onupdate'          => 'onupdateFundingId'
@@ -51,19 +52,20 @@ class OrderPayment extends Model {
 
             'order_lines_ids' => [
                 'type'              => 'one2many',
-                'foreign_object'    => OrderLine::getType(),
+                'foreign_object'    => 'sale\pos\OrderLine',
                 'foreign_field'     => 'order_payment_id',
                 'ondetach'          => 'null',
-                'description'       => 'The order lines selected for the payment.',
-                'onupdate'          => 'onupdateOrderLinesIds'
+                'description'       => "The order lines selected for the payment.",
+                'dependents'        => ['total_due']
             ],
 
             'order_payment_parts_ids' => [
                 'type'              => 'one2many',
-                'foreign_object'    => OrderPaymentPart::getType(),
+                'foreign_object'    => 'sale\pos\OrderPaymentPart',
                 'foreign_field'     => 'order_payment_id',
-                'description'       => 'The parts that relate to the payment.',
-                'onupdate'          => 'onupdateOrderPaymentPartsIds'
+                'description'       => "The parts that relate to the payment.",
+                'ondetach'          => 'delete',
+                'dependents'        => ['total_paid']
             ],
 
             'total_paid' => [
@@ -88,22 +90,58 @@ class OrderPayment extends Model {
                 'usage'             => 'amount/money:2',
                 'description'       => 'Total due amount (tax incl.) from selected lines.',
                 'function'          => 'calcTotalChange'
+            ],
+
+            'has_booking' => [
+                'type'              => 'boolean',
+                'description'       => 'Mark the payment as done using a booking.',
+                'default'           => false,
+                'onupdate'          => 'onupdateHasBooking'
+            ],
+
+            'booking_id' => [
+                'type'              => 'many2one',
+                'foreign_object'    => 'lodging\sale\booking\Booking',
+                'description'       => 'Booking the payment relates to.',
+                'visible'           => ['has_booking', '=', true],
+                'ondelete'          => 'null'
+            ],
+
+            'payments_ids' => [
+                'type'              => 'one2many',
+                'foreign_object'    => 'lodging\sale\booking\Payment',
+                'foreign_field'     => 'order_payment_id',
+                'ondetach'          => 'null',
+                'description'       => 'The payments relating to the OrderPayment (o2o : list length should be 1 or 0).'
+            ],
+
+            'is_exported' => [
+                'type'              => 'computed',
+                'result_type'       => 'boolean',
+                'description'       => 'Tells if at least one of the related payments has been exported.',
+                'function'          => 'calcIsExported'
             ]
 
         ];
     }
 
     /**
-     * Populate the payement with remaining orderLines.
+     * Sync the payment with the assigned order (fields has_funding and funding_id).
      * This handled is mostly called upon creation and assignation to an order.
-     *
      */
     public static function onupdateOrderId($om, $ids, $values, $lang) {
+        $payments = $om->read(self::getType(), $ids, ['order_id'], $lang);
+        if($payments > 0) {
+            foreach($payments as $id => $payment) {
+                $orders = $om->read(Order::getType(), $payment['order_id'], ['has_funding', 'funding_id'], $lang);
+                if($orders > 0) {
+                    $order = reset($orders);
+                    $om->update(self::getType(), $id, ['has_funding' => $order['has_funding'], 'funding_id' => $order['funding_id']], $lang);
+                }
+            }
+        }
     }
 
-    /**
-     *
-     */
     public static function onupdateStatus($om, $ids, $values, $lang) {
         /*
         $payments = $om->read(self::getType(), $ids, ['status', 'order_payment_parts_ids'], $lang);
@@ -115,68 +153,104 @@ class OrderPayment extends Model {
     }
 
     public static function onupdateFundingId($om, $ids, $values, $lang) {
-        $payments = $om->read(self::getType(), $ids, ['order_id', 'funding_id'], $lang);
+        $payments = $om->read(self::getType(), $ids, ['order_id', 'funding_id', 'funding_id.booking_id', 'funding_id.invoice_id'], $lang);
         if($payments > 0) {
+            $map_bookings_ids = [];
+            $map_invoices_ids = [];
             foreach($payments as $pid => $payment) {
-                $om->update(self::getType(), $pid, ['has_funding' => ($payment['funding_id'] > 0)], $lang);
-                $om->update(Order::getType(), $payment['order_id'], ['funding_id' => $payment['funding_id']], $lang);
-            }
-        }
-    }
-
-    public static function calcTotalPaid($om, $ids, $lang) {
-        $result = [];
-        $payments = $om->read(self::getType(), $ids, ['order_payment_parts_ids'], $lang);
-        if($payments > 0) {
-            foreach($payments as $id => $payment) {
-                $result[$id] = 0.0;
-                $parts = $om->read(OrderPaymentPart::getType(), $payment['order_payment_parts_ids'], ['status', 'amount'], $lang);
-                foreach($parts as $part) {
-                    if($part['status'] == 'paid') {
-                        $result[$id] += $part['amount'];
+                if($payment['funding_id']) {
+                    $om->update(self::getType(), $pid, ['has_funding' => ($payment['funding_id'] > 0)], $lang);
+                    $om->update(Order::getType(), $payment['order_id'], ['funding_id' => $payment['funding_id']], $lang);
+                    if($payment['funding_id.booking_id']) {
+                        $map_bookings_ids[$payment['funding_id.booking_id']] = true;
+                    }
+                    if($payment['funding_id.invoice_id']) {
+                        $map_invoices_ids[$payment['funding_id.invoice_id']] = true;
                     }
                 }
-                $result[$id] = round($result[$id], 2);
             }
+            $om->update(\lodging\sale\booking\Booking::getType(), array_keys($map_bookings_ids), ['payment_status' => null, 'paid_amount' => null], $lang);
+            $om->update(\lodging\sale\booking\Invoice::getType(), array_keys($map_invoices_ids), ['payment_status' => null, 'is_paid' => null]);
         }
-        return $result;
     }
 
-    public static function calcTotalDue($om, $ids, $lang) {
-        $result = [];
-        $payments = $om->read(__CLASS__, $ids, ['order_lines_ids.price'], $lang);
+    public static function onupdateHasBooking($om, $ids, $values, $lang) {
+        // upon update, update related order lines accordingly
+        $payments = $om->read(self::getType(), $ids, ['has_booking', 'booking_id', 'order_id', 'order_lines_ids'], $lang);
         if($payments > 0) {
             foreach($payments as $oid => $payment) {
-                $result[$oid] = 0.0;
-                foreach((array) $payment['order_lines_ids.price'] as $line) {
-                    $result[$oid] += $line['price'];
-                }
-                $result[$oid] = round($result[$oid], 2);
+                $om->update(OrderLine::getType(), $payment['order_lines_ids'], ['has_booking' => $payment['has_booking']], $lang);
+                $om->update(Order::getType(), $payment['order_id'], ['booking_id' => $payment['booking_id']], $lang);
             }
         }
-        return $result;
     }
 
-    public static function calcTotalChange($om, $ids, $lang) {
+    public static function calcTotalPaid($self) {
         $result = [];
-        $payments = $om->read(__CLASS__, $ids, ['total_due', 'total_paid'], $lang);
-        if($payments > 0) {
-            foreach($payments as $id => $payment) {
-                $result[$id] = 0.0;
-                if($payment['total_due'] > 0) {
-                    $result[$id] = -round($payment['total_paid'] - $payment['total_due'], 2);
+        $self->read(['order_payment_parts_ids' => ['status', 'amount']]);
+        foreach($self as $id => $payment) {
+            $result[$id] = 0.0;
+            foreach($payment['order_payment_parts_ids'] as $part) {
+                if($part['status'] == 'paid') {
+                    $result[$id] += $part['amount'];
                 }
             }
         }
+
         return $result;
     }
 
-    public static function onupdateOrderPaymentPartsIds($om, $ids, $values, $lang) {
-        $om->write(__CLASS__, $ids, ['total_paid' => null], $lang);
+    public static function calcTotalDue($self) {
+        $result = [];
+        $self->read(['order_lines_ids' => ['price']]);
+        foreach($self as $id => $payment) {
+            $result[$id] = 0.0;
+            foreach($payment['order_lines_ids'] as $line) {
+                $result[$id] += $line['price'];
+            }
+            $result[$id] = round($result[$id], 2);
+        }
+
+        return $result;
     }
 
-    public static function onupdateOrderLinesIds($om, $ids, $values, $lang) {
-        $om->write(__CLASS__, $ids, ['total_due' => null], $lang);
+    public static function calcTotalChange($self) {
+        $result = [];
+        $self->read(['total_due', 'total_paid']);
+        foreach($self as $id => $payment) {
+            $result[$id] = 0.0;
+            if($payment['total_due'] > 0) {
+                $result[$id] = -round($payment['total_paid'] - $payment['total_due'], 2);
+            }
+        }
+
+        return $result;
     }
 
+    public static function calcIsExported($self) {
+        $result = [];
+        $self->read(['payments_ids' => ['is_exported']]);
+        foreach($self as $id => $order_payment) {
+            foreach($order_payment['payments_ids'] as $payment) {
+                if($payment['is_exported']) {
+                    $result[$id] = true;
+                    break;
+                }
+            }
+        }
+
+        return $result;
+    }
+
+    public static function candelete($self) {
+        $self->read(['order_id' => ['status']]);
+        foreach($self as $payment) {
+            if($payment['order_id']['status'] === 'paid') {
+                return ['status' => ['non_removable' => 'Payments from paid orders cannot be deleted.']];
+            }
+        }
+
+        // ignore parent `candelete()`
+        return [];
+    }
 }

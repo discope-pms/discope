@@ -21,7 +21,7 @@
                         "description": "",
                         "route": "/",
                         "context": {
-                            "entity": "sale\\booking\\BankStatement",
+                            "entity": "sale\\pay\\BankStatement",
                             "view": "list.reconciled",
                             "domain": [
                                 [
@@ -44,7 +44,7 @@
                         "description": "",
                         "route": "/",
                         "context": {
-                            "entity": "sale\\booking\\BankStatement",
+                            "entity": "sale\\pay\\BankStatement",
                             "view": "list.default"
                         }
                     }
