@@ -7,6 +7,7 @@
 
 use identity\CenterOffice;
 use equal\orm\ModelFactory;
+use sale\booking\Booking;
 use sale\pay\Funding;
 use sale\pay\Payment;
 use sale\pay\PaymentDeadline;
@@ -26,7 +27,7 @@ $tests = [
                 ]
             ]);
 
-            $center_data = CenterOffice::create(
+            $center_office = CenterOffice::create(
                     $center_data
                 )
                 ->read(['id', 'name'])
@@ -45,15 +46,30 @@ $tests = [
                 ->read(['id', 'name'])
                 ->first(true);
 
-            return [$center_data['id'], $payment_deadline['id']];
+            $booking_data = ModelFactory::create(Booking::class, [
+                    "values" => [
+                        "center_office_id"    => $center_office['id'],
+                        "price"               => 100
+                    ]
+                ]);
+
+            $booking = Booking::create(
+                        $booking_data
+                    )
+                    ->read(['id', 'name'])
+                    ->first(true);
+
+
+            return [$center_office['id'], $payment_deadline['id'], $booking['id']];
         },
         'act'               =>  function ($data) {
 
-            list($center_office_id, $payment_deadline_id) = $data;
+            list($center_office_id, $payment_deadline_id , $booking_id) = $data;
 
             $funding_data = ModelFactory::create(Funding::class, [
                 "values" => [
                     "center_office_id"       => $center_office_id,
+                    "booking_id"             => $booking_id,
                     "payment_deadline_id"    => $payment_deadline_id,
                     "due_amount"             => 100
                 ]
