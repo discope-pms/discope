@@ -54,7 +54,7 @@ class ProductFavorite extends Model {
 
     public static function calcName($self) {
         $result = [];
-        $self->read(['product_id' => 'name']);
+        $self->read(['product_id' => ['name']]);
         foreach($self as $id => $product_favorite) {
             $result[$id] = $product_favorite['product_id']['name'];
         }

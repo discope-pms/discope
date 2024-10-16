@@ -173,7 +173,7 @@ class ProductModel extends Model {
                 'rel_table'         => 'sale_catalog_product_rel_productmodel_group',
                 'rel_foreign_key'   => 'group_id',
                 'rel_local_key'     => 'productmodel_id',
-                'onupdate'          => 'onupdateGroupsIds' // TODO: check if needed !!!!!
+                'onupdate'          => 'onupdateGroupsIds'
             ],
 
             'categories_ids' => [
