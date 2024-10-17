@@ -101,6 +101,11 @@ use lodging\sale\booking\Booking;
  */
 ['context' => $context, 'orm' => $orm] = $providers;
 
+$model = $orm->getModel($params['entity']);
+if(!$model) {
+    throw new Exception("unknown_entity", EQ_ERROR_UNKNOWN_OBJECT);
+}
+
 $domain = $params['domain'];
 
 if(isset($params['booking_id']) && $params['booking_id'] > 0) {
