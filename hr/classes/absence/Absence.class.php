@@ -7,8 +7,9 @@
 namespace hr\absence;
 
 use core\setting\Setting;
+use equal\orm\Model;
 
-class Absence extends \equal\orm\Model {
+class Absence extends Model {
 
     public static function getName() {
         return 'Absence';
@@ -35,27 +36,27 @@ class Absence extends \equal\orm\Model {
             'organisation_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'identity\Identity',
-                'description'       => 'The organisation which the targeted identity is a partner of.',
+                'description'       => "The organisation which the targeted identity is a partner of.",
                 'default'           => 1
             ],
 
             'employee_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'hr\employee\Employee',
-                'description'       => 'The employee the absence relates to.',
+                'description'       => "The employee the absence relates to.",
                 'required'          => true
             ],
 
             'code_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'hr\absence\AbsenceCode',
-                'description'       => 'Absence code (reason).',
+                'description'       => "Absence code (reason).",
                 'required'          => true
             ],
 
             'date' => [
                 'type'              => 'date',
-                'description'       => 'Date at which the absence is planned.',
+                'description'       => "Date at which the absence is planned.",
                 'required'          => true
             ],
 
@@ -75,7 +76,7 @@ class Absence extends \equal\orm\Model {
                     'fullday',
                     'hours'
                 ],
-                'description'       => 'The units in which the quantity is expressed.',
+                'description'       => "The units in which the quantity is expressed.",
                 'default'           => 'hours',
                 'dependents'        => ['duration']
             ],
@@ -83,7 +84,7 @@ class Absence extends \equal\orm\Model {
             'qty' => [
                 'type'              => 'float',
                 'usage'             => 'number/real:2',
-                'description'       => 'Amount of units expressed in measure_unit.',
+                'description'       => "Amount of units expressed in measure_unit.",
                 'required'          => true,
                 'dependents'        => ['duration']
             ],
@@ -91,24 +92,24 @@ class Absence extends \equal\orm\Model {
             'duration' => [
                 'type'              => 'computed',
                 'result_type'       => 'float',
-                'function'          => 'calcDuration',
                 'usage'             => 'number/real:3',
-                'description'       => 'Duration in hours (computed).',
+                'description'       => "Duration in hours (computed).",
                 'store'             => true,
                 'instant'           => true,
+                'function'          => 'calcDuration'
             ]
 
         ];
     }
 
-
     public static function calcDuration($self) {
         $result = [];
-        $self ->read(['measure_unit', 'qty']);
+        $self->read(['measure_unit', 'qty']);
         foreach($self as $id => $absence) {
             $hours_per_day = Setting::get_value('hr', 'locale', 'daily_work_hours');
             $result[$id] =  ($absence['measure_unit'] == 'fullday') ? $absence['qty'] * $hours_per_day : $absence['qty'];
         }
+
         return $result;
     }
 

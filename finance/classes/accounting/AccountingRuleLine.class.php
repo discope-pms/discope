@@ -5,6 +5,7 @@
     License: GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 namespace finance\accounting;
+
 use equal\orm\Model;
 
 class AccountingRuleLine extends Model {
@@ -18,8 +19,8 @@ class AccountingRuleLine extends Model {
     }
 
     public static function getColumns() {
-
         return [
+
             'name' => [
                 'type'              => 'string',
                 'description'       => "Short string to serve as memo.",
@@ -30,8 +31,8 @@ class AccountingRuleLine extends Model {
                 'type'              => 'computed',
                 'result_type'       => 'string',
                 'description'       => "Code of the related account.",
-                'function'          => 'calcAccount',
-                'store'             => true
+                'store'             => true,
+                'function'          => 'calcAccount'
             ],
 
             'account_id' => [
@@ -63,8 +64,7 @@ class AccountingRuleLine extends Model {
         foreach($self as $id => $line) {
             $result[$id] = $line['account_id']['code'];
         }
+
         return $result;
     }
-
-
 }

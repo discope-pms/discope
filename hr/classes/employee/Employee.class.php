@@ -11,7 +11,7 @@ use identity\Partner;
 class Employee extends Partner {
 
     public static function getName() {
-        return 'Employee';
+        return "Employee";
     }
 
     public static function getDescription() {
@@ -19,37 +19,36 @@ class Employee extends Partner {
     }
 
     public static function getColumns() {
-
         return [
 
             'role_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'hr\employee\Role',
-                'description'       => 'Role assigned to the employee.'
+                'description'       => "Role assigned to the employee."
             ],
 
             'relationship' => [
                 'type'              => 'string',
                 'default'           => 'employee',
-                'description'       => 'Force relationship to Employee'
+                'description'       => "Force relationship to Employee"
             ],
 
             'date_start' => [
                 'type'              => 'date',
-                'description'       => 'Date of the first day of work.',
+                'description'       => "Date of the first day of work.",
                 'default'           => time(),
 
             ],
 
             'date_end' => [
                 'type'              => 'date',
-                'description'       => 'Date of the last day of work.',
-                'help'              => 'Date at which the contract ends (known in advance for fixed-term or unknown for permanent).'
+                'description'       => "Date of the last day of work.",
+                'help'              => "Date at which the contract ends (known in advance for fixed-term or unknown for permanent)."
             ],
 
             'is_active' => [
                 'type'              => 'boolean',
-                'description'       => 'Marks the employee as currently active within the organisation.',
+                'description'       => "Marks the employee as currently active within the organisation.",
                 'default'           => true
             ],
 
@@ -57,7 +56,7 @@ class Employee extends Partner {
                 'type'              => 'one2many',
                 'foreign_object'    => 'hr\absence\Absence',
                 'foreign_field'     => 'employee_id',
-                'description'       => 'Absences relating to the employee.',
+                'description'       => "Absences relating to the employee."
             ]
 
         ];
@@ -68,5 +67,4 @@ class Employee extends Partner {
             ['owner_identity_id', 'partner_identity_id', 'role_id']
         ];
     }
-
 }

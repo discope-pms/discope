@@ -1,7 +1,7 @@
 <?php
 /*
     This file is part of Symbiose Community Edition <https://github.com/yesbabylon/symbiose>
-    Some Rights Reserved, Yesbabylon SRL, 2020-2021
+    Some Rights Reserved, Yesbabylon SRL, 2020-2024
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 namespace documents;
@@ -17,6 +17,7 @@ class Document extends Model {
 
     public static function getColumns() {
         return [
+
             'name' => [
                 'type'              => 'string',
                 'required'          => true
@@ -24,19 +25,20 @@ class Document extends Model {
 
             'data' => [
                 'type'              => 'binary',
-                'onupdate'          => 'onupdateData'
+                'onupdate'          => 'onupdateData',
+                'dependents'        => ['preview_image', 'readable_size']
             ],
 
             'type' => [
                 'type'              => 'string',
                 'readonly'          => true,
-                'description'        => 'Content type of the document (from data).'
+                'description'        => "Content type of the document (from data)."
             ],
 
             'size'		    => [
                 'type'              => 'integer',
                 'readonly'          => true,
-                'description'        => 'Size of the document, in octets (from data).'
+                'description'        => "Size of the document, in octets (from data)."
             ],
 
             'readable_size' => [
@@ -58,7 +60,7 @@ class Document extends Model {
                 'type'              => 'computed',
                 'result_type'       => 'string',
                 'usage'             => 'uri/url',
-                'description'       => 'Direct URL to the document (uses hash).',
+                'description'       => "Direct URL to the document (uses hash).",
                 'function'          => 'calcLink',
                 'store'             => true,
                 'readonly'          => true
@@ -67,7 +69,7 @@ class Document extends Model {
             'category_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'documents\DocumentCategory',
-                'description'       => 'Category of the document.'
+                'description'       => "Category of the document."
             ],
 
             'tags_ids' => [
@@ -77,12 +79,12 @@ class Document extends Model {
                 'rel_table'         => 'documents_rel_document_tag',
                 'rel_foreign_key'   => 'tag_id',
                 'rel_local_key'     => 'document_id',
-                'description'       => 'List of product models assigned to this tag.'
+                'description'       => "List of product models assigned to this tag."
             ],
 
             'public' => [
                 'type'              => 'boolean',
-                'description'       => 'Accessibility of the document.',
+                'description'       => "Accessibility of the document.",
                 'default'           => false
             ],
 
@@ -91,7 +93,7 @@ class Document extends Model {
                 'result_type'       => 'binary',
                 'usage'             => 'image/jpeg',
                 'function'          => 'calcPreviewImage',
-                'description'       => 'Thumbnail of the document.',
+                'description'       => "Thumbnail of the document.",
                 'store'             => true
             ],
 
@@ -105,64 +107,64 @@ class Document extends Model {
         ];
     }
 
-    function calcReadableSize($om, $oids, $lang) {
-        $res = $om->read(__CLASS__, $oids, ['size']);
+    function calcReadableSize($self) {
         $precision = 1;
-        $suffixes = array('B', 'KB', 'MB', 'GB');
+        $suffixes = ['B', 'KB', 'MB', 'GB'];
+
         $result = [];
-        foreach($res as $oid => $odoc) {
-            $content = $odoc['size'];
+        $self->read(['size']);
+        foreach($self as $id => $document) {
+            $content = $document['size'];
             $base = log($content, 1024);
-            $result[$oid] = round(pow(1024, $base - floor($base)), $precision) . ' '. $suffixes[floor($base)];
+            $result[$id] = round(pow(1024, $base - floor($base)), $precision) . ' '. $suffixes[floor($base)];
         }
+
         return $result;
     }
 
-    public static function calcLink($om, $oids) {
-        $res = $om->read(__CLASS__, $oids, ['hash']);
-
+    public static function calcLink($self) {
         $result = [];
-        foreach($res as $oid => $odata) {
-            $result[$oid] = '/document/'.$odata['hash'];
+        $self->read(['hash']);
+        foreach($self as $id => $document) {
+            $result[$id] = "/document/{$document['hash']}";
         }
 
         return $result;
     }
 
-    public static function onupdateData($om, $oids, $values, $lang) {
-        $res = $om->read(self::getType(), $oids, ['hash', 'data']);
-
-        foreach($res as $oid => $odata) {
-            $content = $odata['data'];
+    public static function onupdateData($self) {
+        $self->read(['hash', 'data']);
+        foreach($self as $id => $document) {
+            $content = $document['data'];
             $size = strlen($content);
 
             // retrieve content_type from MIME
             $finfo = new \finfo(FILEINFO_MIME);
             $content_type = explode(';', $finfo->buffer($content))[0];
-            $om->update(self::getType(), $oid, [
+
+            Document::id($id)->update([
                 'size'  => $size,
                 'type'	=> $content_type
             ]);
 
             // set hash if not assigned yet
-            if(strlen($odata['hash']) <= 0) {
-                $om->update(self::getType(), $oid, ['hash'=> md5($oid.substr($content, 0, 128))]);
+            if(strlen($document['hash']) <= 0) {
+                Document::id($id)->update([
+                    'hash'=> md5($id.substr($content, 0, 128))
+                ]);
             }
         }
-        // reset preview image
-        $om->update(self::getType(), $oids, ['preview_image' => null, 'readable_size' => null]);
     }
 
     /**
      * Retrieve and validate an extension from a content type and a filename.
      *
-     * @param $content_type string  The content_type found for for the file.
-     * @param $name string  (optional) The name of the file, if any.
+     * @param $content_type string  The content_type found for the file.
+     * @param $name         string  (optional) The name of the file, if any.
      *
-     * @return string | bool    In case of success, the extesnion is return. If no extension matches the content type, it returns false.
+     * @return string|bool          In case of success, the extension is return. If no extension matches the content type, it returns false.
      */
-    public static function _getExtensionFromType($content_type, $name = '') {
-
+    public static function _getExtensionFromType(string $content_type, string $name = '') {
         static $extension_map = [
             '3g2'   =>	'video/3gpp2',
             '3gp'   =>	['video/3gp', 'video/3gpp'],
@@ -345,59 +347,48 @@ class Document extends Model {
             if(strlen($extension)) {
                 if(isset($extension_map[$extension])) {
                     $map = (array) $extension_map[$extension];
-                    foreach($map as $mime) {
-                        if($mime == $content_type) {
-                            return $extension;
-                        }
+                    if(in_array($content_type, $map)) {
+                        return $extension;
                     }
                 }
             }
         }
+
         // find the first extension that matches the given content_type
         foreach($extension_map as $extension => $map) {
             $map = (array) $map;
-            foreach($map as $mime) {
-                if($mime == $content_type) {
-                    return $extension;
-                }
+            if(in_array($content_type, $map)) {
+                return $extension;
             }
         }
+
         return false;
     }
 
     /**
      * Generate the preview image.
-     *
      * By convention, generated thumbnail is always a JPEG image.
-     *
      */
-    public static function calcPreviewImage($om, $oids) {
-
-        $res = $om->read(__CLASS__, $oids, ['name', 'type', 'data']);
+    public static function calcPreviewImage($self) {
         $result = [];
-
-        foreach($res as $oid => $odoc) {
-
+        $self->read(['name', 'type', 'data']);
+        foreach($self as $id => $document) {
             try {
-
-                if(substr($odoc['type'], 0, 5) != 'image') {
+                if(substr($document['type'], 0, 5) != 'image') {
                     throw new Exception('not an image');
                 }
 
-                $parts = explode('/', $odoc['type']);
-
+                $parts = explode('/', $document['type']);
                 if(count($parts) < 2) {
                     throw new Exception('invalid content type');
                 }
 
                 $image_type = $parts[1];
-
                 if(!in_array($image_type, ['bmp', 'png', 'gif', 'jpeg', 'webp'])) {
                     throw new Exception('non supported image format');
                 }
 
-                $src_image = imagecreatefromstring($odoc['data']);
-
+                $src_image = imagecreatefromstring($document['data']);
                 if(!$src_image) {
                     throw new Exception();
                 }
@@ -431,13 +422,13 @@ class Document extends Model {
                 imagejpeg($dst_image, null, 80);
                 $buffer = ob_get_clean();
 
-                $result[$oid] = $buffer;
+                $result[$id] = $buffer;
             }
             catch(Exception $e){
                 // unknown image type : fallback to hardcoded default thumbnail
-                $result[$oid] = base64_decode('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');
+                $result[$id] = base64_decode('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');
 
-                $extension = self::_getExtensionFromType($odoc['type'], $odoc['name']);
+                $extension = self::_getExtensionFromType($document['type'], $document['name']);
                 if($extension) {
                     $filename = QN_BASEDIR.'/packages/documents/assets/img/extensions/'.$extension.'.jpg';
                     if(!is_file($filename)) {
@@ -445,11 +436,12 @@ class Document extends Model {
                         $filename = QN_BASEDIR.'/packages/documents/assets/img/extensions/unknown.jpg';
                     }
                     if(is_file($filename)) {
-                        $result[$oid] =  file_get_contents($filename);
+                        $result[$id] =  file_get_contents($filename);
                     }
                 }
             }
         }
+
         return $result;
     }
 }

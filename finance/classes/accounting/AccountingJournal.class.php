@@ -24,20 +24,20 @@ class AccountingJournal extends Model {
             'name' => [
                 'type'              => 'computed',
                 'result_type'       => 'string',
-                'description'       => 'Label for identifying the journal.',
+                'description'       => "Label for identifying the journal.",
                 'function'          => 'calcName',
                 'store'             => true
             ],
 
             'description' => [
                 'type'              => 'string',
-                'description'       => 'Verbose detail of the role of the journal.',
+                'description'       => "Verbose detail of the role of the journal.",
                 'multilang'         => true
             ],
 
             'code' => [
                 'type'              => 'string',
-                'description'       => 'Unique code (optional).',
+                'description'       => "Unique code (optional).",
                 'unique'            => true
             ],
 
@@ -56,7 +56,7 @@ class AccountingJournal extends Model {
 
             'index' => [
                 'type'              => 'integer',
-                'description'       => 'Counter for payments exports.',
+                'description'       => "Counter for payments exports.",
                 'default'           => 120000
             ],
 
@@ -70,7 +70,7 @@ class AccountingJournal extends Model {
             'center_office_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => '\identity\CenterOffice',
-                'description'       => 'Management Group the accounting journal belongs to.',
+                'description'       => "Management Group the accounting journal belongs to.",
                 'onupdate'          => 'onupdateCenterOfficeId'
             ],
 
@@ -78,7 +78,7 @@ class AccountingJournal extends Model {
                 'type'              => 'one2many',
                 'foreign_object'    => 'finance\accounting\AccountingEntry',
                 'foreign_field'     => 'journal_id',
-                'description'       => 'Accounting entries relating to the journal.',
+                'description'       => "Accounting entries relating to the journal.",
                 'ondetach'          => 'null'
             ]
 
@@ -91,6 +91,7 @@ class AccountingJournal extends Model {
         foreach($self as $id => $journal) {
             $result[$id] =  $journal['code'].' - '.$journal['organisation_id']['name'];
         }
+
         return $result;
     }
 

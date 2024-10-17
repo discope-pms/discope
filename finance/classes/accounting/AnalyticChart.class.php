@@ -5,6 +5,7 @@
     License: GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 namespace finance\accounting;
+
 use equal\orm\Model;
 
 class AnalyticChart extends Model {
@@ -18,8 +19,8 @@ class AnalyticChart extends Model {
     }
 
     public static function getColumns() {
-
         return [
+
             'name' => [
                 'type'              => 'string',
                 'description'       => "Name of the analytical chart of accounts."
@@ -41,5 +42,4 @@ class AnalyticChart extends Model {
 
         ];
     }
-
 }

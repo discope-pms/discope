@@ -6,10 +6,12 @@
 */
 namespace hr\employee;
 
-class Role extends \equal\orm\Model {
+use equal\orm\Model;
+
+class Role extends Model {
 
     public static function getName() {
-        return 'Role';
+        return "Role";
     }
 
     public static function getDescription() {
@@ -17,18 +19,17 @@ class Role extends \equal\orm\Model {
     }
 
     public static function getColumns() {
-
         return [
 
             'name' => [
                 'type'              => 'string',
-                'description'       => 'Official Name of the role.',
+                'description'       => "Official Name of the role.",
                 'required'          => true
             ],
 
             'code' => [
                 'type'              => 'string',
-                'description'       => 'Official Name of the role.',
+                'description'       => "Official Name of the role.",
                 'unique'            => true,
                 'required'          => true
             ],
@@ -36,10 +37,9 @@ class Role extends \equal\orm\Model {
             'description' => [
                 'type'              => 'string',
                 'usage'             => 'text/plain',
-                'description'       => 'Details about the role.'
+                'description'       => "Details about the role."
             ]
 
         ];
     }
-
 }
