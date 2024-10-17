@@ -553,58 +553,30 @@ class Identity extends Model {
         return $result;
     }
 
-    /**
-     * Check wether an object can be updated, and perform some additional operations if necessary.
-     * This method can be overriden to define a more precise set of tests.
-     *
-     * @param  object   $om         ObjectManager instance.
-     * @param  array    $oids       List of objects identifiers.
-     * @param  array    $values     Associative array holding the new values to be assigned.
-     * @param  string   $lang       Language in which multilang fields are being updated.
-     * @return array    Returns an associative array mapping fields with their error messages. En empty array means that object has been successfully processed and can be updated.
-     */
-    public static function canupdate($om, $oids, $values, $lang='en') {
+    public static function canupdate($self, $values) {
         if(isset($values['type_id'])) {
-            $identities = $om->read(get_called_class(), $oids, [ 'firstname', 'lastname', 'legal_name' ], $lang);
-            foreach($identities as $oid => $identity) {
+            $self->read(['firstname', 'lastname', 'legal_name']);
+            foreach($self as $identity) {
                 if($values['type_id'] == 1) {
-                    $firstname = '';
-                    $lastname = '';
-                    if(isset($values['firstname'])) {
-                        $firstname = $values['firstname'];
+                    $firstname = $values['firstname'] ?? $identity['firstname'];
+                    if(empty($firstname)) {
+                        return ['firstname' => ['missing' => "Firstname cannot be empty for natural person."]];
                     }
-                    else {
-                        $firstname = $identity['firstname'];
-                    }
-                    if(isset($values['lastname'])) {
-                        $lastname = $values['lastname'];
-                    }
-                    else {
-                        $lastname = $identity['lastname'];
-                    }
-
-                    if(!strlen($firstname) ) {
-                        return ['firstname' => ['missing' => 'Firstname cannot be empty for natural person.']];
-                    }
-                    if(!strlen($lastname) ) {
-                        return ['lastname' => ['missing' => 'Lastname cannot be empty for natural person.']];
+                    $lastname = $values['lastname'] ?? $identity['lastname'];
+                    if(empty($lastname)) {
+                        return ['lastname' => ['missing' => "Lastname cannot be empty for natural person."]];
                     }
                 }
                 else {
-                    $legal_name = '';
-                    if(isset($values['legal_name'])) {
-                        $legal_name = $values['legal_name'];
-                    }
-                    else {
-                        $legal_name = $identity['legal_name'];
-                    }
-                    if(!strlen($legal_name)) {
-                        return ['legal_name' => ['missing' => 'Legal name cannot be empty for legal person.']];
+                    $legal_name = $values['legal_name'] ?? $identity['legal_name'];
+                    if(empty($legal_name)) {
+                        return ['legal_name' => ['missing' => "Legal name cannot be empty for legal person."]];
                     }
                 }
             }
         }
-        return parent::canupdate($om, $oids, $values, $lang);
+
+        return parent::canupdate($self, $values);
     }
 
     public static function getConstraints() {
