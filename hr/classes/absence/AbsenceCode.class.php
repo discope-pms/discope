@@ -6,7 +6,9 @@
 */
 namespace hr\absence;
 
-class AbsenceCode extends \equal\orm\Model {
+use equal\orm\Model;
+
+class AbsenceCode extends Model {
 
     public static function getName() {
         return 'Absence code';
@@ -17,29 +19,28 @@ class AbsenceCode extends \equal\orm\Model {
     }
 
     public static function getColumns() {
-
         return [
 
             'name' => [
                 'type'              => 'computed',
                 'result_type'       => 'string',
-                'function'          => 'calcName',
-                'description'       => 'Label describing the code.',
+                'description'       => "Label describing the code.",
                 'store'             => true,
                 'instant'           => true,
+                'function'          => 'calcName',
                 'readonly'          => true
             ],
 
             'code' => [
                 'type'              => 'string',
-                'description'       => 'Code (based on local legislation).',
+                'description'       => "Code (based on local legislation).",
                 'required'          => true,
                 'dependents'        => ['name']
             ],
 
             'description' => [
                 'type'              => 'string',
-                'description'       => 'Description of the absence code (reason).',
+                'description'       => "Description of the absence code (reason).",
                 'dependents'        => ['name']
             ]
 
@@ -52,13 +53,13 @@ class AbsenceCode extends \equal\orm\Model {
         foreach($self as $id => $code) {
             $result[$id] = $code['code'].' - '.$code['description'];
         }
+
         return $result;
     }
 
     public static function onchange($event, $values) {
         $result = [];
-
-        if( isset($event['code']) || isset($event['description']) ) {
+        if(isset($event['code']) || isset($event['description'])) {
             $code = $event['code'] ?? $values['code'];
             $description = $event['description'] ?? $values['description'];
             $result['name'] = $code.' - '.$description;

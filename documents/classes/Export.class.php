@@ -25,7 +25,7 @@ class Export extends Document {
             'center_office_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'identity\CenterOffice',
-                'description'       => 'Office the invoice relates to (for center management).',
+                'description'       => "Office the invoice relates to (for center management)."
             ],
 
             'export_type' => [
@@ -41,7 +41,7 @@ class Export extends Document {
             'is_exported' => [
                 'type'              => 'boolean',
                 'default'           => false,
-                'description'       => 'Mark the archive as already exported.'
+                'description'       => "Mark the archive as already exported."
             ]
 
         ];
@@ -50,7 +50,6 @@ class Export extends Document {
     public static function calcName($self) {
         $result = [];
         $self->read(['created', 'export_type', 'center_office_id' => ['name']]);
-
         foreach($self as $id => $export) {
             $result[$id] = sprintf('%s - %s - %s',
                 date('Ymd', $export['created']),

@@ -1,7 +1,7 @@
 <?php
 /*
     This file is part of Symbiose Community Edition <https://github.com/yesbabylon/symbiose>
-    Some Rights Reserved, Yesbabylon SRL, 2020-2021
+    Some Rights Reserved, Yesbabylon SRL, 2020-2024
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 namespace documents;
@@ -12,6 +12,7 @@ class DocumentCategory extends Model {
 
     public static function getColumns() {
         return [
+
             'name' => [
                 'type'              => 'string',
                 'description'       => '',
@@ -28,7 +29,7 @@ class DocumentCategory extends Model {
 
             'parent_id' => [
                 'type'              => 'many2one',
-                'description'       => 'Product Family which current family belongs to, if any.',
+                'description'       => "Product Family which current family belongs to, if any.",
                 'foreign_object'    => 'documents\DocumentCategory',
                 'onupdate'          => 'onupdatePath'
             ],
@@ -37,7 +38,7 @@ class DocumentCategory extends Model {
                 'type'              => 'computed',
                 'function'          => 'calcPath',
                 'result_type'       => 'string',
-                'description'       => 'Full path of the Document',
+                'description'       => "Full path of the Document",
                 'store'             => true,
                 'multilang'         => true,
                 'readonly'          => true
@@ -47,8 +48,9 @@ class DocumentCategory extends Model {
                 'type'              => 'one2many',
                 'foreign_field'     => 'category_id',
                 'foreign_object'    => 'documents\Document',
-                'description'       => 'Product models which current product belongs to the family.'
+                'description'       => "Product models which current product belongs to the family."
             ]
+
         ];
     }
 

@@ -1,10 +1,11 @@
 <?php
 /*
     This file is part of Symbiose Community Edition <https://github.com/yesbabylon/symbiose>
-    Some Rights Reserved, Yesbabylon SRL, 2020-2021
+    Some Rights Reserved, Yesbabylon SRL, 2020-2024
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 namespace calendar;
+
 use equal\orm\Model;
 
 class HolidayYear extends Model {
@@ -18,8 +19,8 @@ class HolidayYear extends Model {
     }
 
     public static function getColumns() {
-
         return [
+
             'name' => [
                 'type'              => 'string',
                 'description'       => "Year of the ephemeris list.",
@@ -36,9 +37,9 @@ class HolidayYear extends Model {
                 'type'              => 'one2many',
                 'foreign_object'    => 'calendar\Holiday',
                 'foreign_field'     => 'holiday_year_id',
-                'description'       => 'List of holidays occuring during the year.'
+                'description'       => "List of holidays occurring during the year."
             ]
+
         ];
     }
-
 }

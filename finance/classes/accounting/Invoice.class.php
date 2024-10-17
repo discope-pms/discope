@@ -5,6 +5,7 @@
     License: GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 namespace finance\accounting;
+
 use equal\orm\Model;
 use core\setting\Setting;
 use sale\catalog\Product;
@@ -20,8 +21,8 @@ class Invoice extends Model {
     }
 
     public static function getColumns() {
-
         return [
+
             'name' => [
                 'type'              => 'alias',
                 'alias'             => "number"
@@ -29,12 +30,12 @@ class Invoice extends Model {
 
             'customer_ref' => [
                 'type'              => 'string',
-                'description'       => 'Reference that must appear on invoice (requested by customer).'
+                'description'       => "Reference that must appear on invoice (requested by customer)."
             ],
 
             'is_deposit' => [
                 'type'              => 'boolean',
-                'description'       => 'Marks the invoice as a deposit one, relating to a downpayment.',
+                'description'       => "Marks the invoice as a deposit one, relating to a downpayment.",
                 'default'           => false
             ],
 
@@ -77,14 +78,14 @@ class Invoice extends Model {
                 'type'              => 'computed',
                 'result_type'       => 'boolean',
                 'description'       => "Indicator of the invoice payment status.",
-                'visible'           => ['status', '=', 'invoice'],
+                'store'             => true,
                 'function'          => 'calcIsPaid',
-                'store'             => true
+                'visible'           => ['status', '=', 'invoice']
             ],
 
             'reversed_invoice_id' => [
                 'type'              => 'many2one',
-                'foreign_object'    => self::getType(),
+                'foreign_object'    => 'finance\accounting\Invoice',
                 'description'       => "Credit note that was created for cancelling the invoice, if any.",
                 'visible'           => [[['status', '=', 'cancelled']], [['type', '=', 'credit_note']]]
             ],
@@ -105,14 +106,14 @@ class Invoice extends Model {
             'payment_reference' => [
                 'type'              => 'computed',
                 'result_type'       => 'string',
-                'function'          => 'calcPaymentReference',
-                'description'       => 'Message for identifying payments related to the invoice.',
-                'store'             => true
+                'description'       => "Message for identifying payments related to the invoice.",
+                'store'             => true,
+                'function'          => 'calcPaymentReference'
             ],
 
             'date' => [
                 'type'              => 'datetime',
-                'description'       => 'Emission date of the invoice.',
+                'description'       => "Emission date of the invoice.",
                 'default'           => time()
             ],
 
@@ -131,26 +132,26 @@ class Invoice extends Model {
             'price' => [
                 'type'              => 'computed',
                 'result_type'       => 'float',
-                'function'          => 'calcPrice',
                 'usage'             => 'amount/money:2',
+                'description'       => "Final tax-included invoiced amount (computed).",
                 'store'             => true,
-                'description'       => "Final tax-included invoiced amount (computed)."
+                'function'          => 'calcPrice'
             ],
 
             'total' => [
                 'type'              => 'computed',
                 'result_type'       => 'float',
-                'function'          => 'calcTotal',
                 'usage'             => 'amount/money:4',
-                'description'       => 'Total tax-excluded price of the invoice (computed).',
-                'store'             => true
+                'description'       => "Total tax-excluded price of the invoice (computed).",
+                'store'             => true,
+                'function'          => 'calcTotal'
             ],
 
             'invoice_lines_ids' => [
                 'type'              => 'one2many',
                 'foreign_object'    => 'finance\accounting\InvoiceLine',
                 'foreign_field'     => 'invoice_id',
-                'description'       => 'Detailed lines of the invoice.',
+                'description'       => "Detailed lines of the invoice.",
                 'ondetach'          => 'delete',
                 'dependents'         => ['total', 'price']
             ],
@@ -159,7 +160,7 @@ class Invoice extends Model {
                 'type'              => 'one2many',
                 'foreign_object'    => 'finance\accounting\InvoiceLineGroup',
                 'foreign_field'     => 'invoice_id',
-                'description'       => 'Groups of lines of the invoice.',
+                'description'       => "Groups of lines of the invoice.",
                 'ondetach'          => 'delete',
                 'dependents'         => ['total', 'price']
             ],
@@ -168,7 +169,7 @@ class Invoice extends Model {
                 'type'              => 'one2many',
                 'foreign_object'    => 'finance\accounting\AccountingEntry',
                 'foreign_field'     => 'invoice_id',
-                'description'       => 'Accounting entries relating to the lines of the invoice.',
+                'description'       => "Accounting entries relating to the lines of the invoice.",
                 'ondetach'          => 'delete'
             ],
 
@@ -176,7 +177,7 @@ class Invoice extends Model {
                 'type'              => 'one2many',
                 'foreign_object'    => 'sale\pay\Funding',
                 'foreign_field'     => 'invoice_id',
-                'description'       => 'Fundings related to the invoice (should be max. 1).'
+                'description'       => "Fundings related to the invoice (should be max. 1)."
             ],
 
             'payment_terms_id' => [
@@ -196,45 +197,47 @@ class Invoice extends Model {
 
             'is_exported' => [
                 'type'              => 'boolean',
-                'description'       => 'Mark the invoice as exported (part of an export to elsewhere).',
+                'description'       => "Mark the invoice as exported (part of an export to elsewhere).",
                 'default'           => false
             ],
 
             'display_price' => [
                 'type'              => 'computed',
                 'result_type'       => 'float',
-                'function'          => 'calcDisplayPrice',
                 'usage'             => 'amount/money:2',
+                'description'       => "Final tax-included amount used for display (inverted for credit notes).",
                 'store'             => true,
-                'description'       => "Final tax-included amount used for display (inverted for credit notes)."
+                'function'          => 'calcDisplayPrice'
             ],
 
             'accounting_price' => [
                 'type'              => 'computed',
                 'result_type'       => 'float',
-                'function'          => 'calcAccountingPrice',
                 'usage'             => 'amount/money:4',
                 'description'       => "Total tax-included price to record for accounting.",
-                'store'             => true
+                'store'             => true,
+                'function'          => 'calcAccountingPrice'
             ],
 
             'accounting_total' => [
                 'type'              => 'computed',
                 'result_type'       => 'float',
-                'function'          => 'calcAccountingTotal',
                 'usage'             => 'amount/money:4',
                 'description'       => "Total tax-excluded price to record for accounting related outputs.",
-                'store'             => true
-            ],
+                'store'             => true,
+                'function'          => 'calcAccountingTotal'
+            ]
 
         ];
     }
 
-
     public static function calcAccountingPrice($self) {
         $result = [];
-
-        $self->read(['organisation_id', 'is_deposit', 'invoice_lines_ids' => ['id','price', 'product_id', 'downpayment_invoice_id'=>['id','status']]]);
+        $self->read([
+            'organisation_id',
+            'is_deposit',
+            'invoice_lines_ids' => ['id', 'price', 'product_id', 'downpayment_invoice_id' => ['id', 'status']]
+        ]);
         foreach($self as $id => $invoice) {
             $downpayment_product_id = 0;
             $downpayment_sku = Setting::get_value('sale', 'invoice', 'downpayment.sku.'.$invoice['organisation_id']);
@@ -246,7 +249,7 @@ class Invoice extends Model {
             }
 
             $price = 0;
-            foreach($invoice['invoice_lines_ids'] as $lid => $line) {
+            foreach($invoice['invoice_lines_ids'] as $line) {
                 if($line['product_id'] == $downpayment_product_id) {
                     if($invoice['is_deposit']) {
                         $price += $line['price'];
@@ -263,17 +266,22 @@ class Invoice extends Model {
                     $price += $line['price'];
                 }
             }
+
             $result[$id] = round($price, 2);
         }
+
         return $result;
     }
 
 
     public static function calcAccountingTotal($self) {
         $result = [];
-
-        $self->read(['organisation_id', 'is_deposit', 'invoice_lines_ids' => ['id','total', 'product_id', 'downpayment_invoice_id'=>['id','status']]]);
-        foreach($self as $oid => $invoice) {
+        $self->read([
+            'organisation_id',
+            'is_deposit',
+            'invoice_lines_ids' => ['id', 'total', 'product_id', 'downpayment_invoice_id' => ['id', 'status']]
+        ]);
+        foreach($self as $id => $invoice) {
             $downpayment_product_id = 0;
             $downpayment_sku = Setting::get_value('sale', 'invoice', 'downpayment.sku.'.$invoice['organisation_id']);
             if($downpayment_sku) {
@@ -284,7 +292,7 @@ class Invoice extends Model {
             }
 
             $total = 0;
-            foreach($invoice['invoice_lines_ids'] as $lid => $line) {
+            foreach($invoice['invoice_lines_ids'] as $line) {
                 if($line['product_id'] == $downpayment_product_id) {
                     if($invoice['is_deposit']) {
                         $total += round($line['total'], 2);
@@ -299,34 +307,34 @@ class Invoice extends Model {
                     $total += round($line['total'], 2);
                 }
             }
-            $result[$oid] = round($total, 2);
+
+            $result[$id] = round($total, 2);
         }
+
         return $result;
     }
 
-
-    public static function calcIsPaid($om, $oids, $lang) {
+    public static function calcIsPaid($self) {
         $result = [];
         // #memo - fundings_ids targets all fundings relating to invoice: this includes the installments
         // we need to limit the check to the direct funding, if any
-        $invoices = $om->read(get_called_class(), $oids, ['status', 'price', 'funding_id.paid_amount'], $lang);
-        if($invoices > 0) {
-            foreach($invoices as $oid => $invoice) {
-                $result[$oid] = false;
-                if($invoice['status'] != 'invoice') {
-                    // proforma invoices cannot be marked as paid
-                    continue;
-                }
-                if($invoice['price'] == 0) {
-                    // mark the invoice as paid, whatever its funding
-                    $result[$oid] = true;
-                    continue;
-                }
-                if($invoice['funding_id.paid_amount'] && $invoice['funding_id.paid_amount'] == $invoice['price']) {
-                    $result[$oid] = true;
-                }
+        $self->read(['status', 'price', 'funding_id' => ['paid_amount']]);
+        foreach($self as $id => $invoice) {
+            $result[$id] = false;
+            if($invoice['status'] != 'invoice') {
+                // proforma invoices cannot be marked as paid
+                continue;
+            }
+            if($invoice['price'] == 0) {
+                // mark the invoice as paid, whatever its funding
+                $result[$id] = true;
+                continue;
+            }
+            if($invoice['funding_id']['paid_amount'] && $invoice['funding_id']['paid_amount'] == $invoice['price']) {
+                $result[$id] = true;
             }
         }
+
         return $result;
     }
 
@@ -344,11 +352,9 @@ class Invoice extends Model {
 
     public static function calcNumber($self) {
         $result = [];
-
-        $self->read(['status', 'date', 'organisation_id', 'center_office_id' => 'code']);
+        $self->read(['status', 'date', 'organisation_id', 'center_office_id' => ['code']]);
         foreach($self as $id => $invoice) {
-
-            if($invoice['status'] == 'proforma') {
+            if($invoice['status'] === 'proforma') {
                 $result[$id] = '[proforma]';
                 continue;
             }
@@ -357,7 +363,6 @@ class Invoice extends Model {
             $fiscal_year = Setting::get_value('finance', 'invoice', 'fiscal_year');
             $year = date('Y', $invoice['date']);
             $sequence = Setting::get_value('lodging', 'invoice', 'sequence.'.$invoice['center_office_id']['code']);
-
 
             if(intval($year) == intval($fiscal_year) && $sequence) {
                 Setting::set_value('lodging', 'invoice', 'sequence.'.$invoice['center_office_id']['code'], $sequence + 1);
@@ -370,6 +375,7 @@ class Invoice extends Model {
                 ]);
             }
         }
+
         return $result;
     }
 
@@ -430,9 +436,8 @@ class Invoice extends Model {
     public static function calcDisplayPrice($self) {
         $result = [];
         $self->read(['type', 'price']);
-
         foreach($self as $id => $invoice) {
-            if($invoice['type'] == 'invoice') {
+            if($invoice['type'] === 'invoice') {
                 $result[$id] = $invoice['price'];
             }
             else {
@@ -442,7 +447,6 @@ class Invoice extends Model {
 
         return $result;
     }
-
 
     /**
      * Handler triggered after a status change occurred.
@@ -500,62 +504,42 @@ class Invoice extends Model {
                     }
                 }
             }
-
         }
     }
 
-    /**
-     * Check whether an object can be updated, and perform some additional operations if necessary.
-     * This method can be overridden to define a more precise set of tests.
-     *
-     * @param  \equal\orm\ObjectManager   $om         ObjectManager instance.
-     * @param  array                      $oids       List of objects identifiers.
-     * @param  array                      $values     Associative array holding the new values to be assigned.
-     * @param  string                     $lang       Language in which multilang fields are being updated.
-     * @return array                      Returns an associative array mapping fields with their error messages. En empty array means that object has been successfully processed and can be updated.
-     */
-    public static function canupdate($om, $oids, $values, $lang='en') {
-        $res = $om->read(self::getType(), $oids, ['status']);
-
-        if($res > 0) {
-            foreach($res as $oids => $odata) {
-                // status can only be changed from 'proforma' to 'invoice' and from 'invoice' to 'cancelled'
-                if($odata['status'] == 'proforma') {
+    public static function canupdate($self, $values) {
+        $self->read(['status']);
+        foreach($self as $invoice) {
+            switch($invoice['status']) {
+                case 'proforma':
                     if(isset($values['status']) && !in_array($values['status'], ['proforma', 'invoice'])) {
-                        return ['status' => ['non_editable' => 'Invoice status can only be updated from proforma to invoice.']];
+                        return ['status' => ['non_editable' => "Invoice status can only be updated from proforma to invoice."]];
                     }
-                }
-                if($odata['status'] == 'invoice') {
+                    break;
+                case 'invoice':
                     if(!isset($values['status']) || !in_array($values['status'], ['invoice', 'cancelled'])) {
-                        // only allow modifiable fields
-                        if( count(array_diff(array_keys($values), ['customer_ref','payment_status','is_exported'])) ) {
-                            return ['status' => ['non_editable' => 'Invoice can only be updated while its status is proforma.']];
+                        $modifiable_fields = ['customer_ref', 'payment_status', 'is_exported'];
+                        $is_modifying_non_modifiable_fields = count(array_diff(array_keys($values), $modifiable_fields));
+                        if($is_modifying_non_modifiable_fields) {
+                            return ['status' => ['non_editable' => "Invoice can only be updated while its status is proforma."]];
                         }
                     }
-                }
+                    break;
             }
         }
-        return parent::canupdate($om, $oids, $values, $lang);
+
+        return parent::canupdate($self, $values);
     }
 
-    /**
-     * Check whether the invoice can be deleted.
-     *
-     * @param  \equal\orm\ObjectManager    $om         ObjectManager instance.
-     * @param  array                       $oids       List of objects identifiers.
-     * @return array                       Returns an associative array mapping fields with their error messages. An empty array means that object has been successfully processed and can be deleted.
-     */
-    public static function candelete($om, $oids) {
-        $res = $om->read(get_called_class(), $oids, [ 'status' ]);
-
-        if($res > 0) {
-            foreach($res as $oids => $odata) {
-                if($odata['status'] != 'proforma') {
-                    return ['status' => ['non_removable' => 'Invoice can only be deleted while its status is proforma.']];
-                }
+    public static function candelete($self) {
+        $self->read(['status']);
+        foreach($self as $invoice) {
+            if($invoice['status'] !== 'proforma') {
+                return ['status' => ['non_removable' => "Invoice can only be deleted while its status is proforma."]];
             }
         }
-        return parent::candelete($om, $oids);
+
+        return parent::candelete($self);
     }
 
     /**
@@ -727,6 +711,7 @@ class Invoice extends Model {
                 }
             }
         }
+
         return $result;
     }
 
@@ -742,8 +727,9 @@ class Invoice extends Model {
     protected static function _get_payment_reference($prefix, $suffix) {
         $a = intval($prefix);
         $b = intval($suffix);
-        $control = ((76*$a) + $b ) % 97;
-        $control = ($control == 0)?97:$control;
+        $control = ((76 * $a) + $b) % 97;
+        $control = ($control == 0) ? 97 : $control;
+
         return sprintf("%3d%04d%03d%02d", $a, $b / 1000, $b % 1000, $control);
     }
 }

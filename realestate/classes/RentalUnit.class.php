@@ -26,19 +26,19 @@ class RentalUnit extends Model {
 
             'order' => [
                 'type'              => 'integer',
-                'description'       => 'Arbitrary value for ordering the rental units.',
+                'description'       => "Arbitrary value for ordering the rental units.",
                 'default'           => 1
             ],
 
             'code' => [
                 'type'              => 'string',
-                'description'       => 'Short code for identification.',
+                'description'       => "Short code for identification.",
                 'generation'        => 'generateCode'
             ],
 
             'description' => [
                 'type'              => 'string',
-                'description'       => 'Short description of the unit.'
+                'description'       => "Short description of the unit."
             ],
 
             'type' => [
@@ -52,52 +52,52 @@ class RentalUnit extends Model {
                     'room',
                     'FFE'               // Furniture, Fixtures, and Equipment
                 ],
-                'description'       => 'Type of rental unit (that relates to capacity).',
+                'description'       => "Type of rental unit (that relates to capacity).",
                 'required'          => true
             ],
 
             'category' => [
                 'type'              => 'string',
                 'selection'         => ['hostel', 'lodge'],         // hostel is GA, lodge is GG
-                'description'       => 'Type of rental unit (that usually comes with extra accommodations, ie meals; or rented as is).',
+                'description'       => "Type of rental unit (that usually comes with extra accommodations, ie meals; or rented as is).",
                 'default'           => 'hostel'
             ],
 
             'is_accomodation' => [
                 'type'              => 'boolean',
-                'description'       => 'The rental unit is an accommodation (having at least one bed).',
+                'description'       => "The rental unit is an accommodation (having at least one bed).",
                 'default'           => true
             ],
 
             'capacity' => [
                 'type'              => 'integer',
-                'description'       => 'The number of persons that may stay in the unit.',
+                'description'       => "The number of persons that may stay in the unit.",
                 'default'           => 1
             ],
 
             'has_children' => [
                 'type'              => 'boolean',
-                'description'       => 'Flag to mark the unit as having sub-units.',
+                'description'       => "Flag to mark the unit as having sub-units.",
                 'default'           => false
             ],
 
             'has_parent' => [
                 'type'              => 'computed',
                 'result_type'       => 'boolean',
-                'function'          => 'calcHasParent',
-                'description'       => 'Flag to mark the unit as having sub-units.',
-                'store'             => true
+                'description'       => "Flag to mark the unit as having sub-units.",
+                'store'             => true,
+                'function'          => 'calcHasParent'
             ],
 
             'can_rent' => [
                 'type'              => 'boolean',
-                'description'       => 'Flag to mark the unit as (temporarily) unavailable for renting.',
+                'description'       => "Flag to mark the unit as (temporarily) unavailable for renting.",
                 'default'           => true
             ],
 
             'can_partial_rent' => [
                 'type'              => 'boolean',
-                'description'       => 'Flag to mark the unit as rentable partially (when children units).',
+                'description'       => "Flag to mark the unit as rentable partially (when children units).",
                 'visible'           => [ 'has_children', '=', true ],
                 'default'           => false
             ],
@@ -113,7 +113,7 @@ class RentalUnit extends Model {
             'center_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'identity\Center',
-                'description'       => 'The center to which belongs the rental unit.'
+                'description'       => "The center to which belongs the rental unit."
             ],
 
             'parent_id' => [
@@ -141,7 +141,7 @@ class RentalUnit extends Model {
                     'busy_part',           // unit is partially occupied
                     'ooo'                  // unit is out-of-order
                 ],
-                'description'       => 'Status of the rental unit.',
+                'description'       => "Status of the rental unit.",
                 'default'           => 'ready',
                 // cannot be set manually
                 'readonly'          => true
@@ -155,14 +155,14 @@ class RentalUnit extends Model {
                     'cleanup_full',         // unit requires a full cleanup
                     'repair'                // unit requires repair or maintenance
                 ],
-                'description'       => 'Action required for the rental unit.',
+                'description'       => "Action required for the rental unit.",
                 'default'           => 'none'
             ],
 
             'sojourn_type_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'lodging\sale\booking\SojournType',
-                'description'       => 'Default sojourn type of the rental unit.',
+                'description'       => "Default sojourn type of the rental unit.",
                 'default'           => 1,
                 'visible'           => ['is_accomodation', '=', true]
             ],
@@ -179,7 +179,7 @@ class RentalUnit extends Model {
                     'lightgreen',
                     'paleturquoise'
                 ],
-                'description'       => 'Arbitrary color to use for the rental unit when rendering the calendar.'
+                'description'       => "Arbitrary color to use for the rental unit when rendering the calendar."
             ],
 
             'consumptions_ids' => [
@@ -209,7 +209,7 @@ class RentalUnit extends Model {
                 'rel_table'         => 'sale_rel_repairing_rentalunit',
                 'rel_foreign_key'   => 'repairing_id',
                 'rel_local_key'     => 'rental_unit_id',
-                'description'       => 'List of scheduled repairing assigned to the rental units.'
+                'description'       => "List of scheduled repairing assigned to the rental units."
             ],
 
             'room_types_ids' => [
@@ -219,8 +219,8 @@ class RentalUnit extends Model {
                 'rel_table'         => 'lodging_rental_unit_rel_room_type',
                 'rel_foreign_key'   => 'room_type_id',
                 'rel_local_key'     => 'rental_unit_id',
-                'description'       => 'Room Type (from channel manager) the rental unit refers to.',
-                'help'              => 'If this field is set, it means that the rental unit can be rented on OTA via the channel manager. So, in case of a local booking it must trigger an update of the availabilities.'
+                'description'       => "Room Type (from channel manager) the rental unit refers to.",
+                'help'              => "If this field is set, it means that the rental unit can be rented on OTA via the channel manager. So, in case of a local booking it must trigger an update of the availabilities."
             ]
 
         ];
@@ -282,10 +282,12 @@ class RentalUnit extends Model {
                         }
                     }
                 }
+
                 if(in_array($values['parent_id'], $descendants_ids)) {
                     return ['parent_id' => ['child_cannot_be_parent' => 'Selected parent cannot be amongst rental unit children.']];
                 }
             }
+
             if(isset($values['children_ids'])) {
                 $ancestors_ids = [];
                 $parent_unit_id = $id;
@@ -300,6 +302,7 @@ class RentalUnit extends Model {
                         }
                     }
                 }
+
                 foreach($values['children_ids'] as $assignment) {
                     if($assignment > 0) {
                         if(in_array($assignment, $ancestors_ids)) {
@@ -309,6 +312,7 @@ class RentalUnit extends Model {
                 }
             }
         }
+
         return [];
     }
 
@@ -326,37 +330,36 @@ class RentalUnit extends Model {
         return [
             'capacity' =>  [
                 'lte_zero' => [
-                    'message'       => 'Capacity must be a positive value.',
+                    'message'       => "Capacity must be a positive value.",
                     'function'      => function ($qty, $values) {
                         return ($qty > 0);
                     }
                 ]
             ]
-
         ];
     }
 
     public static function generateName() {
-        $letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-        $code = '';
-        for ($i = 0; $i < 2; $i++) {
-            $code .= $letters[rand(0, strlen($letters) - 1)];
-        }
-
+        $code = self::randomCode();
         $number = rand(1, 150);
 
         return "$code - $number";
     }
 
     public static function generateCode() {
+        $code = self::randomCode();
+        $number = rand(1, 150);
+
+        return "$code$number";
+    }
+
+    private static function randomCode(): string {
         $letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
         $code = '';
         for ($i = 0; $i < 2; $i++) {
             $code .= $letters[rand(0, strlen($letters) - 1)];
         }
 
-        $number = rand(1, 150);
-
-        return "$code$number";
+        return $code;
     }
 }

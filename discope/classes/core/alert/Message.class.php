@@ -37,7 +37,6 @@ class Message extends \core\alert\Message {
     public static function calcCenterOfficeId($self) {
         $result = [];
         $self->read(['group_id']);
-
         foreach($self as $id => $message) {
             $result[$id] = $message['group_id'];
         }
@@ -48,7 +47,6 @@ class Message extends \core\alert\Message {
     public static function calcAlert($self) {
         $result = [];
         $self->read(['severity']);
-
         foreach($self as $id => $message) {
             switch($message['severity']) {
                 case 'notice':

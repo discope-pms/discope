@@ -5,6 +5,7 @@
     License: GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 namespace finance\accounting;
+
 use equal\orm\Model;
 
 class AnalyticSection extends Model {
@@ -14,12 +15,12 @@ class AnalyticSection extends Model {
     }
 
     public static function getDescription() {
-        return "Analytic sections allow to group spendings and revenues independently from the chart of accounts.";
+        return "Analytic sections allow to group spending and revenues independently from the chart of accounts.";
     }
 
     public static function getColumns() {
-
         return [
+
             'name' => [
                 'type'              => 'alias',
                 'alias'             => 'code'
@@ -56,5 +57,4 @@ class AnalyticSection extends Model {
 
         ];
     }
-
 }

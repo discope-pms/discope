@@ -19,8 +19,8 @@ class AccountingRule extends Model {
     }
 
     public static function getColumns() {
-
         return [
+
             'name' => [
                 'type'              => 'string',
                 'description'       => "Name of the accounting rule.",

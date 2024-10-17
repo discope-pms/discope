@@ -5,6 +5,7 @@
     License: GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 namespace finance\accounting;
+
 use equal\orm\Model;
 
 class InvoiceLineGroup extends Model {
@@ -19,21 +20,22 @@ class InvoiceLineGroup extends Model {
 
     public static function getColumns() {
         return [
+
             'name' => [
                 'type'              => 'string',
-                'description'       => 'Label of the group (displayed on invoice).',
+                'description'       => "Label of the group (displayed on invoice).",
                 'required'          => true
             ],
 
             'description' => [
                 'type'              => 'string',
-                'description'       => 'Short description of the group (displayed on invoice).'
+                'description'       => "Short description of the group (displayed on invoice)."
             ],
 
             'invoice_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'finance\accounting\Invoice',
-                'description'       => 'Invoice the line is related to.',
+                'description'       => "Invoice the line is related to.",
                 'required'          => true,
                 'ondelete'          => 'cascade'
             ],
@@ -42,7 +44,7 @@ class InvoiceLineGroup extends Model {
                 'type'              => 'one2many',
                 'foreign_object'    => 'finance\accounting\InvoiceLine',
                 'foreign_field'     => 'invoice_line_group_id',
-                'description'       => 'Detailed lines of the group.',
+                'description'       => "Detailed lines of the group.",
                 'ondetach'          => 'delete',
                 'onupdate'          => 'onupdateInvoiceLinesIds'
             ]

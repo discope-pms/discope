@@ -6,10 +6,12 @@
 */
 namespace hr\holiday;
 
-class Holiday extends \equal\orm\Model {
+use equal\orm\Model;
+
+class Holiday extends Model {
 
     public static function getName() {
-        return 'Holiday';
+        return "Holiday";
     }
 
     public static function getDescription() {
@@ -18,9 +20,10 @@ class Holiday extends \equal\orm\Model {
 
     public static function getColumns() {
         return [
+
             'name' => [
                 'type'              => 'string',
-                'description'       => 'Name of the holiday.',
+                'description'       => "Name of the holiday.",
                 'multilang'         => true
             ],
 
@@ -35,10 +38,11 @@ class Holiday extends \equal\orm\Model {
                 'type'              => 'computed',
                 'result_type'       => 'integer',
                 'usage'             => 'date/year:4',
-                'function'          => 'calcYear',
+                'description'       => "Year on which the holiday applies (based first date).",
                 'store'             => true,
-                'description'       => "Year on which the holiday applies (based first date)."
+                'function'          => 'calcYear'
             ]
+
         ];
     }
 
@@ -48,6 +52,7 @@ class Holiday extends \equal\orm\Model {
         foreach($self as $id => $holiday) {
             $result[$id] = date('Y', $holiday['date']);
         }
+
         return $result;
     }
 }

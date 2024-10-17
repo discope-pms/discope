@@ -5,6 +5,7 @@
     License: GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 namespace finance\accounting;
+
 use equal\orm\Model;
 
 class InvoiceLine extends Model {
@@ -23,20 +24,20 @@ class InvoiceLine extends Model {
             'name' => [
                 'type'              => 'computed',
                 'result_type'       => 'string',
-                'description'       => 'Default label of the line, based on product (computed).',
-                'function'          => 'calcName',
-                'store'             => true
+                'description'       => "Default label of the line, based on product (computed).",
+                'store'             => true,
+                'function'          => 'calcName'
             ],
 
             'description' => [
                 'type'              => 'string',
-                'description'       => 'Complementary description of the line (independant from product).'
+                'description'       => "Complementary description of the line (independent from product)."
             ],
 
             'invoice_line_group_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'finance\accounting\InvoiceLineGroup',
-                'description'       => 'Group the line relates to (in turn, groups relate to their invoice).',
+                'description'       => "Group the line relates to (in turn, groups relate to their invoice).",
                 'ondelete'          => 'cascade',
                 'domain'            => ['invoice_id', '=', 'object.invoice_id']
             ],
@@ -44,7 +45,7 @@ class InvoiceLine extends Model {
             'invoice_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'finance\accounting\Invoice',
-                'description'       => 'Invoice the line is related to.',
+                'description'       => "Invoice the line is related to.",
                 'required'          => true,
                 'onupdate'          => 'onupdateInvoiceId',
                 'ondelete'          => 'cascade'
@@ -53,14 +54,14 @@ class InvoiceLine extends Model {
             'product_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\catalog\Product',
-                'description'       => 'The product (SKU) the line relates to.',
+                'description'       => "The product (SKU) the line relates to.",
                 'required'          => true
             ],
 
             'price_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => '\sale\price\Price',
-                'description'       => 'The price the line relates to (assigned at line creation).',
+                'description'       => "The price the line relates to (assigned at line creation).",
                 'onupdate'          => 'onupdatePriceId'
             ],
 
@@ -68,9 +69,9 @@ class InvoiceLine extends Model {
                 'type'              => 'computed',
                 'result_type'       => 'float',
                 'usage'             => 'amount/money:4',
-                'description'       => 'Unit price of the product related to the line.',
-                'function'          => 'finance\accounting\InvoiceLine::calcUnitPrice',
-                'store'             => true
+                'description'       => "Unit price of the product related to the line.",
+                'store'             => true,
+                'function'          => 'calcUnitPrice'
             ],
 
             'vat_rate' => [
@@ -78,22 +79,22 @@ class InvoiceLine extends Model {
                 'result_type'       => 'float',
                 'usage'             => 'amount/rate',
                 'description'       => 'VAT rate to be applied.',
-                'function'          => 'calcVatRate',
                 'store'             => true,
+                'function'          => 'calcVatRate',
                 'default'           => 0.0,
                 'onupdate'          => 'onupdateVatRate'
             ],
 
             'qty' => [
                 'type'              => 'float',
-                'description'       => 'Quantity of product.',
+                'description'       => "Quantity of product.",
                 'default'           => 0,
                 'onupdate'          => 'onupdateQty'
             ],
 
             'free_qty' => [
                 'type'              => 'integer',
-                'description'       => 'Free quantity.',
+                'description'       => "Free quantity.",
                 'default'           => 0,
                 'onupdate'          => 'onupdateFreeQty'
             ],
@@ -101,7 +102,7 @@ class InvoiceLine extends Model {
             'discount' => [
                 'type'              => 'float',
                 'usage'             => 'amount/rate',
-                'description'       => 'Total amount of discount to apply, if any.',
+                'description'       => "Total amount of discount to apply, if any.",
                 'default'           => 0.0,
                 'onupdate'          => 'onupdateDiscount'
             ],
@@ -110,28 +111,28 @@ class InvoiceLine extends Model {
                 'type'              => 'computed',
                 'result_type'       => 'float',
                 'usage'             => 'amount/money:4',
-                'description'       => 'Total tax-excluded price of the line (computed).',
-                'function'          => 'calcTotal',
-                'store'             => true
+                'description'       => "Total tax-excluded price of the line (computed).",
+                'store'             => true,
+                'function'          => 'calcTotal'
             ],
 
             'price' => [
                 'type'              => 'computed',
                 'result_type'       => 'float',
                 'usage'             => 'amount/money:2',
-                'description'       => 'Final tax-included price of the line (computed).',
-                'function'          => 'calcPrice',
-                'store'             => true
+                'description'       => "Final tax-included price of the line (computed).",
+                'store'             => true,
+                'function'          => 'calcPrice'
             ],
 
             'downpayment_invoice_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'finance\accounting\Invoice',
-                'description'       => 'Downpayment invoice (set when the line refers to an invoiced downpayment.)'
+                'description'       => "Downpayment invoice (set when the line refers to an invoiced downpayment.)"
             ]
+
         ];
     }
-
 
     public static function calcName($self) {
         $result = [];
@@ -139,6 +140,7 @@ class InvoiceLine extends Model {
         foreach($self as $id => $line) {
             $result[$id] = $line['product_id']['name'];
         }
+
         return $result;
     }
 
@@ -148,6 +150,7 @@ class InvoiceLine extends Model {
         foreach($self as $id => $line) {
             $result[$id] = $line['price_id']['price'];
         }
+
         return $result;
     }
 
@@ -166,10 +169,11 @@ class InvoiceLine extends Model {
 
     public static function calcTotal($self) {
         $result = [];
-        $self->read(['qty','unit_price','free_qty','discount']);
+        $self->read(['qty','unit_price', 'free_qty', 'discount']);
         foreach($self as $id => $line) {
             $result[$id] = $line['unit_price'] * (1.0 - $line['discount']) * ($line['qty'] - $line['free_qty']);
         }
+
         return $result;
     }
 
@@ -181,10 +185,9 @@ class InvoiceLine extends Model {
             $vat = (float) $line['vat_rate'];
             $result[$id] = round($total * (1.0 + $vat), 2);
         }
+
         return $result;
     }
-
-
 
     public static function onupdatePriceId($self) {
         $self->do('reset_prices');
@@ -212,6 +215,7 @@ class InvoiceLine extends Model {
 
     public static function getActions() {
         return [
+
             'reset_prices' => [
                 'description'   => 'Resets price and total computed fields of the invoice line and the invoice.',
                 'policies'      => [],
@@ -222,6 +226,7 @@ class InvoiceLine extends Model {
                 'policies'      => [],
                 'function'      => 'doResetInvoicePrices'
             ]
+
         ];
     }
 
@@ -243,5 +248,4 @@ class InvoiceLine extends Model {
                 'total' => null
             ]);
     }
-
 }

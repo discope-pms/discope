@@ -5,6 +5,7 @@
     License: GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 namespace finance\accounting;
+
 use equal\orm\Model;
 
 class AccountingEntry extends Model {
@@ -22,19 +23,19 @@ class AccountingEntry extends Model {
 
             'name' => [
                 'type'              => 'string',
-                'description'       => 'Label for identifying the entry.',
+                'description'       => "Label for identifying the entry."
             ],
 
             'has_invoice' => [
                 'type'              => 'boolean',
-                'description'       => 'Signals that the entry relates to an invoice.',
+                'description'       => "Signals that the entry relates to an invoice.",
                 'default'           => false
             ],
 
             'invoice_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'finance\accounting\Invoice',
-                'description'       => 'Invoice that the line relates to.',
+                'description'       => "Invoice that the line relates to.",
                 'ondelete'          => 'cascade',
                 'visible'           => ['has_invoice', '=', true]
             ],
@@ -42,21 +43,21 @@ class AccountingEntry extends Model {
             'invoice_line_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'finance\accounting\InvoiceLine',
-                'description'       => 'Invoice line the entry relates to.',
+                'description'       => "Invoice line the entry relates to.",
                 'ondelete'          => 'cascade',
                 'visible'           => ['has_invoice', '=', true]
             ],
 
             'has_order' => [
                 'type'              => 'boolean',
-                'description'       => 'Signals that the entry relates to an order.',
+                'description'       => "Signals that the entry relates to an order.",
                 'default'           => false
             ],
 
             'order_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => '\sale\pos\Order',
-                'description'       => 'Invoice that the line relates to.',
+                'description'       => "Invoice that the line relates to.",
                 'ondelete'          => 'cascade',
                 'visible'           => ['has_order', '=', true]
             ],
@@ -64,7 +65,7 @@ class AccountingEntry extends Model {
             'order_line_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => '\sale\pos\OrderLine',
-                'description'       => 'Invoice line the entry relates to.',
+                'description'       => "Invoice line the entry relates to.",
                 'ondelete'          => 'cascade',
                 'visible'           => ['has_invoice', '=', true]
             ],
@@ -87,17 +88,17 @@ class AccountingEntry extends Model {
             'debit' => [
                 'type'              => 'float',
                 'usage'             => 'amount/money:4',
-                'description'       => 'Amount to be received.',
+                'description'       => "Amount to be received.",
                 'default'           => 0.0
             ],
 
             'credit' => [
                 'type'              => 'float',
                 'usage'             => 'amount/money:4',
-                'description'       => 'Amount to be disbursed.',
+                'description'       => "Amount to be disbursed.",
                 'default'           => 0.0
             ]
+
         ];
     }
-
 }

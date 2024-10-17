@@ -5,6 +5,7 @@
     License: GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 namespace finance\accounting;
+
 use equal\orm\Model;
 
 class AccountChart extends Model {
@@ -18,8 +19,8 @@ class AccountChart extends Model {
     }
 
     public static function getColumns() {
-
         return [
+
             'name' => [
                 'type'              => 'string',
                 'description'       => "Name of the chart of accounts."
@@ -42,5 +43,4 @@ class AccountChart extends Model {
 
         ];
     }
-
 }
