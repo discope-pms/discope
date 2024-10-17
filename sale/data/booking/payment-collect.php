@@ -6,8 +6,8 @@
 */
 
 use equal\orm\Domain;
-use lodging\sale\booking\BankStatementLine;
-use lodging\sale\booking\Booking;
+use sale\pay\BankStatementLine;
+use sale\booking\Booking;
 
 [$params, $providers] = eQual::announce([
     'description'   => "Advanced search for Payments: returns a collection of Payments according to extra parameters.",

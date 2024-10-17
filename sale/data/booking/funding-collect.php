@@ -6,7 +6,7 @@
 */
 
 use equal\orm\Domain;
-use lodging\sale\booking\Booking;
+use sale\booking\Booking;
 
 [$params, $providers] = eQual::announce([
     'description'   => "Advanced search for the Funding: returns a collection of Reports according to extra parameters.",
