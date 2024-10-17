@@ -32,7 +32,7 @@ use identity\Contact;
         ]
     ],
     'response'      => [
-        //'content-type'  => 'application/json',
+        'content-type'  => 'application/json',
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
@@ -106,5 +106,5 @@ $params['domain'] = $domain;
 $result = eQual::run('get', 'model_collect', $params, true);
 
 $context->httpResponse()
-    ->body($result)
-    ->send();
+        ->body($result)
+        ->send();
