@@ -3,7 +3,7 @@
     "description": "",
     "access": {
         "groups": ["booking.default.user"]
-     },
+    },
     "actions": [
         {
             "id": "action.sent",
@@ -19,7 +19,7 @@
             "description": "Contract will be marked as signed. Booking will be validated as soon as the payment is received.",
             "controller": "sale_contract_signed",
             "confirm": true,
-            "visible": ["status", "=", "sent"]
+            "visible": ["status", "in", ["pending", "sent"]]
         }
     ],
     "layout": {
@@ -58,9 +58,9 @@
                             }
                         ]
                     }
-                                       
+
                 ]
-            },            
+            },
             {
                 "sections": [
                     {
@@ -101,6 +101,20 @@
                                                 "width": "100%"
                                             }
                                         ]
+                                    },
+                                    {
+                                        "width": "50%",
+                                        "align": "right",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "is_locked",
+                                                "width": "100%",
+                                                "widget": {
+                                                    "align": "right"
+                                                }
+                                            }
+                                        ]
                                     }
                                 ]
                             }
@@ -111,7 +125,7 @@
                         "label": "Contract Lines",
                         "rows": [
                             {
-                                "columns": [                                    
+                                "columns": [
                                     {
                                         "width": "100%",
                                         "items": [
@@ -125,7 +139,7 @@
                                 ]
                             }
                         ]
-                    }                    
+                    }
                 ]
             }
         ]

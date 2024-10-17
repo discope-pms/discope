@@ -1,9 +1,32 @@
 {
-    "name": "Contracts",
-    "description": "Contracts are formal agreement regarding the delivery of products or services concluded between two parties.",
+    "name": "Contract",
+    "description": "",
     "access": {
         "groups": ["booking.default.user"]
     },
+    "header": {
+        "actions": {
+            "ACTION.EDIT": false
+        }
+    },
+    "actions": [
+        {
+            "id": "action.sent",
+            "label": "Mark as sent",
+            "description": "Contract will be marked as sent and waiting for customer's signature.",
+            "controller": "sale_contract_sent",
+            "confirm": true,
+            "visible": ["status", "=", "pending"]
+        },
+        {
+            "id": "action.signed",
+            "label": "Mark as signed",
+            "description": "Contract will be marked as signed. Booking will be validated as soon as the payment is received.",
+            "controller": "sale_contract_signed",
+            "confirm": true,
+            "visible": ["status", "in", ["pending", "sent"]]
+        }
+    ],
     "layout": {
         "groups": [
             {
@@ -17,27 +40,55 @@
                                         "items": [
                                             {
                                                 "type": "field",
+                                                "label": "Name",
                                                 "value": "name",
-                                                "width": "50%",
+                                                "width": "100%",
                                                 "widget": {
                                                     "heading": true
                                                 }
-                                            },
-                                            {
-                                                "type": "field",
-                                                "value": "status",
-                                                "width": "50%"
-                                            },
-                                            {
-                                                "type": "field",
-                                                "value": "description",
-                                                "width": "100%"                                                
                                             }
                                         ]
                                     },
                                     {
                                         "width": "50%",
                                         "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "customer_id",
+                                                "width": "100%"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+
+                ]
+            },
+            {
+                "sections": [
+                    {
+                        "id": "section.details",
+                        "label": "Details",
+                        "rows": [
+                            {
+                                "columns": [
+                                    {
+                                        "width": "50%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "label": "Status",
+                                                "value": "status",
+                                                "width": "50%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "label": "Booking",
+                                                "value": "booking_id",
+                                                "width": "50%"
+                                            },
                                             {
                                                 "type": "field",
                                                 "value": "date",
@@ -47,6 +98,53 @@
                                                 "type": "field",
                                                 "value": "valid_until",
                                                 "width": "50%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "label": "Description",
+                                                "value": "description",
+                                                "width": "100%"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "width": "50%",
+                                        "align": "right",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "is_locked",
+                                                "width": "100%",
+                                                "widget": {
+                                                    "align": "right"
+                                                }
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "section.lines",
+                        "label": "Contract Lines",
+                        "rows": [
+                            {
+                                "columns": [
+                                    {
+                                        "width": "100%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "contract_lines_ids",
+                                                "width": "100%",
+                                                "widget": {
+                                                    "header": {
+                                                        "actions": {
+                                                            "ACTION.CREATE": false
+                                                        }
+                                                    }
+                                                }
                                             }
                                         ]
                                     }

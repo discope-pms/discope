@@ -1,11 +1,16 @@
 {
     "name": "Contrat",
     "plural": "Contrats",
-    "description": "Les contrats sont des accords formels concernant la livraison de produits ou de services conclus entre deux parties.",
+    "description": "Les contrats liés à une réservation",
     "model": {
         "name": {
-            "label": "Identification",
-            "description": "Nom abrégé du contrat.",
+            "label": "Nom",
+            "description": "Le nom du contrat.",
+            "help": ""
+        },
+        "booking_id": {
+            "label": "Réservation",
+            "description": "Code de la réservation à laquelle le contrat est lié.",
             "help": ""
         },
         "description": {
@@ -48,13 +53,33 @@
             "label": "Total HT",
             "description": "Prix total hors-taxes de la réservation.",
             "help": ""
+        },
+        "contract_lines_ids": {
+            "label": "Les lignes du contrat",
+            "description": "Les lignes du contrat.",
+            "help": ""
+        },
+        "is_locked": {
+            "label": "Verrouillé",
+            "description": "Un contrat verrouillé ne peut être annulé.",
+            "help": ""
         }
     },
     "view": {
         "form.default": {
             "name": "Contrat",
             "description": "Les contrats sont des accords formels concernant la livraison de produits ou de services conclus entre deux parties.",
-            "layout": {}
+            "layout": {},
+            "actions": {
+                "action.lock": {
+                    "label": "Verrrouiller le contrat",
+                    "description": "Le contrat sera verrouillé. Les utilisateurs n'auront plus la possibilité de le modifier ou de l'annuler (ainsi que la réservation liée) tant qu'il sera verrouillé."
+                },
+                "action.unlock": {
+                    "label": "Déverrouiller le contrat",
+                    "description": "Le contrat sera déverrouillé et les utilisateurs auront à nouveau la possibilité de l'annuler lors du passage de la réservation en Devis."
+                }
+            }
         },
         "list.default": {
             "name": "Liste des Contrats",
