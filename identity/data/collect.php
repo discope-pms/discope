@@ -27,7 +27,7 @@ use identity\Contact;
         ],
         'contact_identity_id' => [
             'type'              => 'many2one',
-            'foreign_object'    => 'identity\Identity',
+            'foreign_object'    => 'identity\Contact',
             'description'       => "Related contact identity."
         ]
     ],
