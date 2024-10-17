@@ -7,7 +7,7 @@
 use sale\contract\Contract;
 
 list($params, $providers) = announce([
-    'description'   => "Mark a contract as sent to the customer.",
+    'description'   => "Unlocks a contract (can be cancelled if booking is reverted to quote).",
     'params'        => [
         'id' =>  [
             'description'   => 'Identifier of the targeted contract.',
@@ -18,7 +18,7 @@ list($params, $providers) = announce([
     ],
     'access' => [
         'visibility'        => 'public',
-        'groups'            => ['booking.default.user'],
+        'groups'            => ['booking.default.administrator', 'sale.default.administrator'],
     ],
     'response'      => [
         'content-type'  => 'application/json',
@@ -28,23 +28,23 @@ list($params, $providers) = announce([
     'providers'     => ['context']
 ]);
 
+/**
+ * @var \equal\php\Context  $context
+ */
 $context = $providers['context'];
 
+
 $contract = Contract::id($params['id'])
-                  ->read(['id', 'name', 'status', 'valid_until'])
-                  ->first(true);
+                    ->read(['id', 'name', 'status', 'valid_until'])
+                    ->first(true);
 
 if(!$contract) {
     throw new Exception("unknown_contract", QN_ERROR_UNKNOWN_OBJECT);
 }
 
-if($contract['status'] != 'pending') {
-    throw new Exception("invalid_status", QN_ERROR_NOT_ALLOWED);
-}
+Contract::id($params['id'])->update(['is_locked' => false]);
 
-Contract::id($params['id'])->update(['status' => 'sent']);
 
 $context->httpResponse()
-        ->status(200)
-        ->body([])
+        ->status(204)
         ->send();

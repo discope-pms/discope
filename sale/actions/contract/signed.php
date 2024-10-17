@@ -1,12 +1,10 @@
 <?php
 /*
     This file is part of Symbiose Community Edition <https://github.com/yesbabylon/symbiose>
-    Some Rights Reserved, Yesbabylon SRL, 2020-2021
+    Some Rights Reserved, Yesbabylon SRL, 2020-2024
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 use sale\contract\Contract;
-
-use core\Task;
 
 list($params, $providers) = announce([
     'description'   => "Mark a contract as signed (signed version has been received).",
@@ -19,41 +17,32 @@ list($params, $providers) = announce([
         ]
     ],
     'access' => [
-        'visibility'        => 'public',		// 'public' (default) or 'private' (can be invoked by CLI only)
-        'groups'            => ['booking.default.user'],// list of groups ids or names granted 
+        'visibility'        => 'public',
+        'groups'            => ['booking.default.user'],
     ],
     'response'      => [
         'content-type'  => 'application/json',
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'     => ['context', 'orm', 'auth']     
+    'providers'     => ['context', 'orm', 'auth']
 ]);
 
-list($context, $orm, $auth) = [$providers['context'], $providers['orm'], $providers['auth']];
+$context = $providers['context'];
 
-// read contract object
 $contract = Contract::id($params['id'])
                   ->read(['id', 'name', 'status', 'valid_until'])
                   ->first();
-                  
+
 if(!$contract) {
     throw new Exception("unknown_contract", QN_ERROR_UNKNOWN_OBJECT);
-}
-
-if($contract['valid_until'] < time()) {
-    throw new Exception("outdated_contract", QN_ERROR_NOT_ALLOWED);
 }
 
 if($contract['status'] != 'sent') {
     throw new Exception("invalid_status", QN_ERROR_NOT_ALLOWED);
 }
 
-// Update booking status
 Contract::id($params['id'])->update(['status' => 'signed']);
-
-
-// #todo - check if required payment have been paid in the meantime
 
 $context->httpResponse()
         ->status(204)
