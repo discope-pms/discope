@@ -35,8 +35,7 @@ class Funding extends Model {
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\booking\Booking',
                 'description'       => 'Booking the contract relates to.',
-                'ondelete'          => 'cascade',        // delete funding when parent booking is deleted
-                'required'          => true
+                'ondelete'          => 'cascade'        // delete funding when parent booking is deleted
             ],
 
             'description' => [
