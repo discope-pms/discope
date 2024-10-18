@@ -1,8 +1,8 @@
 <?php
 /*
-    This file is part of Symbiose Community Edition <https://github.com/yesbabylon/symbiose>
-    Some Rights Reserved, Yesbabylon SRL, 2020-2021
-    Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
+    This file is part of the Discope property management software.
+    Author: Yesbabylon SRL, 2020-2024
+    License: GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 namespace sale\booking;
 use equal\orm\Model;
@@ -171,6 +171,33 @@ class Consumption extends Model {
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\customer\AgeRange',
                 'description'       => 'Customers age range the product is intended for.'
+            ],
+
+            'center_id' => [
+                'type'              => 'many2one',
+                'foreign_object'    => 'identity\Center',
+                'description'       => "The center to which the consumption relates.",
+                'required'          => true,
+                'ondelete'          => 'cascade',         // delete consumption when parent Center is deleted
+                'readonly'          => true
+            ],
+
+            'customer_id' => [
+                'type'              => 'many2one',
+                'foreign_object'    => 'sale\customer\Customer',
+                'description'       => "The customer whom the consumption relates to (computed).",
+            ],
+
+            'is_snack' => [
+                'type'              => 'boolean',
+                'description'       => 'Does the consumption relate to a snack?',
+                'default'           => false
+            ],
+
+            'time_slot_id' => [
+                'type'              => 'many2one',
+                'foreign_object'    => 'sale\booking\TimeSlot',
+                'description'       => 'Indicator of the moment of the day when the consumption occurs (from schedule).',
             ]
 
         ];

@@ -1,8 +1,8 @@
 <?php
 /*
-    This file is part of Symbiose Community Edition <https://github.com/yesbabylon/symbiose>
-    Some Rights Reserved, Yesbabylon SRL, 2020-2021
-    Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
+    This file is part of the Discope property management software.
+    Author: Yesbabylon SRL, 2020-2024
+    License: GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 namespace sale\booking;
 
@@ -14,6 +14,10 @@ class Repair extends Consumption {
 
     public static function getDescription() {
         return "A repair is an event that relates to a scheduled repairing. Repairs and Consumptions are handled the same way in the Planning.";
+    }
+
+    public static function getLink() {
+        return "/booking/#/repairs/repair/object.id";
     }
 
     public static function getColumns() {
@@ -55,8 +59,6 @@ class Repair extends Consumption {
                 'default'           => 1,
                 'readonly'          => true
             ],
-
-            /* override schedule_from and schedule_to with specific onupdate events */
 
             'schedule_from' => [
                 'type'              => 'time',
