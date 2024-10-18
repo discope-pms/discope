@@ -71,7 +71,17 @@ class Contract extends Model {
                 'foreign_object'    => 'sale\contract\ContractLine',
                 'foreign_field'     => 'contract_id',
                 'description'       => "Contract lines that belong to the contract.",
-                'ondetach'          => 'delete'
+                'ondetach'          => 'delete',
+                'dependents'         => ['total', 'price']
+            ],
+
+            'contract_line_groups_ids' => [
+                'type'              => 'one2many',
+                'foreign_object'    => 'sale\contract\ContractLineGroup',
+                'foreign_field'     => 'contract_id',
+                'description'       => "Contract line group that belong to the contract.",
+                'ondetach'          => 'delete',
+                'dependents'         => ['total', 'price']
             ],
 
             'total' => [

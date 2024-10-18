@@ -47,13 +47,15 @@ class ContractLine extends Model {
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\catalog\Product',
                 'description'       => "The product (SKU) the line relates to.",
-                'required'          => true
+                'required'          => true,
+                'dependents'         => ['total', 'price']
             ],
 
             'price_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\price\Price',
-                'description'       => "The price the line relates to, if any."
+                'description'       => "The price the line relates to, if any.",
+                'dependents'         => ['total', 'price']
             ],
 
             'unit_price' => [
