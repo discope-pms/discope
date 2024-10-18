@@ -29,7 +29,8 @@ class ContractLineGroup extends Model {
                 'foreign_object'    => 'sale\contract\ContractLine',
                 'foreign_field'     => 'contract_line_group_id',
                 'description'       => "Contract lines that belong to the contract.",
-                'ondetach'          => 'delete'
+                'ondetach'          => 'delete',
+                'dependents'        => ['total', 'price']
             ],
 
             'rate_class_id' => [
@@ -73,24 +74,27 @@ class ContractLineGroup extends Model {
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\contract\ContractLine',
                 'description'       => "Contract line that describes the pack.",
-                'visible'           => ['is_pack', '=', true]
+                'visible'           => ['is_pack', '=', true],
+                'dependents'        => ['total', 'price']
             ]
 
         ];
     }
 
-
     public static function calcPrice($self) {
         $result = [];
 
-        $self->read(['contract_lines_ids' => ['price'], 'contract_line_id' => ['vat_rate'], 'total', 'is_pack']);
+        $self->read(['contract_lines_ids' => ['id','price'], 'contract_line_id' => ['vat_rate'], 'total', 'is_pack']);
         foreach($self as $gid => $group) {
+            $result[$gid] = 0.0;
             if ($group['is_pack']) {
                 $vatRate = $group['contract_line_id']['vat_rate'] ?? 0;
                 $result[$gid] = round(($group['total'] ?? 0) * (1 + $vatRate), 2);
             } else {
-                $prices = array_column($group['contract_lines_ids'] ?? [], 'price');
-                $result[$gid] = round(array_sum($prices), 2);
+                foreach($group['contract_lines_ids'] as $id =>  $line) {
+                    $result[$gid] += $line['price'];
+                }
+                $result[$gid] =  round($result[$gid], 2);
             }
         }
         return $result;
@@ -100,12 +104,16 @@ class ContractLineGroup extends Model {
         $result = [];
         $self->read(['contract_id', 'contract_lines_ids' => ['id', 'total'], 'is_pack', 'contract_line_id' => ['unit_price', 'qty']]);
         foreach($self as $gid => $group) {
-            foreach ($self as $gid => $group) {
-                $result[$gid] = $group['is_pack']
-                    ? ($group['contract_line_id']['unit_price'] ?? 0) * ($group['contract_line_id']['qty'] ?? 0)
-                    : array_sum(array_column($group['contract_lines_ids'] ?? [], 'total'));
-            }
+            $result[$gid] = 0.0;
 
+            if($group['is_pack']) {
+                $result[$gid] = $group['contract_line_id']['unit_price'] * $group['contract_line_id']['qty'];
+            }
+            else {
+                foreach($group['contract_lines_ids'] as $id =>  $line) {
+                    $result[$gid] += $line['total'];
+                }
+            }
         }
 
         return $result;
