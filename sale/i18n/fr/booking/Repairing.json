@@ -32,6 +32,11 @@
             "label": "Fin",
             "description": "Dernier jour de la période.",
             "help": ""
+        },
+        "center_id": {
+            "label": "Centre",
+            "description": "Centre auquel se rapporte l'épisode.",
+            "help": ""
         }
     },
     "view": {
@@ -56,5 +61,9 @@
             "layout": {}
         }
     },
-    "error": {}
+    "error": {
+        "id": {
+            "non_editable": "La modification n'est pas autorisée car il y a un conflit avec des consommations existantes."
+        }
+    }
 }
