@@ -142,6 +142,11 @@
                 "name": "sale.features.channelmanager.client_domain",
                 "setting_id": 165,
                 "value": " "
+            },
+            {
+                "name": "sale.features.payment.bank_check",
+                "setting_id": 166,
+                "value": "1"
             }
         ]
     }

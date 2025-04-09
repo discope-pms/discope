@@ -542,6 +542,22 @@
                 "is_multilang": 0,
                 "is_sequence": 0,
                 "object_class": null
+            },
+            {
+                "id": 166,
+                "name": "sale.features.payment.bank_check",
+                "code": "payment.bank_check",
+                "package": "sale",
+                "section_id": 7,
+                "title": "Autorisation de chèque bancaire",
+                "description": "La gestion des chèques bancaires est autorisée pour cette instance.",
+                "help": null,
+                "type": "boolean",
+                "form_control": "input",
+                "section": "features",
+                "is_multilang": 0,
+                "is_sequence": 0,
+                "object_class": null
             }
 
         ]
