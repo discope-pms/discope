@@ -226,7 +226,8 @@
                         "description": "",
                         "context": {
                             "entity": "sale\\booking\\BankCheck",
-                            "view": "list.default"
+                            "view": "list.default",
+                            "visible": [ true, "=", "env.sale.features.payment.bank_check"]
                         }
                     },
                     {
@@ -236,7 +237,8 @@
                         "description": "",
                         "context": {
                             "entity": "sale\\booking\\BankCheck",
-                            "view": "list.pending"
+                            "view": "list.pending",
+                            "visible": [ true, "=", "env.sale.features.payment.bank_check" ]
                         }
                     }
                 ]
