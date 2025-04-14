@@ -93,6 +93,19 @@ if(!file_exists($file)) {
     throw new Exception("unknown_view_id", QN_ERROR_UNKNOWN_OBJECT);
 }
 
+$days_languages = [
+    ['fr' => 'Dimanche',  'en' => 'Sunday',    'nl' => 'Zondag'],
+    ['fr' => 'Lundi',     'en' => 'Monday',    'nl' => 'Maandag'],
+    ['fr' => 'Mardi',     'en' => 'Tuesday',   'nl' => 'Dinsdag'],
+    ['fr' => 'Mercredi',  'en' => 'Wednesday', 'nl' => 'Woensdag'],
+    ['fr' => 'Jeudi',     'en' => 'Thursday',  'nl' => 'Donderdag'],
+    ['fr' => 'Vendredi',  'en' => 'Friday',    'nl' => 'Vrijdag'],
+    ['fr' => 'Samedi',    'en' => 'Saturday',  'nl' => 'Zaterdag']
+];
+
+$days_names = array_map(function($day) use ($params) {
+    return $day[$params['lang']];
+}, $days_languages);
 
 // read booking
 $fields = [
@@ -188,6 +201,7 @@ $fields = [
         'name',
         'has_pack',
         'is_locked',
+        'is_sojourn',
         'pack_id'  => ['label'],
         'qty',
         'unit_price',
@@ -199,7 +213,7 @@ $fields = [
         'date_from',
         'date_to',
         'nb_pers',
-        'age_range_assignments_ids'=> ['id', 'age_range_id','booking_line_group_id','qty'],
+        'age_range_assignments_ids'=> ['id', 'age_range_id' =>['id', 'name'] ,'booking_line_group_id','qty'],
         'booking_lines_ids' => [
             'name',
             'product_id' => [
@@ -403,6 +417,16 @@ if($booking['center_id']['use_office_details']) {
 }
 
 
+$conection_languages = [
+    ['fr' => 'et', 'en' => 'and', 'nl' => 'en'],
+];
+
+$conection_names = array_map(function($item) use ($params) {
+    return $item[$params['lang']];
+}, $conection_languages);
+
+
+
 /*
     retrieve templates
 */
@@ -420,9 +444,31 @@ if($booking['center_id']['template_category_id']) {
         if($part['name'] == 'header') {
             $value = $part['value'];
             $value = str_replace('{center}', $booking['center_id']['name'], $value);
-            $value = str_replace('{nb_pers}', $booking['nb_pers'] ,$value);
-            $value = str_replace('{date_from}', date('d/m/Y', $booking['date_from']), $value);
-            $value = str_replace('{date_to}', date('d/m/Y', $booking['date_to']), $value);
+            $value = str_replace('{date_from}', $days_names[date('w', $booking['date_from'])] . ' '. date('d/m/Y', $booking['date_from']) , $value);
+            $value = str_replace('{date_to}',  $days_names[date('w', $booking['date_to'])] . ' '. date('d/m/Y', $booking['date_to']) , $value);
+
+            $age_rang_maps = [];
+            foreach($booking['booking_lines_groups_ids'] as $booking_line_group) {
+                if($booking_line_group['is_sojourn']){
+                    foreach($booking_line_group['age_range_assignments_ids'] as $age_range_assignment) {
+                        $age_range_assignment_code = $age_range_assignment['age_range_id']['id'];
+                        if (!isset($age_rang_maps[$age_range_assignment_code])) {
+                            $age_rang_maps[$age_range_assignment_code] = [
+                                'age_range'    => $age_range_assignment['age_range_id']['name'],
+                                'qty'          => NULL
+                            ];
+                        }
+                        $age_rang_maps[$age_range_assignment_code]['qty'] += $age_range_assignment['qty'];
+                    }
+                }
+            }
+
+            $parts = array_map(fn($item) => $item['qty'] . ' ' . strtolower($item['age_range']), $age_rang_maps);
+            $last = array_pop($parts);
+            $text_pers= count($parts) ? implode(', ', $parts) . ' ' . $conection_names[0]. ' ' . $last : $last;
+
+            $value = str_replace('{nb_pers}', $text_pers,$value);
+
             $values['header_html'] = $value;
         }
         if($part['name'] == 'service') {
@@ -575,7 +621,7 @@ foreach($booking['booking_lines_groups_ids'] as $booking_line_group) {
 
             if($params['mode'] == 'grouped') {
                 $line = [
-                    'name'          => (strlen($booking_line['description']) > 0)?$booking_line['description']:$booking_line['name'],
+                    'name'          => (strlen($booking_line['description']) > 0)?$booking_line['description']:$booking_line['product_id']['label'],
                     'price'         => null,
                     'total'         => null,
                     'unit_price'    => null,
@@ -589,7 +635,7 @@ foreach($booking['booking_lines_groups_ids'] as $booking_line_group) {
             }
             else {
                 $line = [
-                    'name'          => (strlen($booking_line['description']) > 0)?$booking_line['description']:$booking_line['name'],
+                    'name'          => (strlen($booking_line['description']) > 0)?$booking_line['description']:$booking_line['product_id']['label'],
                     'price'         => $booking_line['price'],
                     'total'         => $booking_line['total'],
                     'unit_price'    => $booking_line['unit_price'],
@@ -657,7 +703,7 @@ if($params['mode'] == 'grouped') {
             $grouping_code = isset($product['grouping_code_id']['name'])
                 ? $product['grouping_code_id']['name']
                 : ($product['product_model_id']['grouping_code_id']['name']
-                ?? (strlen($booking_line['description']) > 0)?$booking_line['description']:$booking_line['name']);
+                ?? (strlen($booking_line['description']) > 0)?$booking_line['description']:$booking_line['product_id']['label']);
 
             if (!isset($lines_map[$booking_line_group_id])) {
                 $lines_map[$booking_line_group_id] = [];
@@ -704,7 +750,7 @@ if($params['mode'] == 'grouped') {
                 }
                 $lines[$grouping_code_id]['price'] += $product['price'];
                 $lines[$grouping_code_id]['total'] += $product['total'];
-                
+
 
 
                 if ($product['has_pack']){
@@ -771,22 +817,6 @@ foreach($booking['contacts_ids'] as $contact) {
         $values['contact_email'] = $contact['partner_identity_id']['email'];
     }
 }
-
-$days_languages = [
-    ['fr' => 'Dimanche',  'en' => 'Sunday',    'nl' => 'Zondag'],
-    ['fr' => 'Lundi',     'en' => 'Monday',    'nl' => 'Maandag'],
-    ['fr' => 'Mardi',     'en' => 'Tuesday',   'nl' => 'Dinsdag'],
-    ['fr' => 'Mercredi',  'en' => 'Wednesday', 'nl' => 'Woensdag'],
-    ['fr' => 'Jeudi',     'en' => 'Thursday',  'nl' => 'Donderdag'],
-    ['fr' => 'Vendredi',  'en' => 'Friday',    'nl' => 'Vrijdag'],
-    ['fr' => 'Samedi',    'en' => 'Saturday',  'nl' => 'Zaterdag']
-];
-
-$days_names = array_map(function($day) use ($params) {
-    return $day[$params['lang']];
-}, $days_languages);
-
-
 
 /*
     Generate simple consumptions map
@@ -965,7 +995,7 @@ if($has_activity){
             'id',
             'name',
             'activity_date',
-            'activity_booking_line_id' => ['product_id' => ['id','name']],
+            'activity_booking_line_id'  => ['id','name', 'product_id' => ['id', 'label']],
             'booking_line_group_id' => ['id', 'name'],
             'time_slot_id' => ['id', 'code','name'],
         ])
@@ -1002,7 +1032,7 @@ if($has_activity){
 
         $time_slot_name = $activity['time_slot_id']['name'];
         if (isset($activities_map[$group][$date]['time_slots'][$time_slot_name])) {
-            $activities_map[$group][$date]['time_slots'][$time_slot_name][] = $activity['name'];
+            $activities_map[$group][$date]['time_slots'][$time_slot_name][] = $activity['activity_booking_line_id']['product_id']['label'];
         }
     }
 
