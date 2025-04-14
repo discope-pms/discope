@@ -1,0 +1,61 @@
+<div class="product-wrapper">
+    <mat-form-field *ngIf="!activity && group" class="product-form-field">
+        <mat-label>Activité</mat-label>
+        <input *ngIf="!group.is_locked"
+               matInput
+               #inputField
+               type="text"
+               [matAutocomplete]="productAutocomplete"
+               [(ngModel)]="vm.product.name"
+               (keyup)="vm.product.inputChange($event)"
+               (focus)="vm.product.focus()"
+               (blur)="vm.product.restore()"
+               placeholder="Commencez à taper le nom" />
+        <input *ngIf="group.is_locked" matInput disabled type="text" [value]="vm.product.name" />
+        <mat-autocomplete #productAutocomplete="matAutocomplete"
+                          [displayWith]="vm.product.display"
+                          (optionSelected)="onchangeProduct($event)">
+            <div *ngIf="vm.product.filteredList | async; let productsList">
+                <mat-option *ngFor="let product of productsList" [value]="product">
+                    <span title="{{product.sku}}">{{product.name}}</span>
+                </mat-option>
+                <mat-option *ngIf="productsList.length == 0"><i>pas de résultat</i></mat-option>
+            </div>
+        </mat-autocomplete>
+    </mat-form-field>
+
+    <ng-container *ngIf="activity && group">
+        <mat-form-field class="product-form-field">
+            <mat-label>Activité</mat-label>
+            <input matInput [disabled]="group && group.is_locked" type="text" [value]="vm.product.name" readonly="readonly" />
+        </mat-form-field>
+
+        <button mat-icon-button
+                *ngIf="activity && !activity.is_virtual && !group.is_locked"
+                class="delete-activity"
+                (click)="ondeleteActivity()"
+        >
+            <mat-icon>clear</mat-icon>
+        </button>
+    </ng-container>
+</div>
+
+<mat-form-field *ngIf="activity && activity.has_staff_required" class="employee-form-field">
+    <mat-label>Employé</mat-label>
+    <mat-select [formControl]="vm.employee.formControl" (selectionChange)="vm.employee.change()">
+        <mat-option *ngFor="let employee of employees" [value]="employee.id">
+            {{employee.name}}
+        </mat-option>
+    </mat-select>
+</mat-form-field>
+
+<div *ngIf="activity && activity.has_provider" class="providers-wrapper">
+    <mat-form-field *ngFor="let formControl of vm.providers.formControls" class="provider-form-field">
+        <mat-label>Prestataire</mat-label>
+        <mat-select [formControl]="formControl" (selectionChange)="vm.providers.change()">
+            <mat-option *ngFor="let provider of providers" [value]="provider.id">
+                {{provider.name}}
+            </mat-option>
+        </mat-select>
+    </mat-form-field>
+</div>

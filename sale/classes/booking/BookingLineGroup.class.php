@@ -596,10 +596,13 @@ class BookingLineGroup extends Model {
             }
         }
 
-        foreach(array_values($map_order_group_id) as $index => $group_id) {
+        $group_ids = array_values($map_order_group_id);
+        foreach($group_ids as $index => $group_id) {
             BookingLineGroup::id($group_id)
                 ->update(['activity_group_num' => $index + 1]);
         }
+
+        BookingActivity::search(['booking_line_group_id', 'in', $group_ids])->update(['group_num' => null]);
     }
 
     public static function onupdateDateFrom($om, $oids, $values, $lang) {
@@ -3434,7 +3437,7 @@ class BookingLineGroup extends Model {
      * Resets the Age range assignments to a single assignment (adults) according to nb_pers.
      */
     public static function refreshAgeRangeAssignments($om, $id) {
-        $groups = $om->read(self::getType(), $id, ['booking_id', 'nb_pers', 'is_sojourn', 'age_range_assignments_ids']);
+        $groups = $om->read(self::getType(), $id, ['booking_id', 'nb_pers', 'is_sojourn', 'age_range_assignments_ids', 'age_range_assignments_ids.age_range_id', 'age_range_assignments_ids.age_from', 'age_range_assignments_ids.age_to']);
         if($groups <= 0) {
             return;
         }
@@ -3447,18 +3450,32 @@ class BookingLineGroup extends Model {
             // reset nb_children
             $om->update(self::getType(), $id, ['nb_children' => null]);
 
-            if($group['is_sojourn']) {
-                $adults_age_range_id = Setting::get_value('sale', 'booking', 'default.age_range_id.adults', 1);
-
-                // create default age_range assignment (default to 'adult' age range)
-                $assignment = [
-                    'age_range_id'          => $adults_age_range_id,
-                    'booking_line_group_id' => $id,
-                    'booking_id'            => $group['booking_id'],
-                    'qty'                   => $group['nb_pers']
-                ];
-                $om->create(BookingLineGroupAgeRangeAssignment::getType(), $assignment);
+            $age_from = $age_to = null;
+            if(count($group['age_range_assignments_ids']) === 1) {
+                // keep previous age range if only one
+                $age_range_id = array_values($group['age_range_assignments_ids.age_range_id'])[0]['age_range_id'];
+                $age_from = array_values($group['age_range_assignments_ids.age_from'])[0]['age_from'];
+                $age_to = array_values($group['age_range_assignments_ids.age_to'])[0]['age_to'];
             }
+            else {
+                // else use default 'adult' age range from setting
+                $age_range_id = Setting::get_value('sale', 'booking', 'default.age_range_id.adults', 1);
+            }
+
+            // create age_range assignment
+            $assignment = [
+                'age_range_id'          => $age_range_id,
+                'booking_line_group_id' => $id,
+                'booking_id'            => $group['booking_id'],
+                'qty'                   => $group['nb_pers']
+            ];
+            if(!is_null($age_from)) {
+                $assignment['age_from'] = $age_from;
+            }
+            if(!is_null($age_to)) {
+                $assignment['age_to'] = $age_to;
+            }
+            $om->create(BookingLineGroupAgeRangeAssignment::getType(), $assignment);
         }
     }
 

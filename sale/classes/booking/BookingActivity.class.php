@@ -172,11 +172,19 @@ class BookingActivity extends Model {
             'has_staff_required' => [
                 'type'              => 'computed',
                 'result_type'       => 'boolean',
-                'foreign_object'    => 'sale\catalog\ProductModel',
-                'description'       => "Does the activity need an employee to be assigned to it.",
+                'description'       => "Does the activity need an employee to be assigned to it?",
                 'store'             => true,
                 'instant'           => true,
                 'relation'          => ['product_model_id' => ['has_staff_required']]
+            ],
+
+            'has_provider' => [
+                'type'              => 'computed',
+                'result_type'       => 'boolean',
+                'description'       => "Does the activity need one or multiple providers to be assigned to it?",
+                'store'             => true,
+                'instant'           => true,
+                'relation'          => ['product_model_id' => ['has_provider']]
             ],
 
             'group_num' => [
@@ -341,6 +349,10 @@ class BookingActivity extends Model {
     }
 
     public static function canupdate($self, $values): array {
+        if(!isset($values['activity_date']) && !isset($values['time_slot_id']) && !isset($values['employee_id'])) {
+            return parent::canupdate($self, $values);
+        }
+
         $self->read(['activity_date', 'time_slot_id', 'employee_id', 'product_model_id']);
         foreach($self as $booking_activity) {
             $employee_id = array_key_exists('employee_id', $values) ? $values['employee_id'] : $booking_activity['employee_id'];

@@ -1,0 +1,30 @@
+<ng-container *ngIf="group">
+    <div class="group-name-num">
+        <a [title]="group.name" class="group-name">{{ group.name }}</a>
+        <div class="group-num">({{ group.activity_group_num }})</div>
+    </div>
+
+    <mat-form-field class="nb-pers-form-field">
+        <mat-label>Participants</mat-label>
+        <input type="number" matInput [formControl]="nbPersFormControl" (blur)="onNbPersChanges()">
+        <mat-error *ngIf="nbPersFormControl.hasError('min')">Min 1.</mat-error>
+    </mat-form-field>
+
+    <ng-container *ngIf="mapGroupAgeRangeAssignment[group.id]">
+        <mat-form-field class="age-from-form-field">
+            <mat-label>De</mat-label>
+            <input type="number" matInput [formControl]="ageFromFormControl" (blur)="onAgeFromChanges()">
+            <mat-error *ngIf="ageFromFormControl.hasError('min')">Min 0.</mat-error>
+            <mat-error *ngIf="ageFromFormControl.hasError('max')">Max 99.</mat-error>
+            <mat-error *ngIf="ageFromFormControl.hasError('maxAgeTo')">Max {{mapGroupAgeRangeAssignment[group.id].age_to}}.</mat-error>
+        </mat-form-field>
+
+        <mat-form-field class="age-to-form-field">
+            <mat-label>À</mat-label>
+            <input type="number" matInput [formControl]="ageToFormControl" (blur)="onAgeToChanges()">
+            <mat-error *ngIf="ageToFormControl.hasError('min')">Min 0.</mat-error>
+            <mat-error *ngIf="ageToFormControl.hasError('max')">Max 99.</mat-error>
+            <mat-error *ngIf="ageToFormControl.hasError('minAgeFrom')">Min {{mapGroupAgeRangeAssignment[group.id].age_from}}.</mat-error>
+        </mat-form-field>
+    </ng-container>
+</ng-container>
