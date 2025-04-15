@@ -88,7 +88,43 @@ if(!file_exists($file)) {
     throw new Exception("unknown_view_id", QN_ERROR_UNKNOWN_OBJECT);
 }
 
+$days_languages = [
+    ['fr' => 'Dimanche',  'en' => 'Sunday',    'nl' => 'Zondag'],
+    ['fr' => 'Lundi',     'en' => 'Monday',    'nl' => 'Maandag'],
+    ['fr' => 'Mardi',     'en' => 'Tuesday',   'nl' => 'Dinsdag'],
+    ['fr' => 'Mercredi',  'en' => 'Wednesday', 'nl' => 'Woensdag'],
+    ['fr' => 'Jeudi',     'en' => 'Thursday',  'nl' => 'Donderdag'],
+    ['fr' => 'Vendredi',  'en' => 'Friday',    'nl' => 'Vrijdag'],
+    ['fr' => 'Samedi',    'en' => 'Saturday',  'nl' => 'Zaterdag']
+];
 
+$days_names = array_map(function($day) use ($params) {
+    return $day[$params['lang']];
+}, $days_languages);
+
+
+$lodgingBookingPrintAgeRangesText = function($booking, $conection_names) {
+    $age_rang_maps = [];
+
+    foreach ($booking['booking_lines_groups_ids'] as $booking_line_group) {
+        if ($booking_line_group['is_sojourn']) {
+            foreach ($booking_line_group['age_range_assignments_ids'] as $age_range_assignment) {
+                $age_range_assignment_code = $age_range_assignment['age_range_id']['id'];
+                if (!isset($age_rang_maps[$age_range_assignment_code])) {
+                    $age_rang_maps[$age_range_assignment_code] = [
+                        'age_range' => $age_range_assignment['age_range_id']['name'],
+                        'qty' => 0
+                    ];
+                }
+                $age_rang_maps[$age_range_assignment_code]['qty'] += $age_range_assignment['qty'];
+            }
+        }
+    }
+
+    $parts = array_map(fn($item) => $item['qty'] . ' ' . strtolower($item['age_range']), $age_rang_maps);
+    $last = array_pop($parts);
+    return count($parts) ? implode(', ', $parts) . ' ' . $conection_names[0] . ' ' . $last : $last;
+};
 // read contract
 $fields = [
     'created',
@@ -178,7 +214,12 @@ $fields = [
             'due_amount',
             'payment_reference',
             'payment_deadline_id' => ['name']
-        ]
+        ],
+        'booking_lines_groups_ids' => [
+            'id',
+            'is_sojourn',
+            'age_range_assignments_ids'=> ['id', 'age_range_id' =>['id', 'name'] ,'booking_line_group_id','qty'],
+        ],
     ],
     'contract_line_groups_ids' => [
         'name',
@@ -253,6 +294,7 @@ $postal_address = sprintf("%s - %s %s", $booking['center_id']['organisation_id']
 $customer_name = substr($booking['customer_id']['partner_identity_id']['display_name'], 0,  66);
 $customer_address = $booking['customer_id']['partner_identity_id']['address_street'] .' '. $booking['customer_id']['partner_identity_id']['address_zip'].' '.$booking['customer_id']['partner_identity_id']['address_city'];
 $has_activity = Setting::get_value('sale', 'booking', 'has_activity', 0);
+$consumption_table_show  = Setting::get_value('sale', 'features', 'templates.quote.consumption_table.show', 1);
 $values = [
     'attn_address1'               => '',
     'attn_address2'               => '',
@@ -317,7 +359,8 @@ $values = [
     'activities_map'             => '',
     'sheets_beds'                => '',
     'service_transport'          => '',
-    'has_service_transport'      => 0
+    'has_service_transport'      => 0 ,
+    'show_consumption'           => $consumption_table_show
 ];
 
 /*
@@ -460,9 +503,12 @@ if($booking['center_id']['template_category_id']) {
             $value = $part['value'];
             $value = str_replace('{center}', $booking['center_id']['name'], $value);
             $value = str_replace('{customer}', $customer_name, $value);
-            $value = str_replace('{nb_pers}', $booking['nb_pers'] ,$value);
-            $value = str_replace('{date_from}', date('d/m/Y', $booking['date_from']), $value);
-            $value = str_replace('{date_to}', date('d/m/Y', $booking['date_to']), $value);
+
+            $text_pers = $lodgingBookingPrintAgeRangesText($booking, $conection_names);
+            $value = str_replace('{nb_pers}', $text_pers, $value);
+
+            $value = str_replace('{date_from}', $days_names[date('w', $booking['date_from'])] . ' '. date('d/m/Y', $booking['date_from']) , $value);
+            $value = str_replace('{date_to}',  $days_names[date('w', $booking['date_to'])] . ' '. date('d/m/Y', $booking['date_to']) , $value);
 
             if ($booking['customer_id']['rate_class_id']) {
 
@@ -887,20 +933,6 @@ else if ($installment_amount > 0) {
         // unknown error
     }
 }
-
-$days_languages = [
-    ['fr' => 'Dimanche',  'en' => 'Sunday',    'nl' => 'Zondag'],
-    ['fr' => 'Lundi',     'en' => 'Monday',    'nl' => 'Maandag'],
-    ['fr' => 'Mardi',     'en' => 'Tuesday',   'nl' => 'Dinsdag'],
-    ['fr' => 'Mercredi',  'en' => 'Wednesday', 'nl' => 'Woensdag'],
-    ['fr' => 'Jeudi',     'en' => 'Thursday',  'nl' => 'Donderdag'],
-    ['fr' => 'Vendredi',  'en' => 'Friday',    'nl' => 'Vrijdag'],
-    ['fr' => 'Samedi',    'en' => 'Saturday',  'nl' => 'Zaterdag']
-];
-
-$days_names = array_map(function($day) use ($params) {
-    return $day[$params['lang']];
-}, $days_languages);
 
 
 /*
