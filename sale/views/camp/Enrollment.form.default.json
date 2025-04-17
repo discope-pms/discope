@@ -1,0 +1,71 @@
+{
+    "name": "Enrollment",
+    "description": "Form view for Enrollment.",
+    "actions": [
+        {
+            "id": "action.transition.pending",
+            "label": "Set Pending",
+            "controller": "model_transition",
+            "params": {
+                "entity": "sale\\camp\\Enrollment",
+                "transition": "pending",
+                "ids": []
+            },
+            "visible": [
+                ["status", "=", "waitlisted"]
+            ]
+        }
+    ],
+    "layout": {
+        "groups": [
+            {
+                "sections": [
+                    {
+                        "rows": [
+                            {
+                                "columns": [
+                                    {
+                                        "width": "50%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "child_id",
+                                                "width": "50%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "camp_id",
+                                                "width": "50%"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "width": "50%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "",
+                                                "width": "50%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "status",
+                                                "width": "50%",
+                                                "visible": ["state", "=", "draft"],
+                                                "selection": {
+                                                    "pending": "Pending",
+                                                    "waitlisted": "Waitlisted"
+                                                }
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+
+                ]
+            }
+        ]
+    }
+}
