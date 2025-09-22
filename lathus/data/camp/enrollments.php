@@ -6,6 +6,7 @@
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 
+use core\setting\Setting;
 use equal\http\HttpRequest;
 
 [$params, $providers] = eQual::announce([
@@ -29,24 +30,27 @@ use equal\http\HttpRequest;
  */
 ['context' => $context, 'auth' => $auth] = $providers;
 
-$entrypoint_url = "https://cpa-lathus-api.sc6nozo6393.universe.wf/api/reservations?_format=json&page=2"; // TODO: setting
+$api_uri = Setting::get_value('sale', 'integration', 'camp.enrollments.api_uri');
+if(is_null($api_uri)) {
+    throw new \Exception('missing_api_uri', EQ_ERROR_INVALID_CONFIG);
+}
 
-$request = new HttpRequest('GET '.$entrypoint_url);
-// TODO: handle ssl
-//    'ssl' => [
-//        'verify_peer'      => false,
-//        'verify_peer_name' => false,
-//    ]
+$api_key = Setting::get_value('sale', 'integration', 'camp.enrollments.api_key');
+if(is_null($api_key)) {
+    throw new \Exception('missing_api_key', EQ_ERROR_INVALID_CONFIG);
+}
+
+$request = new HttpRequest('GET '.$api_uri);
 
 $request->header('Content-Type', 'application/json');
-$request->header('X-API-KEY', 'wyLpHY4yA'); // TODO: setting
+$request->header('X-API-KEY', $api_key);
 
 $response = $request->send();
 
 $status = $response->getStatusCode();
 if($status != 200) {
     // upon request rejection, we stop the whole job
-    throw new Exception('request_rejected', QN_ERROR_INVALID_PARAM);
+    throw new Exception("request_rejected", QN_ERROR_INVALID_PARAM);
 }
 
 $data = $response->body();
