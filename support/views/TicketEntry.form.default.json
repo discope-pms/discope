@@ -71,7 +71,6 @@
                                                     "visible": ["status", "<>", "draft"]
                                                 }
                                             }
-
                                         ]
                                     }
                                 ]
@@ -117,6 +116,30 @@
                                             {
                                                 "type": "field",
                                                 "value": "attachments_ids"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "section.previous-ticket-entry-description",
+                        "label": "Previous ticket entry description",
+                        "rows": [
+                            {
+                                "columns": [
+                                    {
+                                        "width": "100%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "previous_ticket_entry_description",
+                                                "width": "100%",
+                                                "widget": {
+                                                    "readonly": true,
+                                                    "height": 100
+                                                }
                                             }
                                         ]
                                     }

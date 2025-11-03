@@ -67,6 +67,15 @@ class TicketEntry extends Model {
                 'foreign_object'    => 'support\TicketAttachment',
                 'description'       => 'Documents assigned to the ticket.',
                 'ondetach'          => 'delete'
+            ],
+
+            'previous_ticket_entry_description' => [
+                'type'              => 'computed',
+                'result_type'       => 'string',
+                'usage'             => 'text/plain',
+                'description'       => "Description of the previous ticket entry.",
+                'store'             => false,
+                'function'          => 'calcPreviousTicketEntryDescription'
             ]
 
         ];
@@ -134,5 +143,24 @@ class TicketEntry extends Model {
                 }
             }
         }
+    }
+
+    public static function calcPreviousTicketEntryDescription($self): array {
+        $result = [];
+        $self->read(['created', 'ticket_id']);
+        foreach($self as $id => $ticket_entry) {
+            $previous = TicketEntry::search(
+                [['created', '<', $ticket_entry['created'] ?? time()], ['ticket_id', '=', $ticket_entry['ticket_id']]],
+                ['sort' => ['created' => 'desc']]
+            )
+                ->read(['description'])
+                ->first();
+
+            if(!is_null($previous)) {
+                $result[$id] = $previous['description'];
+            }
+        }
+
+        return $result;
     }
 }

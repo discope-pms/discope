@@ -64,8 +64,16 @@
                                                     "usage": "text/plain.short",
                                                     "visible": [["status", "<>", "draft"]]
                                                 }
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "previous_ticket_entry_description",
+                                                "width": "100%",
+                                                "widget": {
+                                                    "readonly": true,
+                                                    "height": 100
+                                                }
                                             }
-
                                         ]
                                     }
                                 ]
