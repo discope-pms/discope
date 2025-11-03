@@ -204,7 +204,7 @@ class BankStatementLine extends \sale\pay\BankStatementLine {
                                 $lang);
                             $om->update(Payment::getType(), $payment_id, ['amount' => $line['amount']]);
                             // force recomputing computed fields
-                            $om->update(Funding::getType(), $fid, ['paid_amount' => null, 'is_paid' => null]);
+                            $om->update(Funding::getType(), $matching_funding['id'], ['paid_amount' => null, 'is_paid' => null]);
                             $om->update(Booking::getType(), $matching_funding['booking_id'], ['payment_status' => null, 'paid_amount' => null]);
                             $om->update(Invoice::getType(), $matching_funding['invoice_id'], ['is_paid' => null]);
                             Booking::updateStatusFromFundings($om, (array) $matching_funding['booking_id']);
