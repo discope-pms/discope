@@ -39,7 +39,7 @@ use sale\booking\Booking;
 ['context' => $context, 'orm' => $orm, 'dispatch' => $dispatch] = $providers;
 
 $line = BankStatementLine::id($params['id'])
-    ->read(['structured_message', 'message' , 'amount', 'center_office_id', 'payments_ids' => ['amount']])
+    ->read(['status', 'structured_message', 'message' , 'amount', 'center_office_id', 'payments_ids' => ['amount']])
     ->first(true);
 
 if(is_null($line)) {
