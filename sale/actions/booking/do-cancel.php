@@ -17,7 +17,7 @@ use sale\booking\Contract;
 use sale\booking\Invoice;
 use sale\catalog\Product;
 
-list($params, $providers) = eQual::announce([
+[$params, $providers] = eQual::announce([
     'description'   => "This will cancel the booking, whatever its current status. Balance will be adjusted if cancellation fees apply.",
     'params'        => [
         'id' =>  [
@@ -278,9 +278,9 @@ BookingActivity::search(['booking_id', '=', $booking['id']])
     ->update(['is_cancelled' => true]);
 
 // handle loyalty points
-$loyalty_points_feature = Setting::get_value('sale', 'features', 'booking.loyalty_points', false);
+$has_loyalty_points_feature = Setting::get_value('sale', 'features', 'booking.loyalty_points', false);
 
-if($loyalty_points_feature) {
+if($has_loyalty_points_feature) {
     // remove any created points relating to this booking
     BookingPoint::search(['booking_id', '=', $booking['id']])->delete(true);
     // detach any point applied to this booking
