@@ -113,10 +113,10 @@ if(in_array($booking['status'], ['proforma', 'invoiced', 'debit_balance', 'credi
 
 if(!$params['with_fee']) {
     $proforma_credit_notes_ids = Invoice::search([
-        ['booking_id', '=', $booking['id']],
-        ['status', '=', 'proforma'],
-        ['type', '=', 'credit_note']
-    ])
+            ['booking_id', '=', $booking['id']],
+            ['status', '=', 'proforma'],
+            ['type', '=', 'credit_note']
+        ])
         ->ids();
 
     if(count($proforma_credit_notes_ids) > 0) {
