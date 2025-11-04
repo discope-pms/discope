@@ -180,9 +180,9 @@ class SojournProductModelRentalUnitAssignement extends Model {
     }
 
     public static function onupdateExtraQty($self) {
-        $self->read(['extra_qty', 'rental_unit_id' => ['capacity', 'extra']]);
+        $self->read(['use_extra', 'extra_qty', 'rental_unit_id' => ['capacity', 'extra']]);
         foreach($self as $id => $assignment) {
-            if($assignment['rental_unit_id']['extra'] === 0) {
+            if(!$assignment['use_extra'] || $assignment['rental_unit_id']['extra'] === 0) {
                 // skip if no extra quantity possible
                 continue;
             }
