@@ -156,7 +156,7 @@ Invoice::id($params['id'])
 // remove funding associated with the invoice, if any and unpaid (will be allowed since the invoice is cancelled)
 if(!is_null($invoice['funding_id'])) {
     $funding = Funding::id($invoice['funding_id'])->read(['paid_amount', 'is_paid'])->first(true);
-    if($funding['paid_amount'] == 0 && !$funding['is_paid']) {
+    if(round($funding['paid_amount'], 2) == 0 && !$funding['is_paid']) {
         Funding::id($invoice['funding_id'])->delete(true);
     }
     else {

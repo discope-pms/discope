@@ -337,7 +337,7 @@ if($fundings) {
                 }
                 // #memo - we're re-emitting a balance invoice : remove fundings from previous credit note
                 elseif($funding_invoice['type'] == 'credit_note' /*&& $funding_invoice['status'] != 'invoice'*/) {
-                    if($funding['paid_amount'] == 0 && !$funding['is_paid'] && count($funding['payments_ids']) == 0) {
+                    if(round($funding['paid_amount'], 2) == 0 && !$funding['is_paid'] && count($funding['payments_ids']) == 0) {
                         // remove non-invoiced non-paid fundings for previous credit note
                         Funding::id($fid)->delete(true);
                     }
@@ -355,7 +355,7 @@ if($fundings) {
 
         if($funding['type'] == 'installment') {
             // #memo - fundings can be manually marked as paid without being actually linked to payments (transition)
-            if($funding['paid_amount'] == 0 && !$funding['is_paid'] && count($funding['payments_ids']) == 0 && is_null($funding['invoice_id'])) {
+            if(round($funding['paid_amount'], 2) == 0 && !$funding['is_paid'] && count($funding['payments_ids']) == 0 && is_null($funding['invoice_id'])) {
                 // remove non-invoiced non-paid fundings
                 Funding::id($fid)->delete(true);
             }

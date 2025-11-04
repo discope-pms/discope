@@ -36,15 +36,19 @@ use sale\booking\Funding;
 ['context' => $context] = $providers;
 
 $funding = Funding::id($params['id'])
-    ->read(['type', 'due_amount', 'paid_amount', 'invoice_id' => ['status']])
+    ->read(['type', 'due_amount', 'paid_amount', 'payments_ids', 'invoice_id' => ['status']])
     ->first(true);
 
 if(!$funding) {
     throw new Exception("unknown_funding", EQ_ERROR_INVALID_PARAM);
 }
 
-if($funding['paid_amount'] != 0) {
+if(round($funding['paid_amount'], 2) != 0) {
     throw new Exception("funding_already_paid", EQ_ERROR_INVALID_PARAM);
+}
+
+if(count($funding['payments_ids']) > 0) {
+    throw new Exception("funding_holding_payments", EQ_ERROR_INVALID_PARAM);
 }
 
 // fundings related to invoices cannot be deleted if the invoice isn't a proforma

@@ -2033,10 +2033,15 @@ class Enrollment extends Model {
     }
 
     protected static function doDeleteUnpaidFundings($self) {
-        $self->read(['fundings_ids' => ['is_paid', 'paid_amount']]);
+        $self->read(['fundings_ids' => ['is_paid', 'paid_amount', 'payments_ids']]);
         foreach($self as $enrollment) {
             foreach($enrollment['fundings_ids'] as $funding_id => $funding) {
-                if($funding['paid_amount'] > 0 || $funding['is_paid']) {
+                if(round($funding['paid_amount'], 2) > 0 || $funding['is_paid']) {
+                    continue;
+                }
+
+                if(count($funding['payments_ids']) > 0) {
+                    // Funding holding one payment or more can never be deleted
                     continue;
                 }
 
