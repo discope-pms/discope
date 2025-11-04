@@ -34,6 +34,14 @@
                 "draft": "Brouillon",
                 "sent": "envoyé"
             }
+        },
+        "description": {
+            "label": "Description",
+            "description": "Contenu du message."
+        },
+        "previous_ticket_entry_description": {
+            "label": "Contenu du message précédent (ne pas modifier)",
+            "description": "Contenu du message précédent."
         }
     },
     "view": {
@@ -49,6 +57,9 @@
             "layout": {
                 "section.attachments": {
                     "label": "Pièces jointes"
+                },
+                "section.previous-ticket-entry-description": {
+                    "label": "Description message précédent"
                 }
             }
         },

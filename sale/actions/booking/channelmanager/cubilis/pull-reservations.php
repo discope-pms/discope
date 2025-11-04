@@ -151,7 +151,7 @@ try {
 
                     // attempt to retrieve the booking relating to the reservation, if any
                     $booking = Booking::search(['extref_reservation_id', '=', $reservation['reservation_id']])
-                        ->read(['id', 'name','status', 'customer_id', 'customer_identity_id'])
+                        ->read(['id', 'name', 'status', 'customer_id', 'customer_identity_id', 'is_cancelled'])
                         ->first(true);
 
                     // try to sync the reservation
@@ -167,7 +167,7 @@ try {
                             ++$result['warnings'];
                             $result['logs'][] = "WARN- Unable to handle request for cancelling unknown reservation {$reservation['reservation_id']}.";
                         }
-                        else {
+                        elseif(!$booking['is_cancelled']) {
                             try {
                                 // cancel booking
                                 // #memo - this will trigger `check-contingencies`
@@ -909,6 +909,8 @@ try {
                         }
 
                         // #memo - edge case : even if it is the first time we receive the booking, it might be a cancellation (in such case we won't have the details of the services - not provided by Cubilis)
+                        /* #todo - remove when sure that this part removal doesn't cause problems
+                        // $reservation['status'] == 'Cancelled'  is always false here
                         if($reservation['status'] == 'Cancelled') {
                             // booking is still a 'quote': cancellation is trivial
                             try {
@@ -928,6 +930,7 @@ try {
                                 $result['logs'][] = "ERR - Unable to cancel reservation for Cubilis reservation {$reservation['reservation_id']} (property {$property['extref_property_id']}) : ".$e->getMessage();
                             }
                         }
+                        */
                     }
 
                     // everything went well : queue reservation for acknowledgement

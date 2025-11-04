@@ -1,0 +1,17 @@
+{
+    "description": "Ajouter à la liste d'attente.",
+    "model": {
+        "id": {
+            "label": "Inscription",
+            "description": "Inscription à ajouter à la liste d'attente.",
+            "help": ""
+        }
+    },
+    "error": {
+        "errors": {
+            "unknown_enrollment": "Inscription non connue.",
+            "invalid_status": "L'inscription n'est pas en cours.",
+            "camp_already_started": "Le camp a déjà commencé"
+        }
+    }
+}

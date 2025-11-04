@@ -52,7 +52,8 @@ class Payment extends Model {
                 'type'              => 'string',
                 'selection'         => [
                     'cashdesk',             // money was received at the cashdesk
-                    'bank'                  // money was received on a bank account
+                    'bank',                 // money was received on a bank account
+                    'online'                // money was received online, through a PSP
                 ],
                 'description'       => "Origin of the received money.",
                 'default'           => 'bank'
@@ -143,6 +144,11 @@ class Payment extends Model {
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\pay\BankCheck',
                 'description'       => 'The BankCheck associated with the payment.'
+            ],
+
+            'description' => [
+                'type'              => 'string',
+                'description'       => "Description of the payment."
             ]
 
         ];

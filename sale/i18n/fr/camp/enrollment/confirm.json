@@ -1,0 +1,17 @@
+{
+    "description": "Confirmer l'inscription.",
+    "model": {
+        "id": {
+            "label": "Inscription",
+            "description": "Inscription à confirmer.",
+            "help": ""
+        }
+    },
+    "error": {
+        "errors": {
+            "unknown_enrollment": "Inscription non connue.",
+            "invalid_status": "L'inscription n'est pas en cours.",
+            "camp_already_started": "Le camp a déjà commencé"
+        }
+    }
+}

@@ -9,7 +9,7 @@
 use sale\camp\Enrollment;
 
 [$params, $providers] = eQual::announce([
-    'description'   => "Confirms the pending enrollment if the camp has an available spot, else adds it to the waiting list.",
+    'description'   => "Confirms the pending enrollment.",
     'params'        => [
 
         'id' => [
@@ -23,12 +23,12 @@ use sale\camp\Enrollment;
         'visibility'        => 'protected',
         'groups'            => ['camp.default.administrator', 'camp.default.user'],
     ],
-    'response' => [
+    'response'      => [
         'content-type'      => 'application/json',
         'charset'           => 'utf-8',
         'accept-origin'     => '*'
     ],
-    'providers' => ['context']
+    'providers'     => ['context']
 ]);
 
 /**
@@ -37,42 +37,22 @@ use sale\camp\Enrollment;
 ['context' => $context] = $providers;
 
 $enrollment = Enrollment::id($params['id'])
-    ->read([
-        'status',
-        'is_ase',
-        'camp_id' => [
-            'max_children',
-            'ase_quota',
-            'enrollments_ids' => ['status', 'is_ase']
-        ]
-    ])
+    ->read(['status', 'camp_id' => ['date_from']])
     ->first();
 
-if($enrollment['status'] !== 'pending') {
+if(is_null($enrollment)) {
+    throw new Exception("unknown_enrollment", EQ_ERROR_UNKNOWN_OBJECT);
+}
+
+if(!in_array($enrollment['status'], ['pending', 'waitlisted'])) {
     throw new Exception("invalid_status", EQ_ERROR_INVALID_PARAM);
 }
 
-$confirmed_enrollments_qty = 0;
-$confirmed_ase_enrollments = 0;
-foreach($enrollment['camp_id']['enrollments_ids'] as $en) {
-    if(in_array($en['status'], ['confirmed', 'validated'])) {
-        $confirmed_enrollments_qty++;
-
-        if($en['is_ase']) {
-            $confirmed_ase_enrollments++;
-        }
-    }
+if($enrollment['camp_id']['date_from'] <= time()) {
+    throw new Exception("camp_already_started", EQ_ERROR_INVALID_PARAM);
 }
 
-$transition = 'confirm';
-if($confirmed_enrollments_qty >= $enrollment['camp_id']['max_children']) {
-    $status = 'waitlist';
-}
-if($enrollment['is_ase'] && $confirmed_ase_enrollments >= $enrollment['camp_id']['ase_quota']) {
-    $status = 'waitlist';
-}
-
-Enrollment::id($enrollment['id'])->transition($transition);
+Enrollment::id($enrollment['id'])->transition('confirm');
 
 $context->httpResponse()
         ->status(200)

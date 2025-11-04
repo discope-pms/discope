@@ -5,7 +5,9 @@
     Original author(s): Yesbabylon SRL
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
+
 namespace sale\booking;
+
 use core\setting\Setting;
 use equal\data\DataFormatter;
 use equal\orm\Model;
@@ -108,7 +110,7 @@ class Booking extends Model {
                 'foreign_object'    => 'identity\Center',
                 'description'       => "The center to which the booking relates to.",
                 'required'          => true,
-                'dependents'        => ['name', 'display_name', 'organisation_id', 'center_office_id']
+                'dependents'        => ['name', 'display_name', 'center_office_id']
             ],
 
             'center_office_id' => [
@@ -1460,11 +1462,21 @@ class Booking extends Model {
                 'activity_group_num' => null
             ]);
 
+            $group_camp_name_format = Setting::get_value('sale', 'booking', 'group.camp.name_format');
+
             $group_ids = array_values($map_order_groups_ids);
             foreach($group_ids as $index => $group_id) {
-                BookingLineGroup::id($group_id)->update([
-                    'activity_group_num' => $index + 1
-                ]);
+                $activity_group_num = $index + 1;
+
+                $data = compact('activity_group_num');
+                if(!is_null($group_camp_name_format)) {
+                    $data['name'] = Setting::parse_format($group_camp_name_format, [
+                        'center_name'           => $booking['center_id']['name'],
+                        'activity_group_num'    => $activity_group_num
+                    ]);
+                }
+
+                BookingLineGroup::id($group_id)->update($data);
             }
         }
     }
@@ -1969,13 +1981,13 @@ class Booking extends Model {
                 'nb_adults',
             ];
 
-            $valid = true;
+            // Check conditions on booking
             foreach($conditions as $condition) {
-                $operator = $condition['operator'];
-                if(!in_array($condition['operator'], ['>', '>=', '<', '<=', '='])) {
-                    $valid = false;
-                    break;
+                if(!in_array($condition['operand'], $on_booking)) {
+                    continue;
                 }
+
+                $operator = $condition['operator'];
                 if($operator === '=') {
                     $operator = '==';
                 }
@@ -1985,71 +1997,63 @@ class Booking extends Model {
                     $value = "'$value'";
                 }
 
-                if(in_array($condition['operand'], $on_booking)) {
-                    $operand = $booking[$condition['operand']];
+                $operand = $booking[$condition['operand']];
+                if(!is_numeric($operand)) {
+                    $operand = "'$operand'";
+                }
+
+                if(!eval("return $operand $operator $value;")) {
+                    continue 2;
+                }
+            }
+
+            // Check conditions, rate class and sojourn type on groups
+            foreach($groups as $group) {
+                foreach($conditions as $condition) {
+                    if(!in_array($condition['operand'], $on_sojourn_group)) {
+                        continue;
+                    }
+
+                    $operator = $condition['operator'];
+                    if($operator === '=') {
+                        $operator = '==';
+                    }
+
+                    $value = $condition['value'];
+                    if(!is_numeric($condition['value'])) {
+                        $value = "'$value'";
+                    }
+
+                    if(!empty($attribution['rate_classes_ids']) && !in_array($group['rate_class_id'], $attribution['rate_classes_ids'])) {
+                        continue 2;
+                    }
+                    if($attribution['sojourn_type_id'] && $group['sojourn_type_id'] !== $attribution['sojourn_type_id']) {
+                        continue 2;
+                    }
+
+                    $operand = $group[$condition['operand']];
                     if(!is_numeric($operand)) {
                         $operand = "'$operand'";
                     }
 
                     if(!eval("return $operand $operator $value;")) {
-                        $valid = false;
-                        break;
-                    }
-                }
-                elseif(in_array($condition['operand'], $on_sojourn_group)) {
-                    $group_match = false;
-                    foreach($groups as $group) {
-                        if(!empty($attribution['rate_classes_ids']) && !in_array($group['rate_class_id'], $attribution['rate_classes_ids'])) {
-                            continue;
-                        }
-                        if($attribution['sojourn_type_id'] && $group['sojourn_type_id'] !== $attribution['sojourn_type_id']) {
-                            continue;
-                        }
-
-                        $operand = $group[$condition['operand']];
-                        if(!is_numeric($operand)) {
-                            $operand = "'$value'";
-                        }
-
-                        if(eval("return $operand $operator $value;")) {
-                            $group_match = true;
-                            break;
-                        }
-                    }
-
-                    if(!$group_match) {
-                        $valid = false;
-                        break;
-                    }
-                }
-            }
-
-            // If no conditions only check rate class and sojourn type
-            if(empty($conditions) && (!empty($attribution['rate_classes_ids']) || $attribution['sojourn_type_id'])) {
-                $group_match = false;
-                foreach($groups as $group) {
-                    if(!empty($attribution['rate_classes_ids'])) {
-                        if(in_array($group['rate_class_id'], $attribution['rate_classes_ids'])) {
-                            $group_match = true;
-                            break;
-                        }
-                    }
-                    elseif($attribution['sojourn_type_id']) {
-                        if($group['sojourn_type_id'] === $attribution['sojourn_type_id']) {
-                            $group_match = true;
-                            break;
-                        }
+                        continue 2;
                     }
                 }
 
-                if(!$group_match) {
-                    $valid = false;
+                if(!empty($attribution['rate_classes_ids'])) {
+                    if(!in_array($group['rate_class_id'], $attribution['rate_classes_ids'])) {
+                        continue;
+                    }
                 }
-            }
+                elseif($attribution['sojourn_type_id']) {
+                    if($group['sojourn_type_id'] !== $attribution['sojourn_type_id']) {
+                        continue;
+                    }
+                }
 
-            if($valid) {
                 $matched_attribution = $attribution;
-                break;
+                break 2;
             }
         }
 
@@ -2133,6 +2137,33 @@ class Booking extends Model {
         $om->update(self::getType(), $id, ['is_price_tbc' => $is_tbc]);
     }
 
+    public static function refreshOrder($om, $id) {
+        $bookings = $om->read(self::getType(), $id, ['id', 'booking_lines_groups_ids']);
+        if($bookings <= 0) {
+            return;
+        }
+
+        $booking = reset($bookings);
+
+        $groups = $om->read(BookingLineGroup::getType(), $booking['booking_lines_groups_ids'], ['id', 'order']);
+
+        $map_group_order = [];
+        foreach($groups as $id => $group) {
+            if(!isset($map_group_order[$group['order']])) {
+                $map_group_order[$group['order']] = [];
+            }
+
+            $map_group_order[$group['order']][] = $id;
+        }
+
+        $order = 0;
+        foreach($map_group_order as $group_ids) {
+            foreach($group_ids as $group_id) {
+                $om->update(BookingLineGroup::getType(), $group_id, ['order' => ++$order]);
+            }
+        }
+    }
+
     private static function computeCountBookingYearFiscal($booking_id, $customer_id) {
         $date_from = strtotime(Setting::get_value('finance', 'accounting', 'fiscal_year.date_from'));
         return Booking::search([
@@ -2165,6 +2196,7 @@ class Booking extends Model {
             'date_from',
             'date_to',
             'center_id.autosale_list_category_id',
+            'center_id.sojourn_type_id',
             'customer_rate_class_id'
         ]);
 
@@ -2315,6 +2347,9 @@ class Booking extends Model {
                     'date_to'       => $booking['date_to'],
                     'is_autosale'   => true
                 ];
+                if(isset($booking['center_id.sojourn_type_id'])) {
+                    $group['sojourn_type_id'] = $booking['center_id.sojourn_type_id'];
+                }
                 if($count == 1) {
                     // in case of a single line, overwrite group name
                     foreach($products_to_apply as $autosale_id => $product) {
