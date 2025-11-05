@@ -163,8 +163,13 @@ class SojournProductModelRentalUnitAssignement extends Model {
     }
 
     public static function onupdateUseExtra($self) {
-        $self->read(['use_extra']);
+        $self->read(['use_extra', 'rental_unit_id' => ['extra']]);
         foreach($self as $id => $assignment) {
+            if($assignment['rental_unit_id']['extra'] === 0) {
+                // skip if no extra quantity possible
+                continue;
+            }
+
             if(!$assignment['use_extra']) {
                 self::id($id)->update(['extra_qty' => 0]);
             }
@@ -175,8 +180,13 @@ class SojournProductModelRentalUnitAssignement extends Model {
     }
 
     public static function onupdateExtraQty($self) {
-        $self->read(['extra_qty', 'rental_unit_id' => ['capacity']]);
+        $self->read(['use_extra', 'extra_qty', 'rental_unit_id' => ['capacity', 'extra']]);
         foreach($self as $id => $assignment) {
+            if(!$assignment['use_extra'] || $assignment['rental_unit_id']['extra'] === 0) {
+                // skip if no extra quantity possible
+                continue;
+            }
+
             self::id($id)->update(['qty' => $assignment['rental_unit_id']['capacity'] + $assignment['extra_qty']]);
         }
     }
