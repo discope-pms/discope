@@ -232,9 +232,23 @@ try {
                                 Consumption::search(['booking_id', '=', $booking['id']])->delete(true);
 
                                 // remove only payments previously received from Cubilis (do not remove payments made directly in Discope)
-                                $payments_ids_to_delete = Payment::search(['booking_id', '=', $booking['id']],['payment_origin', '=', 'online'])->ids();
-                                Funding::search(['payments_ids' , 'contains' , $payments_ids_to_delete])->delete(true);
-                                Payment::ids($payments_ids_to_delete)->delete(true);
+                                $payments_ids_to_delete = Payment::search([
+                                        ['booking_id', '=', $booking['id']],
+                                        ['payment_origin', '=', 'online']
+                                    ])
+                                    ->ids();
+
+                                if(count($payments_ids_to_delete)) {
+                                    $candidateFundings = Funding::search(['payments_ids' , 'contains' , $payments_ids_to_delete])->read(['payments_ids']);
+                                    // instant removal of 'online' payments
+                                    Payment::ids($payments_ids_to_delete)->delete(true);
+                                    foreach($candidateFundings as $candidate_funding_id => $candidateFunding) {
+                                        // remove fundings with no payments left
+                                        if(count(array_diff($candidateFunding['payments_ids'], $payments_ids_to_delete)) <= 0) {
+                                            Funding::id($candidate_funding_id)->delete(true);
+                                        }
+                                    }
+                                }
 
                                 if(isset($reservation['customer']) && is_array($reservation['customer'])) {
                                     $language = Lang::search(['code', '=', $reservation['customer']['lang'] ?? 'fr'])->read(['id']) ->first(true);
