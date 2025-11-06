@@ -307,13 +307,9 @@ export class ChildPreRegistrationReminderComponent implements OnInit, AfterConte
     }
 
     private async loadEnrollments(childId: number) {
-        const startYearDate = new Date(new Date().getFullYear(), 0, 1);
-        const endYearDate = new Date(new Date().getFullYear(), 11, 31);
-
         const domain = [
             ['child_id', '=', childId],
-            ['date_from', '>=', startYearDate.getTime() / 1000],
-            ['date_from', '<=', endYearDate.getTime() / 1000]
+            ['date_from', '>=', (new Date()).getTime() / 1000]
         ];
         this.enrollments = await this.api.collect("sale\\camp\\Enrollment", domain, Object.getOwnPropertyNames(new Enrollment()));
 
