@@ -161,6 +161,15 @@ class Invoice extends Model {
                 'store'             => true
             ],
 
+            'total_vat' => [
+                'type'              => 'computed',
+                'result_type'       => 'float',
+                'function'          => 'calcTotalVat',
+                'usage'             => 'amount/money:4',
+                'description'       => 'Total tax price of the invoice (computed).',
+                'store'             => false
+            ],
+
             'balance' => [
                 'type'              => 'computed',
                 'result_type'       => 'float',
@@ -366,35 +375,51 @@ class Invoice extends Model {
     /**
      * #memo - this should not include installment [non-invoiced pre-payments] (we should deal with display_price instead)
      */
-    public static function calcPrice($om, $oids, $lang) {
+    public static function calcPrice($self): array {
         $result = [];
+        $self->read(['invoice_lines_ids' => ['price']]);
+        foreach($self as $id => $invoice) {
+            $price = 0.0;
+            foreach($invoice['invoice_lines_ids'] as $line) {
+                $price += $line['price'];
+            }
 
-        $invoices = $om->read(get_called_class(), $oids, ['invoice_lines_ids.price'], $lang);
-
-        foreach($invoices as $oid => $invoice) {
-            $price = array_reduce((array) $invoice['invoice_lines_ids.price'], function ($c, $a) {
-                return $c + $a['price'];
-            }, 0.0);
-            $result[$oid] = round($price, 2);
+            $result[$id] = round($price, 2);
         }
+
         return $result;
     }
 
     /**
      * #memo - this should not include installment [non-invoiced pre-payments] (we should deal with display_price instead)
      */
-    public static function calcTotal($om, $oids, $lang) {
+    public static function calcTotal($self): array {
         $result = [];
+        $self->read(['invoice_lines_ids' => ['total']]);
+        foreach($self as $id => $invoice) {
+            $total = 0.0;
+            foreach($invoice['invoice_lines_ids'] as $line) {
+                $total += $line['total'];
+            }
 
-        $invoices = $om->read(get_called_class(), $oids, ['invoice_lines_ids.total'], $lang);
-
-        foreach($invoices as $oid => $invoice) {
-            $total = array_reduce((array) $invoice['invoice_lines_ids.total'], function ($c, $a) {
-                // precision must be considered at line level only (i.e. for an invoice with VAT 0, the sum of `total` must equal sum of `price` )
-                return $c + round($a['total'], 2);
-            }, 0.0);
-            $result[$oid] = round($total, 2);
+            $result[$id] = round($total, 2);
         }
+
+        return $result;
+    }
+
+    public static function calcTotalVat($self): array {
+        $result = [];
+        $self->read(['invoice_lines_ids' => ['total_vat']]);
+        foreach($self as $id => $invoice) {
+            $total_vat = 0.0;
+            foreach($invoice['invoice_lines_ids'] as $line) {
+                $total_vat += $line['total_vat'];
+            }
+
+            $result[$id] = round($total_vat, 2);
+        }
+
         return $result;
     }
 

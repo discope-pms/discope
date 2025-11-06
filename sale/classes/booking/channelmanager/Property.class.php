@@ -235,7 +235,7 @@ class Property extends \equal\orm\Model {
     /**
      * Generate a `OTA_HotelResRQ` request XML payload according to Cubilis 2.02 specs
      */
-    public static function cubilis_HotelResRQ_generateXmlPayload($property_id, $username, $password, $api_id) {
+    public static function cubilis_Hote²²²lResRQ_generateXmlPayload($property_id, $username, $password, $api_id) {
         // #memo - the second RequestorID is set globally at Cubilis side for identifying Discope
         $xml = <<<XML
             <OTA_HotelResRQ Version="2.02" xmlns="http://www.opentravel.org/OTA/2003/05">
