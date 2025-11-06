@@ -89,13 +89,6 @@ class InvoiceLine extends Model {
                 'onupdate'          => 'onupdateQty'
             ],
 
-            'free_qty' => [
-                'type'              => 'integer',
-                'description'       => 'Free quantity.',
-                'default'           => 0,
-                'onupdate'          => 'onupdateFreeQty'
-            ],
-
             // #memo - important: to allow the maximum flexibility, percent values can hold 4 decimal digits (must not be rounded, except for display)
             'discount' => [
                 'type'              => 'float',
@@ -112,6 +105,15 @@ class InvoiceLine extends Model {
                 'description'       => 'Total tax-excluded price of the line (computed).',
                 'function'          => 'calcTotal',
                 'store'             => true
+            ],
+
+            'total_vat' => [
+                'type'              => 'computed',
+                'result_type'       => 'float',
+                'usage'             => 'amount/money:4',
+                'description'       => 'Total tax price of the line (computed).',
+                'function'          => 'calcTotalVat',
+                'store'             => false
             ],
 
             'price' => [
@@ -131,56 +133,56 @@ class InvoiceLine extends Model {
         ];
     }
 
-    public static function calcName($om, $oids, $lang) {
+    public static function calcName($self): array {
         $result = [];
-        $lines = $om->read(get_called_class(), $oids, ['product_id.name'], $lang);
-        if($lines > 0) {
-            foreach($lines as $oid => $line) {
-                $result[$oid] = $line['product_id.name'];
-            }
+        $self->read(['product_id' => ['name']]);
+        foreach($self as $id => $line) {
+            $result[$id] = $line['product_id']['name'];
         }
+
         return $result;
     }
 
-    public static function calcUnitPrice($om, $oids, $lang) {
+    public static function calcUnitPrice($self): array {
         $result = [];
-
-        $lines = $om->read(__CLASS__, $oids, ['price_id.price']);
-
-        if($lines > 0) {
-            foreach($lines as $oid => $line) {
-                $result[$oid] = $line['price_id.price'];
-            }
+        $self->read(['price_id' => ['price']]);
+        foreach($self as $id => $line) {
+            $result[$id] = $line['price_id']['price'];
         }
+
         return $result;
     }
 
-    public static function calcVatRate($om, $oids, $lang) {
+    public static function calcVatRate($self): array {
         $result = [];
-        $lines = $om->read(__CLASS__, $oids, ['price_id.accounting_rule_id.vat_rule_id.rate']);
-        if($lines > 0) {
-            foreach($lines as $oid => $odata) {
-                $result[$oid] = 0.0;
-                if(isset($odata['price_id.accounting_rule_id.vat_rule_id.rate'])) {
-                    $result[$oid] = floatval($odata['price_id.accounting_rule_id.vat_rule_id.rate']);
-                }
-            }
+        $self->read(['price_id' => ['accounting_rule_id' => ['vat_rule_id' => ['rate']]]]);
+        foreach($self as $id => $line) {
+            $result[$id] = floatval($line['price_id']['accounting_rule_id']['vat_rule_id']['rate'] ?? 0);
         }
+
         return $result;
     }
 
     /**
      * Get total tax-excluded price of the line.
-     *
      */
-    public static function calcTotal($om, $oids, $lang) {
+    public static function calcTotal($self): array {
         $result = [];
-
-        $lines = $om->read(get_called_class(), $oids, ['qty','unit_price','free_qty','discount']);
-
-        foreach($lines as $oid => $line) {
-            $result[$oid] = round($line['unit_price'] * (1.0 - $line['discount']) * ($line['qty'] - $line['free_qty']), 4);
+        $self->read(['qty', 'unit_price']);
+        foreach($self as $id => $line) {
+            $result[$id] = round($line['qty'] * $line['unit_price'], 4);
         }
+
+        return $result;
+    }
+
+    public static function calcTotalVat($self): array {
+        $result = [];
+        $self->read(['total', 'vat_rate']);
+        foreach($self as $id => $line) {
+            $result[$id] = $line['total'] * $line['vat_rate'];
+        }
+
         return $result;
     }
 
@@ -188,17 +190,13 @@ class InvoiceLine extends Model {
      * Get final tax-included price of the line.
      *
      */
-    public static function calcPrice($om, $oids, $lang) {
+    public static function calcPrice($self) {
         $result = [];
-
-        $lines = $om->read(get_called_class(), $oids, ['total','vat_rate']);
-
-        foreach($lines as $oid => $odata) {
-            $total = round((float) $odata['total'], 4);
-            $vat = round((float) $odata['vat_rate'], 4);
-
-            $result[$oid] = round($total * (1.0 + $vat), 2);
+        $self->read(['total', 'total_vat']);
+        foreach($self as $id => $line) {
+            $result[$id] = round($line['total'], 2) + round($line['total_vat'], 2);
         }
+
         return $result;
     }
 
@@ -215,12 +213,6 @@ class InvoiceLine extends Model {
     }
 
     public static function onupdateQty($om, $oids, $values, $lang) {
-        $om->update(get_called_class(), $oids, ['price' => null, 'total' => null]);
-        // reset parent invoice computed values
-        $om->callonce(self::getType(), '_resetInvoice', $oids, [], $lang);
-    }
-
-    public static function onupdateFreeQty($om, $oids, $values, $lang) {
         $om->update(get_called_class(), $oids, ['price' => null, 'total' => null]);
         // reset parent invoice computed values
         $om->callonce(self::getType(), '_resetInvoice', $oids, [], $lang);
