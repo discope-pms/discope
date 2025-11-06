@@ -484,7 +484,7 @@ foreach($invoices as $invoice) {
 
     // pass-1 : group all lines by account_id
     foreach($invoice['invoice_lines_ids'] as $lid => $line) {
-        $vat = round($line['price'] - $line['total'], 2);
+        $vat = round($line['price'] - round($line['total'], 2), 2);
         $amount = $line['price'] - $vat;
         // when invoice is a credit note, TAMOUNT and TVATOTAMN must be inverted (#memo - not necessarily negative)
         if($invoice['type'] == 'credit_note') {
