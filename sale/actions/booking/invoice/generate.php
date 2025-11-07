@@ -237,8 +237,7 @@ foreach($booking['booking_lines_groups_ids'] as $group_id => $group) {
                 ->update([
                     'vat_rate'                  => $line['vat_rate'],
                     'unit_price'                => $line['unit_price'],
-                    'qty'                       => $line['qty'],
-                    'free_qty'                  => $line['free_qty'],
+                    'qty'                       => $line['qty'] - $line['free_qty'],
                     'discount'                  => $line['discount']
                 ])
                 ->update([

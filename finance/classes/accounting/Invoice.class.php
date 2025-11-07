@@ -35,12 +35,12 @@ class Invoice extends Model {
 
             'name_old' => [
                 'type'              => 'string',
-                'description'       => 'Previous invoice number for invoice emitted before numbering change (as of february 2023).'
+                'description'       => "Previous invoice number for invoice emitted before numbering change (as of february 2023)."
             ],
 
             'customer_ref' => [
                 'type'              => 'string',
-                'description'       => 'Reference that must appear on invoice (requested by customer).'
+                'description'       => "Reference that must appear on invoice (requested by customer)."
             ],
 
             // #memo this field is defined in parent Model and is reset by several handlers. BUT it is not used (yet) nor is it a computed field.
@@ -49,7 +49,7 @@ class Invoice extends Model {
 
             'is_deposit' => [
                 'type'              => 'boolean',
-                'description'       => 'Marks the invoice as a deposit one, relating to a downpayment.',
+                'description'       => "Marks the invoice as a deposit one, relating to a downpayment.",
                 'default'           => false
             ],
 
@@ -62,6 +62,7 @@ class Invoice extends Model {
 
             'status' => [
                 'type'              => 'string',
+                'description'       => "Current status of the invoice, either proforma, invoice or cancelled.",
                 'selection'         => [
                     'proforma',             // draft invoice (no number yet)
                     'invoice',              // final invoice (with unique number and accounting entries)
@@ -73,6 +74,7 @@ class Invoice extends Model {
 
             'type' => [
                 'type'              => 'string',
+                'description'       => "Type of the invoice, either invoice or credit note.",
                 'selection'         => [
                     'invoice',
                     'credit_note'
@@ -99,7 +101,7 @@ class Invoice extends Model {
 
             'reversed_invoice_id' => [
                 'type'              => 'many2one',
-                'foreign_object'    => self::getType(),
+                'foreign_object'    => 'finance\accounting\Invoice',
                 'description'       => "Symmetrical link between credit note and cancelled invoice, if any.",
                 'visible'           => [[['status', '=', 'cancelled']], [['type', '=', 'credit_note']]]
             ],
@@ -120,14 +122,14 @@ class Invoice extends Model {
             'payment_reference' => [
                 'type'              => 'computed',
                 'result_type'       => 'string',
-                'function'          => 'calcPaymentReference',
-                'description'       => 'Message for identifying payments related to the invoice.',
-                'store'             => true
+                'description'       => "Message for identifying payments related to the invoice.",
+                'store'             => true,
+                'function'          => 'calcPaymentReference'
             ],
 
             'date' => [
                 'type'              => 'datetime',
-                'description'       => 'Emission date of the invoice.',
+                'description'       => "Emission date of the invoice.",
                 'default'           => time()
             ],
 
@@ -138,27 +140,64 @@ class Invoice extends Model {
 
             'partner_id' => [
                 'type'              => 'many2one',
-                'foreign_object'    => \identity\Partner::getType(),
+                'foreign_object'    => 'identity\Partner',
                 'description'       => "The counter party organization the invoice relates to.",
                 'required'          => true
             ],
 
-            'price' => [
+            'total_discount' => [
                 'type'              => 'computed',
                 'result_type'       => 'float',
-                'function'          => 'calcPrice',
                 'usage'             => 'amount/money:2',
-                'store'             => true,
-                'description'       => "Final tax-included invoiced amount (computed)."
+                'function'          => 'calcTotalDiscount',
+                'description'       => "Total tax-excluded discount price of all lines of the invoice.",
+                'store'             => false
             ],
 
             'total' => [
                 'type'              => 'computed',
                 'result_type'       => 'float',
-                'function'          => 'calcTotal',
                 'usage'             => 'amount/money:4',
-                'description'       => 'Total tax-excluded price of the invoice (computed).',
+                'function'          => 'calcTotal',
+                'description'       => "Total tax-excluded price of the invoice.",
                 'store'             => true
+            ],
+
+            'subtotals' => [
+                'type'              => 'computed',
+                'result_type'       => 'array',
+                'description'       => "Sub totals, by vat rates, tax-excluded prices of the invoice.",
+                'help'              => "Must sum lines prices totals keeping 4 decimals and rounded to 2 decimals at the end. e.g. '0.0', '6.0', '12.0', '21.0'.",
+                'store'             => false,
+                'function'          => 'calcSubTotals'
+            ],
+
+            'subtotals_vat' => [
+                'type'              => 'computed',
+                'result_type'       => 'array',
+                'description'       => "Sub totals, by vat rates, tax prices of the invoice.",
+                'help'              => "Must sum lines prices totals keeping 4 decimals and rounded to 2 decimals at the end. e.g. '0.0', '6.0', '12.0', '21.0'.",
+                'store'             => false,
+                'function'          => 'calcSubTotalsVat'
+            ],
+
+            'total_vat' => [
+                'type'              => 'computed',
+                'result_type'       => 'float',
+                'usage'             => 'amount/money:2',
+                'description'       => "Total tax price of the invoice.",
+                'store'             => false,
+                'function'          => 'calcTotalVat'
+            ],
+
+            'price' => [
+                'type'              => 'computed',
+                'result_type'       => 'float',
+                'usage'             => 'amount/money:2',
+                'description'       => "Final tax-included invoiced amount.",
+                'help'              => "Sum of 'total' and 'subtotals_vat'.",
+                'store'             => true,
+                'function'          => 'calcPrice'
             ],
 
             'balance' => [
@@ -366,35 +405,118 @@ class Invoice extends Model {
     /**
      * #memo - this should not include installment [non-invoiced pre-payments] (we should deal with display_price instead)
      */
-    public static function calcPrice($om, $oids, $lang) {
+    public static function calcTotalDiscount($self): array {
         $result = [];
+        $self->read(['invoice_lines_ids' => ['total', 'total_no_discount']]);
+        foreach($self as $id => $invoice) {
+            $total_discount = 0.0;
+            foreach($invoice['invoice_lines_ids'] as $line) {
+                // total is rounded to 2 decimals for compatibility with older data that were computed with 4 decimals
+                $total_discount = round($total_discount + ($line['total_no_discount'] - round($line['total'], 2)), 2);
+            }
 
-        $invoices = $om->read(get_called_class(), $oids, ['invoice_lines_ids.price'], $lang);
-
-        foreach($invoices as $oid => $invoice) {
-            $price = array_reduce((array) $invoice['invoice_lines_ids.price'], function ($c, $a) {
-                return $c + $a['price'];
-            }, 0.0);
-            $result[$oid] = round($price, 2);
+            $result[$id] = $total_discount;
         }
+
         return $result;
     }
 
     /**
      * #memo - this should not include installment [non-invoiced pre-payments] (we should deal with display_price instead)
      */
-    public static function calcTotal($om, $oids, $lang) {
+    public static function calcTotal($self): array {
         $result = [];
+        $self->read(['invoice_lines_ids' => ['total']]);
+        foreach($self as $id => $invoice) {
+            $total = 0.0;
+            foreach($invoice['invoice_lines_ids'] as $line) {
+                $total = round($total + $line['total'], 2);
+            }
 
-        $invoices = $om->read(get_called_class(), $oids, ['invoice_lines_ids.total'], $lang);
-
-        foreach($invoices as $oid => $invoice) {
-            $total = array_reduce((array) $invoice['invoice_lines_ids.total'], function ($c, $a) {
-                // precision must be considered at line level only (i.e. for an invoice with VAT 0, the sum of `total` must equal sum of `price` )
-                return $c + round($a['total'], 2);
-            }, 0.0);
-            $result[$oid] = round($total, 2);
+            $result[$id] = $total;
         }
+
+        return $result;
+    }
+
+    public static function calcSubTotals($self): array {
+        $result = [];
+        $self->read(['invoice_lines_ids' => ['vat_rate', 'total']]);
+        foreach($self as $id => $invoice) {
+            $subtotals = [];
+            foreach($invoice['invoice_lines_ids'] as $line) {
+                $vat_rate_index = number_format($line['vat_rate'] * 100, 2, '.', '');
+                if(!isset($subtotals[$vat_rate_index])) {
+                    $subtotals[$vat_rate_index] = 0.0;
+                }
+
+                // total is rounded to 2 decimals for compatibility with older data that were computed with 4 decimals
+                $subtotals[$vat_rate_index] = round($subtotals[$vat_rate_index] + round($line['total'], 2), 2);
+            }
+
+            // #memo - as to be rounded on 2 decimals here and not on each line
+            $result[$id] = array_map(fn($subtotal) => round($subtotal, 2), $subtotals);
+        }
+
+        return $result;
+    }
+
+    /**
+     * #memo - must sum lines prices totals keeping 4 decimals and rounded to 2 decimals at the end
+     */
+    public static function calcSubTotalsVat($self): array {
+        $result = [];
+        $self->read(['invoice_lines_ids' => ['vat_rate', 'total_vat']]);
+        foreach($self as $id => $invoice) {
+            $subtotals_vat = [];
+            foreach($invoice['invoice_lines_ids'] as $line) {
+                $vat_rate_index = number_format($line['vat_rate'] * 100, 2, '.', '');
+                if(!isset($subtotals_vat[$vat_rate_index])) {
+                    $subtotals_vat[$vat_rate_index] = 0.0;
+                }
+
+                $subtotals_vat[$vat_rate_index] = round($subtotals_vat[$vat_rate_index] + $line['total_vat'], 4);
+            }
+
+            // #memo - as to be rounded on 2 decimals here and not on each line
+            $result[$id] = array_map(fn($subtotal) => round($subtotal, 2), $subtotals_vat);
+        }
+
+        return $result;
+    }
+
+    public static function calcTotalVat($self): array {
+        $result = [];
+        $self->read(['subtotals_vat']);
+        foreach($self as $id => $invoice) {
+            $total_vat = 0.0;
+            foreach($invoice['subtotals_vat'] as $subtotal) {
+                $total_vat = round($total_vat + $subtotal, 2);
+            }
+
+            $result[$id] = $total_vat;
+        }
+
+        return $result;
+    }
+
+    /**
+     * #memo - this should not include installment [non-invoiced pre-payments] (we should deal with display_price instead)
+     *
+     * #warning - if displayed rounded on 2 decimals, the sum of all line "price" of and invoice may not match the final "price" of the Invoice (use of subtotals)
+     */
+    public static function calcPrice($self): array {
+        $result = [];
+        $self->read(['total', 'subtotals_vat']);
+        foreach($self as $id => $invoice) {
+            $total_vat = 0.0;
+            foreach($invoice['subtotals_vat'] as $subtotal_vat) {
+                $total_vat = round($total_vat + $subtotal_vat, 2);
+            }
+
+            $result[$id] = round($invoice['total'] + $total_vat, 2);
+        }
+
         return $result;
     }
 
