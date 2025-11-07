@@ -196,8 +196,8 @@ class Invoice extends Model {
                 'usage'             => 'amount/money:2',
                 'description'       => "Final tax-included invoiced amount.",
                 'help'              => "Sum of 'total' and 'subtotals_vat'.",
-                'function'          => 'calcPrice',
-                'store'             => true
+                'store'             => true,
+                'function'          => 'calcPrice'
             ],
 
             'balance' => [
