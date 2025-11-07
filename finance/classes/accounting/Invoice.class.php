@@ -148,7 +148,7 @@ class Invoice extends Model {
             'total_discount' => [
                 'type'              => 'computed',
                 'result_type'       => 'float',
-                'usage'             => 'amount/money:4',
+                'usage'             => 'amount/money:2',
                 'function'          => 'calcTotalDiscount',
                 'description'       => "Total tax-excluded discount price of all lines of the invoice.",
                 'store'             => false
@@ -193,11 +193,11 @@ class Invoice extends Model {
             'price' => [
                 'type'              => 'computed',
                 'result_type'       => 'float',
-                'function'          => 'calcPrice',
                 'usage'             => 'amount/money:2',
-                'store'             => true,
                 'description'       => "Final tax-included invoiced amount.",
                 'help'              => "Sum of 'total' and 'subtotals_vat'.",
+                'function'          => 'calcPrice',
+                'store'             => true
             ],
 
             'balance' => [
