@@ -37,30 +37,6 @@ use finance\accounting\Invoice;
  */
 ['context' => $context] = $providers;
 
-/**
- * Methods
- */
-
-$formatQty = function($value) {
-    return number_format($value, 1, ".", "");
-};
-
-$formatMoney = function($value) {
-    return number_format($value, 2, ".", "");
-};
-
-$formatVatNumber = function($value) {
-    return str_replace([' ', '.'], '', $value);
-};
-
-$formatVatRate = function($value) {
-    return number_format($value * 100, 1, ".", "");
-};
-
-/**
- * Action
- */
-
 $invoice = Invoice::id($params['id'])
     ->read([
         'center_office_id' => [
