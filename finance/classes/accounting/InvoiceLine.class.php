@@ -1,10 +1,12 @@
 <?php
 /*
     This file is part of Symbiose Community Edition <https://github.com/yesbabylon/symbiose>
-    Some Rights Reserved, Yesbabylon SRL, 2020-2021
+    Some Rights Reserved, Yesbabylon SRL, 2020-2025
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
+
 namespace finance\accounting;
+
 use equal\orm\Model;
 
 class InvoiceLine extends Model {
@@ -23,27 +25,27 @@ class InvoiceLine extends Model {
             'name' => [
                 'type'              => 'computed',
                 'result_type'       => 'string',
-                'description'       => 'Default label of the line, based on product (computed).',
+                'description'       => "Default label of the line, based on product.",
                 'function'          => 'calcName',
                 'store'             => true
             ],
 
             'description' => [
                 'type'              => 'string',
-                'description'       => 'Complementary description of the line (independant from product).'
+                'description'       => "Complementary description of the line (independent from product)."
             ],
 
             'invoice_line_group_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'finance\accounting\InvoiceLineGroup',
-                'description'       => 'Group the line relates to (in turn, groups relate to their invoice).',
+                'description'       => "Group the line relates to (in turn, groups relate to their invoice).",
                 'ondelete'          => 'cascade'
             ],
 
             'invoice_id' => [
                 'type'              => 'many2one',
-                'foreign_object'    => Invoice::getType(),
-                'description'       => 'Invoice the line is related to.',
+                'foreign_object'    => 'finance\accounting\Invoice',
+                'description'       => "Invoice the line is related to.",
                 'required'          => true,
                 'ondelete'          => 'cascade'
             ],
@@ -51,14 +53,14 @@ class InvoiceLine extends Model {
             'product_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\catalog\Product',
-                'description'       => 'The product (SKU) the line relates to.',
+                'description'       => "The product (SKU) the line relates to.",
                 'required'          => true
             ],
 
             'price_id' => [
                 'type'              => 'many2one',
-                'foreign_object'    => \sale\price\Price::getType(),
-                'description'       => 'The price the line relates to (assigned at line creation).',
+                'foreign_object'    => 'sale\price\Price',
+                'description'       => "The price the line relates to (assigned at line creation).",
                 'onupdate'          => 'onupdatePriceId'
             ],
 
@@ -66,7 +68,7 @@ class InvoiceLine extends Model {
                 'type'              => 'computed',
                 'result_type'       => 'float',
                 'usage'             => 'amount/money:4',
-                'description'       => 'Unit price of the product related to the line.',
+                'description'       => "Unit price of the product related to the line.",
                 'function'          => 'finance\accounting\InvoiceLine::calcUnitPrice',
                 'store'             => true
             ],
@@ -75,7 +77,7 @@ class InvoiceLine extends Model {
                 'type'              => 'computed',
                 'result_type'       => 'float',
                 'usage'             => 'amount/rate',
-                'description'       => 'VAT rate to be applied.',
+                'description'       => "VAT rate to be applied.",
                 'function'          => 'calcVatRate',
                 'store'             => true,
                 'default'           => 0.0,
@@ -84,7 +86,7 @@ class InvoiceLine extends Model {
 
             'qty' => [
                 'type'              => 'float',
-                'description'       => 'Quantity of product.',
+                'description'       => "Quantity of product.",
                 'default'           => 0,
                 'onupdate'          => 'onupdateQty'
             ],
@@ -93,16 +95,25 @@ class InvoiceLine extends Model {
             'discount' => [
                 'type'              => 'float',
                 'usage'             => 'amount/rate',
-                'description'       => 'Total amount of discount to apply, if any.',
+                'description'       => "Total amount of discount to apply, if any.",
                 'default'           => 0.0,
                 'onupdate'          => 'onupdateDiscount'
+            ],
+
+            'total_no_discount' => [
+                'type'              => 'computed',
+                'result_type'       => 'float',
+                'usage'             => 'amount/money:4',
+                'description'       => "Total tax-excluded price of the line without the discount applied.",
+                'function'          => 'calcTotalNoDiscount',
+                'store'             => false
             ],
 
             'total' => [
                 'type'              => 'computed',
                 'result_type'       => 'float',
                 'usage'             => 'amount/money:4',
-                'description'       => 'Total tax-excluded price of the line (computed).',
+                'description'       => "Total tax-excluded price of the line.",
                 'function'          => 'calcTotal',
                 'store'             => true
             ],
@@ -111,7 +122,7 @@ class InvoiceLine extends Model {
                 'type'              => 'computed',
                 'result_type'       => 'float',
                 'usage'             => 'amount/money:4',
-                'description'       => 'Total tax price of the line (computed).',
+                'description'       => "Total tax price of the line.",
                 'function'          => 'calcTotalVat',
                 'store'             => false
             ],
@@ -120,7 +131,7 @@ class InvoiceLine extends Model {
                 'type'              => 'computed',
                 'result_type'       => 'float',
                 'usage'             => 'amount/money:2',
-                'description'       => 'Final tax-included price of the line (computed).',
+                'description'       => "Final tax-included price of the line.",
                 'function'          => 'calcPrice',
                 'store'             => true
             ],
@@ -128,8 +139,9 @@ class InvoiceLine extends Model {
             'downpayment_invoice_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'finance\accounting\Invoice',
-                'description'       => 'Downpayment invoice (set when the line refers to an invoiced downpayment.)'
+                'description'       => "Downpayment invoice (set when the line refers to an invoiced downpayment.)"
             ]
+
         ];
     }
 
@@ -164,23 +176,50 @@ class InvoiceLine extends Model {
     }
 
     /**
-     * Get total tax-excluded price of the line.
+     * Get total tax-excluded price of the line before the discount is applied.
      */
-    public static function calcTotal($self): array {
+    public static function calcTotalNoDiscount($self): array {
         $result = [];
         $self->read(['qty', 'unit_price']);
         foreach($self as $id => $line) {
-            $result[$id] = round($line['qty'] * $line['unit_price'], 4);
+            // #memo - total_no_discount of a line must be rounded to 2 decimals
+            $result[$id] = round($line['qty'] * $line['unit_price'], 2);
         }
 
         return $result;
     }
 
+    /**
+     * Get total tax-excluded price of the line.
+     */
+    public static function calcTotal($self): array {
+        $result = [];
+        $self->read(['total_no_discount', 'discount']);
+        foreach($self as $id => $line) {
+            // #memo - total of a line must be rounded to 2 decimals
+            $result[$id] = round($line['total_no_discount'] * (1.0 - $line['discount']), 2);
+        }
+
+        return $result;
+    }
+
+    /**
+     * Get tax amount of the line.
+     */
     public static function calcTotalVat($self): array {
         $result = [];
-        $self->read(['total', 'vat_rate']);
+        $self->read(['vat_rate', 'qty', 'unit_price', 'discount']);
         foreach($self as $id => $line) {
-            $result[$id] = $line['total'] * $line['vat_rate'];
+            if($line['vat_rate'] === 0.0) {
+                $result[$id] = 0.0;
+            }
+            else {
+                // #memo - total_vat must be computed using a precision of 4 decimals, it is rounded to 2 decimals at Invoice level for subtotals_vat
+                $total_no_discount = $line['qty'] * $line['unit_price'];
+                $total = $total_no_discount - (1.0 * $line['discount']);
+
+                $result[$id] = round($total * $line['vat_rate'], 4);
+            }
         }
 
         return $result;
@@ -188,13 +227,12 @@ class InvoiceLine extends Model {
 
     /**
      * Get final tax-included price of the line.
-     *
      */
-    public static function calcPrice($self) {
+    public static function calcPrice($self): array {
         $result = [];
         $self->read(['total', 'total_vat']);
         foreach($self as $id => $line) {
-            $result[$id] = round($line['total'], 2) + round($line['total_vat'], 2);
+            $result[$id] = round($line['total'] + $line['total_vat'], 4);
         }
 
         return $result;
@@ -231,5 +269,4 @@ class InvoiceLine extends Model {
             $om->update('finance\accounting\Invoice', $invoices_ids, ['price' => null, 'total' => null]);
         }
     }
-
 }

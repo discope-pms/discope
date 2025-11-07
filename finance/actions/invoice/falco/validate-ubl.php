@@ -9,12 +9,12 @@ use equal\http\HttpRequest;
 use finance\accounting\Invoice;
 
 [$params, $providers] = eQual::announce([
-    'description'   => "Exports the UBL file of a given invoice to Falco API.",
+    'description'   => "Validates a UBL file of a given invoice against Falco API.",
     'params'        => [
 
         'id' =>  [
             'type'          => 'integer',
-            'description'   => "Identifier of the invoice for which the UBL file has to be exported.",
+            'description'   => "Identifier of the invoice for which the UBL file has to be validated.",
             'min'           => 1,
             'required'      => true
         ]
@@ -36,30 +36,6 @@ use finance\accounting\Invoice;
  * @var \equal\php\Context  $context
  */
 ['context' => $context] = $providers;
-
-/**
- * Methods
- */
-
-$formatQty = function($value) {
-    return number_format($value, 1, ".", "");
-};
-
-$formatMoney = function($value) {
-    return number_format($value, 2, ".", "");
-};
-
-$formatVatNumber = function($value) {
-    return str_replace([' ', '.'], '', $value);
-};
-
-$formatVatRate = function($value) {
-    return number_format($value * 100, 1, ".", "");
-};
-
-/**
- * Action
- */
 
 $invoice = Invoice::id($params['id'])
     ->read([
@@ -88,7 +64,7 @@ if(!$invoice['partner_id']['partner_identity_id']['has_vat']) {
     throw new Exception("partner_no_vat", EQ_ERROR_INVALID_PARAM);
 }
 
-$api_uri = 'https://api.sandbox.falco-app.be/v1/invoices/imports/ubl';
+$api_uri = 'https://api.sandbox.falco-app.be/v1/invoices/imports/validate-ubl';
 $api_secret = 'as_test_MsH8DpD5ukSlSzMeflSx+w_JoTLkiRxaVFEmagwMx_WE0Y8KTVh7kiL';
 $api_key = 'sk_test_tqN8+8JAtkWS+FT+pmmWEw_iPZ-hfX-zk-wDclTn90YYbC-M70xj957';
 
@@ -115,10 +91,12 @@ $status = $response->getStatusCode();
 
 if($status != 200) {
     // upon request rejection, we stop the whole job
-    throw new Exception("request_rejected", QN_ERROR_INVALID_PARAM);
+    throw new Exception("request_rejected", EQ_ERROR_INVALID_PARAM);
 }
 
 $data = $response->body();
+
+file_put_contents(QN_LOG_STORAGE_DIR.'/tmp.log', json_encode($data).PHP_EOL, FILE_APPEND | LOCK_EX);
 
 $context->httpResponse()
         ->status(200)
