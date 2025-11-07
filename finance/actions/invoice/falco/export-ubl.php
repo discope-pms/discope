@@ -80,11 +80,11 @@ if(is_null($invoice)) {
     throw new Exception("unknown_invoice", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
-if(!$invoice['center_office_id']['organisation_id']['has_vat']) {
+if(!$invoice['center_office_id']['organisation_id']['has_vat'] || empty($invoice['center_office_id']['organisation_id']['vat_number'])) {
     throw new Exception("organisation_no_vat", EQ_ERROR_INVALID_PARAM);
 }
 
-if(!$invoice['partner_id']['partner_identity_id']['has_vat']) {
+if(!$invoice['partner_id']['partner_identity_id']['has_vat'] || empty($invoice['partner_id']['partner_identity_id']['vat_number'])) {
     throw new Exception("partner_no_vat", EQ_ERROR_INVALID_PARAM);
 }
 
