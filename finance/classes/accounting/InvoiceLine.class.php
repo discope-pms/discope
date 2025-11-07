@@ -103,7 +103,7 @@ class InvoiceLine extends Model {
             'total_no_discount' => [
                 'type'              => 'computed',
                 'result_type'       => 'float',
-                'usage'             => 'amount/money:4',
+                'usage'             => 'amount/money:2',
                 'description'       => "Total tax-excluded price of the line without the discount applied.",
                 'function'          => 'calcTotalNoDiscount',
                 'store'             => false
@@ -123,6 +123,7 @@ class InvoiceLine extends Model {
                 'result_type'       => 'float',
                 'usage'             => 'amount/money:4',
                 'description'       => "Total tax price of the line.",
+                'help'              => "Must have 4 decimals allowed because it is used to compute subtotals_vat of Invoice.",
                 'function'          => 'calcTotalVat',
                 'store'             => false
             ],

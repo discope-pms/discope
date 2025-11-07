@@ -56,6 +56,66 @@ $formatVatRate = function($value) {
     return number_format($value * 100, 2, ".", "");
 };
 
+$formatToUblXml = function($data): string {
+    if(!isset($data['Invoice'])) {
+        throw new Exception("Missing 'Invoice' root.");
+    }
+
+    $doc = new DOMDocument('1.0', 'UTF-8');
+    $doc->formatOutput = true;
+
+    // Create root Invoice element with namespaces
+    $invoice = $doc->createElement('Invoice');
+    $invoice->setAttribute("xmlns", "urn:oasis:names:specification:ubl:schema:xsd:Invoice-2");
+    $invoice->setAttribute("xmlns:cac", "urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2");
+    $invoice->setAttribute("xmlns:cbc", "urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2");
+    $doc->appendChild($invoice);
+
+    // Recursive builder
+    $addElements = function($parent, $data) use(&$addElements, $doc) {
+        foreach($data as $key => $value) {
+            // Handle array of items → multiple repeated tags
+            if(is_array($value) && isset($value['items']) && is_array($value['items'])) {
+                foreach ($value['items'] as $item) {
+                    $element = $doc->createElement($key);
+                    $addElements($element, $item);
+                    $parent->appendChild($element);
+                }
+                continue;
+            }
+
+            // Handle attribute/content structure
+            if(is_array($value) && isset($value['content'])) {
+                $element = $doc->createElement($key, htmlspecialchars((string)$value['content']));
+                if (isset($value['attributes']) && is_array($value['attributes'])) {
+                    foreach ($value['attributes'] as $attrName => $attrValue) {
+                        $element->setAttribute($attrName, $attrValue);
+                    }
+                }
+                $parent->appendChild($element);
+                continue;
+            }
+
+            // Handle nested associative arrays
+            if(is_array($value)) {
+                $element = $doc->createElement($key);
+                $addElements($element, $value);
+                $parent->appendChild($element);
+                continue;
+            }
+
+            // Handle simple scalar value
+            $element = $doc->createElement($key, htmlspecialchars((string)$value));
+            $parent->appendChild($element);
+        }
+    };
+
+    // Start building from Invoice root
+    $addElements($invoice, $data['Invoice']);
+
+    return $doc->saveXML();
+};
+
 /**
  * Action
  */
@@ -280,66 +340,6 @@ $ubl['Invoice']['cac:LegalMonetaryTotal'] = [
         'content'       => $formatMoney($invoice['price'])
     ]
 ];
-
-$formatToUblXml = function($data): string {
-    if(!isset($data['Invoice'])) {
-        throw new Exception("Missing 'Invoice' root.");
-    }
-
-    $doc = new DOMDocument('1.0', 'UTF-8');
-    $doc->formatOutput = true;
-
-    // Create root Invoice element with namespaces
-    $invoice = $doc->createElement('Invoice');
-    $invoice->setAttribute("xmlns", "urn:oasis:names:specification:ubl:schema:xsd:Invoice-2");
-    $invoice->setAttribute("xmlns:cac", "urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2");
-    $invoice->setAttribute("xmlns:cbc", "urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2");
-    $doc->appendChild($invoice);
-
-    // Recursive builder
-    $addElements = function($parent, $data) use(&$addElements, $doc) {
-        foreach($data as $key => $value) {
-            // Handle array of items → multiple repeated tags
-            if(is_array($value) && isset($value['items']) && is_array($value['items'])) {
-                foreach ($value['items'] as $item) {
-                    $element = $doc->createElement($key);
-                    $addElements($element, $item);
-                    $parent->appendChild($element);
-                }
-                continue;
-            }
-
-            // Handle attribute/content structure
-            if(is_array($value) && isset($value['content'])) {
-                $element = $doc->createElement($key, htmlspecialchars((string)$value['content']));
-                if (isset($value['attributes']) && is_array($value['attributes'])) {
-                    foreach ($value['attributes'] as $attrName => $attrValue) {
-                        $element->setAttribute($attrName, $attrValue);
-                    }
-                }
-                $parent->appendChild($element);
-                continue;
-            }
-
-            // Handle nested associative arrays
-            if(is_array($value)) {
-                $element = $doc->createElement($key);
-                $addElements($element, $value);
-                $parent->appendChild($element);
-                continue;
-            }
-
-            // Handle simple scalar value
-            $element = $doc->createElement($key, htmlspecialchars((string)$value));
-            $parent->appendChild($element);
-        }
-    };
-
-    // Start building from Invoice root
-    $addElements($invoice, $data['Invoice']);
-
-    return $doc->saveXML();
-};
 
 $ubl_xml = $formatToUblXml($ubl);
 
