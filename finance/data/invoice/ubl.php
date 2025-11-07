@@ -49,11 +49,11 @@ $formatMoney = function($value, $decimals = 2) {
 };
 
 $formatVatNumber = function($value) {
-    return str_replace([' ', '.'], '', $value);
+    return str_replace([" ", "."], "", $value);
 };
 
 $formatVatRate = function($value) {
-    return number_format($value * 100, 1, ".", "");
+    return number_format($value * 100, 2, ".", "");
 };
 
 /**
@@ -66,7 +66,10 @@ $invoice = Invoice::id($params['id'])
         'date',
         'due_date',
         'number',
+        'total_discount',
         'total',
+        'subtotals',
+        'subtotals_vat',
         'total_vat',
         'price',
         'center_office_id' => [
@@ -98,7 +101,6 @@ $invoice = Invoice::id($params['id'])
             'unit_price',
             'vat_rate',
             'total',
-            'total_vat',
             'price'
         ]
     ])
@@ -202,8 +204,6 @@ switch($invoice['type']) {
         break;
 }
 
-$tax_subtotals = [];
-
 $index = 0;
 foreach($invoice['invoice_lines_ids'] as $line) {
     $vat_rate = $formatVatRate($line['vat_rate']);
@@ -233,16 +233,6 @@ foreach($invoice['invoice_lines_ids'] as $line) {
             ]
         ]
     ];
-
-    if(!isset($tax_subtotals[$vat_rate])) {
-        $tax_subtotals[$vat_rate] = [
-            'taxable_amount'    => 0.0,
-            'tax_amount'        => 0.0
-        ];
-    }
-
-    $tax_subtotals[$vat_rate]['taxable_amount'] += $line['total'];
-    $tax_subtotals[$vat_rate]['tax_amount'] += $line['total_vat'];
 }
 
 $ubl['Invoice']['cac:TaxTotal'] = [
@@ -250,13 +240,15 @@ $ubl['Invoice']['cac:TaxTotal'] = [
     'cac:TaxSubtotal'   => ['items' => []]
 ];
 
-foreach($tax_subtotals as $vat_rate => $total_vat) {
+foreach($invoice['subtotals_vat'] as $vat_rate_index => $total_vat) {
+    $vat_rate = ((float) $vat_rate_index) / 100;
+
     $ubl['Invoice']['cac:TaxTotal']['cac:TaxSubtotal']['items'][] = [
-        'cbc:TaxableAmount' => ['attributes' => ['currencyID' => 'EUR'], 'content' => $formatMoney($total_vat['taxable_amount'])],
-        'cbc:TaxAmount'     => ['attributes' => ['currencyID' => 'EUR'], 'content' => $formatMoney($total_vat['tax_amount'])],
+        'cbc:TaxableAmount' => ['attributes' => ['currencyID' => 'EUR'], 'content' => $formatMoney($invoice['subtotals'][$vat_rate_index])],
+        'cbc:TaxAmount'     => ['attributes' => ['currencyID' => 'EUR'], 'content' => $formatMoney($total_vat)],
         'cac:TaxCategory'   => [
-            'cbc:ID'            => ((float) $vat_rate) === 0.0 ? 'E' : 'S',
-            'cbc:Percent'       => $vat_rate,
+            'cbc:ID'            => $vat_rate === 0.0 ? 'E' : 'S',
+            'cbc:Percent'       => $formatVatRate($vat_rate),
             'cac:TaxScheme'     => ['cbc:ID' => 'VAT']
         ]
     ];
@@ -265,27 +257,29 @@ foreach($tax_subtotals as $vat_rate => $total_vat) {
 $ubl['Invoice']['cac:LegalMonetaryTotal'] = [
     'cbc:LineExtensionAmount' => [
         'attributes'    => ['currencyID' => 'EUR'],
-        'content'       => $invoice['total']
+        'content'       => $formatMoney($invoice['total'] + $invoice['total_discount'])
     ],
     'cbc:TaxExclusiveAmount' => [
         'attributes'    => ['currencyID' => 'EUR'],
-        'content'       => $invoice['total']
+        'content'       => $formatMoney($invoice['total'])
     ],
     'cbc:TaxInclusiveAmount' => [
         'attributes'    => ['currencyID' => 'EUR'],
-        'content'       => $invoice['price']
+        'content'       => $formatMoney($invoice['price'])
     ],
     'cbc:ChargeTotalAmount' => [
         'attributes'    => ['currencyID' => 'EUR'],
         'content'       => 0
     ],
+    'cbc:AllowanceTotalAmount' => [
+        'attributes'    => ['currencyID' => 'EUR'],
+        'content'       => $formatMoney($invoice['total_discount'])
+    ],
     'cbc:PayableAmount' => [
         'attributes'    => ['currencyID' => 'EUR'],
-        'content'       => $invoice['price']
+        'content'       => $formatMoney($invoice['price'])
     ]
 ];
-
-// file_put_contents(QN_LOG_STORAGE_DIR.'/tmp.log', json_encode($ubl).PHP_EOL, FILE_APPEND | LOCK_EX);
 
 $formatToUblXml = function($data): string {
     if(!isset($data['Invoice'])) {
@@ -348,8 +342,6 @@ $formatToUblXml = function($data): string {
 };
 
 $ubl_xml = $formatToUblXml($ubl);
-
-// file_put_contents(QN_LOG_STORAGE_DIR.'/tmp.log', $ubl_xml.PHP_EOL, FILE_APPEND | LOCK_EX);
 
 $context->httpResponse()
         ->status(200)
