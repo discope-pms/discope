@@ -71,7 +71,7 @@ jobs:
           command: cat ~/repo/composer.json
       - run:
           name: Initialize Composer Dependencies
-          command: php run.php --do=init_composer
+          command: php run.php --do=init_composer --ignore_platform=true
       - run:
           name: Create a bin folder with write permissions
           command: mkdir -p ~/repo/bin && chmod 775 ~/repo/bin
