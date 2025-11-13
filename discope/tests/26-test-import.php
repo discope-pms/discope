@@ -57,7 +57,7 @@ $tests = [
 
             $PAYMENT_REFERENCE = '151022051160';
 
-            list($center_id, $booking_type_id, $customer_nature_id, $customer_identity_id) = $data;
+            [$center_id, $booking_type_id, $customer_nature_id, $customer_identity_id] = $data;
 
             $booking = Booking::create([
                     'date_from'             => strtotime('2023-02-17'),
@@ -137,7 +137,7 @@ $tests = [
 
             }
             catch(Exception $e) {
-                $e->getMessage();
+                trigger_error("APP::error while running sale_booking_do-option: ".$e->getMessage(), EQ_REPORT_ERROR);
             }
 
             Booking::id($booking['id'])->update(['payment_reference' => $PAYMENT_REFERENCE]);
@@ -146,7 +146,7 @@ $tests = [
                 eQual::run('do', 'sale_booking_do-confirm', ['id' => $booking['id']]);
             }
             catch(Exception $e) {
-                $e->getMessage();
+                trigger_error("APP::error while running sale_booking_do-confirm: ".$e->getMessage(), EQ_REPORT_ERROR);
             }
 
             try {
@@ -155,7 +155,7 @@ $tests = [
                 ]);
             }
             catch(Exception $e) {
-                $e->getMessage();
+                trigger_error("APP::error while running finance_payments_import: ".$e->getMessage(), EQ_REPORT_ERROR);
             }
 
             $bank_statement_line = BankStatementLine::search(['structured_message' , '=', $PAYMENT_REFERENCE])
@@ -182,7 +182,7 @@ $tests = [
                 eQual::run('do', 'sale_pay_bankstatementline_do-reconcile', ['id' => $bank_statement_line['id']]);
             }
             catch(Exception $e) {
-                $e->getMessage();
+                trigger_error("APP::error while running sale_pay_bankstatementline_do-reconcile: ".$e->getMessage(), EQ_REPORT_ERROR);
             }
 
             $booking = Booking::id($booking['id'])
