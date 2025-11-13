@@ -143,7 +143,8 @@ class Camp extends Model {
                     'product_id',
                     'day_product_id',
                     'weekend_product_id',
-                    'saturday_morning_product_id'
+                    'saturday_morning_product_id',
+                    'camp_type'
                 ]
             ],
 
