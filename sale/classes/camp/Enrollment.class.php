@@ -114,6 +114,14 @@ class Enrollment extends Model {
                 'function'          => 'calcChildAge'
             ],
 
+            'allow_outside_age_range' => [
+                'type'              => 'computed',
+                'result_type'       => 'boolean',
+                'description'       => "If true allow the enrollment of a child without the required age.",
+                'store'             => false,
+                'function'          => 'calcAllowOutsideAgeRange'
+            ],
+
             'main_guardian_id' => [
                 'type'              => 'computed',
                 'result_type'       => 'many2one',
@@ -689,6 +697,19 @@ class Enrollment extends Model {
             $date_from = (new \DateTime())->setTimestamp($enrollment['date_from']);
             $birthdate = (new \DateTime())->setTimestamp($enrollment['child_id']['birthdate']);
             $result[$id] = $birthdate->diff($date_from)->y;
+        }
+
+        return $result;
+    }
+
+    /**
+     * Used to allow manual bypass of camp's age range condition
+     */
+    public static function calcAllowOutsideAgeRange($self): array {
+        $result = [];
+        $self->read(['id']);
+        foreach($self as $id => $enrollment) {
+            $result[$id] = false;
         }
 
         return $result;
@@ -1331,7 +1352,10 @@ class Enrollment extends Model {
 
                 // allow some flexibility with -1 and +1 (a warning will be dispatched if age doesn't exactly meet requirements of min_age and max_age)
                 if($child_age < ($camp['min_age'] - 1) || $child_age > ($camp['max_age'] + 1)) {
-                    return ['child_id' => ['birthdate' => "The child does not fit the camp age requirements."]];
+                    // allow forcing of child enrollment even if age outside age range -1 and +1
+                    if(!isset($values['allow_outside_age_range']) || !$values['allow_outside_age_range']) {
+                        return ['child_id' => ['birthdate' => "The child does not fit the camp age requirements."]];
+                    }
                 }
             }
         }

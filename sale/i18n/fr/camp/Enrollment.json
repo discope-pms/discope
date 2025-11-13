@@ -48,9 +48,13 @@
             "help": ""
         },
         "child_age": {
-            "label": "Age enfant",
-            "description": "Age de l'enfant au moment du camp.",
+            "label": "Âge enfant",
+            "description": "Âge de l'enfant au moment du camp.",
             "help": ""
+        },
+        "allow_outside_age_range": {
+            "label": "Autoriser âge différent",
+            "description": "Autoriser l'inscription de l'enfant même si son âge diffère de la tranche d'âge du camp."
         },
         "family_quotient": {
             "label": "Quotient familial",
@@ -543,7 +547,9 @@
             "missing_main_guardian": "Tuteur principal manquant.",
             "already_enrolled": "L'enfant est déjà inscrit à ce camp.",
             "already_enrolled_to_other_camp": "L'enfant est déjà inscrit à un autre camp pendant cette période.",
-            "missing_skill": "L'enfant n'a pas toutes les compétences requises pour ce camp."
+            "missing_skill": "L'enfant n'a pas toutes les compétences requises pour ce camp.",
+            "birthdate": "L'enfant n'a pas l'âge requis pour ce camp.",
+            "need_license_ffe": "L'enfant n'a pas la license FFE requise pour ce camp."
         },
         "is_ase": {
             "too_many_ase_children": "Le quota d'enfants de cette catégorie est plein."
