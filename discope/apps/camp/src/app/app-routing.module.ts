@@ -15,10 +15,6 @@ const routes: Routes = [
         loadChildren: () => import(`./in/camps/camps.module`).then(m => m.AppInCampsModule)
     },
     {
-        path: 'child/:child_id',
-        loadChildren: () => import(`./in/child/child.module`).then(m => m.AppInChildModule)
-    },
-    {
         path: 'enrollment/:enrollment_id',
         loadChildren: () => import(`./in/enrollment/enrollment.module`).then(m => m.AppInEnrollmentModule)
     },

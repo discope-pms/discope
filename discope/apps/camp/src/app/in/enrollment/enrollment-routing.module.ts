@@ -3,9 +3,19 @@ import { RouterModule, Routes } from '@angular/router';
 
 import { EnrollmentConfirmationComponent } from './confirmation/confirmation.component';
 import { EnrollmentComponent } from './enrollment.component';
+import { EnrollmentPreRegistrationComponent } from './pre-registration/pre-registration.component';
+import { EnrollmentPreRegistrationReminderComponent } from './pre-registration-reminder/pre-registration-reminder.component';
 
 
 const routes: Routes = [
+    {
+        path: 'preregistration',
+        component: EnrollmentPreRegistrationComponent
+    },
+    {
+        path: 'preregistration-reminder',
+        component: EnrollmentPreRegistrationReminderComponent
+    },
     {
         path: 'confirmation',
         component: EnrollmentConfirmationComponent

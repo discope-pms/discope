@@ -8,6 +8,8 @@ import { EnrollmentRoutingModule } from './enrollment-routing.module';
 
 import { EnrollmentConfirmationComponent } from './confirmation/confirmation.component';
 import { EnrollmentComponent } from './enrollment.component';
+import { EnrollmentPreRegistrationComponent } from './pre-registration/pre-registration.component';
+import { EnrollmentPreRegistrationReminderComponent } from './pre-registration-reminder/pre-registration-reminder.component';
 
 @NgModule({
     imports: [
@@ -16,6 +18,8 @@ import { EnrollmentComponent } from './enrollment.component';
     ],
     declarations: [
         EnrollmentComponent,
+        EnrollmentPreRegistrationComponent,
+        EnrollmentPreRegistrationReminderComponent,
         EnrollmentConfirmationComponent
     ],
     providers: [
