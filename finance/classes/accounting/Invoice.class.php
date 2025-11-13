@@ -158,9 +158,10 @@ class Invoice extends Model {
                 'type'              => 'computed',
                 'result_type'       => 'float',
                 'usage'             => 'amount/money:4',
-                'function'          => 'calcTotal',
                 'description'       => "Total tax-excluded price of the invoice.",
-                'store'             => true
+                'help'              => "Is now rounded to two decimals for UBL compliance.",
+                'store'             => true,
+                'function'          => 'calcTotal'
             ],
 
             'subtotals' => [
@@ -450,7 +451,7 @@ class Invoice extends Model {
                     $subtotals[$vat_rate_index] = 0.0;
                 }
 
-                // total is rounded to 2 decimals for compatibility with older data that were computed with 4 decimals
+                // #memo - total is rounded to 2 decimals for compatibility with older data that were computed with 4 decimals
                 $subtotals[$vat_rate_index] = round($subtotals[$vat_rate_index] + round($line['total'], 2), 2);
             }
 
