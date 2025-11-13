@@ -211,20 +211,39 @@ class BookingLine extends Model {
                 'default'           => false
             ],
 
+            'total_no_discount' => [
+                'type'              => 'computed',
+                'result_type'       => 'float',
+                'usage'             => 'amount/money:2',
+                'description'       => "Total tax-excluded price of the line without the discount applied.",
+                'function'          => 'calcTotalNoDiscount',
+                'store'             => false
+            ],
+
             'total' => [
                 'type'              => 'computed',
                 'result_type'       => 'float',
                 'usage'             => 'amount/money:4',
-                'description'       => 'Total tax-excluded price of the line (computed).',
+                'description'       => 'Total tax-excluded price of the line.',
                 'function'          => 'calcTotal',
                 'store'             => true
+            ],
+
+            'total_vat' => [
+                'type'              => 'computed',
+                'result_type'       => 'float',
+                'usage'             => 'amount/money:4',
+                'description'       => "Total tax price of the line.",
+                'help'              => "Must have 4 decimals allowed because it is used to compute subtotals_vat of Booking.",
+                'function'          => 'calcTotalVat',
+                'store'             => false
             ],
 
             'price' => [
                 'type'              => 'computed',
                 'result_type'       => 'float',
                 'usage'             => 'amount/money:2',
-                'description'       => 'Final tax-included price (computed).',
+                'description'       => 'Final tax-included price of the line.',
                 'function'          => 'calcPrice',
                 'store'             => true
             ],
@@ -1761,43 +1780,63 @@ class BookingLine extends Model {
     }
 
     /**
-     * Get final tax-included price of the line.
-     *
+     * Get total tax-excluded price of the line before the discount is applied.
      */
-    public static function calcPrice($om, $oids, $lang) {
+    public static function calcTotalNoDiscount($self): array {
         $result = [];
-
-        $lines = $om->read(get_called_class(), $oids, ['total','vat_rate']);
-
-        foreach($lines as $oid => $odata) {
-            $result[$oid] = round($odata['total'] * (1.0 + $odata['vat_rate']), 2);
+        $self->read(['qty', 'free_qty', 'unit_price']);
+        foreach($self as $id => $line) {
+            // #memo - total_no_discount of a line must be rounded to 2 decimals
+            $result[$id] = round(($line['qty'] - $line['free_qty']) * $line['unit_price'], 2);
         }
+
         return $result;
     }
 
     /**
-     * Get total tax-excluded price of the line, with all discounts applied.
-     *
+     * Get total tax-excluded price of the line.
      */
-    public static function calcTotal($om, $ids, $lang) {
+    public static function calcTotal($self): array {
         $result = [];
-        $lines = $om->read(self::getType(), $ids, [
-                    'qty',
-                    'unit_price',
-                    'free_qty',
-                    'discount',
-                    'payment_mode'
-                ]);
-        if($lines > 0) {
-            foreach($lines as $id => $line) {
+        $self->read(['total_no_discount', 'discount']);
+        foreach($self as $id => $line) {
+            // #memo - total of a line must be rounded to 2 decimals
+            $result[$id] = round($line['total_no_discount'] * (1.0 - $line['discount']), 2);
+        }
 
-                if($line['payment_mode'] == 'free') {
-                    $result[$id] = 0.0;
-                    continue;
-                }
-                $qty = max(0, $line['qty'] - $line['free_qty']);
-                $result[$id] = round($line['unit_price'] * (1.0 - $line['discount']) * ($qty), 4);
+        return $result;
+    }
+
+    /**
+     * Get tax amount of the line.
+     */
+    public static function calcTotalVat($self): array {
+        $result = [];
+        $self->read(['vat_rate', 'qty', 'free_qty', 'unit_price', 'discount']);
+        foreach($self as $id => $line) {
+            if($line['vat_rate'] === 0.0) {
+                $result[$id] = 0.0;
             }
+            else {
+                // #memo - total_vat must be computed using a precision of 4 decimals, it is rounded to 2 decimals at Invoice level for subtotals_vat
+                $total_no_discount = ($line['qty'] - $line['free_qty']) * $line['unit_price'];
+                $total = $total_no_discount - (1.0 * $line['discount']);
+
+                $result[$id] = round($total * $line['vat_rate'], 4);
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * Get final tax-included price of the line.
+     */
+    public static function calcPrice($self): array {
+        $result = [];
+        $self->read(['total', 'total_vat']);
+        foreach($self as $id => $line) {
+            $result[$id] = round($line['total'] + $line['total_vat'], 4);
         }
 
         return $result;

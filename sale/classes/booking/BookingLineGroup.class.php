@@ -994,33 +994,22 @@ class BookingLineGroup extends Model {
 
     /**
      * Get total tax-excluded price of the group, with discount applied.
-     *
      */
-    public static function calcTotal($om, $oids, $lang) {
+    public static function calcTotal($self): array {
         $result = [];
-        $groups = $om->read(self::getType(), $oids, ['booking_id', 'booking_lines_ids', 'is_locked', 'has_pack', 'unit_price', 'qty']);
-        $bookings_ids = [];
-
-        if($groups > 0 && count($groups)) {
-            foreach($groups as $gid => $group) {
-                $result[$gid] = 0.0;
-
-                $bookings_ids[] = $group['booking_id'];
-                // if the group relates to a pack and the product_model targeted by the pack has its own Price, then this is the one to return
-                if($group['has_pack'] && $group['is_locked']) {
-                    $result[$gid] = $group['unit_price'] * $group['qty'];
-                }
-                // otherwise, price is the sum of bookingLines totals
-                else {
-                    $lines = $om->read('sale\booking\BookingLine', $group['booking_lines_ids'], ['total']);
-                    if($lines > 0 && count($lines)) {
-                        foreach($lines as $line) {
-                            $result[$gid] += $line['total'];
-                        }
-                        $result[$gid] = round($result[$gid], 4);
-                    }
+        $self->read(['is_locked', 'has_pack', 'unit_price', 'qty', 'booking_lines_ids' => ['total']]);
+        foreach($self as $id => $group) {
+            $total = 0.0;
+            if($group['has_pack'] && $group['is_locked']) {
+                $total = round($group['unit_price'] * $group['qty'], 2);
+            }
+            else {
+                foreach($group['booking_lines_ids'] as $line) {
+                    $total = round($total + $line['total'], 2);
                 }
             }
+
+            $result[$id] = $total;
         }
 
         return $result;
@@ -1030,31 +1019,23 @@ class BookingLineGroup extends Model {
      * Compute the VAT incl. total price of the group (pack), with manual and automated discounts applied.
      *
      */
-    public static function calcPrice($om, $oids, $lang) {
+    public static function calcPrice($self): array {
         $result = [];
-
-        $groups = $om->read(self::getType(), $oids, ['booking_lines_ids', 'total', 'vat_rate', 'is_locked', 'has_pack']);
-
-        if($groups > 0 && count($groups)) {
-            foreach($groups as $gid => $group) {
-                $result[$gid] = 0.0;
-
-                // if the group relates to a pack and the product_model targeted by the pack has its own Price, then this is the one to return
-                if($group['has_pack'] && $group['is_locked']) {
-                    $result[$gid] = round($group['total'] * (1 + $group['vat_rate']), 2);
-                }
-                // otherwise, price is the sum of bookingLines prices
-                else {
-                    $lines = $om->read('sale\booking\BookingLine', $group['booking_lines_ids'], ['price']);
-                    if($lines > 0 && count($lines)) {
-                        foreach($lines as $line) {
-                            $result[$gid] += $line['price'];
-                        }
-                        $result[$gid] = round($result[$gid], 2);
-                    }
+        $self->read(['total', 'vat_rate', 'is_locked', 'has_pack', 'booking_lines_ids' => ['price']]);
+        foreach($self as $id => $group) {
+            $price = 0.0;
+            if($group['has_pack'] && $group['is_locked']) {
+                $price = round($group['total'] * (1 + $group['vat_rate']), 2);
+            }
+            else {
+                foreach($group['booking_lines_ids'] as $line) {
+                    $price = round($price + $line['price'], 2);
                 }
             }
+
+            $result[$id] = $price;
         }
+
         return $result;
     }
 
