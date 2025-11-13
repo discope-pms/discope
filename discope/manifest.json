@@ -8,6 +8,16 @@
         "realestate",
         "communication"
     ],
+    "requires": {
+        "swiftmailer/swiftmailer": "^6.2",
+        "phpoffice/phpspreadsheet": "^1.4",
+        "dompdf/dompdf": "~3.0.0",
+        "twig/twig": "^2.0",
+        "twig/intl-extra": "^3.3",
+        "smhg/sepa-qr-data": "^1.1",
+        "endroid/qr-code": "^4.3",
+        "codelicious/php-coda-parser": "^2.0"
+    },
     "apps": [
         "booking",
         "camp",
