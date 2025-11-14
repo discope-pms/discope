@@ -122,35 +122,38 @@
                                             {
                                                 "type": "label",
                                                 "value": "",
-                                                "width": "50%"
+                                                "width": "33%"
                                             },
                                             {
                                                 "type": "field",
                                                 "value": "date_from",
-                                                "width": "25%"
+                                                "width": "33%"
                                             },
                                             {
                                                 "type": "field",
                                                 "value": "date_to",
-                                                "width": "25%"
+                                                "width": "33%"
                                             },
                                             {
                                                 "type": "field",
                                                 "label": "Via Tour Operator?",
                                                 "value": "has_tour_operator",
-                                                "width": "33%"
+                                                "width": "33%",
+                                                "visible": [true, "=", "env.sale.features.booking.channel_manager"]
                                             },
                                             {
                                                 "type": "field",
                                                 "label": "Tour Operator",
                                                 "value": "tour_operator_id",
-                                                "width": "33%"
+                                                "width": "33%",
+                                                "visible": [true, "=", "env.sale.features.booking.channel_manager"]
                                             },
                                             {
                                                 "type": "field",
                                                 "label": "Reference",
                                                 "value": "tour_operator_ref",
-                                                "width": "33%"
+                                                "width": "33%",
+                                                "visible": [true, "=", "env.sale.features.booking.channel_manager"]
                                             }
                                         ]
                                     }
