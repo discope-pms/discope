@@ -3,6 +3,21 @@
     "plural": "E-mails",
     "description": "E-mails qui sont envoyés pour les confirmations d'inscription.",
     "model": {
+        "mail_status": {
+            "label": "Status",
+            "selection": {
+                "pending": "en attente",
+                "failing": "en échec",
+                "sent": "envoyé"
+            },
+            "description": "Status de l'e-mail.",
+            "help": ""
+        },
+        "mail_created": {
+            "label": "Créé",
+            "description": "Date de création de le-mail.",
+            "help": ""
+        },
         "mail_id": {
             "label": "E-mail",
             "description": "E-mail qui a été envoyé.",

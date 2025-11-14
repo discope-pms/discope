@@ -36,6 +36,27 @@ class EnrollmentMail extends Model {
                 'default'           => 'pre-registration'
             ],
 
+            'mail_status' => [
+                'type'              => 'computed',
+                'result_type'       => 'string',
+                'selection'         => [
+                    'pending',
+                    'failing',
+                    'sent'
+                ],
+                'description'       => "Sending status of the mail.",
+                'store'             => false,
+                'relation'          => ['mail_id' => 'status']
+            ],
+
+            'mail_created' => [
+                'type'              => 'computed',
+                'result_type'       => 'date',
+                'description'       => "Creation date of the mail.",
+                'store'             => false,
+                'relation'          => ['mail_id' => 'created']
+            ],
+
             'enrollments_ids' => [
                 'type'              => 'many2many',
                 'foreign_object'    => 'sale\camp\Enrollment',

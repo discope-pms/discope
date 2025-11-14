@@ -105,6 +105,7 @@ $children = Child::ids($ids)
         'lastname',
         'main_guardian_id',
         'enrollments_ids' => [
+            'status',
             'price',
             'camp_id' => [
                 'short_name',
@@ -117,8 +118,8 @@ $children = Child::ids($ids)
                 'center_id'
             ],
             'enrollment_lines_ids' => [
-                'product_id' => ['label'],
-                'price'
+                'price',
+                'product_id' => ['label']
             ],
             'price_adapters_ids' => [
                 'name',
@@ -134,10 +135,9 @@ if(count($ids) !== count($children)) {
     throw new Exception("unknown_children", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
-foreach($children as $child) {
+foreach($children as &$child) {
     $child['enrollments_ids'] = array_filter($child['enrollments_ids'] ?? [], function($enrollment) use($center) {
-        return $enrollment['camp_id']['center_id'] === $center['id']
-            && date('Y', $enrollment['camp_id']['date_from']) === date('Y');
+        return $enrollment['camp_id']['center_id'] === $center['id'] && $enrollment['camp_id']['date_from'] > time() && $enrollment['status'] === 'confirmed';
     });
 }
 

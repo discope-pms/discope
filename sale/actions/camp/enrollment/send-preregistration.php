@@ -118,7 +118,7 @@ if(empty($params['children_ids'])) {
 }
 
 $children = Child::ids($params['children_ids'])
-    ->read(['main_guardian_id', 'enrollments_ids' => ['camp_id' => ['center_id', 'date_from']]])
+    ->read(['main_guardian_id', 'enrollments_ids' => ['status', 'camp_id' => ['center_id', 'date_from']]])
     ->get();
 
 if(count($params['children_ids']) !== count($children)) {
@@ -128,10 +128,7 @@ if(count($params['children_ids']) !== count($children)) {
 $enrollments_ids = [];
 foreach($children as $child) {
     foreach($child['enrollments_ids'] as $enrollment) {
-        if(
-            $enrollment['camp_id']['center_id'] === $center['id']
-            && date('Y', $enrollment['camp_id']['date_from']) === date('Y')
-        ) {
+        if($enrollment['camp_id']['center_id'] === $center['id'] && $enrollment['camp_id']['date_from'] > time() && $enrollment['status'] === 'confirmed') {
             $enrollments_ids[] = $enrollment['id'];
         }
     }
