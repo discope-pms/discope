@@ -66,6 +66,11 @@
             "description": "Camp auquel l'enfant s'inscrit.",
             "help": ""
         },
+        "camp_remaining_qty": {
+            "label": "Places restantes",
+            "description": "Nombre de places restantes du camp.",
+            "help": ""
+        },
         "date_from": {
             "label": "Début camp",
             "description": "Date de début du camp.",

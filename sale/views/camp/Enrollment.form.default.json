@@ -179,12 +179,23 @@
                                         "width": "50%",
                                         "items": [
                                             {
+                                                "type": "field",
+                                                "value": "camp_remaining_qty",
+                                                "width": "33%",
+                                                "readonly": true,
+                                                "visible": [
+                                                    ["camp_id", "<>", null],
+                                                    ["state", "=", "draft"]
+                                                ]
+                                            },
+                                            {
                                                 "type": "label",
                                                 "value": "",
                                                 "width": "33%",
                                                 "visible": [
                                                     ["child_id", "<>", null],
-                                                    ["camp_id", "<>", null]
+                                                    ["camp_id", "<>", null],
+                                                    ["state", "<>", "draft"]
                                                 ]
                                             },
                                             {
