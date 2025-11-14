@@ -44,6 +44,13 @@
                 "width": "20%",
                 "sortable": false,
                 "readonly": true
+            },
+            {
+                "type": "field",
+                "value": "age_range",
+                "width": "20%",
+                "sortable": false,
+                "readonly": true
             }
         ]
     }

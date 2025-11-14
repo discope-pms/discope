@@ -40,6 +40,21 @@ class CampGroup extends Model {
                 'ondelete'          => 'cascade'
             ],
 
+            'age_range' => [
+                'type'              => 'computed',
+                'result_type'       => 'string',
+                'description'       => "Age range of the accepted participants.",
+                'help'              => "Can be different from the camp age range only when CLSH camp, camp '6-to-14' can be either '6-to-9' or '10-to-14' for camp group.",
+                'selection'         => [
+                    '6-to-9',               // 'Non CLSH' or 'CLSH'
+                    '10-to-12',             // 'Non CLSH'
+                    '13-to-16',             // 'Non CLSH'
+                    '10-to-14'              // 'CLSH'
+                ],
+                'store'             => true,
+                'function'          => 'calcAgeRange'
+            ],
+
             'employee_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'hr\employee\Employee',
@@ -284,6 +299,22 @@ class CampGroup extends Model {
         return $result;
     }
 
+    public static function calcAgeRange($self): array {
+        $result = [];
+        $self->read(['camp_id' => ['is_clsh', 'age_range']]);
+        foreach($self as $id => $camp_group) {
+            if($camp_group['camp_id']['is_clsh']) {
+                // can be modified to '10-to-14' manually
+                $result[$id] = '6-to-9';
+            }
+            else {
+                $result[$id] = $camp_group['camp_id']['age_range'];
+            }
+        }
+
+        return $result;
+    }
+
     public static function calcMaxChildren($self): array {
         $result = [];
         $self->read(['camp_id' => ['employee_ratio']]);
@@ -345,6 +376,18 @@ class CampGroup extends Model {
                     if(!is_null($group)) {
                         return ['employee_id' => ['already_assigned' => "The employee is already assigned to another camp group for this period."]];
                     }
+                }
+            }
+        }
+
+        if(isset($values['age_range'])) {
+            $self->read(['camp_id' => ['is_clsh', 'age_range']]);
+            foreach($self as $camp_group) {
+                if($camp_group['camp_id']['is_clsh'] && !in_array($values['age_range'], ['6-to-9', '10-to-14'])) {
+                    return ['age_range' => ['clsh_invalid_age_range' => "Age range should be '6 to 9' or '10 to 14' for CLSH camp group."]];
+                }
+                elseif(!$camp_group['camp_id']['is_clsh'] && $values['age_range'] !== $camp_group['camp_id']['age_range']) {
+                    return ['age_range' => ['invalid_age_range' => "Age range should be '6 to 9', '10 to 12' or '13 to 16' for camp group."]];
                 }
             }
         }

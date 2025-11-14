@@ -275,10 +275,11 @@ class Camp extends Model {
                 'selection'         => [
                     '6-to-9',
                     '10-to-12',
-                    '13-to-16'
+                    '13-to-16',
+                    '6-to-14'
                 ],
                 'default'           => '10-to-12',
-                'dependents'        => ['min_age', 'max_age']
+                'dependents'        => ['min_age', 'max_age', 'camp_groups_ids' => ['age_range']]
             ],
 
             'min_age' => [
@@ -667,6 +668,7 @@ class Camp extends Model {
         foreach($self as $id => $camp) {
             switch($camp['age_range']) {
                 case '6-to-9':
+                case '6-to-14':
                     $result[$id] = 6;
                     break;
                 case '10-to-12':
@@ -691,6 +693,9 @@ class Camp extends Model {
                     break;
                 case '10-to-12':
                     $result[$id] = 12;
+                    break;
+                case '6-to-14':
+                    $result[$id] = 14;
                     break;
                 case '13-to-16':
                     $result[$id] = 16;
@@ -976,6 +981,20 @@ class Camp extends Model {
                     if(date('w', $date_to) != 5) {
                         return ['date_to' => ['must_end_friday' => "A camp that isn't CLSH must end Friday."]];
                     }
+                }
+            }
+        }
+
+        // Checks the age range validity depending on CLSH or not
+        if(isset($values['age_range'])) {
+            $self->read(['is_clsh']);
+            foreach($self as $camp) {
+                $is_clsh = $values['is_clsh'] ?? $camp['is_clsh'];
+                if($is_clsh && $values['age_range'] !== '6-to-14') {
+                    return ['age_range' => ['clsh_invalid_age_range' => "Age range should be '6 to 14' for CLSH camp."]];
+                }
+                elseif(!$is_clsh && !in_array($values['age_range'], ['6-to-9', '10-to-12', '13-to-16'])) {
+                    return ['age_range' => ['invalid_age_range' => "Age range should be '6 to 9', '10 to 12' or '13 to 16' for camp."]];
                 }
             }
         }

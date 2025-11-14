@@ -113,7 +113,8 @@
             "selection": {
                 "6-to-9": "6 à 9 ans",
                 "10-to-12": "10 à 12 ans",
-                "13-to-16": "13 à 16 ans"
+                "13-to-16": "13 à 16 ans",
+                "6-to-14": "6 à 14 ans"
             }
         },
         "min_age": {
@@ -227,6 +228,10 @@
             "not_long_enough": "Un camp CLSH de 5 jours doit avoir une durée de 5 jours.",
             "too_long": "Un camp CLSH de 4 jours doit avoir une durée de 4 jours.",
             "must_end_friday": "Un camp doit finir un vendredi."
+        },
+        "age_range": {
+            "clsh_invalid_age_range": "La tranche d'âge doit être '6 à 14 ans' pour CLSH.",
+            "invalid_age_range": "La tranche d'âge doit être '6 à 9 ans', '10 à 12 ans' ou '13 à 16 ans'."
         }
     }
 }

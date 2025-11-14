@@ -102,7 +102,8 @@ use equal\orm\DomainCondition;
                 'all',
                 '6-to-9',
                 '10-to-12',
-                '13-to-16'
+                '13-to-16',
+                '6-to-14',
             ],
             'default'           => 'all'
         ],
