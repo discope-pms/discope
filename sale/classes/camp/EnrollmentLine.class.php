@@ -26,7 +26,8 @@ class EnrollmentLine extends Model {
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\camp\Enrollment',
                 'description'       => "Enrollment the line is part of.",
-                'required'          => true
+                'required'          => true,
+                'ondelete'          => 'cascade'
             ],
 
             'product_id' => [

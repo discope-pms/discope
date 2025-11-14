@@ -19,7 +19,8 @@ class EnrollmentDocument extends Model {
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\camp\Enrollment',
                 'required'          => true,
-                'readonly'          => true
+                'readonly'          => true,
+                'ondelete'          => 'cascade'
             ],
 
             'document_id' => [

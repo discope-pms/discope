@@ -165,6 +165,7 @@ class Enrollment extends Model {
                 'description'       => "The camp the child is enrolled to.",
                 'required'          => true,
                 'onupdate'          => 'onupdateCampId',
+                'ondelete'          => 'cascade',
                 'dependents'        => ['date_from', 'date_to', 'is_clsh', 'clsh_type', 'child_age']
             ],
 
