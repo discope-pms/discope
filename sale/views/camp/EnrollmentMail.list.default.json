@@ -13,6 +13,13 @@
             },
             {
                 "type": "field",
+                "value": "mail_created",
+                "width": "20%",
+                "sortable": true,
+                "readonly": true
+            },
+            {
+                "type": "field",
                 "value": "mail_id",
                 "width": "50%",
                 "sortable": true,
@@ -21,7 +28,14 @@
             {
                 "type": "field",
                 "value": "mail_type",
-                "width": "50%",
+                "width": "20%",
+                "sortable": true,
+                "readonly": true
+            },
+            {
+                "type": "field",
+                "value": "mail_status",
+                "width": "20%",
                 "sortable": true,
                 "readonly": true
             }

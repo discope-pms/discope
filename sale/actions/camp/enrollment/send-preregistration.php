@@ -128,10 +128,7 @@ if(count($params['children_ids']) !== count($children)) {
 $enrollments_ids = [];
 foreach($children as $child) {
     foreach($child['enrollments_ids'] as $enrollment) {
-        if(
-            $enrollment['camp_id']['center_id'] === $center['id']
-            && date('Y', $enrollment['camp_id']['date_from']) === date('Y')
-        ) {
+        if($enrollment['camp_id']['center_id'] === $center['id'] && $enrollment['camp_id']['date_from'] > time()) {
             $enrollments_ids[] = $enrollment['id'];
         }
     }
