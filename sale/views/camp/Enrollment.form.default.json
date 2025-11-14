@@ -7,7 +7,7 @@
             "label": "Envoi pré-inscription",
             "description": "Envoyer la confirmation de pré-inscription.",
             "icon": "email",
-            "route": "/child/object.child_id/preregistration",
+            "route": "/enrollment/object.id/preregistration",
             "visible": ["status", "=", "confirmed"]
         },
         {
@@ -15,7 +15,7 @@
             "label": "Relance pré-inscription",
             "description": "Envoyer la relance de demande de documents manquant pour l'inscription.",
             "icon": "email",
-            "route": "/child/object.child_id/preregistration-reminder",
+            "route": "/enrollment/object.id/preregistration-reminder",
             "visible": [
                 ["status", "=", "confirmed"],
                 ["preregistration_sent", "=", true]

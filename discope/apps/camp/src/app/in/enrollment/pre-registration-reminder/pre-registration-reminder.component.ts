@@ -24,8 +24,7 @@ class Enrollment {
         public child_id: number = 0,
         public camp_id: number = 0,
         public total: number = 0,
-        public price: number = 0,
-        public is_ase: boolean = false
+        public price: number = 0
     ) {
     }
 }
@@ -162,11 +161,12 @@ interface vModel {
 
 @Component({
     selector: 'enrollment-pre-registration',
-    templateUrl: 'pre-registration.component.html',
-    styleUrls: ['pre-registration.component.scss']
+    templateUrl: 'pre-registration-reminder.component.html',
+    styleUrls: ['pre-registration-reminder.component.scss']
 })
-export class ChildPreRegistrationComponent implements OnInit, AfterContentInit {
+export class EnrollmentPreRegistrationReminderComponent implements OnInit, AfterContentInit {
 
+    public enrollment: Enrollment = new Enrollment();
     public child: Child = new Child();
 
     public enrollments: Enrollment[] = [];
@@ -255,12 +255,12 @@ export class ChildPreRegistrationComponent implements OnInit, AfterContentInit {
             }
 
             try {
-                if(!params.hasOwnProperty('child_id')) {
+                if(!params.hasOwnProperty('enrollment_id')) {
                     return;
                 }
 
-                const childId = parseInt(params['child_id'], 10);
-                await this.loadChild(childId);
+                const enrollmentId = parseInt(params['enrollment_id'], 10);
+                await this.loadChild(enrollmentId);
 
                 this.refreshSenderAddresses();
                 this.refreshTemplates();
@@ -294,16 +294,23 @@ export class ChildPreRegistrationComponent implements OnInit, AfterContentInit {
             }
         }
     }
-    private async loadChild(childId: number) {
-        const children: Child[] = await this.api.read("sale\\camp\\Child", [childId], Object.getOwnPropertyNames(new Child()));
-        if(children.length > 0) {
-            const child = children[0];
 
-            this.child = child;
-            this.vm.children.formControl.setValue([this.child.id]);
+    private async loadChild(enrollmentId: number) {
+        const enrollments: Enrollment[] = await this.api.read("sale\\camp\\Enrollment", [enrollmentId], Object.getOwnPropertyNames(new Enrollment()));
+        if(enrollments.length > 0) {
+            const enrollment = enrollments[0];
+            this.enrollment = enrollment;
 
-            await this.loadEnrollments(child.id);
-            await this.loadGuardians(child.guardians_ids, child.main_guardian_id);
+            const children: Child[] = await this.api.read("sale\\camp\\Child", [enrollment.child_id], Object.getOwnPropertyNames(new Child()));
+            if(children.length > 0) {
+                const child = children[0];
+
+                this.child = child;
+                this.vm.children.formControl.setValue([this.child.id]);
+
+                await this.loadEnrollments(child.id);
+                await this.loadGuardians(child.guardians_ids, child.main_guardian_id);
+            }
         }
     }
 
@@ -449,21 +456,13 @@ export class ChildPreRegistrationComponent implements OnInit, AfterContentInit {
     private async refreshTemplates() {
         console.log('re-fetch templates');
 
-        let ase = false;
-        for(let enrollment of this.enrollments) {
-            if(enrollment.is_ase) {
-                ase = true;
-                break;
-            }
-        }
-
         try {
             const templates: Template[] = await this.api.collect(
                 "communication\\Template",
                 [
                     ['category_id', '=', this.selectedCenter.template_category_id],
                     ['type', '=', 'camp'],
-                    ['code', '=', ase ? 'preregistration' : 'preregistration_ase']
+                    ['code', '=', 'preregistration_reminder']
                 ],
                 Object.getOwnPropertyNames(new Template()),
                 'id', 'asc', 0, 1, this.selectedLanguage.code
@@ -601,7 +600,7 @@ export class ChildPreRegistrationComponent implements OnInit, AfterContentInit {
             });
 
             this.isSent = true;
-            this.snack.open("Confirmation de pré-inscription envoyée avec succès.");
+            this.snack.open("Relance de pré-inscription envoyée avec succès.");
             this.loading = false;
         }
         catch(response: any) {

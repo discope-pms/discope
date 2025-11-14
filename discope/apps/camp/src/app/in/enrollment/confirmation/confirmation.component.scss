@@ -54,6 +54,11 @@
                 max-height: 48px;
                 text-overflow: ellipsis;
                 padding-right: 150px;
+
+                a {
+                    color: var(--mdc-theme-primary);
+                    text-decoration: none;
+                }
             }
 
             .lang-selector {
