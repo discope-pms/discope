@@ -25,12 +25,12 @@
                                         "items": [
                                             {
                                                 "type": "field",
-                                                "value": "firstname",
+                                                "value": "lastname",
                                                 "width": "40%"
                                             },
                                             {
                                                 "type": "field",
-                                                "value": "lastname",
+                                                "value": "firstname",
                                                 "width": "40%"
                                             },
                                             {

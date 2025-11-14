@@ -14,14 +14,14 @@
             },
             {
                 "type": "field",
-                "value": "firstname",
+                "value": "lastname",
                 "width": "20%",
                 "sortable": false,
                 "readonly": true
             },
             {
                 "type": "field",
-                "value": "lastname",
+                "value": "firstname",
                 "width": "20%",
                 "sortable": false,
                 "readonly": true
