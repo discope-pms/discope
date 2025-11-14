@@ -37,39 +37,44 @@
                                             {
                                                 "type": "field",
                                                 "value": "product_id",
-                                                "width": "50%",
-                                                "widget": {
-                                                    "domain": ["camp_product_type", "=", "full"]
-                                                }
-                                            },
-                                            {
-                                                "type": "field",
-                                                "value": "day_product_id",
-                                                "width": "50%",
-                                                "widget": {
-                                                    "domain": ["camp_product_type", "=", "day"]
-                                                }
+                                                "width": "50%"
                                             },
                                             {
                                                 "type": "label",
                                                 "value": "",
-                                                "width": "50%"
+                                                "width": "50%",
+                                                "visible": ["is_clsh", "=", false]
                                             },
                                             {
                                                 "type": "field",
                                                 "value": "weekend_product_id",
-                                                "width": "50%",
-                                                "widget": {
-                                                    "domain": ["camp_product_type", "=", "weekend"]
-                                                }
+                                                "width": "50%"
                                             },
                                             {
                                                 "type": "field",
                                                 "value": "saturday_morning_product_id",
+                                                "width": "50%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "5_days_product_id",
+                                                "width": "50%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "4_days_product_id",
+                                                "width": "50%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "day_product_id",
+                                                "width": "50%"
+                                            },
+                                            {
+                                                "type": "label",
+                                                "value": "",
                                                 "width": "50%",
-                                                "widget": {
-                                                    "domain": ["camp_product_type", "=", "saturday-morning"]
-                                                }
+                                                "visible": ["is_clsh", "=", true]
                                             },
                                             {
                                                 "type": "field",

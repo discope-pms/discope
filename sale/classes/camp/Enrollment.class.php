@@ -1784,11 +1784,13 @@ class Enrollment extends Model {
             'family_quotient',
             'camp_class',
             'child_id',
-            'camp_id'   => [
+            'camp_id' => [
                 'date_from',
                 'date_to',
                 'product_id',
-                'day_product_id',
+                '5_days_product_id',
+                '4_days_product_id',
+                'day_product_id'
             ]
         ]);
         foreach($self as $id => $enrollment) {
@@ -1797,31 +1799,6 @@ class Enrollment extends Model {
             }
 
             if($enrollment['is_clsh']) {
-                $day_products_ids = Product::search(['camp_product_type', '=', 'day'])->ids();
-
-                $camp_product_line = EnrollmentLine::search([
-                    ['product_id', 'in', $day_products_ids],
-                    ['enrollment_id', '=', $id]
-                ])
-                    ->read(['product_id'])
-                    ->first();
-
-                $day_product_id = $enrollment['camp_id']['day_product_id'];
-                if(!is_null($camp_product_line)) {
-                    $day_product_id = $camp_product_line['product_id'];
-                }
-
-                $day_product = Product::id($day_product_id)
-                    ->read([
-                        'prices_ids' => [
-                            'camp_class',
-                            'family_quotient_min',
-                            'family_quotient_max',
-                            'price_list_id' => ['date_from', 'date_to']
-                        ]
-                    ])
-                    ->first();
-
                 $present_days = [
                     $enrollment['presence_day_1'],
                     $enrollment['presence_day_2'],
@@ -1837,6 +1814,27 @@ class Enrollment extends Model {
                     }
                 }
 
+                $product_id = $enrollment['camp_id']['day_product_id'];
+                if($enrollment['clsh_type'] === '5-days' && $qty === 5) {
+                    $product_id = $enrollment['camp_id']['5_days_product_id'];
+                    $qty = 1;
+                }
+                elseif($enrollment['clsh_type'] === '4-days' && $qty >= 4) {
+                    $product_id = $enrollment['camp_id']['4_days_product_id'];
+                    $qty = 1;
+                }
+
+                $product = Product::id($product_id)
+                    ->read([
+                        'prices_ids' => [
+                            'camp_class',
+                            'family_quotient_min',
+                            'family_quotient_max',
+                            'price_list_id' => ['date_from', 'date_to']
+                        ]
+                    ])
+                    ->first();
+
                 $camp_classes = ['other'];
                 if($enrollment['camp_class'] === 'close-member') {
                     $camp_classes = ['close-member', 'member', 'other'];
@@ -1847,7 +1845,7 @@ class Enrollment extends Model {
 
                 $camp_price = null;
                 foreach($camp_classes as $camp_class) {
-                    foreach($day_product['prices_ids'] as $price) {
+                    foreach($product['prices_ids'] as $price) {
                         if(
                             $camp_class === $price['camp_class']
                             && $enrollment['camp_id']['date_from'] >= $price['price_list_id']['date_from']
@@ -1861,21 +1859,30 @@ class Enrollment extends Model {
                     }
                 }
 
+                $clsh_camp_products_ids = Product::search(['camp_product_type', 'in', ['clsh-full-5-days', 'clsh-full-4-days', 'clsh-day']])->ids();
+
+                $camp_product_line = EnrollmentLine::search([
+                    ['product_id', 'in', $clsh_camp_products_ids],
+                    ['enrollment_id', '=', $id]
+                ])
+                    ->read(['product_id' => ['camp_product_type']])
+                    ->first();
+
                 if(!is_null($camp_price)) {
                     if(is_null($camp_product_line)) {
                         EnrollmentLine::create([
                             'enrollment_id' => $id,
-                            'product_id'    => $day_product['id'],
+                            'product_id'    => $product['id'],
                             'price_id'      => $camp_price['id'],
                             'qty'           => $qty
                         ]);
                     }
                     else {
-                        EnrollmentLine::id($camp_product_line['id'])
-                            ->update([
-                                'price_id'  => $camp_price['id'],
-                                'qty'       => $qty
-                            ]);
+                        EnrollmentLine::id($camp_product_line['id'])->update([
+                            'product_id'    => $product['id'],
+                            'price_id'      => $camp_price['id'],
+                            'qty'           => $qty
+                        ]);
                     }
                 }
             }

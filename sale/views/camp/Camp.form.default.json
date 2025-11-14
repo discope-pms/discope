@@ -184,29 +184,25 @@
                                                 "type": "field",
                                                 "value": "product_id",
                                                 "width": "50%",
-                                                "visible": false,
-                                                "domain": ["camp_product_type", "=", "full"]
+                                                "visible": false
                                             },
                                             {
                                                 "type": "field",
                                                 "value": "day_product_id",
                                                 "width": "50%",
-                                                "visible":  false,
-                                                "domain": ["camp_product_type", "=", "day"]
+                                                "visible":  false
                                             },
                                             {
                                                 "type": "field",
                                                 "value": "weekend_product_id",
                                                 "width": "50%",
-                                                "visible":  false,
-                                                "domain": ["camp_product_type", "=", "weekend"]
+                                                "visible":  false
                                             },
                                             {
                                                 "type": "field",
                                                 "value": "saturday_morning_product_id",
                                                 "width": "50%",
-                                                "visible":  false,
-                                                "domain": ["camp_product_type", "=", "saturday-morning"]
+                                                "visible":  false
                                             },
                                             {
                                                 "type": "field",

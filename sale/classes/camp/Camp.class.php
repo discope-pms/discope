@@ -148,17 +148,6 @@ class Camp extends Model {
                 ]
             ],
 
-            'product_id' => [
-                'type'              => 'computed',
-                'result_type'       => 'many2one',
-                'foreign_object'    => 'sale\camp\catalog\Product',
-                'description'       => "The product that will be added to the enrollment lines for a non CLSH camp.",
-                'domain'            => ['is_camp', '=', true],
-                'visible'           => ['is_clsh', '=', false],
-                'store'             => true,
-                'relation'          => ['camp_model_id' => 'product_id']
-            ],
-
             'camp_type' => [
                 'type'              => 'computed',
                 'result_type'       => 'string',
@@ -196,15 +185,18 @@ class Camp extends Model {
                 'visible'           => ['is_clsh', '=', true]
             ],
 
-            'day_product_id' => [
+            'product_id' => [
                 'type'              => 'computed',
                 'result_type'       => 'many2one',
                 'foreign_object'    => 'sale\camp\catalog\Product',
-                'description'       => "The product that will be added to the enrollment lines if the child enroll for specific days of the CLSH camp.",
-                'domain'            => ['is_camp', '=', true],
-                'visible'           => ['is_clsh', '=', true],
+                'description'       => "The product that will be added to the enrollment lines for a non CLSH camp.",
+                'domain'            => [
+                    ['is_camp', '=', true],
+                    ['camp_product_type', '=', 'full']
+                ],
+                'visible'           => ['is_clsh', '=', false],
                 'store'             => true,
-                'relation'          => ['camp_model_id' => 'day_product_id']
+                'relation'          => ['camp_model_id' => 'product_id']
             ],
 
             'weekend_product_id' => [
@@ -212,7 +204,10 @@ class Camp extends Model {
                 'result_type'       => 'many2one',
                 'foreign_object'    => 'sale\camp\catalog\Product',
                 'description'       => "The product that will be added to the enrollment lines if the child stays the weekend after the camp.",
-                'domain'            => ['is_camp', '=', true],
+                'domain'            => [
+                    ['is_camp', '=', true],
+                    ['camp_product_type', '=', 'weekend']
+                ],
                 'visible'           => ['is_clsh', '=', false],
                 'store'             => true,
                 'relation'          => ['camp_model_id' => 'weekend_product_id']
@@ -223,10 +218,55 @@ class Camp extends Model {
                 'result_type'       => 'many2one',
                 'foreign_object'    => 'sale\camp\catalog\Product',
                 'description'       => "The product that will be added to the enrollment lines if the child stays the until Saturday morning after the camp.",
-                'domain'            => ['is_camp', '=', true],
+                'domain'            => [
+                    ['is_camp', '=', true],
+                    ['camp_product_type', '=', 'saturday-morning']
+                ],
                 'visible'           => ['is_clsh', '=', false],
                 'store'             => true,
                 'relation'          => ['camp_model_id' => 'saturday_morning_product_id']
+            ],
+
+            '5_days_product_id' => [
+                'type'              => 'computed',
+                'result_type'       => 'many2one',
+                'foreign_object'    => 'sale\camp\catalog\Product',
+                'description'       => "The product that will be added to the enrollment lines if the child enroll the whole CLSH camp of 5 days.",
+                'domain'            => [
+                    ['is_camp', '=', true],
+                    ['camp_product_type', '=', 'clsh-full-5-days']
+                ],
+                'visible'           => ['is_clsh', '=', true],
+                'store'             => true,
+                'relation'          => ['camp_model_id' => '5_days_product_id']
+            ],
+
+            '4_days_product_id' => [
+                'type'              => 'computed',
+                'result_type'       => 'many2one',
+                'foreign_object'    => 'sale\camp\catalog\Product',
+                'description'       => "The product that will be added to the enrollment lines if the child enroll the whole CLSH camp of 4 days.",
+                'domain'            => [
+                    ['is_camp', '=', true],
+                    ['camp_product_type', '=', 'clsh-full-4-days']
+                ],
+                'visible'           => ['is_clsh', '=', true],
+                'store'             => true,
+                'relation'          => ['camp_model_id' => '4_days_product_id']
+            ],
+
+            'day_product_id' => [
+                'type'              => 'computed',
+                'result_type'       => 'many2one',
+                'foreign_object'    => 'sale\camp\catalog\Product',
+                'description'       => "The product that will be added to the enrollment lines if the child enroll for specific days of the CLSH camp.",
+                'domain'            => [
+                    ['is_camp', '=', true],
+                    ['camp_product_type', '=', 'clsh-day']
+                ],
+                'visible'           => ['is_clsh', '=', true],
+                'store'             => true,
+                'relation'          => ['camp_model_id' => 'day_product_id']
             ],
 
             'age_range' => [
@@ -808,7 +848,6 @@ class Camp extends Model {
             'status',
             'is_clsh',
             'clsh_type',
-            'day_product_id',
             'date_from',
             'date_to',
             'camp_groups_ids',
