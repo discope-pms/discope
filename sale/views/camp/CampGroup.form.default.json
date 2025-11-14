@@ -31,9 +31,19 @@
                                                 }
                                             },
                                             {
+                                                "type": "label",
+                                                "value": "",
+                                                "width": "20%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "age_range",
+                                                "width": "33%"
+                                            },
+                                            {
                                                 "type": "field",
                                                 "value": "employee_id",
-                                                "width": "40%"
+                                                "width": "33%"
                                             }
                                         ]
                                     },
