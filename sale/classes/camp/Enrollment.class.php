@@ -169,6 +169,15 @@ class Enrollment extends Model {
                 'dependents'        => ['date_from', 'date_to', 'is_clsh', 'clsh_type', 'child_age']
             ],
 
+            'camp_remaining_qty' => [
+                'type'              => 'computed',
+                'result_type'       => 'integer',
+                'description'       => "Camp remaining enrollment quantity.",
+                'help'              => "Used for UX when creating a new enrollment.",
+                'store'             => false,
+                'function'          => 'calcCampRemainingQty'
+            ],
+
             'date_from' => [
                 'type'              => 'computed',
                 'result_type'       => 'date',
@@ -578,11 +587,13 @@ class Enrollment extends Model {
         $is_clsh = null;
         if(isset($event['camp_id'])) {
             $camp = Camp::id($event['camp_id'])
-                ->read(['is_clsh'])
+                ->read(['is_clsh', 'enrollments_qty', 'max_children'])
                 ->first();
 
             $result['is_clsh'] = $camp['is_clsh'];
             $is_clsh = $camp['is_clsh'];
+
+            $result['camp_remaining_qty'] = $camp['max_children'] - $camp['enrollments_qty'];
         }
 
         if(!is_null($is_clsh)) {
@@ -711,6 +722,16 @@ class Enrollment extends Model {
         $self->read(['id']);
         foreach($self as $id => $enrollment) {
             $result[$id] = false;
+        }
+
+        return $result;
+    }
+
+    public static function calcCampRemainingQty($self): array {
+        $result = [];
+        $self->read(['camp_id' => ['enrollments_qty', 'max_children']]);
+        foreach($self as $id => $enrollment) {
+            $result[$id] = $enrollment['max_children'] - $enrollment['enrollments_qty'];
         }
 
         return $result;
