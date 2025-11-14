@@ -193,17 +193,17 @@ class EnrollmentLine extends Model {
     }
 
     public static function onupdateProductId($self) {
-        $camp_products_enrollments_ids = [];
+        $map_enrollments_ids = [];
 
         $self->read(['enrollment_id', 'product_id' => ['camp_product_type']]);
         foreach($self as $enrollment_line) {
-            if(in_array($enrollment_line['product_id']['camp_product_type'], ['full', 'day'])) {
-                $camp_products_enrollments_ids[] = $enrollment_line['enrollment_id'];
+            if(in_array($enrollment_line['product_id']['camp_product_type'], ['full', 'clsh-full-5-days', 'clsh-full-4-days', 'clsh-day'])) {
+                $map_enrollments_ids[$enrollment_line['enrollment_id']] = true;
             }
         }
 
-        if(!empty($camp_products_enrollments_ids)) {
-            Enrollment::ids($camp_products_enrollments_ids)->do('refresh_camp_product_line');
+        if(!empty($map_enrollments_ids)) {
+            Enrollment::ids(array_keys($map_enrollments_ids))->do('refresh_camp_product_line');
         }
     }
 
@@ -247,14 +247,18 @@ class EnrollmentLine extends Model {
             }
         }
 
+        // restrict the modification of the product of a line, most modifications should be inferred from enrollment modifications
         if(isset($values['product_id'])) {
             $new_product = Product::id($values['product_id'])
                 ->read(['camp_product_type'])
                 ->first();
 
-            $self->read(['product_id' => ['camp_product_type']]);
+            $self->read(['enrollment_id' => ['is_clsh'], 'product_id' => ['camp_product_type']]);
             foreach($self as $enrollment_line) {
-                if($enrollment_line['product_id']['camp_product_type'] !== $new_product['camp_product_type']) {
+                $same_product_type = ($enrollment_line['product_id']['camp_product_type'] === $new_product['camp_product_type'])
+                    || ($enrollment_line['enrollment_id']['is_clsh'] && strpos($enrollment_line['product_id']['camp_product_type'], 'clsh') !== false && strpos($new_product['camp_product_type'], 'clsh') !== false);
+
+                if(!$same_product_type) {
                     return ['product_id' => ['invalid_camp_product_type' => "Camp product is not matching the current camp product type."]];
                 }
             }

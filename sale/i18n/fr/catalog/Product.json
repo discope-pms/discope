@@ -174,9 +174,11 @@
             "help": "",
             "selection": {
                 "full": "Camp complet",
-                "day": "Camp à la journée",
                 "weekend": "Week-end",
-                "saturday-morning": "Samedi matin"
+                "saturday-morning": "Samedi matin",
+                "clsh-day": "Camp CLSH à la journée",
+                "clsh-full-5-days": "Camp CLSH complet 5 jours",
+                "clsh-full-4-days": "Camp CLSH complet 4 jours"
             }
         }
     },

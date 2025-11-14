@@ -109,7 +109,7 @@
                                             {
                                                 "type": "field",
                                                 "value": "child_id",
-                                                "width": "40%",
+                                                "width": "33%",
                                                 "widget": {
                                                     "limit": 25,
                                                     "sort": "asc",
@@ -119,7 +119,16 @@
                                             {
                                                 "type": "field",
                                                 "value": "camp_id",
-                                                "width": "60%"
+                                                "width": "66%",
+                                                "widget": {
+                                                    "domain": [
+                                                        ["date_from", ">=", "date.this.day"],
+                                                        ["status", "=", "published"]
+                                                    ],
+                                                    "order": "name",
+                                                    "sort": "asc",
+                                                    "limit": 10
+                                                }
                                             },
                                             {
                                                 "type": "field",
@@ -394,7 +403,7 @@
                                                 "width": "66%",
                                                 "widget": {
                                                     "view": "list.enrollment",
-                                                    "domain": ["visible_date", "<=", "date.this.day.first"]
+                                                    "domain": ["visible_date", "<=", "date.this.day"]
                                                 }
                                             },
                                             {

@@ -43,11 +43,6 @@
             "description": "Fin du camp.",
             "help": ""
         },
-        "product_id": {
-            "label": "Produit",
-            "description": "Le produit de vente du camp à la semaine.",
-            "help": ""
-        },
         "camp_type": {
             "label": "Type",
             "description": "Type de camp.",
@@ -76,9 +71,9 @@
                 "4-days": "4 jours"
             }
         },
-        "day_product_id": {
-            "label": "Produit à la journée",
-            "description": "Le produit de vente du camp CLSH à la journée.",
+        "product_id": {
+            "label": "Produit camp",
+            "description": "Le produit de vente du camp.",
             "help": ""
         },
         "weekend_product_id": {
@@ -89,6 +84,21 @@
         "saturday_morning_product_id": {
             "label": "Produit samedi matin",
             "description": "Le produit de vente de l'hébergement jusqu'au samedi matin après le camp.",
+            "help": ""
+        },
+        "5_days_product_id": {
+            "label": "Produit camp 5 jours",
+            "description": "Le produit de vente du camp CLSH complet s'il dure 5 jours.",
+            "help": ""
+        },
+        "4_days_product_id": {
+            "label": "Produit camp 4 jours",
+            "description": "Le produit de vente du camp CLSH complet s'il dure 4 jours.",
+            "help": ""
+        },
+        "day_product_id": {
+            "label": "Produit à la journée",
+            "description": "Le produit de vente du camp CLSH à la journée.",
             "help": ""
         },
         "camp_model_id": {
@@ -201,21 +211,22 @@
         }
     },
     "error": {
-        "day_product_id": {
-            "required": "Produit de jour requis si camp CLSH."
-        },
         "camp_groups_ids": {
             "one_needed": "Un camp doit avoir au moins un groupe de camp.",
             "too_many_children": "Il y a trop d'enfants inscrits dans les groupes de camp.",
-            "missing_group": "Un groupe est nécssaire pour publier."
+            "missing_group": "Un groupe est nécessaire pour publier."
         },
         "employee_ratio": {
             "too_many_children": "Il y a trop d'enfants inscrits au camp."
         },
+        "date_from": {
+            "must_start_sunday": "Un camp doit commencer un dimanche."
+        },
         "date_to": {
             "wrong_duration": "Un camp CLSH doit avoir une durée de 4 ou 5 jours.",
             "not_long_enough": "Un camp CLSH de 5 jours doit avoir une durée de 5 jours.",
-            "too_long": "Un camp CLSH de 4 jours doit avoir une durée de 4 jours."
+            "too_long": "Un camp CLSH de 4 jours doit avoir une durée de 4 jours.",
+            "must_end_friday": "Un camp doit finir un vendredi."
         }
     }
 }

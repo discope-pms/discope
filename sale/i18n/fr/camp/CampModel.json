@@ -8,9 +8,9 @@
             "description": "Description du modèle de camp.",
             "help": ""
         },
-        "product_id": {
-            "label": "Produit",
-            "description": "Le produit qui sera utilisé.",
+        "is_clsh": {
+            "label": "CLSH",
+            "description": "Centre loisir sans hébergement.",
             "help": ""
         },
         "camp_type": {
@@ -27,14 +27,9 @@
                 "other": "Autre"
             }
         },
-        "is_clsh": {
-            "label": "CLSH",
-            "description": "Centre loisir sans hébergement.",
-            "help": ""
-        },
-        "day_product_id": {
-            "label": "Produit à la journée",
-            "description": "Le produit de vente du camp CLSH à la journée.",
+        "product_id": {
+            "label": "Produit camp",
+            "description": "Le produit de vente du camp.",
             "help": ""
         },
         "weekend_product_id": {
@@ -45,6 +40,21 @@
         "saturday_morning_product_id": {
             "label": "Produit samedi matin",
             "description": "Le produit de vente de l'hébergement jusqu'au samedi matin après le camp.",
+            "help": ""
+        },
+        "5_days_product_id": {
+            "label": "Produit camp 5 jours",
+            "description": "Le produit de vente du camp CLSH complet s'il dure 5 jours.",
+            "help": ""
+        },
+        "4_days_product_id": {
+            "label": "Produit camp 4 jours",
+            "description": "Le produit de vente du camp CLSH complet s'il dure 4 jours.",
+            "help": ""
+        },
+        "day_product_id": {
+            "label": "Produit à la journée",
+            "description": "Le produit de vente du camp CLSH à la journée.",
             "help": ""
         },
         "employee_ratio": {
@@ -88,5 +98,24 @@
             "layout": []
         }
     },
-    "error": []
+    "error": {
+        "5_days_product_id": {
+            "required": "Produit camp complet 5 jours requis si camp CLSH."
+        },
+        "4_days_product_id": {
+            "required": "Produit camp complet 4 jours requis si camp CLSH."
+        },
+        "day_product_id": {
+            "required": "Produit de jour requis si camp CLSH."
+        },
+        "product_id": {
+            "required": "Produit camp requis."
+        },
+        "weekend_product_id": {
+            "required": "Produit weekend requis."
+        },
+        "saturday_morning_product_id": {
+            "required": "Produit samedi matin requis."
+        }
+    }
 }

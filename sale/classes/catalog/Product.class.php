@@ -307,11 +307,13 @@ class Product extends Model {
                 'type'              => 'string',
                 'selection'         => [
                     'full',
-                    'day',
                     'weekend',
-                    'saturday-morning'
+                    'saturday-morning',
+                    'clsh-full-5-days',
+                    'clsh-full-4-days',
+                    'clsh-day',
                 ],
-                'description'       => "The type of camp product (non CLSH: full, day and weekend | CLSH: day).",
+                'description'       => "The type of camp product (non CLSH: full, weekend and Saturday morning | CLSH: full '5 or 4 days' and day).",
                 'help'              => "Allows to distinguish how the products of camps should be used.",
                 'default'           => 'full',
                 'visible'           => [ ['is_camp', '=', true] ]

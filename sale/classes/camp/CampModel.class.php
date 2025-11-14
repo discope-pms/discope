@@ -56,8 +56,11 @@ class CampModel extends Model {
             'product_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\camp\catalog\Product',
-                'description'       => "The product that will be added to the enrollment lines for a non CLSH camp.",
-                'domain'            => ['is_camp', '=', true],
+                'description'       => "The product that will be added to the enrollment lines when the child enroll for the whole camp.",
+                'domain'            => [
+                    ['is_camp', '=', true],
+                    ['camp_product_type', '=', 'full']
+                ],
                 'visible'           => ['is_clsh', '=', false]
             ],
 
@@ -65,7 +68,10 @@ class CampModel extends Model {
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\camp\catalog\Product',
                 'description'       => "The product that will be added to the enrollment lines if the child stays the weekend after the camp.",
-                'domain'            => ['is_camp', '=', true],
+                'domain'            => [
+                    ['is_camp', '=', true],
+                    ['camp_product_type', '=', 'weekend']
+                ],
                 'visible'           => ['is_clsh', '=', false]
             ],
 
@@ -73,17 +79,47 @@ class CampModel extends Model {
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\camp\catalog\Product',
                 'description'       => "The product that will be added to the enrollment lines if the child stays the until Saturday morning after the camp.",
-                'domain'            => ['is_camp', '=', true],
+                'domain'            => [
+                    ['is_camp', '=', true],
+                    ['camp_product_type', '=', 'saturday-morning']
+                ],
                 'visible'           => ['is_clsh', '=', false]
             ],
 
-            // CLSH product: 'day_product_id'
+            // CLSH product: '5_days_product_id', '4_days_product_id' and 'day_product_id'
+
+            '5_days_product_id' => [
+                'type'              => 'many2one',
+                'foreign_object'    => 'sale\camp\catalog\Product',
+                'description'       => "The product that will be added to the enrollment lines if the child enroll the whole CLSH camp of 5 days.",
+                'help'              => "Only used if the camp clsh type is 5 days.",
+                'domain'            => [
+                    ['is_camp', '=', true],
+                    ['camp_product_type', '=', 'clsh-full-5-days']
+                ],
+                'visible'           => ['is_clsh', '=', true]
+            ],
+
+            '4_days_product_id' => [
+                'type'              => 'many2one',
+                'foreign_object'    => 'sale\camp\catalog\Product',
+                'description'       => "The product that will be added to the enrollment lines if the child enroll the whole CLSH camp of 4 days.",
+                'help'              => "Only used if the camp clsh type is 4 days.",
+                'domain'            => [
+                    ['is_camp', '=', true],
+                    ['camp_product_type', '=', 'clsh-full-4-days']
+                ],
+                'visible'           => ['is_clsh', '=', true]
+            ],
 
             'day_product_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\camp\catalog\Product',
                 'description'       => "The product that will be added to the enrollment lines if the child enroll for specific days of the CLSH camp.",
-                'domain'            => ['is_camp', '=', true],
+                'domain'            => [
+                    ['is_camp', '=', true],
+                    ['camp_product_type', '=', 'clsh-day']
+                ],
                 'visible'           => ['is_clsh', '=', true]
             ],
 
@@ -139,6 +175,8 @@ class CampModel extends Model {
     public static function canupdate($self, $values): array {
         $self->read([
             'is_clsh',
+            '5_days_product_id',
+            '4_days_product_id',
             'day_product_id',
             'product_id',
             'weekend_product_id',
@@ -148,6 +186,16 @@ class CampModel extends Model {
         foreach($self as $camp_model) {
             $is_clsh = $values['is_clsh'] ?? $camp_model['is_clsh'];
             if($is_clsh) {
+                $five_days_product = $values['5_days_product_id'] ?? $camp_model['5_days_product_id'];
+                if(is_null($five_days_product)) {
+                    return ['5_days_product_id' => ['required_product' => "Product required."]];
+                }
+
+                $four_days_product = $values['4_days_product_id'] ?? $camp_model['4_days_product_id'];
+                if(is_null($four_days_product)) {
+                    return ['4_days_product_id' => ['required_product' => "Product required."]];
+                }
+
                 $day_product = $values['day_product_id'] ?? $camp_model['day_product_id'];
                 if(is_null($day_product)) {
                     return ['day_product_id' => ['required_product' => "Product required."]];
