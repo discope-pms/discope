@@ -618,22 +618,27 @@ class Booking extends Model {
         $self->do('import_contacts');
     }
 
-    public static function calcName($om, $oids, $lang) {
+    public static function calcName($om, $ids, $lang) {
         $result = [];
 
-        $bookings = $om->read(self::getType(), $oids, ['center_id.center_office_id.code'], $lang);
+        $bookings = $om->read(self::getType(), $ids, ['center_id.center_office_id.code'], $lang);
         $format = Setting::get_value('sale', 'organization', 'booking.sequence_format', '%05d{sequence}');
 
-        foreach($bookings as $oid => $booking) {
+        foreach($bookings as $id => $booking) {
             $sequence_name = 'booking.sequence.'.$booking['center_id.center_office_id.code'];
             $sequence_value = Setting::get_value('sale', 'organization', $sequence_name);
 
             if($sequence_value) {
                 Setting::set_value('sale', 'organization', $sequence_name, $sequence_value + 1);
-                $result[$oid] = Setting::parse_format($format, [
+                $booking_name = Setting::parse_format($format, [
                     'center'    => $booking['center_id.center_office_id.code'],
                     'sequence'  => $sequence_value
                 ]);
+                // #kaleo - remove leading zero if present
+                if(substr($booking_name, 0, 1) === '0') {
+                    $booking_name = substr($booking_name, 1);
+                }
+                $result[$id] = $booking_name;
             }
 
         }
