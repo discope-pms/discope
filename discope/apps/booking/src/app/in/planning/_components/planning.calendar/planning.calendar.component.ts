@@ -22,6 +22,7 @@ class RentalUnit {
         public action_required: string = '',
         public order: number = 0,
         public is_accomodation: boolean = true,
+        public parent_id: number = 0,
         public has_children: boolean = false,
         public can_partial_rent: boolean = false,
         public color: string = '',
@@ -73,6 +74,7 @@ export class PlanningCalendarComponent implements OnInit, OnChanges, AfterViewIn
     public holidays_classes: any = [];
     // count of rental units taken under account (not necessarily equal to `rental_units.length`)
     public count_rental_units: number = 0;
+    public count_beds: number = 0;
 
     public hovered_consumption: any;
     public hovered_rental_unit: any;
@@ -106,6 +108,7 @@ export class PlanningCalendarComponent implements OnInit, OnChanges, AfterViewIn
     public mapStats: any = {
         'occupied': {},
         'capacity': {},
+        'capacity_beds': {},
         'blocked': {},
         'occupancy': {},
         'arrivals_expected': {},
@@ -296,6 +299,7 @@ export class PlanningCalendarComponent implements OnInit, OnChanges, AfterViewIn
         this.mapStats = {
             'occupied': {},
             'capacity': {},
+            'capacity_beds': {},
             'blocked': {},
             'occupancy': {},
             'arrivals_expected': {},
@@ -304,19 +308,44 @@ export class PlanningCalendarComponent implements OnInit, OnChanges, AfterViewIn
             'departures_confirmed': {}
         };
 
+        const mapCountedRentalUnits: any = {};
+
         // reset values
         this.count_rental_units = 0;
+        this.count_beds = 0;
         for(let rentalUnit of this.rental_units) {
-            if(rentalUnit.is_accomodation) {
-                if(rentalUnit.has_children && rentalUnit.can_partial_rent && this.show_children) {
-                    continue;
-                }
-                ++this.count_rental_units;
+            if(!rentalUnit.is_accomodation) {
+                // skip if not accommodation
+                continue;
             }
+            if(!rentalUnit.display_in_planning) {
+                // skip if the rental unit isn't displayed in planning
+                continue;
+            }
+
+            let has_children_displayed = false;
+            if(this.show_children && rentalUnit.has_children) {
+                for(let rt of this.rental_units) {
+                    if(rt.parent_id && rt.parent_id === rentalUnit.id) {
+                        has_children_displayed = true;
+                        break;
+                    }
+                }
+            }
+
+            // skip if the rental unit it has children displayed
+            if(has_children_displayed) {
+                continue;
+            }
+
+            ++this.count_rental_units;
+            this.count_beds += rentalUnit.capacity;
+            mapCountedRentalUnits[rentalUnit.id] = true;
         }
 
         for(let date_index of this.headers.days_indexes) {
             this.mapStats['capacity'][date_index] = this.count_rental_units;
+            this.mapStats['capacity_beds'][date_index] = this.count_beds;
             this.mapStats['occupied'][date_index] = 0;
             this.mapStats['blocked'][date_index] = 0;
             this.mapStats['occupancy'][date_index] = 0;
@@ -368,6 +397,9 @@ export class PlanningCalendarComponent implements OnInit, OnChanges, AfterViewIn
                                 if(this.mapStats['capacity'][date_index]) {
                                     --this.mapStats['capacity'][date_index];
                                 }
+                                if(this.mapStats['capacity_beds'][date_index]) {
+                                    this.mapStats['capacity_beds'][date_index] -= rentalUnit.capacity;
+                                }
                                 ++this.mapStats['blocked'][date_index];
                                 // for the first date of a blocking, remove capacity for the previous day
                                 if(d.getTime() == date_from.getTime()) {
@@ -377,6 +409,9 @@ export class PlanningCalendarComponent implements OnInit, OnChanges, AfterViewIn
                                     if(prev_date_index >= min_date_index) {
                                         if(this.mapStats['capacity'][prev_date_index]) {
                                             --this.mapStats['capacity'][prev_date_index];
+                                        }
+                                        if(this.mapStats['capacity_beds'][prev_date_index]) {
+                                            this.mapStats['capacity_beds'][prev_date_index] -= rentalUnit.capacity;
                                         }
                                         ++this.mapStats['blocked'][prev_date_index];
                                     }
@@ -390,9 +425,9 @@ export class PlanningCalendarComponent implements OnInit, OnChanges, AfterViewIn
                                             ++this.mapStats['arrivals_confirmed'][date_index];
                                         }
                                     }
-                                    // if(!mapRentalUnits[rentalUnit.id][date_index]) {
+                                    if(mapCountedRentalUnits[rentalUnit.id]) {
                                         ++this.mapStats['occupied'][date_index];
-                                    // }
+                                    }
                                 }
                                 else {
                                     ++this.mapStats['departures_expected'][date_index];
@@ -503,17 +538,21 @@ export class PlanningCalendarComponent implements OnInit, OnChanges, AfterViewIn
         })
             .then(async (response) => {
                 this.consumptions = response;
+
+                // Rental units needed to compute stats
+                await rental_units_promise;
+
                 await this.computeStats();
             })
             .catch(response => {
-                console.warn('unable to fetch rental units', response);
+                console.warn('unable to fetch consumptions', response);
                 // if a 403 response is received, we assume that the user is not identified: redirect to /auth
                 if(response.status == 403) {
                     window.location.href = '/auth';
                 }
             });
 
-        await Promise.all([rental_units_promise, holidays_promise, consumptions_promise]);
+        await Promise.all([holidays_promise, consumptions_promise]);
     }
 
 
