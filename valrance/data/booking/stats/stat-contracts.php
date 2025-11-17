@@ -539,7 +539,8 @@ use sale\customer\Customer;
         'content-type'  => 'application/json',
         'charset'       => 'utf-8',
         'accept-origin' => '*',
-        'cacheable'     => false,
+        'cacheable'     => true,
+        'cache-vary'    => ['body'],
         'expires'       => (60*60*1)
     ],
     'providers'     => ['context', 'orm', 'adapt']
