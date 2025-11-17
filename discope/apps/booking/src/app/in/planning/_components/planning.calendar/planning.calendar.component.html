@@ -135,6 +135,20 @@
                         {{mapStats['capacity'][day_index]}}
                 </td>
             </tr>
+            <tr class="rows">
+                <td class="cell-stat cell-title">
+                    Cap. lits
+                </td>
+                <td class="cell-stat empty"></td>
+                <!-- #debug - for debugging, add [attr.data-date]="day" -->
+                <td *ngFor="let day_index of headers.days_indexes; let i = index"
+                    class="cell-stat cell-days"
+                    [class.is-weekend]="headers.days_is_weekend[i]"
+                    [class.small]="cellsWidth <= 26"
+                    [class.hidden]="cellsWidth < 10">
+                    {{mapStats['capacity_beds'][day_index] ?? 0}}
+                </td>
+            </tr>
             <tr class="rows" >
                 <td class="cell-stat cell-title">
                     Bloquées
