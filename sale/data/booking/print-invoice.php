@@ -279,6 +279,12 @@ if(empty($output)) {
         $img_url = "data:{$content_type};base64, ".base64_encode($logo_document_data);
     }
 
+    $printable_code = sprintf("%04d.%03d", intval($booking['name']) / 1000, intval($booking['name']) % 1000);
+    // #kaleo - remove leading zero if present
+    if(substr($printable_code, 0, 1) === '0') {
+        $printable_code = substr($printable_code, 1);
+    }
+
     $values = [
         'header_img_url'       => $img_url ?? 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8Xw8AAoMBgDTD2qgAAAAASUVORK5CYII=',
         'signature'            => $invoice['organisation_id']['signature'] ?? '',
@@ -309,7 +315,7 @@ if(empty($output)) {
         'is_paid'               => $invoice['is_paid'],
         'status'                => $invoice['status'],
         'type'                  => $invoice['type'],
-        'booking_code'          => sprintf("%03d.%03d", intval($booking['name']) / 1000, intval($booking['name']) % 1000),
+        'booking_code'          => $printable_code,
         'center'                => $booking['center_id']['name'],
         'center_address'        => $booking['center_id']['address_street'].' - '.$booking['center_id']['address_zip'].' '.$booking['center_id']['address_city'],
         'postal_address'        => sprintf("%s - %s %s", $invoice['organisation_id']['address_street'], $invoice['organisation_id']['address_zip'], $invoice['organisation_id']['address_city']),

@@ -189,12 +189,18 @@ if(empty($output)) {
         $img_url = "data:{$content_type};base64, ".base64_encode($logo_document_data);
     }
 
+    $printable_code = sprintf("%04d.%03d", intval($booking['name']) / 1000, intval($booking['name']) % 1000);
+    // #kaleo - remove leading zero if present
+    if(substr($printable_code, 0, 1) === '0') {
+        $printable_code = substr($printable_code, 1);
+    }
+
     $values = [
         'activities_map'             => '',
         'attn_address1'              => '',
         'attn_address2'              => '',
         'attn_name'                  => '',
-        'code'                       => sprintf("%03d.%03d", intval($booking['name']) / 1000, intval($booking['name']) % 1000),
+        'code'                       => $printable_code,
         'company_name'               => $booking['center_id']['organisation_id']['legal_name'],
         'company_reg_number'         => $booking['center_id']['organisation_id']['registration_number'],
         'customer_address1'          => $booking['customer_id']['partner_identity_id']['address_street'],

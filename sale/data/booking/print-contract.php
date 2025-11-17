@@ -268,6 +268,13 @@ if(!$output) {
     $customer_name = substr($booking['customer_id']['partner_identity_id']['display_name'], 0,  66);
     $customer_address = $booking['customer_id']['partner_identity_id']['address_street'] .' '. $booking['customer_id']['partner_identity_id']['address_zip'].' '.$booking['customer_id']['partner_identity_id']['address_city'];
     $has_activity = Setting::get_value('sale', 'features', 'booking.activity', false);
+
+    $printable_code = sprintf("%04d.%03d", intval($booking['name']) / 1000, intval($booking['name']) % 1000);
+    // #kaleo - remove leading zero if present
+    if(substr($printable_code, 0, 1) === '0') {
+        $printable_code = substr($printable_code, 1);
+    }
+
     $values = [
         'attn_address1'               => '',
         'attn_address2'               => '',
@@ -281,7 +288,7 @@ if(!$output) {
         'center_office'               => $center_office_code,
         'center_phone'                => DataFormatter::format($booking['center_id']['phone'], 'phone'),
         'center_signature'            => $booking['center_id']['organisation_id']['signature'],
-        'code'                        => sprintf("%03d.%03d", intval($booking['name']) / 1000, intval($booking['name']) % 1000),
+        'code'                        => $printable_code,
         'company_address'             => sprintf("%s %s %s", $booking['center_id']['organisation_id']['address_street'], $booking['center_id']['organisation_id']['address_zip'], $booking['center_id']['organisation_id']['address_city']),
         'company_bic'                 => DataFormatter::format($booking['center_id']['organisation_id']['bank_account_bic'], 'bic'),
         'company_email'               => $booking['center_id']['organisation_id']['email'],
