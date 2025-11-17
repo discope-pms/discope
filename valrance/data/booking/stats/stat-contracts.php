@@ -539,7 +539,8 @@ use sale\customer\Customer;
         'content-type'  => 'application/json',
         'charset'       => 'utf-8',
         'accept-origin' => '*',
-        'cacheable'     => true,
+        // #memo - when cached, the annouce from model_schema generates an empty body (with fields: []) that prevents fields to be fetched
+        'cacheable'     => false,
         'cache-vary'    => ['body'],
         'expires'       => (60*60*1)
     ],
