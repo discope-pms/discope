@@ -93,6 +93,15 @@ class Funding extends Model {
                 'instant'           => true
             ],
 
+            'remaining_amount' => [
+                'type'              => 'computed',
+                'result_type'       => 'float',
+                'usage'             => 'amount/money:2',
+                'description'       => "Total amount that has not been received yet (0 if more received than what was due).",
+                'store'             => false,
+                'function'          => 'calcRemainingAmount'
+            ],
+
             'is_paid' => [
                 'type'              => 'computed',
                 'result_type'       => 'boolean',
@@ -195,6 +204,16 @@ class Funding extends Model {
                 $om->update(Enrollment::getType(), array_keys($map_enrollments_ids), ['payment_status' => null, 'paid_amount' => null]);
             }
         }
+        return $result;
+    }
+
+    public static function calcRemainingAmount($self): array {
+        $result = [];
+        $self->read(['due_amount', 'paid_amount']);
+        foreach($self as $id => $funding) {
+            $result[$id] = max(0, $funding['due_amount'] - $funding['paid_amount']);
+        }
+
         return $result;
     }
 
