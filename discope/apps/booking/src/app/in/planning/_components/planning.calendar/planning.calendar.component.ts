@@ -326,7 +326,7 @@ export class PlanningCalendarComponent implements OnInit, OnChanges, AfterViewIn
             let has_children_displayed = false;
             if(this.show_children && rentalUnit.has_children) {
                 for(let rt of this.rental_units) {
-                    if(rt.parent_id && rt.parent_id === rentalUnit.id) {
+                    if(rt.display_in_planning && rt.parent_id && rt.parent_id === rentalUnit.id) {
                         has_children_displayed = true;
                         break;
                     }
