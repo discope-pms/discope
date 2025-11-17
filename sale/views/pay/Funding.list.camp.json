@@ -7,6 +7,10 @@
      },
     "operations": {
         "total": {
+            "remaining_amount": {
+                "operation": "SUM",
+                "usage": "amount/money:2"
+            },
             "paid_amount": {
                 "operation": "SUM",
                 "usage": "amount/money:2"
@@ -88,6 +92,11 @@
             {
                 "type": "field",
                 "value": "paid_amount",
+                "width": "15%"
+            },
+            {
+                "type": "field",
+                "value": "remaining_amount",
                 "width": "15%"
             }
         ]
