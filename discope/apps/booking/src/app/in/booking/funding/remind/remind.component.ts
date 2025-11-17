@@ -419,7 +419,7 @@ export class BookingFundingRemindComponent implements OnInit, AfterContentInit {
                 let contact:any = new Contact();
                 for(let field of Object.getOwnPropertyNames(contact) ) {
                     if(contact.hasOwnProperty(field)) {
-                    contact[field] = item[field];
+                        contact[field] = item[field];
                     }
                 }
                 this.contacts.push(contact);
@@ -434,7 +434,7 @@ export class BookingFundingRemindComponent implements OnInit, AfterContentInit {
             let center:any = new Center();
             for(let field of Object.getOwnPropertyNames(center) ) {
                 if(item.hasOwnProperty(field)) {
-                center[field] = item[field];
+                    center[field] = item[field];
                 }
             }
             this.center = <Center> center;
@@ -454,7 +454,7 @@ export class BookingFundingRemindComponent implements OnInit, AfterContentInit {
             let office:any = new CenterOffice();
             for(let field of Object.getOwnPropertyNames(office) ) {
                 if(item.hasOwnProperty(field)) {
-                office[field] = item[field];
+                    office[field] = item[field];
                 }
             }
             this.office = <CenterOffice> office;
@@ -467,7 +467,7 @@ export class BookingFundingRemindComponent implements OnInit, AfterContentInit {
             let item = result[0];
             let organisation:any = new Organisation();
             for(let field of Object.getOwnPropertyNames(organisation) ) {
-                if(result.hasOwnProperty(field)) {
+                if(item.hasOwnProperty(field)) {
                     organisation[field] = item[field];
                 }
             }

@@ -481,7 +481,7 @@ export class BookingInvoiceComponent implements OnInit, AfterContentInit {
             let office:any = new CenterOffice();
             for(let field of Object.getOwnPropertyNames(office) ) {
                 if(item.hasOwnProperty(field)) {
-                office[field] = item[field];
+                    office[field] = item[field];
                 }
             }
             this.office = <CenterOffice> office;
@@ -494,7 +494,7 @@ export class BookingInvoiceComponent implements OnInit, AfterContentInit {
             let item = result[0];
             let organisation:any = new Organisation();
             for(let field of Object.getOwnPropertyNames(organisation) ) {
-                if(result.hasOwnProperty(field)) {
+                if(item.hasOwnProperty(field)) {
                     organisation[field] = item[field];
                 }
             }
