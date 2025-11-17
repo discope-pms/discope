@@ -104,6 +104,7 @@ if(!$booking['has_contract'] || empty($booking['contracts_ids'])) {
     throw new Exception("incompatible_status", QN_ERROR_INVALID_PARAM);
 }
 
+// by convention the most recent contract is listed first (see schema in sale/classes/booking/Booking.class.php)
 $last_contract_id = array_shift($booking['contracts_ids']);
 $contract = Contract::id($last_contract_id)->read(['status'])->first(true);
 
@@ -119,12 +120,9 @@ if($booking['date_from'] >= time() || in_array($booking['status'], ['credit_bala
 }
 */
 
-// by convention the most recent contract is listed first (see schema in sale/classes/booking/Booking.class.php)
-$contract_id = array_shift($booking['contracts_ids']);
-
 // generate attachment
 $attachment = eQual::run('get', 'sale_booking_print-contract', [
-    'id'        => $contract_id ,
+    'id'        => $contract['id'] ,
     'view_id'   =>'print.default',
     'lang'      => $params['lang'],
     'mode'      => $params['mode']
