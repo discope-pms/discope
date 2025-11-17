@@ -40,7 +40,7 @@ list($context, $orm, $auth) = [$providers['context'], $providers['orm'], $provid
 
 // read booking object
 $booking = Booking::id($params['id'])
-                  ->read(['id', 'status', 'nb_pers', 'is_from_channelmanager', 'booking_lines_ids', 'customer_id', 'customer_identity_id'])
+                  ->read(['id', 'type_id', 'status', 'nb_pers', 'is_from_channelmanager', 'booking_lines_ids', 'customer_id', 'customer_identity_id'])
                   ->first(true);
 
 if(!$booking) {
@@ -51,7 +51,7 @@ if($booking['status'] != 'checkedout') {
     throw new Exception("incompatible_status", QN_ERROR_INVALID_PARAM);
 }
 
-if($booking['is_from_channelmanager'] !== true && $booking['nb_pers'] > 9) {
+if($booking['is_from_channelmanager'] !== true && $booking['type_id'] !== 1) {
     throw new Exception("incompatible_booking", QN_ERROR_INVALID_PARAM);
 }
 
