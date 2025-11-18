@@ -230,6 +230,15 @@
                                 }
                             },
                             {
+                                "id": "stats.camps.enrollments.by-ages",
+                                "label": "By age",
+                                "description": "",
+                                "context": {
+                                    "entity": "sale\\camp\\stats\\stat-enrollments-by-ages",
+                                    "view": "list.default"
+                                }
+                            },
+                            {
                                 "id": "stats.camps.enrollments.by-months",
                                 "label": "By months",
                                 "description": "",
