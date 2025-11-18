@@ -33,6 +33,21 @@
             "description": "",
             "help": ""
         },
+        "location": {
+            "label": "Site",
+            "description": "",
+            "help": "",
+            "selection": {
+                "cricket": "Criquets",
+                "ladybug": "Coccinelles",
+                "dragonfly": "Libellules"
+            }
+        },
+        "employees": {
+            "label": "Animateurs",
+            "description": "",
+            "help": ""
+        },
         "age": {
             "label": "Age",
             "description": "",
@@ -55,6 +70,11 @@
         },
         "qty_new": {
             "label": "Qté nouveaux",
+            "description": "",
+            "help": ""
+        },
+        "qty_ase": {
+            "label": "Qté ASE",
             "description": "",
             "help": ""
         },

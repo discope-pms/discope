@@ -49,6 +49,20 @@ use sale\camp\Enrollment;
             'type'              => 'string',
             'description'       => "Name of the camp for the children quantities."
         ],
+        'location' => [
+            'type'              => 'string',
+            'description'       => "The location of the accommodation of camp.",
+            'help'              => "Depends on the camp age range.",
+            'selection'         => [
+                'cricket',
+                'ladybug',
+                'dragonfly'
+            ]
+        ],
+        'employees' => [
+            'type'              => 'string',
+            'description'       => "Names of the employees responsible for the camp groups."
+        ],
         'age' => [
             'type'              => 'string',
             'description'       => "The age(s) concerned by the quantities."
@@ -68,6 +82,10 @@ use sale\camp\Enrollment;
         'qty_new' => [
             'type'              => 'integer',
             'description'       => "Quantity of children attending who already have participated to a camp."
+        ],
+        'qty_ase' => [
+            'type'              => 'integer',
+            'description'       => "Quantity of ASE children attending the camp."
         ],
         'qty' => [
             'type'              => 'integer',
@@ -120,18 +138,25 @@ $camps = Camp::search($domain, ['sort' => ['date_from' => 'asc']])
     ->read([
         'name',
         'date_from',
+        'location',
         'center_id' => [
             'name'
         ],
         'enrollments_ids' => [
             'status',
+            'is_ase',
             'child_age',
             'child_id' => [
                 'gender'
             ]
+        ],
+        'camp_groups_ids' => [
+            'employee_id' => [
+                'name'
+            ]
         ]
     ])
-    ->get();
+    ->get(true);
 
 $map_children_ids = [];
 foreach($camps as $camp) {
@@ -162,6 +187,13 @@ foreach($children_enrollments as $enrollment) {
 foreach($camps as $camp) {
     $map_age_data = [];
 
+    $employees = [];
+    foreach($camp['camp_groups_ids'] as $group) {
+        if(isset($group['employee_id'])) {
+            $employees[] = $group['employee_id']['name'];
+        }
+    }
+
     foreach($camp['enrollments_ids'] as $enrollment) {
         if($enrollment['status'] !== 'validated') {
             continue;
@@ -170,11 +202,14 @@ foreach($camps as $camp) {
             $map_age_data[$enrollment['child_age']] = [
                 'center'        => $camp['center_id']['name'],
                 'camp'          => $camp['name'],
+                'location'      => $camp['location'],
+                'employees'     => implode(', ', $employees),
                 'age'           => $enrollment['child_age'],
                 'qty_male'      => 0,
                 'qty_female'    => 0,
                 'qty_old'       => 0,
                 'qty_new'       => 0,
+                'qty_ase'       => 0,
                 'qty'           => 0
             ];
         }
@@ -195,6 +230,10 @@ foreach($camps as $camp) {
         else {
             $map_age_data[$enrollment['child_age']]['qty_new']++;
         }
+
+        if($enrollment['is_ase']) {
+            $map_age_data[$enrollment['child_age']]['qty_ase']++;
+        }
     }
 
     if(empty($map_age_data)) {
@@ -211,11 +250,14 @@ foreach($camps as $camp) {
         $result[] = [
             'center'        => $camp['center_id']['name'],
             'camp'          => $camp['name'],
+            'location'      => $camp['location'],
+            'employees'     => implode(', ', $employees),
             'age'           => implode(', ', $ages),
             'qty_male'      => array_sum(array_column($map_age_data, 'qty_male')),
             'qty_female'    => array_sum(array_column($map_age_data, 'qty_female')),
             'qty_old'       => array_sum(array_column($map_age_data, 'qty_old')),
             'qty_new'       => array_sum(array_column($map_age_data, 'qty_new')),
+            'qty_ase'       => array_sum(array_column($map_age_data, 'qty_ase')),
             'qty'           => array_sum(array_column($map_age_data, 'qty'))
         ];
     }
