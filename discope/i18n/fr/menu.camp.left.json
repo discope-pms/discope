@@ -82,6 +82,10 @@
             "label": "À valider",
             "help": "Inscriptions en cours, récupération des documents et paiements."
         },
+        "pending.enrollments.registration-file": {
+            "label": "Gestion dossiers",
+            "help": "Toutes les inscription avec information à propos de la complétion du dossier."
+        },
         "financial-helps": {
             "label": "Aides financières",
             "help": ""
