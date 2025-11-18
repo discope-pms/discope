@@ -127,6 +127,16 @@
             "description": "Age maximum des participants.",
             "help": ""
         },
+        "location": {
+            "label": "Site",
+            "description": "Site d'hébergement du camp.",
+            "help": "En fonction de la tranche d'âge. Pas d'hébergement pour les camps CLSH.",
+            "selection": {
+                "cricket": "Criquets",
+                "ladybug": "Coccinelles",
+                "dragonfly": "Libellules"
+            }
+        },
         "employee_ratio": {
             "label": "Ratio employé",
             "description": "La quantité d'enfants qu'un employé peut géré seul.",

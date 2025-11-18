@@ -279,7 +279,7 @@ class Camp extends Model {
                     '6-to-14'
                 ],
                 'default'           => '10-to-12',
-                'dependents'        => ['min_age', 'max_age', 'camp_groups_ids' => ['age_range']]
+                'dependents'        => ['min_age', 'max_age', 'location', 'camp_groups_ids' => ['age_range']]
             ],
 
             'min_age' => [
@@ -298,6 +298,20 @@ class Camp extends Model {
                 'store'             => true,
                 'function'          => 'calcMaxAge',
                 'dependents'        => ['name']
+            ],
+
+            'location' => [
+                'type'              => 'computed',
+                'result_type'       => 'string',
+                'selection'         => [
+                    'cricket',
+                    'ladybug',
+                    'dragonfly'
+                ],
+                'description'       => "Location of the accommodation for the camp.",
+                'help'              => "Depends on the age range of the camp. No accommodation for CLSH camp.",
+                'store'             => true,
+                'function'          => 'calcLocation'
             ],
 
             'employee_ratio' => [
@@ -699,6 +713,26 @@ class Camp extends Model {
                     break;
                 case '13-to-16':
                     $result[$id] = 16;
+                    break;
+            }
+        }
+
+        return $result;
+    }
+
+    public static function calcLocation($self): array {
+        $result = [];
+        $self->read(['age_range']);
+        foreach($self as $id => $camp) {
+            switch($camp['age_range']) {
+                case '6-to-9':
+                    $result[$id] = 'cricket';
+                    break;
+                case '10-to-12':
+                    $result[$id] = 'ladybug';
+                    break;
+                case '13-to-16':
+                    $result[$id] = 'dragonfly';
                     break;
             }
         }

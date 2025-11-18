@@ -177,7 +177,7 @@ foreach($camps as $camp) {
     ];
 
     foreach($camp['enrollments_ids'] as $enrollment) {
-        if($enrollment['status'] === 'cancelled') {
+        if($enrollment['status'] !== 'validated') {
             continue;
         }
 
