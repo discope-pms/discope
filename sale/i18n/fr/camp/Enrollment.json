@@ -66,6 +66,26 @@
             "description": "Camp auquel l'enfant s'inscrit.",
             "help": ""
         },
+        "camp_name": {
+            "label": "Camp",
+            "description": "Camp auquel l'enfant s'inscrit.",
+            "help": ""
+        },
+        "camp_employees": {
+            "label": "Animateurs",
+            "description": "Animateurs responsables des groupes du camp.",
+            "help": ""
+        },
+        "camp_location": {
+            "label": "Site",
+            "description": "Site d'hébergement du camp.",
+            "selection": {
+                "cricket": "Criquets",
+                "ladybug": "Coccinelles",
+                "dragonfly": "Libellules"
+            },
+            "help": ""
+        },
         "camp_remaining_qty": {
             "label": "Places restantes",
             "description": "Nombre de places restantes du camp.",

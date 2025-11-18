@@ -1,0 +1,102 @@
+{
+    "name": "Enrollments",
+    "order": "child_lastname",
+    "sort": "asc",
+    "controller": "sale_camp_collect-enrollments",
+    "layout": {
+        "items": [
+            {
+                "type": "field",
+                "value": "id",
+                "width": "5%",
+                "sortable": false,
+                "readonly": true,
+                "visible": false
+            },
+            {
+                "type": "field",
+                "value": "child_lastname",
+                "width": "20%",
+                "sortable": false,
+                "readonly": true
+            },
+            {
+                "type": "field",
+                "value": "child_firstname",
+                "width": "20%",
+                "sortable": false,
+                "readonly": false
+            },
+            {
+                "type": "field",
+                "value": "child_gender",
+                "width": "20%",
+                "sortable": false,
+                "readonly": false
+            },
+            {
+                "type": "field",
+                "value": "child_birthdate",
+                "width": "20%",
+                "sortable": false,
+                "readonly": false
+            },
+            {
+                "type": "field",
+                "value": "child_age",
+                "width": "20%",
+                "sortable": false,
+                "readonly": false
+            },
+            {
+                "type": "field",
+                "value": "child_remarks",
+                "width": "20%",
+                "sortable": false,
+                "readonly": false
+            },
+            {
+                "type": "field",
+                "value": "all_documents_received",
+                "width": "20%",
+                "sortable": false,
+                "readonly": false
+            },
+            {
+                "type": "field",
+                "value": "doc_aquatic_skills_received",
+                "width": "20%",
+                "sortable": false,
+                "readonly": false
+            },
+            {
+                "type": "field",
+                "value": "camp_name",
+                "width": "33%",
+                "sortable": false,
+                "readonly": false
+            },
+            {
+                "type": "field",
+                "value": "camp_employees",
+                "width": "20%",
+                "sortable": false,
+                "readonly": false
+            },
+            {
+                "type": "field",
+                "value": "camp_location",
+                "width": "20%",
+                "sortable": false,
+                "readonly": false
+            },
+            {
+                "type": "field",
+                "value": "description",
+                "width": "20%",
+                "sortable": false,
+                "readonly": false
+            }
+        ]
+    }
+}

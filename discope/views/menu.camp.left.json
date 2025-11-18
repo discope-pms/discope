@@ -269,6 +269,18 @@
                                     "entity": "sale\\camp\\Enrollment",
                                     "view": "list.confirmed"
                                 }
+                            },
+                            {
+                                "id": "pending.enrollments.registration-file",
+                                "type": "entry",
+                                "label": "Handle registration files",
+                                "description": "List all enrollments, with info about the registration file completion.",
+                                "icon": "",
+                                "route": "/camps",
+                                "context": {
+                                    "entity": "sale\\camp\\Enrollment",
+                                    "view": "list.registration-file"
+                                }
                             }
                         ]
                     }

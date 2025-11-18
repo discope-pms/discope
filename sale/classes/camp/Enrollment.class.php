@@ -187,6 +187,35 @@ class Enrollment extends Model {
                 'dependents'        => ['date_from', 'date_to', 'is_clsh', 'clsh_type', 'child_age']
             ],
 
+            'camp_name' => [
+                'type'              => 'computed',
+                'result_type'       => 'string',
+                'description'       => "Name of the camp, sojourn number + short name.",
+                'store'             => false,
+                'function'          => 'calcCampName'
+            ],
+
+            'camp_employees' => [
+                'type'              => 'computed',
+                'result_type'       => 'string',
+                'description'       => "Name of the camp.",
+                'store'             => false,
+                'function'          => 'calcCampEmployees'
+            ],
+
+            'camp_location' => [
+                'type'              => 'computed',
+                'result_type'       => 'string',
+                'selection'         => [
+                    'cricket',
+                    'ladybug',
+                    'dragonfly'
+                ],
+                'description'       => "Location of the camp.",
+                'store'             => false,
+                'relation'          => ['camp_id' => 'location']
+            ],
+
             'camp_remaining_qty' => [
                 'type'              => 'computed',
                 'result_type'       => 'integer',
@@ -748,6 +777,33 @@ class Enrollment extends Model {
         $self->read(['id']);
         foreach($self as $id => $enrollment) {
             $result[$id] = false;
+        }
+
+        return $result;
+    }
+
+    public static function calcCampName($self): array {
+        $result = [];
+        $self->read(['camp_id' => ['sojourn_number', 'short_name']]);
+        foreach($self as $id => $enrollment) {
+            $result[$id] =  str_pad($enrollment['camp_id']['sojourn_number'], 3, '0', STR_PAD_LEFT).' '.$enrollment['camp_id']['short_name'];
+        }
+
+        return $result;
+    }
+
+    public static function calcCampEmployees($self): array {
+        $result = [];
+        $self->read(['camp_id' => ['camp_groups_ids' => ['employee_id' => ['partner_identity_id' => ['lastname', 'firstname']]]]]);
+        foreach($self as $id => $enrollment) {
+            $employees = [];
+            foreach($enrollment['camp_id']['camp_groups_ids'] as $group) {
+                if(!is_null($group['employee_id']['partner_identity_id'])) {
+                    $employees[] = $group['employee_id']['partner_identity_id']['firstname'].' '.substr($group['employee_id']['partner_identity_id']['lastname'], 0, 1).'.';
+                }
+            }
+
+            $result[$id] = implode(' + ', $employees);
         }
 
         return $result;
