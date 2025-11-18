@@ -4,16 +4,20 @@
     "description": "Statistiques quantités d'inscriptions par département et communes.",
     "model": {
         "all_centers": {
-            "label": "Tous les centres"
+            "label": "Tous les centres",
+            "description": "Afficher tous les centres."
         },
         "center_id": {
-            "label": "Centre"
+            "label": "Centre",
+            "description": "Centre à afficher."
         },
         "date_from": {
-            "label": "Du"
+            "label": "Du",
+            "description": "Date début de l'interval."
         },
         "date_to": {
-            "label": "Au"
+            "label": "Au",
+            "description": "Date fin de l'interval."
         },
         "by_municipality": {
             "label": "Par commune (86, 87)"

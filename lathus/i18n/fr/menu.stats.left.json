@@ -50,6 +50,10 @@
             "label": "Par semaines",
             "help": ""
         },
+        "stats.camps.children.summer-clsh": {
+            "label": "CLSH été",
+            "help": ""
+        },
         "stats.camps.enrollments": {
             "label": "Inscriptions",
             "help": ""

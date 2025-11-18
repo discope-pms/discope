@@ -88,7 +88,7 @@ $json_adapter = $adapter_provider->get('json');
 $domain = [
     ['date_from', '>=', $params['date_from']],
     ['date_from', '<=', $params['date_to']],
-    ['status', '<>', 'cancelled']
+    ['status', '=', 'published']
 ];
 
 if($params['all_centers']) {

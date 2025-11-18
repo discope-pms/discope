@@ -1,7 +1,7 @@
 {
-    "name": "Statistiques quantités d'inscriptions par mois.",
+    "name": "Statistiques quantités de jours d'inscriptions pour les camps CLSH.",
     "plural": "",
-    "description": "Statistiques quantités d'inscriptions par mois.",
+    "description": "Statistiques quantités de jours d'inscriptions pour les camps CLSH durant l'été de l'année sélectionnée.",
     "model": {
         "all_centers": {
             "label": "Tous les centres",
@@ -11,46 +11,37 @@
             "label": "Centre",
             "description": "Centre à afficher."
         },
-        "date_from": {
-            "label": "Du",
-            "description": "Date début de l'interval."
-        },
-        "date_to": {
-            "label": "Au",
-            "description": "Date fin de l'interval."
+        "year": {
+            "label": "Année",
+            "description": "Année concernée."
         },
         "center": {
             "label": "Centre",
             "description": "",
             "help": ""
         },
-        "month": {
-            "label": "Mois",
+        "child_name": {
+            "label": "Nom enfant",
             "description": "",
             "help": ""
         },
-        "qty_pending": {
-            "label": "Qté brouillons",
+        "age_range_6_9": {
+            "label": "6 - 9 ans",
             "description": "",
             "help": ""
         },
-        "qty_waitlisted": {
-            "label": "Qté en attentes",
+        "age_range_10_14": {
+            "label": "10 - 14 ans",
             "description": "",
             "help": ""
         },
-        "qty_confirmed": {
-            "label": "Qté confirmées",
+        "qty_july": {
+            "label": "Qté juillet",
             "description": "",
             "help": ""
         },
-        "qty_validated": {
-            "label": "Qté validées",
-            "description": "",
-            "help": ""
-        },
-        "qty_cancelled": {
-            "label": "Qté annulées",
+        "qty_august": {
+            "label": "Qté août",
             "description": "",
             "help": ""
         },
@@ -67,7 +58,7 @@
             "layout": {}
         },
         "list.default": {
-            "name": "Quantités d'inscriptions par mois",
+            "name": "Quantités d'enfants par semaines",
             "description": "",
             "layout": {}
         }

@@ -5,19 +5,19 @@
     "model": {
         "all_centers": {
             "label": "Tous les centres",
-            "description": "Afficher tous les centres"
+            "description": "Afficher tous les centres."
         },
         "center_id": {
             "label": "Centre",
-            "description": "Centre à afficher"
+            "description": "Centre à afficher."
         },
         "date_from": {
             "label": "Du",
-            "description": "Date début de l'interval"
+            "description": "Date début de l'interval."
         },
         "date_to": {
             "label": "Au",
-            "description": "Date fin de l'interval"
+            "description": "Date fin de l'interval."
         },
         "center": {
             "label": "Centre",
