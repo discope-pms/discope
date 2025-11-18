@@ -1,7 +1,7 @@
 {
-    "name": "Statistiques quantités d'inscriptions par tranches d'âge.",
+    "name": "Statistiques quantités d'inscriptions par âges.",
     "plural": "",
-    "description": "Statistiques quantités d'inscriptions par tranches d'âge.",
+    "description": "Statistiques quantités d'inscriptions par âges.",
     "model": {
         "all_centers": {
             "label": "Tous les centres",
@@ -21,8 +21,8 @@
             "description": "",
             "help": ""
         },
-        "age_range": {
-            "label": "Tranche d'age",
+        "age": {
+            "label": "Âge",
             "description": "",
             "help": ""
         },
@@ -52,7 +52,7 @@
             "layout": {}
         },
         "list.default": {
-            "name": "Quantités d'inscriptions par tranches d'âge",
+            "name": "Quantités d'inscriptions par âges",
             "description": "",
             "layout": {}
         }
