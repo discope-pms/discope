@@ -126,6 +126,16 @@
                                     "entity": "sale\\camp\\stats\\stat-camps-children-distribution",
                                     "view": "list.default"
                                 }
+                            },
+                            {
+                                "id": "stats.camps.camps.ages-distribution",
+                                "type": "entry",
+                                "label": "Ages distribution",
+                                "description": "Ages distribution.",
+                                "context": {
+                                    "entity": "sale\\camp\\stats\\stat-camps-ages-distribution",
+                                    "view": "list.default"
+                                }
                             }
                         ]
                     },

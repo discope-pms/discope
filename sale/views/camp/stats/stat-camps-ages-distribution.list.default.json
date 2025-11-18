@@ -1,0 +1,135 @@
+{
+    "name": "Stat Camps Children Ages Quantities",
+    "description": "",
+    "controller": "sale_camp_stats_stat-camps-ages-distribution",
+    "header": {
+        "actions": {
+            "ACTION.CREATE": false
+        },
+        "advanced_search": {
+            "open": true
+        }
+    },
+    "group_by": [
+        { "field": "center", "operations": ["SUM", "object.qty"], "open": true }
+    ],
+    "operations": {
+        "total": {
+            "qty": {
+                "operation": "SUM",
+                "usage": "numeric/integer"
+            },
+            "4_year_old_qty": {
+                "operation": "SUM",
+                "usage": "numeric/integer"
+            },
+            "5_6_year_old_qty": {
+                "operation": "SUM",
+                "usage": "numeric/integer"
+            },
+            "7_8_year_old_qty": {
+                "operation": "SUM",
+                "usage": "numeric/integer"
+            },
+            "9_10_year_old_qty": {
+                "operation": "SUM",
+                "usage": "numeric/integer"
+            },
+            "11_12_year_old_qty": {
+                "operation": "SUM",
+                "usage": "numeric/integer"
+            },
+            "13_14_year_old_qty": {
+                "operation": "SUM",
+                "usage": "numeric/integer"
+            },
+            "15_year_old_qty": {
+                "operation": "SUM",
+                "usage": "numeric/integer"
+            },
+            "16_17_year_old_qty": {
+                "operation": "SUM",
+                "usage": "numeric/integer"
+            },
+            "no_year_old_qty": {
+                "operation": "SUM",
+                "usage": "numeric/integer"
+            }
+        }
+    },
+    "layout": {
+        "items": [
+            {
+                "type": "field",
+                "value": "center",
+                "sortable": true,
+                "width": "20%"
+            },
+            {
+                "type": "field",
+                "value": "code",
+                "width": "20%"
+            },
+            {
+                "type": "field",
+                "value": "camp",
+                "width": "50%"
+            },
+            {
+                "type": "field",
+                "value": "age_range",
+                "width": "20%"
+            },
+            {
+                "type": "field",
+                "value": "qty",
+                "width": "20%"
+            },
+            {
+                "type": "field",
+                "value": "4_year_old_qty",
+                "width": "20%"
+            },
+            {
+                "type": "field",
+                "value": "5_6_year_old_qty",
+                "width": "20%"
+            },
+            {
+                "type": "field",
+                "value": "7_8_year_old_qty",
+                "width": "20%"
+            },
+            {
+                "type": "field",
+                "value": "9_10_year_old_qty",
+                "width": "20%"
+            },
+            {
+                "type": "field",
+                "value": "11_12_year_old_qty",
+                "width": "20%"
+            },
+            {
+                "type": "field",
+                "value": "13_14_year_old_qty",
+                "width": "20%"
+            },
+            {
+                "type": "field",
+                "value": "15_year_old_qty",
+                "width": "20%"
+            },
+            {
+                "type": "field",
+                "value": "16_17_year_old_qty",
+                "width": "20%"
+            },
+            {
+                "type": "field",
+                "value": "no_year_old_qty",
+                "width": "20%"
+            }
+        ]
+    }
+}

@@ -38,6 +38,10 @@
             "label": "Distribution enfants",
             "help": ""
         },
+        "stats.camps.camps.ages-distribution": {
+            "label": "Distribution âges",
+            "help": ""
+        },
         "stats.camps.children": {
             "label": "Enfants",
             "help": ""
