@@ -1,7 +1,7 @@
 {
-    "name": "Statistiques quantités d'enfants par camps et centres.",
+    "name": "Statistiques quantités d'enfants par âges par camps et centres.",
     "plural": "",
-    "description": "Statistiques quantités d'enfants par camps et centres.",
+    "description": "Statistiques quantités d'enfants par âges par camps et centres.",
     "model": {
         "all_centers": {
             "label": "Tous les centres",
@@ -19,10 +19,6 @@
             "label": "Au",
             "description": "Date fin de l'interval"
         },
-        "by_age": {
-            "label": "Par âge",
-            "description": "Séparation par âge"
-        },
         "center": {
             "label": "Centre",
             "description": "",
@@ -33,33 +29,53 @@
             "description": "",
             "help": ""
         },
-        "age": {
-            "label": "Age",
-            "description": "",
-            "help": ""
-        },
-        "qty_male": {
-            "label": "Qté garçons",
-            "description": "",
-            "help": ""
-        },
-        "qty_female": {
-            "label": "Qté filles",
-            "description": "",
-            "help": ""
-        },
-        "qty_old": {
-            "label": "Qté anciens",
-            "description": "",
-            "help": ""
-        },
-        "qty_new": {
-            "label": "Qté nouveaux",
-            "description": "",
-            "help": ""
-        },
         "qty": {
             "label": "Qté",
+            "description": "",
+            "help": ""
+        },
+        "4_year_old_qty": {
+            "label": "4 ans",
+            "description": "",
+            "help": ""
+        },
+        "5_6_year_old_qty": {
+            "label": "5-6 ans",
+            "description": "",
+            "help": ""
+        },
+        "7_8_year_old_qty": {
+            "label": "7-8 ans",
+            "description": "",
+            "help": ""
+        },
+        "9_10_year_old_qty": {
+            "label": "9-10 ans",
+            "description": "",
+            "help": ""
+        },
+        "11_12_year_old_qty": {
+            "label": "11-12 ans",
+            "description": "",
+            "help": ""
+        },
+        "13_14_year_old_qty": {
+            "label": "13-14 ans",
+            "description": "",
+            "help": ""
+        },
+        "15_year_old_qty": {
+            "label": "15 ans",
+            "description": "",
+            "help": ""
+        },
+        "16_17_year_old_qty": {
+            "label": "16-17 ans",
+            "description": "",
+            "help": ""
+        },
+        "no_year_old_qty": {
+            "label": "sans âge",
             "description": "",
             "help": ""
         }
@@ -71,7 +87,7 @@
             "layout": {}
         },
         "list.default": {
-            "name": "Distribution enfants",
+            "name": "Distribution par âges",
             "description": "",
             "layout": {}
         }
