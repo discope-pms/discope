@@ -80,6 +80,8 @@ $camps = Camp::search(
             'weekend_extra',
             'is_ase',
             'child_remarks',
+            'main_guardian_mobile',
+            'main_guardian_phone',
             'camp_id'           => ['name'],
             'main_guardian_id'  => ['name'],
             'institution_id'    => ['name']

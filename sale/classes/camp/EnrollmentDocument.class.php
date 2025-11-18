@@ -20,7 +20,8 @@ class EnrollmentDocument extends Model {
                 'foreign_object'    => 'sale\camp\Enrollment',
                 'required'          => true,
                 'readonly'          => true,
-                'ondelete'          => 'cascade'
+                'ondelete'          => 'cascade',
+                'onupdate'          => 'onupdateEnrollmentId'
             ],
 
             'document_id' => [
@@ -46,11 +47,25 @@ class EnrollmentDocument extends Model {
         ];
     }
 
+    public static function onupdateEnrollmentId($self) {
+        $self->read(['enrollment_id']);
+        foreach($self as $enrollment_doc) {
+            // reset all documents received computed value
+            Enrollment::id($enrollment_doc['enrollment_id'])->update([
+                'all_documents_received'        => null,
+                'doc_aquatic_skills_received'   => null
+            ]);
+        }
+    }
+
     public static function onupdateReceived($self) {
         $self->read(['enrollment_id']);
         foreach($self as $enrollment_doc) {
-            Enrollment::id($enrollment_doc['enrollment_id'])
-                ->update(['all_documents_received' => null]);
+            // reset all documents received computed value
+            Enrollment::id($enrollment_doc['enrollment_id'])->update([
+                'all_documents_received'        => null,
+                'doc_aquatic_skills_received'   => null
+            ]);
         }
     }
 }

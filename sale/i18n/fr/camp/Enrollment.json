@@ -255,6 +255,11 @@
             "description": "Tous les documents requis pour le camp ont bien été reçus.",
             "help": ""
         },
+        "doc_aquatic_skills_received": {
+            "label": "Doc aptitudes aquatique reçus",
+            "description": "Le document attestant des compétences aquatique de l'enfant a été reçus.",
+            "help": ""
+        },
         "paid_amount": {
             "label": "Reçu",
             "description": "Montant reçu pour l'inscription.",
@@ -273,6 +278,16 @@
             "label": "Responsable",
             "description": "Le tuteur principal responsable de l'enfant.",
             "help": "Utilisé pour savoir quelle adresse utiliser pour la facturation."
+        },
+        "main_guardian_mobile": {
+            "label": "Mobile",
+            "description": "Numéro de téléphone mobile du tuteur.",
+            "help": ""
+        },
+        "main_guardian_phone": {
+            "label": "Téléphone",
+            "description": "Numéro de téléphone du tuteur.",
+            "help": ""
         },
         "is_foster": {
             "label": "Famille d'accueil",
