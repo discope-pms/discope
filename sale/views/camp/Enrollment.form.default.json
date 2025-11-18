@@ -296,6 +296,12 @@
                                                 "visible": false
                                             },
                                             {
+                                                "type": "field",
+                                                "value": "doc_aquatic_skills_received",
+                                                "width": "50%",
+                                                "visible": false
+                                            },
+                                            {
                                                 "type": "label",
                                                 "value": "",
                                                 "width": "33%",

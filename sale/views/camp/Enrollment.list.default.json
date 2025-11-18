@@ -22,6 +22,27 @@
             },
             {
                 "type": "field",
+                "value": "main_guardian_id",
+                "width": "20%",
+                "sortable": false,
+                "readonly": false
+            },
+            {
+                "type": "field",
+                "value": "main_guardian_mobile",
+                "width": "20%",
+                "sortable": false,
+                "readonly": true
+            },
+            {
+                "type": "field",
+                "value": "main_guardian_phone",
+                "width": "20%",
+                "sortable": false,
+                "readonly": true
+            },
+            {
+                "type": "field",
                 "value": "date_created",
                 "width": "20%",
                 "sortable": false,
@@ -83,6 +104,38 @@
                 "width": "20%",
                 "sortable": false,
                 "readonly": true
+            },
+            {
+                "type": "field",
+                "value": "doc_aquatic_skills_received",
+                "width": "20%",
+                "sortable": false,
+                "readonly": true,
+                "visible": false
+            },
+            {
+                "type": "field",
+                "value": "all_documents_received",
+                "width": "20%",
+                "sortable": false,
+                "readonly": true,
+                "visible": false
+            },
+            {
+                "type": "field",
+                "value": "description",
+                "width": "20%",
+                "sortable": false,
+                "readonly": true,
+                "visible": false
+            },
+            {
+                "type": "field",
+                "value": "child_remarks",
+                "width": "20%",
+                "sortable": false,
+                "readonly": true,
+                "visible": false
             }
         ]
     }

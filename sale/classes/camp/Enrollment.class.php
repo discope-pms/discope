@@ -131,6 +131,24 @@ class Enrollment extends Model {
                 'relation'          => ['child_id' => ['main_guardian_id']]
             ],
 
+            'main_guardian_mobile' => [
+                'type'              => 'computed',
+                'result_type'       => 'string',
+                'usage'             => 'phone',
+                'description'       => "Mobile phone number of the main guardian of the child.",
+                'store'             => false,
+                'relation'          => ['main_guardian_id' => ['mobile']]
+            ],
+
+            'main_guardian_phone' => [
+                'type'              => 'computed',
+                'result_type'       => 'string',
+                'usage'             => 'phone',
+                'description'       => "Phone number of the main guardian of the child.",
+                'store'             => false,
+                'relation'          => ['main_guardian_id' => ['phone']]
+            ],
+
             'is_foster' => [
                 'type'              => 'computed',
                 'result_type'       => 'boolean',
@@ -466,6 +484,14 @@ class Enrollment extends Model {
                 'description'       => "Have all required documents been received?",
                 'store'             => true,
                 'function'          => 'calcAllDocumentsReceived'
+            ],
+
+            'doc_aquatic_skills_received' => [
+                'type'              => 'computed',
+                'result_type'       => 'boolean',
+                'description'       => "Has aquatic skills doc been received?",
+                'store'             => true,
+                'function'          => 'calcDocAquaticSkillsReceived'
             ],
 
             'is_locked' => [
@@ -885,6 +911,24 @@ class Enrollment extends Model {
         return $result;
     }
 
+    public static function calcDocAquaticSkillsReceived($self): array {
+        $result = [];
+        $self->read(['enrollment_documents_ids' => ['document_id' => ['doc_type'], 'received']]);
+        foreach($self as $id => $enrollment) {
+            $doc_aquatic_skill_received = false;
+            foreach($enrollment['enrollment_documents_ids'] as $doc) {
+                if($doc['document_id']['doc_type'] === 'aquatic-skills' && $doc['received']) {
+                    $doc_aquatic_skill_received = true;
+                    break;
+                }
+            }
+
+            $result[$id] = $doc_aquatic_skill_received;
+        }
+
+        return $result;
+    }
+
     public static function calcPaymentStatus($self): array {
         $result = [];
         $self->read(['status', 'fundings_ids' => ['due_date', 'is_paid']]);
@@ -1168,7 +1212,7 @@ class Enrollment extends Model {
             'presence_day_1', 'presence_day_2', 'presence_day_3', 'presence_day_4', 'presence_day_5'
         ]);
 
-        $allowed_keys = ['is_locked', 'status', 'description', 'all_documents_received', 'payment_status', 'paid_amount', 'cancellation_date', 'preregistration_sent', 'confirmation_sent', 'enrollment_mails_ids'];
+        $allowed_keys = ['is_locked', 'status', 'description', 'all_documents_received', 'doc_aquatic_skills_received', 'payment_status', 'paid_amount', 'cancellation_date', 'preregistration_sent', 'confirmation_sent', 'enrollment_mails_ids'];
 
         // weekend_extra can be modified to alter presences, but it'll not affect lines for external enrollments, only presences
         $external_allowed_keys = ['weekend_extra'];
@@ -2003,7 +2047,10 @@ class Enrollment extends Model {
         }
 
         // reset all documents received computed value
-        $self->update(['all_documents_received' => null]);
+        $self->update([
+            'all_documents_received'        => null,
+            'doc_aquatic_skills_received'   => null
+        ]);
     }
 
     public static function doGenerateFunding($self) {

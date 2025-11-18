@@ -79,8 +79,21 @@
                 "value": "main_guardian_id",
                 "width": "20%",
                 "sortable": false,
-                "readonly": true,
-                "visible": false
+                "readonly": true
+            },
+            {
+                "type": "field",
+                "value": "main_guardian_mobile",
+                "width": "20%",
+                "sortable": false,
+                "readonly": true
+            },
+            {
+                "type": "field",
+                "value": "main_guardian_phone",
+                "width": "20%",
+                "sortable": false,
+                "readonly": true
             },
             {
                 "type": "field",
@@ -101,6 +114,22 @@
             {
                 "type": "field",
                 "value": "is_ase",
+                "width": "20%",
+                "sortable": false,
+                "readonly": true,
+                "visible": false
+            },
+            {
+                "type": "field",
+                "value": "description",
+                "width": "20%",
+                "sortable": false,
+                "readonly": true,
+                "visible": false
+            },
+            {
+                "type": "field",
+                "value": "child_remarks",
                 "width": "20%",
                 "sortable": false,
                 "readonly": true,

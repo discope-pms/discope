@@ -31,6 +31,20 @@ class Document extends Model {
                 'usage'             => 'text/plain'
             ],
 
+            'doc_type' => [
+                'type'              => 'string',
+                'description'       => "Type of the document.",
+                'selection'         => [
+                    'aquatic-skills',
+                    'contact-form',
+                    'health-record',
+                    'social-security-number',
+                    'vaccines',
+                    'other'
+                ],
+                'default'           => 'other',
+            ],
+
             'camp_models_ids' => [
                 'type'              => 'many2many',
                 'foreign_object'    => 'sale\camp\CampModel',

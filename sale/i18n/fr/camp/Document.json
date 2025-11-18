@@ -8,13 +8,16 @@
             "description": "Description du document.",
             "help": ""
         },
-        "enrollment_type": {
-            "label": "Description",
-            "description": "Description du document.",
+        "doc_type": {
+            "label": "Type",
+            "description": "Type du document.",
             "selection": {
-                "other": "Autre",
-                "help-ccvg": "Aide CCVG (Communauté de communes Vienne et Gartempe)",
-                "health-sheet": "Fiche sanitaire"
+                "aquatic-skills": "Aptitudes activités aquatiques",
+                "contact-form": "Fiche contact",
+                "health-record": "Fiche sanitaire",
+                "social-security-number": "Numéro de sécu",
+                "vaccines": "Vaccins",
+                "other": "Autre"
             },
             "help": ""
         }
