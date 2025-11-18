@@ -36,6 +36,7 @@ class Center {
         public name: string = '',
         public email: string = '',
         public organisation_id: number = 0,
+        public center_office_id: number = 0,
         public template_category_id: number = 0
     ) {}
 }
@@ -45,6 +46,7 @@ class CenterOffice {
         public id: number = 0,
         public name: string = '',
         public email: string = '',
+        public email_alt: string = '',
         public code: number = 0,
     ) {}
 }
@@ -441,7 +443,7 @@ export class BookingFundingRemindComponent implements OnInit, AfterContentInit {
             if(this.center.organisation_id) {
                 await this.loadOrganisation();
             }
-            if(this.center.use_office_details && this.center.center_office_id) {
+            if(this.center.center_office_id) {
                 await this.loadCenterOffice();
             }
         }
@@ -482,9 +484,15 @@ export class BookingFundingRemindComponent implements OnInit, AfterContentInit {
         this.vm.sender.formControl.reset();
 
         // 1) email of Center's Office, if any
-        if(this.center.use_office_details && this.office && this.office.email.length) {
+        if(this.office && this.office.email.length) {
             if(!this.vm.sender.addresses.includes(this.office.email)) {
                 this.vm.sender.addresses.push(this.office.email);
+            }
+        }
+
+        if(this.office && this.office.email_alt && this.office.email_alt.length) {
+            if(!this.vm.sender.addresses.includes(this.office.email_alt)) {
+                this.vm.sender.addresses.push(this.office.email_alt);
             }
         }
 
