@@ -1,0 +1,72 @@
+{
+    "name": "Stat Enrollments for CLSH camps during summer.",
+    "description": "",
+    "controller": "sale_camp_stats_stat-children-summer-clsh",
+    "header": {
+        "actions": {
+            "ACTION.CREATE": false
+        },
+        "advanced_search": {
+            "open": true
+        }
+    },
+    "group_by": [
+        { "field": "center", "operations": ["SUM", "object.qty"], "open": true }
+    ],
+    "operations": {
+        "total": {
+            "qty_july": {
+                "operation": "SUM",
+                "usage": "numeric/integer"
+            },
+            "qty_august": {
+                "operation": "SUM",
+                "usage": "numeric/integer"
+            },
+            "qty": {
+                "operation": "SUM",
+                "usage": "numeric/integer"
+            }
+        }
+    },
+    "layout": {
+        "items": [
+            {
+                "type": "field",
+                "value": "center",
+                "sortable": true,
+                "width": "20%"
+            },
+            {
+                "type": "field",
+                "value": "child_name",
+                "width": "20%"
+            },
+            {
+                "type": "field",
+                "value": "age_range_6_9",
+                "width": "20%"
+            },
+            {
+                "type": "field",
+                "value": "age_range_10_14",
+                "width": "20%"
+            },
+            {
+                "type": "field",
+                "value": "qty_july",
+                "width": "10%"
+            },
+            {
+                "type": "field",
+                "value": "qty_august",
+                "width": "10%"
+            },
+            {
+                "type": "field",
+                "value": "qty",
+                "width": "10%"
+            }
+        ]
+    }
+}

@@ -155,6 +155,16 @@
                                     "entity": "sale\\camp\\stats\\stat-children-by-weeks",
                                     "view": "list.default"
                                 }
+                            },
+                            {
+                                "id": "stats.camps.children.summer-clsh",
+                                "type": "entry",
+                                "label": "CLSH summer",
+                                "description": "Children attending CLSH camps.",
+                                "context": {
+                                    "entity": "sale\\camp\\stats\\stat-children-summer-clsh",
+                                    "view": "list.default"
+                                }
                             }
                         ]
                     },
