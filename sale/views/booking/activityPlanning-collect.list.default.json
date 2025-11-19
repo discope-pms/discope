@@ -1,0 +1,56 @@
+{
+    "name": "Activity planning",
+    "description": "Advanced collector for activities booking lines planning.",
+    "access": {
+        "groups": ["booking.default.user"]
+    },
+    "header": {
+        "actions": {
+            "ACTION.CREATE": false
+        },
+        "advanced_search": {
+            "open": true
+        }
+    },
+    "actions": [
+        {
+            "id": "action.print-activities-planning",
+            "label": "Planning",
+            "description": "Print the planning of activities.",
+            "controller": "sale_booking_print-booking-activities"
+        }
+    ],
+    "controller": "sale_booking_activityPlanning-collect",
+    "group_by": ["product"],
+    "layout": {
+        "items": [
+            {
+                "type": "field",
+                "value": "id",
+                "width": "10%",
+                "visible": false
+            },
+            {
+                "type": "field",
+                "value": "product",
+                "width": "20%",
+                "visible": false
+            },
+            {
+                "type": "field",
+                "value": "date",
+                "width": "20%"
+            },
+            {
+                "type": "field",
+                "value": "time_slot",
+                "width": "20%"
+            },
+            {
+                "type": "field",
+                "value": "customer",
+                "width": "20%"
+            }
+        ]
+    }
+}

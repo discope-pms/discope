@@ -1,0 +1,154 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xml:lang="en" xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+
+<title>Programme d'activités</title>
+<style type="text/css">
+@page {
+  margin: 0.5cm;
+}
+body {
+    margin: 45px 0 35px;
+    padding: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 0.7em;
+    text-align: justify;
+    width: 100%;
+}
+
+h2 {
+    margin-top: 8px;
+    margin-bottom: 0;
+    font-size: 21px;
+}
+
+h3 {
+    margin-top: 0;
+    margin-bottom: 0;
+    font-size: 15px;
+}
+
+div, table, table tr td {
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+div.header,
+div.footer {
+    box-sizing: border-box;
+    border: 0;
+    margin: 0;
+    padding: 0;
+    position: fixed;
+    width: 100%;
+    overflow: hidden;
+}
+
+div.header {
+    top: 0;
+    left: 0;
+    height: 40px;
+}
+
+div.header .title {
+    width: 100%;
+    text-align: center;
+}
+
+div.footer {
+    bottom: 0;
+    left: 0;
+    height: 30px;
+    overflow: visible;
+    z-index: 200;
+    font-size: 0.8em !important;
+}
+
+.activities-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.activities-table th {
+    padding: 5px 0;
+    text-transform: uppercase;
+}
+
+.activities-table td {
+    width: 15%;
+    padding: 0;
+    border: solid 1px black;
+    font-size: 0.6rem;
+}
+
+.customers-table {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    border: none;
+    border-collapse: collapse;
+}
+
+.customers-table td {
+    padding: 0 3px;
+    border: none;
+    border-bottom: 1px solid black;
+}
+
+.customers-table tr:first-child td {
+    padding-top: 2px;
+}
+
+.customers-table tr:last-child td {
+    padding-bottom: 3px;
+    border-bottom: none;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="header">
+    <h3 class="title">{{ title }}</h3>
+</div>
+
+<div class="footer">
+</div>
+
+<table class="activities-table">
+    <tr>
+        <th></th>
+        {% for day, map_activities_customer in map_week_days_activities_customers %}
+            <th>{{ day }}</th>
+        {% endfor %}
+    </tr>
+    {% for activity in activities %}
+        <tr>
+            <td style="padding-left: 5px;">{{ activity }}</td>
+            {% for day, map_activities_customers in map_week_days_activities_customers %}
+                <td style="vertical-align: top;">
+                    {% for act, customers in map_activities_customers %}
+                        {% if act == activity %}
+                            <table class="customers-table">
+                                {% for customer in customers %}
+                                    <tr><td>{{customer}}</td></tr>
+                                {% endfor %}
+                            </table>
+                        {% endif %}
+                    {% endfor %}
+                </td>
+            {% endfor %}
+        </tr>
+        <tr>
+            <td style="height: 2px"></td>
+            {% for day, map_activities_customers in map_week_days_activities_customers %}
+                <td></td>
+            {% endfor %}
+        </tr>
+    {% endfor %}
+</table>
+
+</body>
+</html>

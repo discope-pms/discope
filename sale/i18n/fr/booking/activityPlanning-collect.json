@@ -1,0 +1,39 @@
+{
+    "name": "Planning",
+    "description": "Planning des activités.",
+    "model": {
+        "product": {
+            "label": "Produit",
+            "description": "",
+            "help": ""
+        },
+        "date": {
+            "label": "Date",
+            "description": "",
+            "help": ""
+        },
+        "time_slot": {
+            "label": "Tranche horaire",
+            "description": "",
+            "help": ""
+        },
+        "booking": {
+            "label": "Réservation",
+            "description": "",
+            "help": ""
+        },
+        "customer": {
+            "label": "Client",
+            "description": "",
+            "help": ""
+        }
+    },
+    "view": {
+        "list.default": {
+            "name": "Planning activités",
+            "description": "",
+            "layout": {}
+        }
+    },
+    "error": {}
+}

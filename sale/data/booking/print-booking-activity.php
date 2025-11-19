@@ -1,21 +1,18 @@
 <?php
 /*
     This file is part of the Discope property management software <https://github.com/discope-pms/discope>
-    Some Rights Reserved, Discope PMS, 2020-2024
+    Some Rights Reserved, Discope PMS, 2020-2025
     Original author(s): Yesbabylon SRL
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 
 use communication\Template;
-use communication\TemplatePart;
 use core\setting\Setting;
 use Dompdf\Dompdf;
 use Dompdf\Options as DompdfOptions;
-use equal\data\DataFormatter;
 use sale\booking\Booking;
 use sale\booking\BookingActivity;
 use sale\booking\BookingMeal;
-use sale\booking\Consumption;
 use sale\booking\TimeSlot;
 use Twig\Environment as TwigEnvironment;
 use Twig\Extension\ExtensionInterface;
@@ -23,7 +20,7 @@ use Twig\Extra\Intl\IntlExtension;
 use Twig\Loader\FilesystemLoader as TwigFilesystemLoader;
 
 [$params, $providers] = eQual::announce([
-    'description'   => "Render a booking quote as a PDF document, given its id.",
+    'description'   => "Render a booking activities planning as a PDF document, given its id.",
     'params'        => [
         'id' => [
             'description'   => 'Identifier of the booking to print.',
