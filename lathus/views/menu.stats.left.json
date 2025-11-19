@@ -159,10 +159,20 @@
                             {
                                 "id": "stats.camps.children.summer-clsh",
                                 "type": "entry",
-                                "label": "CLSH summer",
+                                "label": "CLSH sojourns",
                                 "description": "Children attending CLSH camps.",
                                 "context": {
                                     "entity": "sale\\camp\\stats\\stat-children-summer-clsh",
+                                    "view": "list.default"
+                                }
+                            },
+                            {
+                                "id": "stats.camps.children.sojourns",
+                                "type": "entry",
+                                "label": "Sojourns",
+                                "description": "Children attending camps.",
+                                "context": {
+                                    "entity": "sale\\camp\\stats\\stat-children-sojourns",
                                     "view": "list.default"
                                 }
                             }

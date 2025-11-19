@@ -1,7 +1,7 @@
 {
-    "name": "Stat Children sojourns for CLSH camps during summer.",
+    "name": "Stat Children sojourns.",
     "description": "",
-    "controller": "sale_camp_stats_stat-children-summer-clsh",
+    "controller": "sale_camp_stats_stat-children-sojourns",
     "header": {
         "actions": {
             "ACTION.CREATE": false
@@ -15,14 +15,6 @@
     ],
     "operations": {
         "total": {
-            "qty_july": {
-                "operation": "SUM",
-                "usage": "numeric/integer"
-            },
-            "qty_august": {
-                "operation": "SUM",
-                "usage": "numeric/integer"
-            },
             "qty": {
                 "operation": "SUM",
                 "usage": "numeric/integer"
@@ -41,26 +33,6 @@
                 "type": "field",
                 "value": "child_name",
                 "width": "20%"
-            },
-            {
-                "type": "field",
-                "value": "age_range_6_9",
-                "width": "20%"
-            },
-            {
-                "type": "field",
-                "value": "age_range_10_14",
-                "width": "20%"
-            },
-            {
-                "type": "field",
-                "value": "qty_july",
-                "width": "10%"
-            },
-            {
-                "type": "field",
-                "value": "qty_august",
-                "width": "10%"
             },
             {
                 "type": "field",

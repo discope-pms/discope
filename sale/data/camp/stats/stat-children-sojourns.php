@@ -26,7 +26,7 @@ use sale\camp\Camp;
         ],
         'year' => [
             'type'              => 'string',
-            'description'       => "Year for which we want the summer CLSH information.",
+            'description'       => "Year for which we want the sojourns information.",
             'selection'         => range('2025', date('Y', time())),
             'default'           => fn() => date('Y', time())
         ],
@@ -40,25 +40,9 @@ use sale\camp\Camp;
             'type'              => 'string',
             'description'       => "Name of the child."
         ],
-        'age_range_6_9' => [
-            'type'              => 'boolean',
-            'description'       => "Was the child age range 6 to 9 years old?"
-        ],
-        'age_range_10_14' => [
-            'type'              => 'boolean',
-            'description'       => "Was the child age range 10 to 14 years old?"
-        ],
-        'qty_july' => [
-            'type'              => 'integer',
-            'description'       => "Quantity of attending days during the month of July."
-        ],
-        'qty_august' => [
-            'type'              => 'integer',
-            'description'       => "Quantity of attending days during the month of August."
-        ],
         'qty' => [
             'type'              => 'integer',
-            'description'       => "Total quantity of attending days."
+            'description'       => "Total quantity of sojourns."
         ]
     ],
     'access'        => [
@@ -80,14 +64,11 @@ use sale\camp\Camp;
  */
 ['context' => $context, 'adapt' => $adapter_provider, 'auth' => $auth] = $providers;
 
-/** @var \equal\data\adapt\DataAdapterJson $json_adapter */
-$json_adapter = $adapter_provider->get('json');
-
-$date_from = strtotime($params['year'].'-07-01');
-$date_to = strtotime($params['year'].'-08-31');
+$date_from = strtotime($params['year'].'-01-01');
+$date_to = strtotime($params['year'].'-12-31');
 
 $domain = [
-    ['is_clsh', '=', true],
+    ['is_clsh', '=', false],
     ['date_from', '>=', $date_from],
     ['date_from', '<=', $date_to],
     ['status', '=', 'published']
@@ -117,12 +98,6 @@ $camps = Camp::search($domain)
         'clsh_type',
         'enrollments_ids' => [
             'status',
-            'child_age',
-            'presence_day_1',
-            'presence_day_2',
-            'presence_day_3',
-            'presence_day_4',
-            'presence_day_5',
             'child_id' => [
                 'name'
             ]
@@ -143,47 +118,12 @@ foreach($camps as $camp) {
 
         if(!isset($map_centers_children[$center_id][$child_id])) {
             $map_centers_children[$center_id][$child_id] = [
-                'child_name'        => $enrollment['child_id']['name'],
-                'age_range_6_9'     => false,
-                'age_range_10_14'   => false,
-                'qty_july'          => 0,
-                'qty_august'        => 0,
-                'qty'               => 0
+                'child_name'    => $enrollment['child_id']['name'],
+                'qty'           => 0
             ];
         }
 
-        $present_days = [
-            $enrollment['presence_day_1'],
-            $enrollment['presence_day_2'],
-            $enrollment['presence_day_3'],
-            $enrollment['presence_day_4']
-        ];
-        if($camp['clsh_type'] === '5-days') {
-            $present_days[] = $enrollment['presence_day_5'];
-        }
-
-        $qty = 0;
-        foreach($present_days as $present_day) {
-            if($present_day) {
-                $qty++;
-            }
-        }
-
-        if(date('n', $camp['date_from']) === '7') {
-            $map_centers_children[$center_id][$child_id]['qty_july'] += $qty;
-        }
-        else {
-            $map_centers_children[$center_id][$child_id]['qty_august'] += $qty;
-        }
-
-        if($enrollment['child_age'] <= 9) {
-            $map_centers_children[$center_id][$child_id]['age_range_6_9'] = true;
-        }
-        else {
-            $map_centers_children[$center_id][$child_id]['age_range_10_14'] = true;
-        }
-
-        $map_centers_children[$center_id][$child_id]['qty'] += $qty;
+        $map_centers_children[$center_id][$child_id]['qty']++;
     }
 }
 
@@ -204,10 +144,10 @@ foreach($map_centers_children as $center_id => $map_children) {
         }
     }
 
-    foreach($map_children as $week => $child_clsh_summer_info) {
+    foreach($map_children as $week => $child_sojourns_info) {
         $result[] = array_merge(
             ['center' => $center],
-            $child_clsh_summer_info
+            $child_sojourns_info
         );
     }
 }
