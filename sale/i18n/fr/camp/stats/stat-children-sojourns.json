@@ -1,7 +1,7 @@
 {
-    "name": "Statistiques quantités de jours d'inscriptions pour les camps CLSH.",
+    "name": "Statistiques quantités de jours d'inscriptions pour les camps.",
     "plural": "",
-    "description": "Statistiques quantités de jours d'inscriptions pour les camps CLSH durant l'été de l'année sélectionnée.",
+    "description": "Statistiques quantités de jours d'inscriptions pour les camps de l'année sélectionnée.",
     "model": {
         "all_centers": {
             "label": "Tous les centres",
@@ -22,26 +22,6 @@
         },
         "child_name": {
             "label": "Nom enfant",
-            "description": "",
-            "help": ""
-        },
-        "age_range_6_9": {
-            "label": "6 - 9 ans",
-            "description": "",
-            "help": ""
-        },
-        "age_range_10_14": {
-            "label": "10 - 14 ans",
-            "description": "",
-            "help": ""
-        },
-        "qty_july": {
-            "label": "Qté juillet",
-            "description": "",
-            "help": ""
-        },
-        "qty_august": {
-            "label": "Qté août",
             "description": "",
             "help": ""
         },

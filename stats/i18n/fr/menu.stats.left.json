@@ -51,11 +51,11 @@
             "help": ""
         },
         "stats.camps.children.summer-clsh": {
-            "label": "CLSH été",
+            "label": "Séjours CLSH",
             "help": ""
         },
-        "stats.camps.enrollments": {
-            "label": "Inscriptions",
+        "stats.camps.children.sojourns": {
+            "label": "Séjours",
             "help": ""
         },
         "stats.camps.enrollments.by-areas": {
