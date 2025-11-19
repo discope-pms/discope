@@ -125,6 +125,10 @@
             "label": "Nettoyages",
             "help": ""
         },
+        "item.planning.activities": {
+            "label": "Activités",
+            "help": ""
+        },
         "item.planning.transports": {
             "label": "Transports",
             "help": ""

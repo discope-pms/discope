@@ -415,6 +415,17 @@
                         ]
                     },
                     {
+                        "id": "item.planning.activities",
+                        "type": "entry",
+                        "label": "Activities",
+                        "description": "",
+                        "context": {
+                            "entity": "sale\\booking\\activityPlanning-collect",
+                            "view": "list.default"
+                        }
+
+                    },
+                    {
                         "id": "item.planning.transports",
                         "type": "entry",
                         "label": "Transports",
