@@ -839,20 +839,30 @@ class Enrollment extends Model {
     public static function calcTotal($self): array {
         $result = [];
         $self->read([
-            'camp_id'               => ['product_id', 'day_product_id'],
-            'enrollment_lines_ids'  => ['product_id', 'total'],
+            'camp_id'               => ['is_clsh'],
+            'enrollment_lines_ids'  => ['total'],
             'price_adapters_ids'    => ['price_adapter_type', 'origin_type', 'value']
         ]);
         foreach($self as $id => $enrollment) {
             $total = 0.0;
-            $camp_product_line = null;
             foreach($enrollment['enrollment_lines_ids'] as $enrollment_line) {
                 $total += $enrollment_line['total'];
-
-                if(in_array($enrollment_line['product_id'], [$enrollment['camp_id']['product_id'], $enrollment['camp_id']['day_product_id']])) {
-                    $camp_product_line = $enrollment_line;
-                }
             }
+
+            $camp_product_ids = null;
+            if($enrollment['camp_id']['is_clsh']) {
+                $camp_product_ids = Product::search(['camp_product_type', 'in', ['clsh-full-5-days', 'clsh-full-4-days', 'clsh-day']])->ids();
+            }
+            else {
+                $camp_product_ids = Product::search(['camp_product_type', '=', 'full'])->ids();
+            }
+
+            $camp_product_line = EnrollmentLine::search([
+                ['product_id', 'in', $camp_product_ids],
+                ['enrollment_id', '=', $enrollment['id']]
+            ])
+                ->read(['total'])
+                ->first();
 
             // #memo - the percentage price-adapter only applies on camp price
             if(!is_null($camp_product_line)) {
@@ -893,20 +903,30 @@ class Enrollment extends Model {
     public static function calcPrice($self): array {
         $result = [];
         $self->read([
-            'camp_id'               => ['product_id', 'day_product_id'],
-            'enrollment_lines_ids'  => ['product_id', 'price'],
+            'camp_id'               => ['is_clsh'],
+            'enrollment_lines_ids'  => ['price'],
             'price_adapters_ids'    => ['price_adapter_type', 'origin_type', 'value']
         ]);
         foreach($self as $id => $enrollment) {
             $price = 0.0;
-            $camp_product_line = null;
             foreach($enrollment['enrollment_lines_ids'] as $enrollment_line) {
                 $price += $enrollment_line['price'];
-
-                if(in_array($enrollment_line['product_id'], [$enrollment['camp_id']['product_id'], $enrollment['camp_id']['day_product_id']])) {
-                    $camp_product_line = $enrollment_line;
-                }
             }
+
+            $camp_product_ids = null;
+            if($enrollment['camp_id']['is_clsh']) {
+                $camp_product_ids = Product::search(['camp_product_type', 'in', ['clsh-full-5-days', 'clsh-full-4-days', 'clsh-day']])->ids();
+            }
+            else {
+                $camp_product_ids = Product::search(['camp_product_type', '=', 'full'])->ids();
+            }
+
+            $camp_product_line = EnrollmentLine::search([
+                ['product_id', 'in', $camp_product_ids],
+                ['enrollment_id', '=', $enrollment['id']]
+            ])
+                ->read(['price'])
+                ->first();
 
             // #memo - the percentage price-adapter only applies on camp price
             if(!is_null($camp_product_line)) {
@@ -1987,7 +2007,7 @@ class Enrollment extends Model {
                     ['product_id', 'in', $clsh_camp_products_ids],
                     ['enrollment_id', '=', $id]
                 ])
-                    ->read(['product_id' => ['camp_product_type']])
+                    ->read(['id'])
                     ->first();
 
                 if(!is_null($camp_price)) {
