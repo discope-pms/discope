@@ -10,6 +10,7 @@ use identity\Center;
 use identity\User;
 use sale\camp\Camp;
 use sale\camp\catalog\Product;
+use sale\camp\EnrollmentLine;
 
 [$params, $providers] = eQual::announce([
     'description'   => "Data about children's participation to camps.",
@@ -53,13 +54,29 @@ use sale\camp\catalog\Product;
             'type'              => 'string',
             'description'       => "Name of the center for the enrollments quantities."
         ],
-        'product_id' => [
-            'type'              => 'many2one',
-            'foreign_object'    => 'sale\catalog\Product',
-            'description'       => "The camp tariff."
+        'product' => [
+            'type'              => 'string',
+            'description'       => "Name of the tariff."
+        ],
+        'qty_other' => [
+            'type'              => 'integer',
+            'description'       => "Quantity of enrollments of the tariff for the camp class 'other'."
+        ],
+        'qty_member' => [
+            'type'              => 'integer',
+            'description'       => "Quantity of enrollments of the tariff for the camp class 'member'."
+        ],
+        'qty_close_member' => [
+            'type'              => 'integer',
+            'description'       => "Quantity of enrollments of the tariff for the camp class 'close-member'."
         ],
         'qty' => [
             'type'              => 'integer',
+            'description'       => "Quantity of enrollments of the tariff."
+        ],
+        'price' => [
+            'type'              => 'float',
+            'usage'             => 'amount/money',
             'description'       => "Quantity of enrollments of the tariff."
         ]
     ],
@@ -113,15 +130,12 @@ $camps = Camp::search($domain)
         'center_id',
         'enrollments_ids' => [
             'status',
-            'enrollment_lines_ids' => [
-                'product_id',
-                'qty'
-            ]
+            'camp_class'
         ]
     ])
     ->get(true);
 
-$map_center_tariffs_enrollments_qty = [];
+$map_center_tariffs_enrollments_quantities = [];
 $map_products = [];
 
 foreach($camps as $camp) {
@@ -130,31 +144,86 @@ foreach($camps as $camp) {
             continue;
         }
 
-        $camp_product_id = $camp['is_clsh'] ? $camp['day_product_id'] : $camp['product_id'];
-
-        if(!isset($map_center_tariffs_enrollments_qty[$camp['center_id']])) {
-            $map_center_tariffs_enrollments_qty[$camp['center_id']] = [];
-        }
-        if(!isset($map_center_tariffs_enrollments_qty[$camp['center_id']][$camp_product_id])) {
-            $map_center_tariffs_enrollments_qty[$camp['center_id']][$camp_product_id] = 0;
-        }
-
-        $qty = 1;
+        $camp_product_id = null;
+        $qty = 0;
+        $price = 0.0;
         if($camp['is_clsh']) {
-            foreach($enrollment['enrollment_lines_ids'] as $line) {
-                if($line['product_id'] === $camp_product_id) {
-                    $qty = $line['qty'];
-                    break;
-                }
+            $clsh_camp_products_ids = Product::search(['camp_product_type', 'in', ['clsh-full-5-days', 'clsh-full-4-days', 'clsh-day']])->ids();
+
+            $camp_product_line = EnrollmentLine::search([
+                ['product_id', 'in', $clsh_camp_products_ids],
+                ['enrollment_id', '=', $enrollment['id']]
+            ])
+                ->read(['qty', 'price', 'product_id' => ['camp_product_type']])
+                ->first();
+
+            $camp_product_id = $camp_product_line['product_id']['id'];
+            if(is_null($camp_product_id)) {
+                continue;
             }
+
+            if($camp_product_line['product_id']['camp_product_type'] === 'clsh-day') {
+                // should be 1, 2, 3 or 4 if camp_product_type is 'clsh-day' (participation to some days of camp)
+                $qty = $camp_product_line['qty'];
+            }
+            else {
+                // should be 1 if camp_product_type is 'clsh-full-5-days' or 'clsh-full-4-days' (participation to entire camp)
+                $qty = 1;
+            }
+
+            $price = $camp_product_line['price'];
+        }
+        else {
+            $products_ids = Product::search(['camp_product_type', '=', 'full'])->ids();
+
+            $camp_product_line = EnrollmentLine::search([
+                ['product_id', 'in', $products_ids],
+                ['enrollment_id', '=', $enrollment['id']]
+            ])
+                ->read(['price', 'product_id'])
+                ->first();
+
+            $camp_product_id = $camp_product_line['product_id'];
+            if(is_null($camp_product_id)) {
+                continue;
+            }
+
+            // should be 1 because camp_product_type is 'full' (participation to entire camp)
+            $qty = 1;
+
+            $price = $camp_product_line['price'];
         }
 
-        $map_center_tariffs_enrollments_qty[$camp['center_id']][$camp_product_id] += $qty;
+        if(!isset($map_center_tariffs_enrollments_quantities[$camp['center_id']][$camp_product_id])) {
+            $map_center_tariffs_enrollments_quantities[$camp['center_id']][$camp_product_id] = [
+                'qty_other'         => 0,
+                'qty_member'        => 0,
+                'qty_close_member'  => 0,
+                'qty'               => 0,
+                'price'             => 0.0
+            ];
+        }
+
+        switch($enrollment['camp_class']) {
+            case 'other':
+                $map_center_tariffs_enrollments_quantities[$camp['center_id']][$camp_product_id]['qty_other'] += $qty;
+                break;
+            case 'member':
+                $map_center_tariffs_enrollments_quantities[$camp['center_id']][$camp_product_id]['qty_member'] += $qty;
+                break;
+            case 'close-member':
+                $map_center_tariffs_enrollments_quantities[$camp['center_id']][$camp_product_id]['qty_close_member'] += $qty;
+                break;
+        }
+
+        $map_center_tariffs_enrollments_quantities[$camp['center_id']][$camp_product_id]['qty'] += $qty;
+        $map_center_tariffs_enrollments_quantities[$camp['center_id']][$camp_product_id]['price'] += $price;
+
         $map_products[$camp_product_id] = true;
     }
 }
 
-$center_ids = array_keys($map_center_tariffs_enrollments_qty);
+$center_ids = array_keys($map_center_tariffs_enrollments_quantities);
 
 $centers = Center::search(['id', 'in', $center_ids])
     ->read(['name'])
@@ -166,7 +235,7 @@ $products = Product::search(['id', 'in', $products_ids])
     ->read(['name'])
     ->get();
 
-foreach($map_center_tariffs_enrollments_qty as $center_id => $map_products_qty) {
+foreach($map_center_tariffs_enrollments_quantities as $center_id => $map_products_quantities) {
     $center = null;
     foreach($centers as $c) {
         if($c['id'] === $center_id) {
@@ -175,7 +244,7 @@ foreach($map_center_tariffs_enrollments_qty as $center_id => $map_products_qty) 
         }
     }
 
-    foreach($map_products_qty as $product_id => $qty) {
+    foreach($map_products_quantities as $product_id => $quantities) {
         $product = null;
         foreach($products as $p) {
             if($p['id'] === $product_id) {
@@ -184,13 +253,20 @@ foreach($map_center_tariffs_enrollments_qty as $center_id => $map_products_qty) 
             }
         }
 
-        $result[] = [
-            'center'        => $center,
-            'product_id'    => ['id' => $product_id, 'name' => $product],
-            'qty'           => $qty
-        ];
+        $result[] = array_merge(
+            ['center' => $center, 'product' => $product],
+            $quantities
+        );
     }
 }
+
+usort($result, function($a, $b) {
+    $result = strcmp($a['center'], $b['center']);
+    if($result === 0) {
+        return strcmp($a['product'], $b['product']);
+    }
+    return $result;
+});
 
 $context->httpResponse()
         ->header('X-Total-Count', count($result))

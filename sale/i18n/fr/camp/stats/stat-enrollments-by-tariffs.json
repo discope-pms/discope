@@ -24,13 +24,33 @@
             "description": "",
             "help": ""
         },
-        "product_id": {
+        "product": {
             "label": "Tarif",
+            "description": "",
+            "help": ""
+        },
+        "qty_other": {
+            "label": "Qté Autre",
+            "description": "",
+            "help": ""
+        },
+        "qty_member": {
+            "label": "Qté Habitants Vienne/Partenaires hors Vienne",
+            "description": "",
+            "help": ""
+        },
+        "qty_close_member": {
+            "label": "Qté Adhérents/Partenaires Vienne/Habitants des cantons",
             "description": "",
             "help": ""
         },
         "qty": {
             "label": "Qté",
+            "description": "",
+            "help": ""
+        },
+        "price": {
+            "label": "Total",
             "description": "",
             "help": ""
         },

@@ -15,10 +15,25 @@
     ],
     "operations": {
         "total": {
+            "qty_other": {
+                "operation": "SUM",
+                "usage": "numeric/integer"
+            },
+            "qty_member": {
+                "operation": "SUM",
+                "usage": "numeric/integer"
+            },
+            "qty_close_member": {
+                "operation": "SUM",
+                "usage": "numeric/integer"
+            },
             "qty": {
                 "operation": "SUM",
-                "usage": "numeric/integer",
-                "suffix": " inscriptions"
+                "usage": "numeric/integer"
+            },
+            "price": {
+                "operation": "SUM",
+                "usage": "amount/money"
             }
         }
     },
@@ -32,12 +47,32 @@
             },
             {
                 "type": "field",
-                "value": "product_id",
+                "value": "product",
                 "width": "20%"
             },
             {
                 "type": "field",
+                "value": "qty_other",
+                "width": "10%"
+            },
+            {
+                "type": "field",
+                "value": "qty_member",
+                "width": "10%"
+            },
+            {
+                "type": "field",
+                "value": "qty_close_member",
+                "width": "10%"
+            },
+            {
+                "type": "field",
                 "value": "qty",
+                "width": "10%"
+            },
+            {
+                "type": "field",
+                "value": "price",
                 "width": "10%"
             },
             {
