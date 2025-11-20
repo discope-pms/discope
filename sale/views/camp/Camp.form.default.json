@@ -57,11 +57,20 @@
     ],
     "routes": [
         {
-            "id": "item.camp.planning",
+            "id": "route.camp.planning-condensed",
+            "label": "Planning condensed",
+            "description": "",
+            "icon": "list_alt",
+            "route": "/?get=sale_camp_print-planning-condensed&camp_id=object.id",
+            "target": "_blank",
+            "absolute": true
+        },
+        {
+            "id": "route.camp.planning",
             "label": "Planning",
             "description": "",
             "icon": "list_alt",
-            "route": "/?get=sale_camp_print-activities-planning&camp_id=object.id",
+            "route": "/?get=sale_camp_print-planning&camp_id=object.id",
             "target": "_blank",
             "absolute": true
         }

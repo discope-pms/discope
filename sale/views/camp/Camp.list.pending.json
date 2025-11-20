@@ -23,10 +23,16 @@
     },
     "actions": [
         {
-            "id": "action.print-activities-planning",
+            "id": "action.print-planning-condensed",
             "label": "Planning",
-            "description": "Print the planning of activities.",
-            "controller": "sale_camp_print-activities-planning"
+            "description": "Print the camps planning of activities and meals condensed.",
+            "controller": "sale_camp_print-planning-condensed"
+        },
+        {
+            "id": "action.print-planning",
+            "label": "Planning",
+            "description": "Print the camps planning of activities and meals.",
+            "controller": "sale_camp_print-planning"
         }
     ],
     "order": "sojourn_number",
