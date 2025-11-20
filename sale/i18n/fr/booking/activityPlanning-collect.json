@@ -2,6 +2,21 @@
     "name": "Planning",
     "description": "Planning des activités.",
     "model": {
+        "date_from": {
+            "label": "Du",
+            "description": "Date (incluse) de début de la saison.",
+            "help": ""
+        },
+        "date_to": {
+            "label": "Au",
+            "description": "Date (exclue) à laquelle la saison se termine.",
+            "help": ""
+        },
+        "time_slot_id": {
+            "label": "Tranche horaire",
+            "description": "Plage horaire précise du jour où la prestation est délivrée.",
+            "help": ""
+        },
         "product": {
             "label": "Produit",
             "description": "",
@@ -14,11 +29,6 @@
         },
         "time_slot": {
             "label": "Tranche horaire",
-            "description": "",
-            "help": ""
-        },
-        "booking": {
-            "label": "Réservation",
             "description": "",
             "help": ""
         },

@@ -1,0 +1,18 @@
+{
+    "name": "Planning activités",
+    "description": "Planning global des activités des réservation et des camps, pour une tranche horaire spécifique.",
+    "model": {
+        "date_from": {
+            "label": "Du",
+            "description": "Date (incluse) de début de la saison.",
+            "help": ""
+        },
+        "time_slot_id": {
+            "label": "Tranche horaire",
+            "description": "Plage horaire précise du jour où la prestation est délivrée.",
+            "help": ""
+        }
+    },
+    "view": {},
+    "error": {}
+}

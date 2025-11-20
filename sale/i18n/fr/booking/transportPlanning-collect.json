@@ -2,6 +2,16 @@
     "name": "Planning",
     "description": "Planning des transports.",
     "model": {
+        "date_from": {
+            "label": "Du",
+            "description": "Date (incluse) de début de la saison.",
+            "help": ""
+        },
+        "date_to": {
+            "label": "Au",
+            "description": "Date (exclue) à laquelle la saison se termine.",
+            "help": ""
+        },
         "product": {
             "label": "Produit",
             "description": "",

@@ -419,6 +419,7 @@
                         "type": "entry",
                         "label": "Activities",
                         "description": "",
+                        "route": "/bookings",
                         "context": {
                             "entity": "sale\\booking\\activityPlanning-collect",
                             "view": "list.default"
@@ -429,6 +430,7 @@
                         "id": "item.planning.transports",
                         "type": "entry",
                         "label": "Transports",
+                        "route": "/bookings",
                         "description": "",
                         "context": {
                             "entity": "sale\\booking\\transportPlanning-collect",
