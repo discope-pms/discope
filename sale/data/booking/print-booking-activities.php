@@ -24,11 +24,6 @@ use Twig\TwigFilter;
             'description'   => "Start date of the interval (included).",
             'default'       => strtotime('Monday this week')
         ],
-        'date_to' => [
-            'type'          => 'date',
-            'description'   => "End date of the interval (included).",
-            'default'       => strtotime('Sunday this week')
-        ],
         'time_slot_id' => [
             'type'              => 'many2one',
             'foreign_object'    => 'sale\booking\TimeSlot',
@@ -107,9 +102,21 @@ if(is_null($time_slot)) {
     throw new Exception("unknown_time_slot", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
+$date_from = null;
+$date_to = null;
+
+if(date('l', $params['date_from']) !== 'Sunday') {
+    $date_from = (new DateTime(date('Y-m-d', $params['date_from'])))->modify('last Sunday')->getTimestamp();
+    $date_to = (new DateTime(date('Y-m-d', $params['date_from'])))->modify('Saturday this week')->getTimestamp();
+}
+else {
+    $date_from = $params['date_from'];
+    $date_to = (new DateTime(date('Y-m-d', $params['date_from'])))->modify('Saturday next week')->getTimestamp();
+}
+
 $booking_activities = BookingActivity::search([
-    ['activity_date', '>=', $params['date_from']],
-    ['activity_date', '<=', $params['date_to']],
+    ['activity_date', '>=', $date_from],
+    ['activity_date', '<=', $date_to],
     ['time_slot_id', '=', $time_slot['id']],
     ['product_id', '<>', null]
 ])
@@ -128,16 +135,16 @@ if(empty($booking_activities)) {
 }
 
 $title = sprintf('Semaine du %s au %s %s',
-    date('d/m/Y', $params['date_from']),
-    date('d/m/Y', $params['date_to']),
+    date('d/m/Y', $date_from),
+    date('d/m/Y', $date_to),
     $time_slot['name']
 );
 
 $map_week_days_activities_customers = [];
 $map_activities = [];
 
-$date = $params['date_from'];
-while($date <= $params['date_to']) {
+$date = $date_from;
+while($date <= $date_to) {
     $day_index = $formatDateDay($date);
     $map_week_days_activities_customers[$day_index] = [];
 
