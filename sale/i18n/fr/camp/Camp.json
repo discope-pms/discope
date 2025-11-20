@@ -188,6 +188,14 @@
                     "label": "Ajouter groupe"
                 }
             },
+            "routes": {
+                "route.camp.planning-condensed": {
+                    "label": "Planning condensé"
+                },
+                "route.camp.planning": {
+                    "label": "Planning"
+                }
+            },
             "layout": {
                 "section.descriptions": {
                     "label": "Descriptions"
@@ -218,6 +226,21 @@
         "list.default": {
             "name": "Camps",
             "description": "",
+            "layout": {}
+        },
+        "list.pending": {
+            "name": "Camps de la semaine",
+            "description": "",
+            "actions": {
+                "action.print-planning-condensed": {
+                    "label": "Planning condensé",
+                    "description": "Télécharge le planning condensé (activités/repas) des camps de la semaine."
+                },
+                "action.print-planning": {
+                    "label": "Planning",
+                    "description": "Télécharge le planning (activités/repas) des camps de la semaine."
+                }
+            },
             "layout": {}
         }
     },

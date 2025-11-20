@@ -1,0 +1,277 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xml:lang="en" xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+
+    <title>Planning</title>
+
+    <style type="text/css">
+        @page {
+            margin: 1cm;
+        }
+
+        body {
+            width: 100%;
+            margin: 0;
+            padding: 0;
+            text-align: justify;
+            font-family: Helvetica, Arial, sans-serif;
+            font-size: 0.8em;
+        }
+
+        div, table, table tr td {
+            font-family: Helvetica, Arial, sans-serif;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .text-small {
+            font-size: 0.6rem;
+        }
+
+        .text-big {
+            font-size: 1.1rem;
+        }
+
+        .text-bold {
+            font-family: Helvetica, Arial, sans-serif;
+        }
+
+        .text-uppercase {
+            text-transform: uppercase;
+        }
+
+        .camp-header-table {
+            width: 100%;
+            border: none;
+        }
+
+        .camp-header-table td {
+            vertical-align: top;
+            border: none;
+        }
+
+        .camp-header-table .camp-planning-col, {
+            width: 33%;
+        }
+
+        .camp-header-table .camp-dates-col {
+            width: 33%;
+        }
+
+        .camp-header-table .camp-info-col {
+            width: 33%;
+        }
+
+        .camp-info-table {
+            width: 100%;
+            border: none;
+        }
+
+        .camp-info-table td {
+            padding: 0;
+            border: none;
+        }
+
+        .camp-info-table .label-col {
+            width: 23%;
+        }
+
+        .camp-info-table .value-col {
+            width: 77%;
+        }
+
+        .camp-planning-table {
+            width: 100%;
+            margin-top: 10px;
+            border: 1px solid black;
+            border-collapse: collapse;
+        }
+
+        .camp-planning-table th:first-child, td:first-child {
+            width: 6%;
+        }
+
+        .camp-planning-table th, td {
+            width: 15%;
+            border: 1px solid black;
+        }
+
+        .camp-planning-table th {
+            text-transform: capitalize;
+        }
+
+        .camp-planning-table td.disabled-moment {
+            background-color: #b5b5b5;
+        }
+
+        .camp-planning-table .activities-col {
+            padding: 5px;
+            text-align: center;
+        }
+
+        .camp-planning-table .time-slot-col {
+            padding: 5px;
+            font-size: 0.9rem;
+        }
+
+    </style>
+</head>
+
+<body>
+
+{% for camp in camps_planning %}
+
+<table class="camp-header-table">
+    <tr>
+        <td class="camp-planning-col">
+            Planning CAMPS
+        </td>
+        <td class="camp-dates-col">
+            Camps du {{ camp.date_from }} au {{ camp.date_to }}
+        </td>
+        <td class="camp-info-col">
+            <div>
+                <table class="camp-info-table">
+                    <tr>
+                        <td class="label-col">Séjour :</td>
+                        <td class="value-col">{{ camp.name }}</td>
+                    </tr>
+                </table>
+            </div>
+            <div>
+                <table class="camp-info-table">
+                    <tr>
+                        <td class="label-col">Code :</td>
+                        <td class="value-col">{{ camp.code }}</td>
+                    </tr>
+                </table>
+            </div>
+            <div>
+                <table class="camp-info-table">
+                    <tr>
+                        <td class="label-col">Animateurs :</td>
+                        <td class="value-col">{{ camp.employees }}</td>
+                    </tr>
+                </table>
+            </div>
+            <div>
+                <table class="camp-info-table">
+                    <tr>
+                        <td class="label-col">Site :</td>
+                        <td class="value-col">{{ camp.location }}</td>
+                    </tr>
+                </table>
+            </div>
+        </td>
+    </tr>
+</table>
+
+<table class="camp-planning-table">
+    <tr>
+        <th></th>
+        {% for day_name in days_names %}
+            <th>{{ day_name }}</th>
+        {% endfor %}
+    </tr>
+    <tr>
+        <td class="time-slot-col" style="height: 120px">Matin</td>
+        {% for items in camp.planning.AM %}
+            {% if loop.first or loop.last %}
+                <td class="disabled-moment"></td>
+            {% else %}
+                <td class="activities-col">
+                    {% for item in items %}
+                        <div class="text-big text-bold">{{ item }}</div>
+                    {% endfor %}
+                </td>
+            {% endif %}
+        {% endfor %}
+    </tr>
+    <tr>
+        <td class="time-slot-col"  style="height: 40px">Repas</td>
+        {% for items in camp.planning.L %}
+            {% if loop.first or loop.last %}
+                <td class="disabled-moment"></td>
+            {% else %}
+                <td class="text-center">
+                    {% for item in items %}
+                        <div class="text-big">{{ item }}</div>
+                    {% endfor %}
+                </td>
+            {% endif %}
+        {% endfor %}
+    </tr>
+    <tr>
+        <td class="time-slot-col"  style="height: 40px">Temps calme</td>
+        {% for items in camp.planning.L %}
+            {% if loop.first or loop.last %}
+                <td class="disabled-moment"></td>
+            {% else %}
+                <td></td>
+            {% endif %}
+        {% endfor %}
+    </tr>
+    <tr>
+        <td class="time-slot-col"  style="height: 120px">A. midi</td>
+        {% for items in camp.planning.PM %}
+                {% if loop.last %}
+                    <td class="disabled-moment"></td>
+                {% else %}
+                    <td class="activities-col">
+                        {% for item in items %}
+                            <div class="text-big text-bold">{{ item }}</div>
+                        {% endfor %}
+                    </td>
+            {% endif %}
+        {% endfor %}
+    </tr>
+    <tr>
+        <td class="time-slot-col"  style="height: 40px;"></td>
+        <td colspan="6" class="text-big text-center">
+           DOUCHE ------------------------ BATON DE PAROLE ------------------------ DOUCHE
+        </td>
+        <td class="disabled-moment"></td>
+    </tr>
+    <tr>
+        <td class="time-slot-col"  style="height: 40px">Repas</td>
+        {% for items in camp.planning.D %}
+            {% if loop.last %}
+                <td class="disabled-moment"></td>
+            {% else %}
+                <td class="text-center">
+                    {% for item in items %}
+                        <div class="text-big">{{ item }}</div>
+                    {% endfor %}
+                </td>
+            {% endif %}
+        {% endfor %}
+    </tr>
+    <tr>
+        <td class="time-slot-col"  style="height: 120px">Veillée</td>
+            {% for items in camp.planning.EV %}
+                {% if loop.last %}
+                    <td class="disabled-moment"></td>
+                {% elseif loop.index == 6 %}
+                    <td class="activities-col text-big">Départ</td>
+                {% else %}
+                    <td class="activities-col">
+                        {% for item in items %}
+                            <div class="text-big text-bold">{{ item }}</div>
+                        {% endfor %}
+                    </td>
+            {% endif %}
+        {% endfor %}
+    </tr>
+</table>
+
+{% if not loop.last %}
+    <div style="page-break-after: always;"></div>
+{% endif %}
+
+{% endfor %}
+
+</body>
+</html>

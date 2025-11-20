@@ -39,6 +39,11 @@
         "form.default": {
             "name": "",
             "description": "",
+            "routes": {
+                "item.camp.planning-condensed": {
+                    "label": "Planning condensé"
+                }
+            },
             "layout": {
                 "section.activities": {
                     "label": "Activités"

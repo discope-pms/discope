@@ -7,7 +7,7 @@
 */
 
 [$params, $providers] = eQual::announce([
-    'description'   => "Render a booking quote as a PDF document, given its id.",
+    'description'   => "Render camps activities and meals planning as a PDF document, one page per camp.",
     'params'        => [
         'params' => [
             'type'          => 'array',
@@ -35,18 +35,14 @@
 $adapter = $dap->get('json');
 
 $date_from = strtotime('last Sunday');
-$date_to = strtotime('Sunday this week');
 
 if(!empty($params['params'])) {
     if(isset($params['params']['date_from'])) {
         $date_from = $adapter->adaptIn($params['params']['date_from'], 'datetime');
     }
-    if(isset($params['params']['date_to'])) {
-        $date_to = $adapter->adaptIn($params['params']['date_to'], 'datetime');
-    }
 }
 
-$output = eQual::run('get', 'sale_camp_print-activities-planning', ['date_from' => $date_from, 'date_to' => $date_to]);
+$output = eQual::run('get', 'sale_camp_print-planning', ['date_from' => $date_from]);
 
 $context->httpResponse()
         ->header('Content-Disposition', 'inline; filename="planning.pdf"')

@@ -2,11 +2,11 @@
     "name": "Group",
     "routes": [
         {
-            "id": "item.camp.planning",
-            "label": "Planning",
+            "id": "item.camp.planning-condensed",
+            "label": "Planning condensed",
             "description": "",
             "icon": "list_alt",
-            "route": "/?get=sale_camp_print-activities-planning&camp_group_id=object.id",
+            "route": "/?get=sale_camp_print-planning-condensed&camp_group_id=object.id",
             "target": "_blank",
             "absolute": true
         }

@@ -17,20 +17,16 @@ use Twig\Extra\Intl\IntlExtension;
 use Twig\Loader\FilesystemLoader as TwigFilesystemLoader;
 
 [$params, $providers] = eQual::announce([
-    'description'   => "Print the planning of activities for given week (time interval is always reduced to 5 days based on date_from).",
+    'description'   => "Print the condensed planning of activities and meals given week (time interval is always reduced to 5 days based on date_from).",
     'params'        => [
         'view_id' =>  [
             'description'   => 'The identifier of the view <type.name>.',
             'type'          => 'string',
-            'default'       => 'print.activities-planning'
+            'default'       => 'print.planning-condensed'
         ],
         'date_from' => [
             'type'              => 'date',
             'description'       => "Date interval lower limit."
-        ],
-        'date_to' => [
-            'type'              => 'date',
-            'description'       => 'Date interval Upper limit.'
         ],
         'camp_id' => [
             'type'              => 'many2one',
@@ -207,11 +203,7 @@ foreach($camps as $camp) {
                     continue;
                 }
 
-                $short_name = $activity['name'];
-                if(strpos($activity['name'], 'Activité ') === 0) {
-                    $short_name = substr($activity['name'], strlen('Activité '));
-                }
-                $short_name = preg_replace('/\s*\(\d+\)$/', '', $short_name);
+                $short_name = preg_replace('/\s*\(\d+\)$/', '', $activity['name']);
 
                 $day[$activity['time_slot_id']['code']][$group['activity_group_num']] = array_merge(
                     $activity,
