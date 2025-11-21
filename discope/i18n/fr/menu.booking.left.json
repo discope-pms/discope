@@ -145,6 +145,10 @@
             "label": "Calendrier Cubilis",
             "help": ""
         },
+        "item.planning.pending-bookings": {
+            "label": "En cours",
+            "help": ""
+        },
         "item.repairings": {
             "label": "Réparation & Maintenance",
             "help": ""

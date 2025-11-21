@@ -1,0 +1,153 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xml:lang="en" xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+
+<title>Réservations</title>
+<style type="text/css">
+@page {
+  margin: 1cm;
+}
+body {
+    margin: 0;
+    padding: 0;
+    margin-top: 40px;
+    margin-bottom: 35px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 0.7em;
+    text-align: justify;
+    width: 100%;
+}
+
+h2 {
+    margin-top: 8px;
+    margin-bottom: 0;
+    font-size: 21px;
+}
+
+h3 {
+    margin-top: 0;
+    margin-bottom: 0;
+    font-size: 15px;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.text-small {
+    font-size: 0.6rem;
+}
+
+div, table, table tr td {
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+div.header,
+div.footer {
+    box-sizing: border-box;
+    border: 0;
+    margin: 0;
+    padding: 0;
+    position: fixed;
+    width: 100%;
+    overflow: hidden;
+}
+
+div.header {
+    top: 0;
+    left: 0;
+    height: 40px;
+}
+
+div.header .title {
+    width: 100%;
+    text-align: center;
+    font-size: 1.2rem;
+}
+
+.bookings-planning-table {
+    width: 100%;
+    border: none;
+    border-collapse: collapse;
+}
+
+.bookings-planning-table th,
+.bookings-planning-table td {
+    border: 1px solid black;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="header">
+    <div class="title">{{ title }}</div>
+</div>
+
+<table class="bookings-planning-table">
+    <tr>
+        <th style="text-align: left">Groupes</th>
+        <th style="width: 150px;">Dates</th>
+        <th>Nombre</th>
+        <th style="width: 80px;">Age</th>
+        <th style="width: 80px;">Planning</th>
+        <th style="width: 80px;">Frigo</th>
+        <th style="width: 80px;">Répartition</th>
+        <th style="width: 80px;">Handicap</th>
+        <th style="width: 80px;">Repas</th>
+    </tr>
+
+    {% if has_bookings_with_accommodations %}
+        <tr>
+            <td style="height: 30px; padding-left: 100px; vertical-align: bottom; border-left: none; border-right: none;" colspan="9">
+                Avec hébergement
+            </td>
+        </tr>
+
+        {% for booking in bookings_planning %}
+            {% if booking.has_accommodations %}
+                <tr>
+                    <td>{{ booking.name }}</td>
+                    <td class="text-center">{{ booking.dates }}</td>
+                    <td class="text-center">{{ booking.quantities }}</td>
+                    <td class="text-center">{{ booking.age }}</td>
+                    <td class="text-center">{{ booking.has_planning }}</td>
+                    <td class="text-center">{{ booking.has_icebox }}</td>
+                    <td class="text-center">{{ booking.has_repartition }}</td>
+                    <td class="text-center">{{ booking.has_disability }}</td>
+                    <td class="text-center">{{ booking.has_meal }}</td>
+                </tr>
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+
+    {% if has_bookings_without_accommodations %}
+        <tr>
+            <td style="height: 30px; padding-left: 100px; vertical-align: bottom; border-left: none; border-right: none;" colspan="9">
+                Sans hébergement
+            </td>
+        </tr>
+
+        {% for booking in bookings_planning %}
+            {% if not booking.has_accommodations %}
+                <tr>
+                    <td>{{ booking.name }}</td>
+                    <td class="text-center">{{ booking.dates }}</td>
+                    <td class="text-center">{{ booking.quantities }}</td>
+                    <td class="text-center">{{ booking.age }}</td>
+                    <td class="text-center">{{ booking.has_planning }}</td>
+                    <td class="text-center">{{ booking.has_icebox }}</td>
+                    <td class="text-center">{{ booking.has_repartition }}</td>
+                    <td class="text-center">{{ booking.has_disability }}</td>
+                    <td class="text-center">{{ booking.has_meal }}</td>
+                </tr>
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+</table>
+
+</body>
+</html>
