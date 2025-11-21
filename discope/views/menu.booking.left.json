@@ -480,6 +480,16 @@
                             "entity": "sale\\booking\\stats\\stat-roomtypes",
                             "view": "list.default"
                         }
+                    },
+                    {
+                        "id": "item.planning.pending-bookings",
+                        "type": "entry",
+                        "label": "Bookings",
+                        "description": "",
+                        "context": {
+                            "entity": "sale\\booking\\Booking",
+                            "view": "list.pending"
+                        }
                     }
                 ]
             },

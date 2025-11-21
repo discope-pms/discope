@@ -56,7 +56,7 @@ use sale\booking\TimeSlot;
     ],
     'access' => [
         'visibility'        => 'protected',
-        'groups'            => ['camp.default.user'],
+        'groups'            => ['camp.default.user', 'booking.default.user'],
     ],
     'response'      => [
         'content-type'      => 'application/pdf',
