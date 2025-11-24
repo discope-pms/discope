@@ -110,6 +110,16 @@ Informations :
 
 `Apps dashboard → Réservations → Planning → En cours`
 
+### Paramètres
+
+Un paramètre permet de configurer le programme de la semaine :
+
+#### 1. SKUs mise à disposition frigo
+
+Liste des SKUs des produits de mise à disposition d'un frigo
+
+> sale.booking.icebox_skus
+
 ---
 
 ## Camps
