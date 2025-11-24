@@ -671,7 +671,7 @@ Informations :
 
 #### Inscriptions par tranches d'âge
 
-Liste les tranches d'âge entre les deux dates données et donne des informations sur les quantités d'inscriptions aux camps.
+Liste les quantités d'inscriptions par tranches d'âge entre les deux dates données.
 
 Tranches d'âges :
   - 6 - 9
@@ -682,6 +682,15 @@ Informations :
   - Qté
 
 > 📍 `Apps dashboard → Statistiques (Lathus) -> Stats Camps → Inscriptions → Par tranches d'âge`
+
+#### Inscriptions par âges
+
+Liste les quantités d'inscriptions par âges entre les deux dates données.
+
+Informations :
+  - Qté
+
+> 📍 `Apps dashboard → Statistiques (Lathus) -> Stats Camps → Inscriptions → Par âges`
 
 #### Inscriptions par mois
 
