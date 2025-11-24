@@ -593,6 +593,24 @@ Informations :
 
 > **Note :** Uniquement les inscriptions validées sont prises en compte.
 
+#### Séjours CLSH
+
+Liste les enfants ayant participé à un ou plusieurs camps CLSH lors de l'année sélectionnée.
+
+Informations :
+  - Nom enfant
+  - 6 - 9 ans
+  - 10 - 14 ans
+  - Qté juillet (Quantité de jours d'inscription de l'enfant en juillet)
+  - Qté août (Quantité de jours d'inscription de l'enfant en août)
+  - Qté (Quantité totale de jours d'inscription de l'enfant)
+
+> 📍 `Apps dashboard → Statistiques (Lathus) -> Stats Camps → Enfants → Séjours CLSH`
+
+#### Séjour
+
+> 📍 `Apps dashboard → Statistiques (Lathus) -> Stats Camps → Enfants → Séjours`
+
 #### Inscriptions par régions
 
 Liste les départements entre les deux dates données et donne des informations sur les quantités d'inscriptions aux camps.
