@@ -404,6 +404,18 @@ La fiche d'inscription liste les documents **requis** afin de pouvoir **valider*
 Cette liste est créée en fonction de la configuration du **modèle de camp**.  
 Il faut marquer les documents comme reçus quand ils le sont.
 
+Deux champs sont affichés, dans les listes des inscriptions, afin de facilité la gestion des documents :
+  - Doc aptitudes aquatiques reçu (le document de type `Aptitudes activités aquatiques` est marqué comme reçu)
+  - Tous les documents reçus
+
+Types de document :
+  - Aptitudes activités aquatiques
+  - Fiche contact
+  - Fiche sanitaire
+  - Numéro sécu
+  - Vaccins
+  - Autre
+
 #### Inscription via site web
 
 Une action Discope permet de récupérer les inscriptions depuis l'API du site web du CPA Lathus et les ajouter dans Discope.

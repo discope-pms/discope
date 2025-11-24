@@ -276,8 +276,8 @@
             "help": ""
         },
         "doc_aquatic_skills_received": {
-            "label": "Doc aptitudes aquatique reçus",
-            "description": "Le document attestant des compétences aquatique de l'enfant a été reçus.",
+            "label": "Doc aptitudes aquatiques reçu",
+            "description": "Le document attestant des compétences aquatiques de l'enfant a été reçu.",
             "help": ""
         },
         "paid_amount": {
