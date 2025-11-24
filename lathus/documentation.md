@@ -628,10 +628,14 @@ Informations :
 
 Liste les tarifs entre les deux dates données et donne des informations sur les quantités d'inscriptions aux camps.
 
-Pour les camps `CLSH` la quantité de journées d'inscriptions est utilisées (_si 2 jours alors comptabilisé comme 2 inscriptions_).
+Pour les camps `CLSH` la quantité de journées d'inscriptions est utilisées si le tarif est à la journée.
 
 Informations :
+  - Qté Autre
+  - Qté Habitants Vienne/Partenaires hors Vienne
+  - Qté Adhérents/Partenaires Vienne/Habitants des cantons
   - Qté
+  - Total (Prix du produit de camp sans l'application des réductions)
 
 > 📍 `Apps dashboard → Statistiques (Lathus) -> Stats Camps → Inscriptions → Par tarifs`
 
