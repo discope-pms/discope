@@ -463,23 +463,25 @@ try {
                                 $resulting_total = round($resulting_price / (1 + $price['vat_rate']), 4);
 
                                 $booking_line_group = BookingLineGroup::create([
-                                        'name'          => "Sejour {$nb_pers} personne(s) {$reservation['partner']}",
-                                        'is_sojourn'    => true,
-                                        'group_type'    => 'sojourn',
-                                        'has_pack'      => true,
-                                        'pack_id'       => $group_product['id'],
-                                        'is_locked'     => true,
-                                        'date_from'     => strtotime('midnight', $date_from),
-                                        'date_to'       => strtotime('midnight', $date_to),
-                                        'time_from'     => $date_from - strtotime('midnight', $date_from),
-                                        'time_to'       => $date_to - strtotime('midnight', $date_to),
-                                        'nb_pers'       => $nb_pers,
-                                        'booking_id'    => $booking['id'],
-                                        'price_id'      => $price['id'],
-                                        'unit_price'    => $resulting_total,
-                                        'price'         => $resulting_price,
+                                        'name'                  => "Sejour {$nb_pers} personne(s) {$reservation['partner']}",
+                                        'is_sojourn'            => true,
+                                        'group_type'            => 'sojourn',
+                                        'has_pack'              => true,
+                                        'pack_id'               => $group_product['id'],
+                                        'is_locked'             => true,
+                                        'date_from'             => strtotime('midnight', $date_from),
+                                        'date_to'               => strtotime('midnight', $date_to),
+                                        'time_from'             => $date_from - strtotime('midnight', $date_from),
+                                        'time_to'               => $date_to - strtotime('midnight', $date_to),
+                                        'nb_pers'               => $nb_pers,
+                                        // used to check-contingencies if overbooking
+                                        'extref_room_type_id'   => $room_stay['room_type']['id'],
+                                        'booking_id'            => $booking['id'],
+                                        'price_id'              => $price['id'],
+                                        'unit_price'            => $resulting_total,
+                                        'price'                 => $resulting_price,
                                         // total depends on the VAT rate of the matching price_id (VAT excl)
-                                        'total'         => $resulting_total
+                                        'total'                 => $resulting_total
                                     ])
                                     ->read(['id'])
                                     ->first(true);

@@ -11,6 +11,7 @@ use sale\booking\Booking;
 use sale\booking\BookingActivity;
 use sale\booking\BookingLine;
 use sale\booking\BookingPoint;
+use sale\booking\channelmanager\RoomType;
 use sale\booking\Consumption;
 use sale\booking\BookingLineGroup;
 use sale\booking\Contract;
@@ -86,9 +87,9 @@ $booking = Booking::id($params['id'])
         'status',
         'paid_amount',
         'is_from_channelmanager',
-        'booking_lines_groups_ids',
-        'customer_id'       => ['rate_class_id'],
-        'center_office_id'  => ['organisation_id']
+        'booking_lines_groups_ids'  => ['rental_unit_assignments_ids', 'extref_room_type_id'],
+        'customer_id'               => ['rate_class_id'],
+        'center_office_id'          => ['organisation_id']
     ])
     ->first(true);
 
@@ -127,7 +128,9 @@ if(!$params['with_fee']) {
 $channelmanager_enabled = Setting::get_value('sale', 'features', 'booking.channel_manager', false);
 if($channelmanager_enabled) {
     /*
-        Check if consistency must be maintained with channel manager (if booking impacts a rental unit that is linked to a channelmanager room type)
+        Check whether consistency needs to be maintained with the channel manager, specifically:
+          - when a booking affects a rental unit linked to a channel-manager room type
+          - or when an overbooking occurs, where the group has no assigned rental unit but is still linked to a channel-manager room type
     */
 
     // retrieve rental units impacted by this operation
@@ -137,6 +140,28 @@ if($channelmanager_enabled) {
     foreach($consumptions as $consumption) {
         if($consumption['is_accomodation'] && $consumption['rental_unit_id'] !== null) {
             $map_rental_units_ids[$consumption['rental_unit_id']] = true;
+        }
+    }
+
+    // retrieve the extref_room_type_id for groups whose rental units could not be assigned due to overbooking
+    $map_extref_room_type_ids = [];
+    foreach($booking['booking_lines_groups_ids'] as $group) {
+        if(empty($group['rental_unit_assignments_ids']) && $group['extref_room_type_id'] !== null) {
+            $map_extref_room_type_ids[$group['extref_room_type_id']] = true;
+        }
+    }
+
+    // retrieve the room types of groups affected by overbooking (group without assigned units but with use of field extref_room_type_id)
+    $room_types_ids = [];
+    if(count($map_extref_room_type_ids)) {
+        $room_types = RoomType::search(['extref_room_type_id', 'in', array_keys($map_extref_room_type_ids)])
+            ->read(['rental_units_ids'])
+            ->get();
+
+        foreach($room_types as $room_type) {
+            foreach($room_type['rental_units_ids'] as $rental_unit_id) {
+                $map_rental_units_ids[$rental_unit_id] = true;
+            }
         }
     }
 
@@ -189,7 +214,7 @@ if($params['with_fee']) {
 
     // mark all sojourns as 'extra' to allow custom changes (there are many possible situations between none and some of the services actually consumed)
     if(count($booking['booking_lines_groups_ids'])) {
-        BookingLineGroup::ids($booking['booking_lines_groups_ids'])->update(['is_extra' => true]);
+        BookingLineGroup::ids(array_column($booking['booking_lines_groups_ids'], 'id'))->update(['is_extra' => true]);
     }
 
     // create a group with one line for the cancellation product
