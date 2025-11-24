@@ -509,6 +509,9 @@ Ce mail confirme au tuteur principal l'inscription de l'enfant au camp.
 Liste les camps entre les deux dates données et donne des informations sur les quantités d'enfants participants aux camps.
 
 Informations :
+  - Camp
+  - Site
+  - Animateurs
   - Age (_list les âges, contient une valeur si `Par âge` activer_)
   - Qté garçons
   - Qté filles
@@ -521,6 +524,31 @@ Informations :
 > 💡 **Astuce :** Il est possible de séparer `Par âge` pour avoir les informations séparées pour chaque âge des enfants.
 
 > **Note :** Uniquement les inscriptions validées sont prises en compte.
+
+#### Distribution âges
+
+Liste les camps entre les deux dates données et donne des informations sur les quantités d'enfants par âges participants aux camps.
+
+Informations :
+  - Code
+  - Camp
+  - Tranche d'âge
+  - Qté
+  - 4 ans (qté enfants de 4 ans)
+  - 5-6 ans (qté enfants de 5-6 ans)
+  - 7-8 ans (qté enfants de 7-8 ans)
+  - 9-10 ans (qté enfants de 9-10 ans)
+  - 11-12 ans (qté enfants de 11-12 ans)
+  - 13-14 ans (qté enfants de 13-14 ans)
+  - 15 ans (qté enfants de 15 ans)
+  - 16-17 ans (qté enfants de 16-17 ans)
+  - sans âge (qté enfants dont l'âge ne rentre pas dans les autres catégories)
+
+> 📍 `Apps dashboard → Statistiques (Lathus) -> Stats Camps → Camps → Distribution âges`
+
+> **Notes :**
+> - Uniquement les inscriptions validées sont prises en compte.
+> - Par défaut les camps de la semaine en cours sont affichés.
 
 #### Enfants par semaines
 

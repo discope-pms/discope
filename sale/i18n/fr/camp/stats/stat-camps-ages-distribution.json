@@ -29,6 +29,11 @@
             "description": "",
             "help": ""
         },
+        "age_range": {
+            "label": "Tranche d'âge",
+            "description": "",
+            "help": ""
+        },
         "qty": {
             "label": "Qté",
             "description": "",
