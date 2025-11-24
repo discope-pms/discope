@@ -101,8 +101,13 @@ Il existe **deux types** de camps :
     - L'enfant est inscrit par jour
     - Peut durer 4 à 5 jours, jamais durant le week-end
 
-> **Notes** : Le nombre de places maximum dans un camp en égale à `Qté groupe * Max enfants`.
-> Les inscriptions de status `Brouillon`, `Confirmée` et `Validée` sont prises en compte.
+> **Notes** :
+>   - Le nombre de places maximum dans un camp en égale à `Qté groupe * Max enfants`.
+>   - Les inscriptions de status `Brouillon`, `Confirmée` et `Validée` sont prises en compte.
+>   - Le **site** d'un camp en déterminé en fonction de sa tranche d'âge.
+>     - Criquets `6-9 ans`
+>     - Coccinelles `10-12 ans`
+>     - Libellules `13-16 ans`
 
 ---
 
@@ -510,13 +515,14 @@ Liste les camps entre les deux dates données et donne des informations sur les 
 
 Informations :
   - Camp
-  - Site
+  - Site (Criquets, Coccinelles, Libellules)
   - Animateurs
   - Age (_list les âges, contient une valeur si `Par âge` activer_)
   - Qté garçons
   - Qté filles
   - Qté anciens
   - Qté nouveaux (_première inscription_)
+  - Qté ASE
   - Qté
 
 > 📍 `Apps dashboard → Statistiques (Lathus) -> Stats Camps → Camps → Distribution enfants`
