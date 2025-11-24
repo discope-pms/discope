@@ -609,6 +609,12 @@ Informations :
 
 #### Séjour
 
+Liste les enfants ayant participé à un ou plusieurs camps non CLSH lors de l'année sélectionnée.
+
+Informations :
+  - Nom enfant
+  - Qté
+
 > 📍 `Apps dashboard → Statistiques (Lathus) -> Stats Camps → Enfants → Séjours`
 
 #### Inscriptions par régions
