@@ -301,6 +301,19 @@ Une liste globale des repas se trouve dans `Apps dashboard → Camps → Repas`
 
 ---
 
+#### Plannings
+
+Les camps en cours sont listés dans la page `Camps de la semaine`
+
+> 📍 `Apps dashboard → Camps -> En cours → Camps`
+
+Deux plannings peuvent être téléchargés sur cette page : un planning présentant un camp par page et un planning condensé.
+
+Ces plannings donnent les informations sur :
+  - Les activités des groups de camp
+  - Les animateurs des groups de camp
+  - Les repas des camps
+
 ### Inscriptions
 
 Une inscription permet d'inscrire un enfant à un camp d'été.
