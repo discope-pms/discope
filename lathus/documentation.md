@@ -81,6 +81,47 @@ Configuration :
 
 ---
 
+## Planning activités condensé
+
+Le planning d'activités liste toutes les activités des camps et des réservations pour une tranche horaire à une date.
+
+### 📍 Où le trouver ?
+
+`Apps dashboard → Réservations → Planning → Activités`
+
+---
+
+## Programme de la semaine
+
+Le programme de la semaine des réservations liste les réservations de la semaine en cours.
+
+Informations :
+  - Groupes (Nom du client de la réservation)
+  - Dates (Date de début et fin de la réservation)
+  - Nombre (Nombre d'`enfants + adultes` participants)
+  - Age (Tranche d'âge des enfants s'il y en à, sinon tranche d'âge des adultes)
+  - Planning (Des activités sont planifiées durant le séjour)
+  - Frigo (Mise à disposition d'un frigo)
+  - Répartition (Unités locatives assignées)
+  - Handicap (Une personne avec un handicap participe)
+  - Repas (Des repas sont planifiés durant le séjour)
+
+### 📍 Où le trouver ?
+
+`Apps dashboard → Réservations → Planning → En cours`
+
+### Paramètres
+
+Un paramètre permet de configurer le programme de la semaine :
+
+#### 1. SKUs mise à disposition frigo
+
+Liste des SKUs des produits de mise à disposition d'un frigo
+
+> sale.booking.icebox_skus
+
+---
+
 ## Camps
 
 L'application `Camps` permet la gestion des camps d'été du CPA Lathus.  
@@ -101,8 +142,13 @@ Il existe **deux types** de camps :
     - L'enfant est inscrit par jour
     - Peut durer 4 à 5 jours, jamais durant le week-end
 
-> **Notes** : Le nombre de places maximum dans un camp en égale à `Qté groupe * Max enfants`.
-> Les inscriptions de status `Brouillon`, `Confirmée` et `Validée` sont prises en compte.
+> **Notes** :
+>   - Le nombre de places maximum dans un camp en égale à `Qté groupe * Max enfants`.
+>   - Les inscriptions de status `Brouillon`, `Confirmée` et `Validée` sont prises en compte.
+>   - Le **site** d'un camp en déterminé en fonction de sa tranche d'âge.
+>     - Criquets `6-9 ans`
+>     - Coccinelles `10-12 ans`
+>     - Libellules `13-16 ans`
 
 ---
 
@@ -296,6 +342,19 @@ Une liste globale des repas se trouve dans `Apps dashboard → Camps → Repas`
 
 ---
 
+#### Plannings
+
+Les camps en cours sont listés dans la page `Camps de la semaine`
+
+> 📍 `Apps dashboard → Camps -> En cours → Camps`
+
+Deux plannings peuvent être téléchargés sur cette page : un planning présentant un camp par page et un planning condensé.
+
+Ces plannings donnent les informations sur :
+  - Les activités des groups de camp
+  - Les animateurs des groups de camp
+  - Les repas des camps
+
 ### Inscriptions
 
 Une inscription permet d'inscrire un enfant à un camp d'été.
@@ -398,6 +457,18 @@ Elles génèrent des paiements sur le financement créé lors du passage de l'é
 La fiche d'inscription liste les documents **requis** afin de pouvoir **valider** l'inscription.  
 Cette liste est créée en fonction de la configuration du **modèle de camp**.  
 Il faut marquer les documents comme reçus quand ils le sont.
+
+Deux champs sont affichés, dans les listes des inscriptions, afin de facilité la gestion des documents :
+  - Doc aptitudes aquatiques reçu (le document de type `Aptitudes activités aquatiques` est marqué comme reçu)
+  - Tous les documents reçus
+
+Types de document :
+  - Aptitudes activités aquatiques
+  - Fiche contact
+  - Fiche sanitaire
+  - Numéro sécu
+  - Vaccins
+  - Autre
 
 #### Inscription via site web
 
@@ -509,11 +580,15 @@ Ce mail confirme au tuteur principal l'inscription de l'enfant au camp.
 Liste les camps entre les deux dates données et donne des informations sur les quantités d'enfants participants aux camps.
 
 Informations :
+  - Camp
+  - Site (Criquets, Coccinelles, Libellules)
+  - Animateurs
   - Age (_list les âges, contient une valeur si `Par âge` activer_)
   - Qté garçons
   - Qté filles
   - Qté anciens
   - Qté nouveaux (_première inscription_)
+  - Qté ASE
   - Qté
 
 > 📍 `Apps dashboard → Statistiques (Lathus) -> Stats Camps → Camps → Distribution enfants`
@@ -521,6 +596,31 @@ Informations :
 > 💡 **Astuce :** Il est possible de séparer `Par âge` pour avoir les informations séparées pour chaque âge des enfants.
 
 > **Note :** Uniquement les inscriptions validées sont prises en compte.
+
+#### Distribution âges
+
+Liste les camps entre les deux dates données et donne des informations sur les quantités d'enfants par âges participants aux camps.
+
+Informations :
+  - Code
+  - Camp
+  - Tranche d'âge
+  - Qté
+  - 4 ans (qté enfants de 4 ans)
+  - 5-6 ans (qté enfants de 5-6 ans)
+  - 7-8 ans (qté enfants de 7-8 ans)
+  - 9-10 ans (qté enfants de 9-10 ans)
+  - 11-12 ans (qté enfants de 11-12 ans)
+  - 13-14 ans (qté enfants de 13-14 ans)
+  - 15 ans (qté enfants de 15 ans)
+  - 16-17 ans (qté enfants de 16-17 ans)
+  - sans âge (qté enfants dont l'âge ne rentre pas dans les autres catégories)
+
+> 📍 `Apps dashboard → Statistiques (Lathus) -> Stats Camps → Camps → Distribution âges`
+
+> **Notes :**
+> - Uniquement les inscriptions validées sont prises en compte.
+> - Par défaut les camps de la semaine en cours sont affichés.
 
 #### Enfants par semaines
 
@@ -533,6 +633,30 @@ Informations :
 > 📍 `Apps dashboard → Statistiques (Lathus) -> Stats Camps → Enfants → Par semaines`
 
 > **Note :** Uniquement les inscriptions validées sont prises en compte.
+
+#### Séjours CLSH
+
+Liste les enfants ayant participé à un ou plusieurs camps CLSH lors de l'année sélectionnée.
+
+Informations :
+  - Nom enfant
+  - 6 - 9 ans
+  - 10 - 14 ans
+  - Qté juillet (Quantité de jours d'inscription de l'enfant en juillet)
+  - Qté août (Quantité de jours d'inscription de l'enfant en août)
+  - Qté (Quantité totale de jours d'inscription de l'enfant)
+
+> 📍 `Apps dashboard → Statistiques (Lathus) -> Stats Camps → Enfants → Séjours CLSH`
+
+#### Séjour
+
+Liste les enfants ayant participé à un ou plusieurs camps non CLSH lors de l'année sélectionnée.
+
+Informations :
+  - Nom enfant
+  - Qté
+
+> 📍 `Apps dashboard → Statistiques (Lathus) -> Stats Camps → Enfants → Séjours`
 
 #### Inscriptions par régions
 
@@ -551,10 +675,14 @@ Informations :
 
 Liste les tarifs entre les deux dates données et donne des informations sur les quantités d'inscriptions aux camps.
 
-Pour les camps `CLSH` la quantité de journées d'inscriptions est utilisées (_si 2 jours alors comptabilisé comme 2 inscriptions_).
+Pour les camps `CLSH` la quantité de journées d'inscriptions est utilisées si le tarif est à la journée.
 
 Informations :
+  - Qté Autre
+  - Qté Habitants Vienne/Partenaires hors Vienne
+  - Qté Adhérents/Partenaires Vienne/Habitants des cantons
   - Qté
+  - Total (Prix du produit de camp sans l'application des réductions)
 
 > 📍 `Apps dashboard → Statistiques (Lathus) -> Stats Camps → Inscriptions → Par tarifs`
 
@@ -594,7 +722,7 @@ Informations :
 
 #### Inscriptions par tranches d'âge
 
-Liste les tranches d'âge entre les deux dates données et donne des informations sur les quantités d'inscriptions aux camps.
+Liste les quantités d'inscriptions par tranches d'âge entre les deux dates données.
 
 Tranches d'âges :
   - 6 - 9
@@ -605,6 +733,15 @@ Informations :
   - Qté
 
 > 📍 `Apps dashboard → Statistiques (Lathus) -> Stats Camps → Inscriptions → Par tranches d'âge`
+
+#### Inscriptions par âges
+
+Liste les quantités d'inscriptions par âges entre les deux dates données.
+
+Informations :
+  - Qté
+
+> 📍 `Apps dashboard → Statistiques (Lathus) -> Stats Camps → Inscriptions → Par âges`
 
 #### Inscriptions par mois
 
