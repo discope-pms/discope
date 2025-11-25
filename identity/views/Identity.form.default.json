@@ -264,7 +264,9 @@
                                                 "value": "reference_partner_id",
                                                 "label": "Person of reference",
                                                 "width": "100%",
-                                                "domain": ["owner_identity_id", "=", "object.id"]
+                                                "widget": {
+                                                    "domain": ["owner_identity_id", "=", "object.id"]
+                                                }
                                             },
                                             {
                                                 "type": "field",
