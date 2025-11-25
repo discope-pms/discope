@@ -960,9 +960,9 @@ class Booking extends Model {
     public static function calcTotalVat($self): array {
         $result = [];
         $self->read(['subtotals_vat']);
-        foreach($self as $id => $invoice) {
+        foreach($self as $id => $booking) {
             $total_vat = 0.0;
-            foreach($invoice['subtotals_vat'] as $subtotal) {
+            foreach($booking['subtotals_vat'] as $subtotal) {
                 $total_vat = round($total_vat + $subtotal, 2);
             }
 
@@ -975,13 +975,13 @@ class Booking extends Model {
     public static function calcPrice($self): array {
         $result = [];
         $self->read(['total', 'subtotals_vat']);
-        foreach($self as $id => $invoice) {
+        foreach($self as $id => $booking) {
             $total_vat = 0.0;
-            foreach($invoice['subtotals_vat'] as $subtotal_vat) {
+            foreach($booking['subtotals_vat'] as $subtotal_vat) {
                 $total_vat = round($total_vat + $subtotal_vat, 2);
             }
 
-            $result[$id] = round($invoice['total'] + $total_vat, 2);
+            $result[$id] = round($booking['total'] + $total_vat, 2);
         }
 
         return $result;

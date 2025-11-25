@@ -1017,7 +1017,6 @@ class BookingLineGroup extends Model {
 
     /**
      * Compute the VAT incl. total price of the group (pack), with manual and automated discounts applied.
-     *
      */
     public static function calcPrice($self): array {
         $result = [];
