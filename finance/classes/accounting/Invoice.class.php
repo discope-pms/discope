@@ -588,12 +588,18 @@ class Invoice extends Model {
         return $result;
     }
 
-    public static function calcAccountingTotal($om, $oids, $lang) {
+    public static function calcAccountingTotal($self): array {
         $result = [];
-
-        $invoices = $om->read(self::getType(), $oids, ['organisation_id', 'is_deposit', 'invoice_lines_ids'], $lang);
-
-        foreach($invoices as $oid => $invoice) {
+        $self->read([
+            'organisation_id',
+            'is_deposit',
+            'invoice_lines_ids' => [
+                'total',
+                'product_id',
+                'downpayment_invoice_id' => ['status']
+            ]
+        ]);
+        foreach($self as $id => $invoice) {
             // retrieve downpayment product
             $downpayment_product_id = 0;
             $downpayment_sku = Setting::get_value('sale', 'organization', 'sku.downpayment.'.$invoice['organisation_id']);
@@ -604,21 +610,19 @@ class Invoice extends Model {
                 }
             }
 
-            $total = 0;
-            $lines = $om->read('finance\accounting\InvoiceLine', $invoice['invoice_lines_ids'], ['total', 'product_id', 'downpayment_invoice_id', 'downpayment_invoice_id.status'], $lang);
-            foreach($lines as $lid => $line) {
+            $total = 0.0;
+            foreach($invoice['invoice_lines_ids'] as $line) {
                 if($line['product_id'] == $downpayment_product_id) {
                     // deposit invoice
                     if($invoice['is_deposit']) {
-                        $total += round($line['total'], 2);
+                        $total = round($total + $line['total'], 2);
                     }
-                    // balance invoice
                     else {
                         // if the line refers to an invoiced downpayment and if the related downpayment invoice hasn't been cancelled
-                        if(isset($line['downpayment_invoice_id']) && $line['downpayment_invoice_id'] && isset($line['downpayment_invoice_id.status']) && $line['downpayment_invoice_id.status'] == 'invoice') {
+                        if(isset($line['downpayment_invoice_id']['status']) && $line['downpayment_invoice_id']['status'] === 'invoice') {
                             // remove deposit from accounting total
                             // #memo - total should be a negative value
-                            $total += round($line['total'], 2);
+                            $total = round($total + $line['total'], 2);
                         }
                         else {
                             // ignore installment
@@ -626,74 +630,40 @@ class Invoice extends Model {
                     }
                 }
                 else {
-                    $total += round($line['total'], 2);
+                    $total = round($total + $line['total'], 2);
                 }
             }
-            $result[$oid] = round($total, 2);
+
+            $result[$id] = $total;
         }
+
         return $result;
     }
 
-    /**
-     * Compute the turnover corresponding to the invoice.
-     */
-    public static function calcAccountingPrice($om, $oids, $lang) {
+    public static function calcAccountingPrice($self): array {
         $result = [];
-
-        $invoices = $om->read(self::getType(), $oids, ['organisation_id', 'is_deposit', 'invoice_lines_ids'], $lang);
-
-        foreach($invoices as $oid => $invoice) {
-            // retrieve downpayment product
-            $downpayment_product_id = 0;
-            $downpayment_sku = Setting::get_value('sale', 'organization', 'sku.downpayment.'.$invoice['organisation_id']);
-            if($downpayment_sku) {
-                $products_ids = Product::search(['sku', '=', $downpayment_sku])->ids();
-                if($products_ids) {
-                    $downpayment_product_id = reset($products_ids);
-                }
+        $self->read(['accounting_total', 'subtotals_vat']);
+        foreach($self as $id => $invoice) {
+            $total_vat = 0.0;
+            foreach($invoice['subtotals_vat'] as $subtotal_vat) {
+                $total_vat = round($total_vat + $subtotal_vat, 2);
             }
 
-            $price = 0;
-            $lines = $om->read('finance\accounting\InvoiceLine', $invoice['invoice_lines_ids'], ['price', 'product_id', 'downpayment_invoice_id', 'downpayment_invoice_id.status'], $lang);
-            foreach($lines as $lid => $line) {
-                if($line['product_id'] == $downpayment_product_id) {
-                    // deposit invoice
-                    if($invoice['is_deposit']) {
-                        $price += $line['price'];
-                    }
-                    // balance invoice
-                    else {
-                        // if the line refers to an invoiced downpayment and if the related downpayment invoice hasn't been cancelled
-                        if(isset($line['downpayment_invoice_id']) && $line['downpayment_invoice_id'] && isset($line['downpayment_invoice_id.status']) && $line['downpayment_invoice_id.status'] == 'invoice') {
-                            // remove deposit from accounting price
-                            // #memo - price should be a negative value
-                            $price += $line['price'];
-                        }
-                        else {
-                            // ignore installment
-                        }
-                    }
-                }
-                else {
-                    $price += $line['price'];
-                }
-            }
-            $result[$oid] = round($price, 2);
+            $result[$id] = round($invoice['accounting_total'] + $total_vat, 2);
         }
+
         return $result;
     }
 
-    public static function calcDisplayPrice($om, $oids, $lang) {
+    public static function calcDisplayPrice($self): array {
         $result = [];
-
-        $invoices = $om->read(self::getType(), $oids, ['type', 'price'], $lang);
-
-        foreach($invoices as $oid => $invoice) {
-            if($invoice['type'] == 'invoice') {
-                $result[$oid] = $invoice['price'];
+        $self->read(['type', 'price']);
+        foreach($self as $id => $invoice) {
+            if($invoice['type'] === 'invoice') {
+                $result[$id] = $invoice['price'];
             }
             else {
-                $result[$oid] = -$invoice['price'];
+                $result[$id] = -$invoice['price'];
             }
         }
 
