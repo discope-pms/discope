@@ -8,6 +8,7 @@
 
 use core\setting\Setting;
 use sale\booking\BookingLineGroup;
+use sale\booking\channelmanager\RoomType;
 use sale\booking\Consumption;
 use realestate\RentalUnit;
 use sale\booking\SojournProductModel;
@@ -62,7 +63,7 @@ foreach($params['assignments'] as $assignment) {
 // fetch the group (nb_pers)
 $group = BookingLineGroup::id($params['booking_line_group_id'])
     ->read([
-        'id', 'nb_pers', 'nb_nights', 'date_from', 'date_to', 'time_from', 'time_to',
+        'id', 'nb_pers', 'nb_nights', 'date_from', 'date_to', 'time_from', 'time_to', 'extref_room_type_id',
         'booking_id' => ['id', 'center_id']
     ])
     ->first(true);
@@ -200,6 +201,19 @@ if($is_channelmanager_enabled) {
     // ... or by new assignments
     foreach($params['assignments'] as $assignment) {
         $map_rental_units_ids[$assignment['rental_unit_id']] = true;
+    }
+
+    // retrieve the room types of groups affected by overbooking (group without assigned units but with use of field extref_room_type_id)
+    if(!is_null($group['extref_room_type_id'])) {
+        $room_type = RoomType::search(['extref_room_type_id', '=', $group['extref_room_type_id']])
+            ->read(['rental_units_ids'])
+            ->first();
+
+        if(!is_null($room_type)) {
+            foreach($room_type['rental_units_ids'] as $rental_unit_id) {
+                $map_rental_units_ids[$rental_unit_id] = true;
+            }
+        }
     }
 
     if(count($map_rental_units_ids)) {

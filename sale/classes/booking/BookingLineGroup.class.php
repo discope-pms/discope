@@ -302,6 +302,12 @@ class BookingLineGroup extends Model {
                 'store'             => true
             ],
 
+            'extref_room_type_id' => [
+                'type'              => 'integer',
+                'description'       => "External identifier of the targeted room type.",
+                'help'              => "Used to know which type of Cubilis room type is at the origin of the creation of the group."
+            ],
+
             // we mean rental_units_ids (for rental units assignment)
             // #todo - deprecate
             'accomodations_ids' => [

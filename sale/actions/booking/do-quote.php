@@ -9,6 +9,7 @@ use core\setting\Setting;
 use sale\booking\Booking;
 use sale\booking\BookingLine;
 use sale\booking\BookingLineGroup;
+use sale\booking\channelmanager\RoomType;
 use sale\booking\Contract;
 use sale\booking\Consumption;
 
@@ -133,13 +134,43 @@ if($params['free_rental_units']) {
     $channelmanager_enabled = Setting::get_value('sale', 'features', 'booking.channel_manager', false);
     if($channelmanager_enabled) {
         $booking = Booking::id($params['id'])
-            ->read(['date_from', 'date_to', 'consumptions_ids' => ['is_accomodation', 'rental_unit_id']])
+            ->read([
+                'date_from',
+                'date_to',
+                'consumptions_ids'          => ['is_accomodation', 'rental_unit_id'],
+                'booking_lines_groups_ids'  => ['extref_room_type_id']
+            ])
             ->first(true);
 
+        // retrieve rental units impacted by this operation
         $map_rental_units_ids = [];
+
+        // retrieve rental units from consumptions
         foreach($booking['consumptions_ids'] as $consumption) {
             if($consumption['is_accomodation']) {
                 $map_rental_units_ids[$consumption['rental_unit_id']] = true;
+            }
+        }
+
+        // retrieve the extref_room_type_id for groups whose rental units could not be assigned due to overbooking
+        $map_extref_room_type_ids = [];
+        foreach($booking['booking_lines_groups_ids'] as $group) {
+            if($group['extref_room_type_id'] !== null) {
+                $map_extref_room_type_ids[$group['extref_room_type_id']] = true;
+            }
+        }
+
+        // retrieve the room types of groups affected by overbooking (group without assigned units but with use of field extref_room_type_id)
+        $room_types_ids = [];
+        if(count($map_extref_room_type_ids)) {
+            $room_types = RoomType::search(['extref_room_type_id', 'in', array_keys($map_extref_room_type_ids)])
+                ->read(['rental_units_ids'])
+                ->get();
+
+            foreach($room_types as $room_type) {
+                foreach($room_type['rental_units_ids'] as $rental_unit_id) {
+                    $map_rental_units_ids[$rental_unit_id] = true;
+                }
             }
         }
 
