@@ -198,7 +198,7 @@ foreach($bookings as $booking) {
                 break;
             case 'ANIM':
                 $map_center_values[$booking['center_id']['name']][$date_index]['animations'] += $line['total'];
-                $map_center_values[$booking['center_id']['name']][$date_index][$line['product_model_id']['activity_scope'].'_animations'] += $line['price'];
+                $map_center_values[$booking['center_id']['name']][$date_index][$line['product_model_id']['activity_scope'].'_animations'] += $line['total'];
                 break;
         }
     }
