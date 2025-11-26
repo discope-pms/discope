@@ -137,6 +137,7 @@ if($channelmanager_enabled) {
     $map_rental_units_ids = [];
     $consumptions = Consumption::search(['booking_id', '=', $booking['id']])->read(['id', 'is_accomodation', 'rental_unit_id'])->get(true);
 
+    // retrieve rental units from consumptions
     foreach($consumptions as $consumption) {
         if($consumption['is_accomodation'] && $consumption['rental_unit_id'] !== null) {
             $map_rental_units_ids[$consumption['rental_unit_id']] = true;
