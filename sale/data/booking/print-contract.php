@@ -115,6 +115,9 @@ if(!$output) {
     // read contract
     $fields = [
         'created',
+        'total',
+        'subtotals_vat',
+        'price',
         'booking_id' => [
             'id', 'name', 'modified', 'date_from', 'date_to','nb_pers', 'time_from', 'time_to', 'price',
             'type_id' => [
@@ -230,9 +233,7 @@ if(!$output) {
                 'total',
                 'price'
             ]
-        ],
-        'price',
-        'total'
+        ]
     ];
 
 
@@ -701,14 +702,10 @@ if(!$output) {
     /*
         retrieve final VAT and group by rate
     */
-    foreach($lines as $line) {
-        $vat_rate = $line['vat_rate'];
-        $tax_label = $values['i18n']['vat'].' '.strval( intval($vat_rate * 100) ).'%';
-        $vat = $line['price'] - $line['total'];
-        if(!isset($values['tax_lines'][$tax_label])) {
-            $values['tax_lines'][$tax_label] = 0;
-        }
-        $values['tax_lines'][$tax_label] += $vat;
+    foreach($contract['subtotals_vat'] as $vat_rate_index => $subtotal_vat) {
+        $vat_rate = ((float) $vat_rate_index) / 100;
+        $tax_label = 'TVA '.intval($vat_rate * 100).'%';
+        $values['tax_lines'][$tax_label] = $subtotal_vat;
     }
 
 
