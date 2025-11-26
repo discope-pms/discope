@@ -474,7 +474,7 @@ try {
                                         'time_from'             => $date_from - strtotime('midnight', $date_from),
                                         'time_to'               => $date_to - strtotime('midnight', $date_to),
                                         'nb_pers'               => $nb_pers,
-                                        // used to check-contingencies if overbooking
+                                        // used to keep contingencies synchronized when (do-quote, do-option, do-cancel or update-sojourn assignment)
                                         'extref_room_type_id'   => $room_stay['room_type']['id'],
                                         'booking_id'            => $booking['id'],
                                         'price_id'              => $price['id'],
