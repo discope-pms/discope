@@ -87,7 +87,7 @@ $booking = Booking::id($params['id'])
         'status',
         'paid_amount',
         'is_from_channelmanager',
-        'booking_lines_groups_ids'  => ['rental_unit_assignments_ids', 'extref_room_type_id'],
+        'booking_lines_groups_ids'  => ['extref_room_type_id'],
         'customer_id'               => ['rate_class_id'],
         'center_office_id'          => ['organisation_id']
     ])
@@ -146,7 +146,7 @@ if($channelmanager_enabled) {
     // retrieve the extref_room_type_id for groups whose rental units could not be assigned due to overbooking
     $map_extref_room_type_ids = [];
     foreach($booking['booking_lines_groups_ids'] as $group) {
-        if(empty($group['rental_unit_assignments_ids']) && $group['extref_room_type_id'] !== null) {
+        if($group['extref_room_type_id'] !== null) {
             $map_extref_room_type_ids[$group['extref_room_type_id']] = true;
         }
     }
