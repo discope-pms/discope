@@ -107,6 +107,15 @@ class OrderLine extends Model {
                 'onupdate'          => '_resetPrice'
             ],
 
+            'total_no_discount' => [
+                'type'              => 'computed',
+                'result_type'       => 'float',
+                'usage'             => 'amount/money:2',
+                'description'       => "Total tax-excluded price of the line without the discount applied.",
+                'store'             => false,
+                'function'          => 'calcTotalNoDiscount'
+            ],
+
             'total' => [
                 'type'              => 'computed',
                 'result_type'       => 'float',
@@ -114,6 +123,16 @@ class OrderLine extends Model {
                 'description'       => 'Total tax-excluded price of the line (computed).',
                 'function'          => 'calcTotal',
                 'store'             => true
+            ],
+
+            'total_vat' => [
+                'type'              => 'computed',
+                'result_type'       => 'float',
+                'usage'             => 'amount/money:4',
+                'description'       => "Total tax price of the line.",
+                'help'              => "Must have 4 decimals allowed because it is used to compute subtotals_vat of Order.",
+                'store'             => false,
+                'function'          => 'calcTotalVat'
             ],
 
             'price' => [
@@ -213,25 +232,60 @@ class OrderLine extends Model {
         return [];
     }
 
-    public static function calcTotal($om, $ids, $lang) {
+    public static function calcTotalNoDiscount($self): array{
         $result = [];
-        $lines = $om->read(self::getType(), $ids, ['unit_price', 'qty', 'free_qty', 'discount']);
-        if($lines > 0) {
-            foreach($lines as $lid => $line) {
-                $result[$lid] = round(($line['unit_price'] * (1 - $line['discount'])) * ($line['qty'] - $line['free_qty']), 4);
-            }
+        $self->read(['qty', 'free_qty', 'unit_price']);
+        foreach($self as $id => $line) {
+            // #memo - total_no_discount of a line must be rounded to 2 decimals
+            $result[$id] = round(($line['qty'] - $line['free_qty']) * $line['unit_price'], 2);
         }
+
         return $result;
     }
 
-    public static function calcPrice($om, $ids, $lang) {
+    public static function calcTotal($self): array {
         $result = [];
-        $lines = $om->read(self::getType(), $ids, ['total', 'vat_rate']);
-        if($lines > 0) {
-            foreach($lines as $lid => $line) {
-                $result[$lid] = round($line['total'] * (1 + $line['vat_rate']), 2);
+        $self->read(['total_no_discount', 'discount']);
+        foreach($self as $id => $line) {
+            // #memo - total of a line must be rounded to 2 decimals
+            $result[$id] = round($line['total_no_discount'] * (1.0 - $line['discount']), 2);
+        }
+
+        return $result;
+    }
+
+    /**
+     * Get tax amount of the line.
+     */
+    public static function calcTotalVat($self): array {
+        $result = [];
+        $self->read(['vat_rate', 'qty', 'free_qty', 'unit_price', 'discount']);
+        foreach($self as $id => $line) {
+            if($line['vat_rate'] === 0.0) {
+                $result[$id] = 0.0;
+            }
+            else {
+                // #memo - total_vat must be computed using a precision of 4 decimals, it is rounded to 2 decimals at Invoice level for subtotals_vat
+                $total_no_discount = ($line['qty'] - $line['free_qty']) * $line['unit_price'];
+                $total = $total_no_discount - (1.0 * $line['discount']);
+
+                $result[$id] = round($total * $line['vat_rate'], 4);
             }
         }
+
+        return $result;
+    }
+
+    /**
+     * Get final tax-included price of the line.
+     */
+    public static function calcPrice($self): array {
+        $result = [];
+        $self->read(['total', 'total_vat']);
+        foreach($self as $id => $line) {
+            $result[$id] = round($line['total'] + $line['total_vat'], 4);
+        }
+
         return $result;
     }
 

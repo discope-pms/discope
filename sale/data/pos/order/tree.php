@@ -57,6 +57,8 @@ switch($params['variant']) {
             'has_invoice',
             'invoice_id',
             'total',
+            'subtotals_vat',
+            'total_vat',
             'price',
             'total_paid',
             'session_id' => [
@@ -154,6 +156,8 @@ switch($params['variant']) {
             'status',
             'center_id',
             'total',
+            'subtotals_vat',
+            'total_vat',
             'price',
             'total_paid',
             'has_invoice',

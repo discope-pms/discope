@@ -117,6 +117,33 @@ class Order extends Model {
                 'store'             => true
             ],
 
+            'subtotals' => [
+                'type'              => 'computed',
+                'result_type'       => 'array',
+                'description'       => "Sub totals, by vat rates, tax-excluded prices of the order.",
+                'help'              => "Must sum lines prices totals keeping 4 decimals and rounded to 2 decimals at the end. e.g. '0.0', '6.0', '12.0', '21.0'.",
+                'store'             => false,
+                'function'          => 'calcSubTotals'
+            ],
+
+            'subtotals_vat' => [
+                'type'              => 'computed',
+                'result_type'       => 'array',
+                'description'       => "Sub totals, by vat rates, tax prices of the order.",
+                'help'              => "Must sum lines prices totals keeping 4 decimals and rounded to 2 decimals at the end. e.g. '0.0', '6.0', '12.0', '21.0'.",
+                'store'             => false,
+                'function'          => 'calcSubTotalsVat'
+            ],
+
+            'total_vat' => [
+                'type'              => 'computed',
+                'result_type'       => 'float',
+                'usage'             => 'amount/money:2',
+                'description'       => "Total tax price of the booking.",
+                'store'             => false,
+                'function'          => 'calcTotalVat'
+            ],
+
             'price' => [
                 'type'              => 'computed',
                 'result_type'       => 'float',
@@ -293,82 +320,141 @@ class Order extends Model {
         }
     }
 
-    public static function calcName($om, $ids, $lang) {
+    public static function calcName($self): array {
         $result = [];
-        $orders = $om->read(self::getType(), $ids, ['sequence', 'session_id', 'session_id.cashdesk_id'], $lang);
-        if($orders > 0) {
-            foreach($orders as $oid => $order) {
-                $result[$oid] = sprintf("%03d.%05d.%03d", $order['session_id.cashdesk_id'], $order['session_id'], $order['sequence']);
-            }
+        $self->read(['sequence', 'session_id' => ['cashdesk_id']]);
+        foreach($self as $id => $order) {
+            $result[$id] = sprintf("%03d.%05d.%03d",
+                $order['session_id']['cashdesk_id'],
+                $order['session_id']['id'],
+                $order['sequence']
+            );
         }
+
         return $result;
     }
 
-    public static function calcSequence($om, $ids, $lang) {
+    public static function calcSequence($self): array {
         trigger_error("ORM::calling sale\pos\Order:calcSequence", QN_REPORT_DEBUG);
         $result = [];
-        $orders = $om->read(self::getType(), $ids, ['session_id'], $lang);
-        if($orders > 0) {
-            foreach($orders as $id => $order) {
-                $result[$id] = 1;
-                $orders_ids = $om->search(self::getType(), [['session_id', '=', $order['session_id']], ['id', '<>', $id]]);
-                // #memo - trying to access sequence of other orders here might lead to infinite loop
-                if(count($orders_ids) > 0) {
-                    $result[$id] = count($orders_ids) + 1;
-                }
+        $self->read(['session_id']);
+        foreach($self as $id => $order) {
+            $sequence = 1;
+
+            $orders_ids = Order::search([['session_id', '=', $order['session_id']], ['id', '<>', $id]])->ids();
+            if(count($orders_ids) > 0) {
+                $sequence = count($orders_ids) + 1;
             }
+
+            $result[$id] = $sequence;
         }
+
         return $result;
     }
 
-    public static function calcTotal($om, $ids, $lang) {
+    public static function calcTotal($self): array {
         $result = [];
-        $orders = $om->read(self::getType(), $ids, ['order_lines_ids.total']);
-        if($orders > 0) {
-            foreach($orders as $oid => $order) {
-                $result[$oid] = 0.0;
-                if($order['order_lines_ids.total'] > 0) {
-                    foreach((array) $order['order_lines_ids.total'] as $lid => $line) {
-                        $result[$oid] += $line['total'];
-                    }
-                    $result[$oid] = round($result[$oid], 4);
-                }
+        $self->read(['order_lines_ids' => ['total']]);
+        foreach($self as $id => $order) {
+            $total = 0.0;
+            foreach($order['order_lines_ids'] as $line) {
+                $total = round($total + $line['total'], 2);
             }
+
+            $result[$id] = $total;
         }
+
         return $result;
     }
 
-    public static function calcPrice($om, $ids, $lang) {
+    public static function calcSubTotals($self): array {
         $result = [];
-        $orders = $om->read(self::getType(), $ids, ['order_lines_ids.price']);
-        if($orders > 0) {
-            foreach($orders as $oid => $order) {
-                $result[$oid] = 0.0;
-                if($order['order_lines_ids.price'] > 0) {
-                    foreach((array) $order['order_lines_ids.price'] as $lid => $line) {
-                        $result[$oid] += $line['price'];
-                    }
-                    $result[$oid] = round($result[$oid], 2);
+        $self->read(['order_lines_ids' => ['vat_rate', 'total']]);
+        foreach($self as $id => $order) {
+            $subtotals = [];
+            foreach($order['order_lines_ids'] as $line) {
+                $vat_rate_index = number_format($line['vat_rate'] * 100, 2, '.', '');
+                if(!isset($subtotals[$vat_rate_index])) {
+                    $subtotals[$vat_rate_index] = 0.0;
                 }
+
+                // #memo - total is rounded to 2 decimals for compatibility with older data that were computed with 4 decimals
+                $subtotals[$vat_rate_index] = round($subtotals[$vat_rate_index] + round($line['total'], 2), 2);
             }
+
+            // #memo - as to be rounded on 2 decimals here and not on each line
+            $result[$id] = array_map(fn($subtotal) => round($subtotal, 2), $subtotals);
         }
+
         return $result;
     }
 
-    public static function calcTotalPaid($om, $ids, $lang) {
+    /**
+     * #memo - must sum lines prices totals keeping 4 decimals and rounded to 2 decimals at the end
+     */
+    public static function calcSubTotalsVat($self): array {
         $result = [];
-        $orders = $om->read(self::getType(), $ids, ['order_payments_ids.total_paid']);
-        if($orders > 0) {
-            foreach($orders as $oid => $order) {
-                $result[$oid] = 0.0;
-                if($order['order_payments_ids.total_paid'] > 0) {
-                    foreach((array) $order['order_payments_ids.total_paid'] as $pid => $payment) {
-                        $result[$oid] += $payment['total_paid'];
-                    }
-                    $result[$oid] = round($result[$oid], 2);
+        $self->read(['order_lines_ids' => ['vat_rate', 'total_vat']]);
+        foreach($self as $id => $order) {
+            $subtotals_vat = [];
+            foreach($order['order_lines_ids'] as $line) {
+                $vat_rate_index = number_format($line['vat_rate'] * 100, 2, '.', '');
+                if(!isset($subtotals_vat[$vat_rate_index])) {
+                    $subtotals_vat[$vat_rate_index] = 0.0;
                 }
+
+                $subtotals_vat[$vat_rate_index] = round($subtotals_vat[$vat_rate_index] + $line['total_vat'], 4);
             }
+
+            // #memo - as to be rounded on 2 decimals here and not on each line
+            $result[$id] = array_map(fn($subtotal) => round($subtotal, 2), $subtotals_vat);
         }
+
+        return $result;
+    }
+
+    public static function calcTotalVat($self): array {
+        $result = [];
+        $self->read(['subtotals_vat']);
+        foreach($self as $id => $order) {
+            $total_vat = 0.0;
+            foreach($order['subtotals_vat'] as $subtotal) {
+                $total_vat = round($total_vat + $subtotal, 2);
+            }
+
+            $result[$id] = $total_vat;
+        }
+
+        return $result;
+    }
+
+    public static function calcPrice($self): array {
+        $result = [];
+        $self->read(['total', 'subtotals_vat']);
+        foreach($self as $id => $order) {
+            $total_vat = 0.0;
+            foreach($order['subtotals_vat'] as $subtotal_vat) {
+                $total_vat = round($total_vat + $subtotal_vat, 2);
+            }
+
+            $result[$id] = round($order['total'] + $total_vat, 2);
+        }
+
+        return $result;
+    }
+
+    public static function calcTotalPaid($self): array {
+        $result = [];
+        $self->read(['order_payments_ids' => ['total_paid']]);
+        foreach($self as $id => $order) {
+            $total_paid = 0.0;
+            foreach($order['order_payments_ids'] as $payment) {
+                $total_paid = round($total_paid + $payment['total_paid'], 2);
+            }
+
+            $result[$id] = $total_paid;
+        }
+
         return $result;
     }
 
