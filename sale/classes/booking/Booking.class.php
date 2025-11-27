@@ -898,11 +898,27 @@ class Booking extends Model {
 
     public static function calcTotal($self): array {
         $result = [];
-        $self->read(['booking_lines_ids' => ['total']]);
+        $self->read([
+            'booking_lines_groups_ids' => [
+                'is_locked',
+                'has_pack',
+                'total',
+                'booking_lines_ids' => [
+                    'total'
+                ]
+            ]
+        ]);
         foreach($self as $id => $booking) {
             $total = 0.0;
-            foreach($booking['booking_lines_ids'] as $line) {
-                $total = round($total + $line['total'], 2);
+            foreach($booking['booking_lines_groups_ids'] as $group) {
+                if($group['has_pack'] && $group['is_locked']) {
+                    $total = round($total + $group['total'], 2);
+                }
+                else {
+                    foreach($group['booking_lines_ids'] as $line) {
+                        $total = round($total + $line['total'], 2);
+                    }
+                }
             }
 
             $result[$id] = $total;
@@ -913,17 +929,41 @@ class Booking extends Model {
 
     public static function calcSubTotals($self): array {
         $result = [];
-        $self->read(['booking_lines_ids' => ['vat_rate', 'total']]);
+        $self->read([
+            'booking_lines_groups_ids' => [
+                'is_locked',
+                'has_pack',
+                'vat_rate',
+                'total',
+                'booking_lines_ids' => [
+                    'vat_rate',
+                    'total'
+                ]
+            ]
+        ]);
         foreach($self as $id => $booking) {
             $subtotals = [];
-            foreach($booking['booking_lines_ids'] as $line) {
-                $vat_rate_index = number_format($line['vat_rate'] * 100, 2, '.', '');
-                if(!isset($subtotals[$vat_rate_index])) {
-                    $subtotals[$vat_rate_index] = 0.0;
-                }
+            foreach($booking['booking_lines_groups_ids'] as $group) {
+                if($group['has_pack'] && $group['is_locked']) {
+                    $vat_rate_index = number_format($group['vat_rate'] * 100, 2, '.', '');
+                    if(!isset($subtotals[$vat_rate_index])) {
+                        $subtotals[$vat_rate_index] = 0.0;
+                    }
 
-                // #memo - total is rounded to 2 decimals for compatibility with older data that were computed with 4 decimals
-                $subtotals[$vat_rate_index] = round($subtotals[$vat_rate_index] + round($line['total'], 2), 2);
+                    // #memo - total is rounded to 2 decimals for compatibility with older data that were computed with 4 decimals
+                    $subtotals[$vat_rate_index] = round($subtotals[$vat_rate_index] + round($group['total'], 2), 2);
+                }
+                else {
+                    foreach($group['booking_lines_ids'] as $line) {
+                        $vat_rate_index = number_format($line['vat_rate'] * 100, 2, '.', '');
+                        if(!isset($subtotals[$vat_rate_index])) {
+                            $subtotals[$vat_rate_index] = 0.0;
+                        }
+
+                        // #memo - total is rounded to 2 decimals for compatibility with older data that were computed with 4 decimals
+                        $subtotals[$vat_rate_index] = round($subtotals[$vat_rate_index] + round($line['total'], 2), 2);
+                    }
+                }
             }
 
             // #memo - as to be rounded on 2 decimals here and not on each line
@@ -938,16 +978,39 @@ class Booking extends Model {
      */
     public static function calcSubTotalsVat($self): array {
         $result = [];
-        $self->read(['booking_lines_ids' => ['vat_rate', 'total_vat']]);
+        $self->read([
+            'booking_lines_groups_ids' => [
+                'is_locked',
+                'has_pack',
+                'vat_rate',
+                'total_vat',
+                'booking_lines_ids' => [
+                    'vat_rate',
+                    'total_vat'
+                ]
+            ]
+        ]);
         foreach($self as $id => $booking) {
             $subtotals_vat = [];
-            foreach($booking['booking_lines_ids'] as $line) {
-                $vat_rate_index = number_format($line['vat_rate'] * 100, 2, '.', '');
-                if(!isset($subtotals_vat[$vat_rate_index])) {
-                    $subtotals_vat[$vat_rate_index] = 0.0;
-                }
+            foreach($booking['booking_lines_groups_ids'] as $group) {
+                if($group['has_pack'] && $group['is_locked']) {
+                    $vat_rate_index = number_format($group['vat_rate'] * 100, 2, '.', '');
+                    if(!isset($subtotals_vat[$vat_rate_index])) {
+                        $subtotals_vat[$vat_rate_index] = 0.0;
+                    }
 
-                $subtotals_vat[$vat_rate_index] = round($subtotals_vat[$vat_rate_index] + $line['total_vat'], 4);
+                    $subtotals_vat[$vat_rate_index] = round($subtotals_vat[$vat_rate_index] + $group['total_vat'], 4);
+                }
+                else {
+                    foreach($group['booking_lines_ids'] as $line) {
+                        $vat_rate_index = number_format($line['vat_rate'] * 100, 2, '.', '');
+                        if(!isset($subtotals_vat[$vat_rate_index])) {
+                            $subtotals_vat[$vat_rate_index] = 0.0;
+                        }
+
+                        $subtotals_vat[$vat_rate_index] = round($subtotals_vat[$vat_rate_index] + $line['total_vat'], 4);
+                    }
+                }
             }
 
             // #memo - as to be rounded on 2 decimals here and not on each line
