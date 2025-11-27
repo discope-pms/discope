@@ -8,6 +8,7 @@
 use identity\Center;
 use identity\Identity;
 use sale\booking\Booking;
+use sale\booking\BookingLine;
 use sale\booking\BookingLineGroup;
 use sale\booking\BookingType;
 use sale\catalog\Product;
@@ -366,5 +367,100 @@ $tests = [
             Booking::search(['description', 'like', '%'. 'Booking for Pack with Logement'.'%'])->delete(true);
         }
 
+    ],
+
+    '2304' => [
+        'description'       => "Create a booking to test the price calculation using subtotals instead of sum of lines totals.",
+        'help'              =>  "
+            Creates a booking with configuration to have a difference between price with VAT calc with subtotals vs price VAT calc by lines. \n \n
+            A total of 3 nights x 4 pers is accounted for city tax. \n \n
+            Dates from: 02-08-2023
+            Dates to: 05-08-2023 (3 nights)
+            Persons: 4",
+        'arrange'           =>  function () {
+
+            $center_vat = Center::id(2)->read(['id'])->first(true);
+            $booking_type = BookingType::search(['code', '=', 'TP'])->read(['id'])->first(true);
+            $customer_nature = CustomerNature::search(['code', '=', 'IN'])->read(['id'])->first(true);
+            $customer_identity = Identity::search([['firstname', '=', 'John'], ['lastname', '=', 'Doe']])->read(['id'])->first(true);
+
+            return [$center_vat['id'], $booking_type['id'], $customer_nature['id'], $customer_identity['id']];
+
+        },
+        'act'               =>  function ($data) use ($orm) {
+
+            list($center_id, $booking_type_id, $customer_nature_id, $customer_identity_id) = $data;
+
+            $booking = Booking::create([
+                'date_from'             => strtotime('2023-08-02'),
+                'date_to'               => strtotime('2023-08-05'),
+                'center_id'             => $center_id,
+                'type_id'               => $booking_type_id,
+                'customer_nature_id'    => $customer_nature_id,
+                'customer_identity_id'  => $customer_identity_id,
+                'description'           => 'Booking with Pack for price VAT calculations with subtotals'
+            ])
+                ->read(['id','date_from','date_to'])
+                ->first(true);
+
+            $booking_line_group = BookingLineGroup::create([
+                'booking_id'     => $booking['id'],
+                'is_sojourn'     => true,
+                'group_type'     => 'sojourn',
+                'rate_class_id'  => 4,
+                'sojourn_type_id'=> 2,
+                'nb_pers'        => 4
+            ])
+                ->read(['id'])
+                ->first(true);
+
+            $orm->disableEvents();
+            try {
+                eQual::run('do', 'sale_booking_update-sojourn-dates',
+                    ['id'           => $booking_line_group['id'],
+                        'date_from'    => $booking['date_from'],
+                        'date_to'      => $booking['date_to']]);
+            }
+            catch(Exception $e) {
+                $e->getMessage();
+            }
+
+            $pack = Product::search(['sku','=','VS-ChSglPC-A'])
+                ->read(['id','label'])
+                ->first(true);
+
+            try {
+                eQual::run('do', 'sale_booking_update-sojourn-pack-set',
+                    ['id' => $booking_line_group['id'],'pack_id' => $pack['id']]);
+            }
+            catch(Exception $e) {
+                $e->getMessage();
+            }
+
+            // Fix to replicate difference between price VAT subtotals and sum of lines prices
+            BookingLine::search(['product_id', '=', 31])->update(['qty' => 12]); // Nuitées
+            BookingLine::search(['product_id', '=', 3])->update(['vat_rate' => 0.06, 'unit_price' => 1.0377]); // Tax séjour
+
+            $orm->enableEvents();
+
+            $booking = Booking::id($booking['id'])
+                ->read(['id', 'price',
+                    'booking_lines_ids' => ['id', 'name', 'total', 'price'],
+                    'booking_lines_groups_ids' => ['id', 'price']
+                ])->first(true);
+
+            return $booking;
+        },
+        'assert'            =>  function ($booking) {
+            $total_price_bl = array_reduce($booking['booking_lines_ids'], function($sum, $line) {
+                return round($sum + $line['price'], 2);
+            }, 0.0);
+
+            return $booking['price'] === 1132.79
+                && $total_price_bl === 1132.80;
+        },
+        'rollback'          =>  function () {
+            Booking::search(['description', 'like', '%'. 'Booking with Pack for price VAT calculations with subtotals'.'%'])->delete(true);
+        }
     ]
 ];

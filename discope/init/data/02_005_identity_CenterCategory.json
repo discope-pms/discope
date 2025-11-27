@@ -1,0 +1,12 @@
+[
+    {
+        "name": "sale\\identity\\CenterCategory",
+        "lang": "fr",
+        "data": [
+            {
+                "id": 1,
+                "name": "Default"
+            }
+        ]
+    }
+]

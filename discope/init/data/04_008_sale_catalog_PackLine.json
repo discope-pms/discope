@@ -110,6 +110,58 @@
                 "has_own_duration": 0,
                 "own_duration": null,
                 "share": 1
+            },
+            {
+                "id": 10,
+                "state": "instance",
+                "name": "Nuitée en Chambre Single",
+                "parent_product_id": 27,
+                "child_product_id": null,
+                "has_own_qty": 0,
+                "own_qty": null,
+                "share": 1.00,
+                "has_own_duration": 0,
+                "own_duration": null,
+                "child_product_model_id": 19
+            },
+            {
+                "id": 11,
+                "state": "instance",
+                "name": "Petit déjeuner (matin)",
+                "parent_product_id": 27,
+                "child_product_id": null,
+                "has_own_qty": 0,
+                "own_qty": null,
+                "share": 1.00,
+                "has_own_duration": 0,
+                "own_duration": null,
+                "child_product_model_id": 17
+            },
+            {
+                "id": 12,
+                "state": "instance",
+                "name": "Lunch (midi)",
+                "parent_product_id": 27,
+                "child_product_id": null,
+                "has_own_qty": 0,
+                "own_qty": null,
+                "share": 1.00,
+                "has_own_duration": 0,
+                "own_duration": null,
+                "child_product_model_id": 18
+            },
+            {
+                "id": 13,
+                "state": "instance",
+                "name": "Repas chaud (soir)",
+                "parent_product_id": 27,
+                "child_product_id": null,
+                "has_own_qty": 0,
+                "own_qty": null,
+                "share": 1.00,
+                "has_own_duration": 0,
+                "own_duration": null,
+                "child_product_model_id": 16
             }
         ]
     }

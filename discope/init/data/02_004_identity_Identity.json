@@ -107,6 +107,15 @@
                 "is_duplicate": 0,
                 "is_ota": 0,
                 "is_readonly": 0
+            },
+            {
+                "id": 4,
+                "type_id": 3,
+                "legal_name": "Your company VAT name Inc.",
+                "short_name": "Your company VAT",
+                "has_parent": false,
+                "has_vat": 1,
+                "vat_number": "BE0424339889"
             }
         ]
     }
