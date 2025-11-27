@@ -1,10 +1,12 @@
 <?php
+
 /*
     This file is part of the Discope property management software <https://github.com/discope-pms/discope>
-    Some Rights Reserved, Discope PMS, 2020-2024
+    Some Rights Reserved, Discope PMS, 2020-2025
     Original author(s): Yesbabylon SRL
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
+
 namespace sale\booking;
 
 class ContractLineGroup extends \sale\contract\ContractLineGroup {
@@ -82,59 +84,55 @@ class ContractLineGroup extends \sale\contract\ContractLineGroup {
     }
 
     /**
-     * Compute the VAT incl. total price of the group (pack), with manual and automated discounts applied.
+     * Get total tax-excluded price of the group, with discount applied.
      */
-    public static function calcPrice($om, $oids, $lang) {
+    public static function calcTotal($self): array {
         $result = [];
-
-        $groups = $om->read(__CLASS__, $oids, ['contract_lines_ids', 'total', 'is_pack', 'contract_line_id.vat_rate']);
-
-        if($groups > 0 && count($groups)) {
-            foreach($groups as $gid => $group) {
-                $result[$gid] = 0.0;
-
-                // if the group relates to a pack and the product_model targeted by the pack has its own Price, then this is the one to return
-                if($group['is_pack'] ) {
-                    $result[$gid] = round($group['total'] * (1 + $group['contract_line_id.vat_rate']), 2);
-                }
-                // otherwise, price is the sum of bookingLines prices
-                else {
-                    $lines = $om->read(\sale\booking\ContractLine::getType(), $group['contract_lines_ids'], ['price']);
-                    if($lines > 0 && count($lines)) {
-                        foreach($lines as $line) {
-                            $result[$gid] += $line['price'];
-                        }
-                        $result[$gid] = round($result[$gid], 2);
-                    }
+        $self->read([
+            'is_pack',
+            'contract_line_id'      => ['unit_price', 'qty'],
+            'contract_lines_ids'    => ['total']
+        ]);
+        foreach($self as $id => $group) {
+            $total = 0.0;
+            if($group['is_pack']) {
+                $total = round($group['contract_line_id']['unit_price'] * $group['contract_line_id']['qty'], 2);
+            }
+            else {
+                foreach($group['contract_lines_ids'] as $line) {
+                    $total = round($total + $line['total'], 2);
                 }
             }
+
+            $result[$id] = $total;
         }
+
         return $result;
     }
 
-    public static function calcTotal($om, $oids, $lang) {
+    /**
+     * Compute the VAT incl. total price of the group (pack), with manual and automated discounts applied.
+     */
+    public static function calcPrice($self): array {
         $result = [];
-        $groups = $om->read(__CLASS__, $oids, ['contract_id', 'contract_lines_ids', 'is_pack', 'contract_line_id.unit_price', 'contract_line_id.qty']);
-
-        if($groups > 0 && count($groups)) {
-            foreach($groups as $gid => $group) {
-                $result[$gid] = 0.0;
-
-                // if the group relates to a pack and the product_model targeted by the pack has its own Price, then this is the one to return
-                if($group['is_pack']) {
-                    $result[$gid] = $group['contract_line_id.unit_price'] * $group['contract_line_id.qty'];
-                }
-                // otherwise, price is the sum of contractLines totals
-                else {
-                    $lines = $om->read(\sale\booking\ContractLine::getType(), $group['contract_lines_ids'], ['total']);
-                    if($lines > 0 && count($lines)) {
-                        foreach($lines as $line) {
-                            $result[$gid] += $line['total'];
-                        }
-                        $result[$gid] = $result[$gid];
-                    }
+        $self->read([
+            'total',
+            'is_pack',
+            'contract_line_id'      => ['vat_rate'],
+            'contract_lines_ids'    => ['price']
+        ]);
+        foreach($self as $id => $group) {
+            $price = 0.0;
+            if($group['is_pack']) {
+                $price = round($group['total'] * (1 + $group['contract_line_id']['vat_rate']), 2);
+            }
+            else {
+                foreach($group['contract_lines_ids'] as $line) {
+                    $price = round($price + $line['price'], 2);
                 }
             }
+
+            $result[$id] = $price;
         }
 
         return $result;

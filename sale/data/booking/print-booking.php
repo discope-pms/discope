@@ -118,6 +118,7 @@ if(!$output) {
         'date_to',
         'nb_pers',
         'total',
+        'subtotals_vat',
         'price',
         'is_price_tbc',
         'type_id' => [
@@ -658,14 +659,10 @@ if(!$output) {
     /*
         retrieve final VAT and group by rate
     */
-    foreach($lines as $line) {
-        $vat_rate = $line['vat_rate'];
-        $tax_label = 'TVA '.strval( intval($vat_rate * 100) ).'%';
-        $vat = $line['price'] - $line['total'];
-        if(!isset($values['tax_lines'][$tax_label])) {
-            $values['tax_lines'][$tax_label] = 0;
-        }
-        $values['tax_lines'][$tax_label] += $vat;
+    foreach($booking['subtotals_vat'] as $vat_rate_index => $subtotal_vat) {
+        $vat_rate = ((float) $vat_rate_index) / 100;
+        $tax_label = 'TVA '.intval($vat_rate * 100).'%';
+        $values['tax_lines'][$tax_label] = $subtotal_vat;
     }
 
 

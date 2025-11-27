@@ -295,6 +295,58 @@
                 "accounting_rule_id": null,
                 "product_id": 26,
                 "vat_rate": null
+            },
+            {
+                "id": 24,
+                "name": "VS-CHsgl-A - Price 2023",
+                "price": 52.6415,
+                "price_vat": 55.8000,
+                "type": "direct",
+                "calculation_method_id": null,
+                "price_list_id": 1,
+                "is_active": 1,
+                "accounting_rule_id": 1,
+                "product_id": 31,
+                "vat_rate": null
+            },
+            {
+                "id": 25,
+                "name": "KA-RepMatin-26_99 - Price 2023",
+                "price": 6.6038,
+                "price_vat": 7.0000,
+                "type": "direct",
+                "calculation_method_id": null,
+                "price_list_id": 1,
+                "is_active": 1,
+                "accounting_rule_id": 2,
+                "product_id": 29,
+                "vat_rate": null
+            },
+            {
+                "id": 26,
+                "name": "KA-RepMidi-26_99 - Price 2023",
+                "price": 12.0536,
+                "price_vat": 13.5000,
+                "type": "direct",
+                "calculation_method_id": null,
+                "price_list_id": 1,
+                "is_active": 1,
+                "accounting_rule_id": 3,
+                "product_id": 30,
+                "vat_rate": null
+            },
+            {
+                "id": 27,
+                "name": "KA-RepSoir-26_99 - Price 2023",
+                "price": 15.1786,
+                "price_vat": 17.0000,
+                "type": "direct",
+                "calculation_method_id": null,
+                "price_list_id": 1,
+                "is_active": 1,
+                "accounting_rule_id": 3,
+                "product_id": 28,
+                "vat_rate": null
             }
         ]
     }

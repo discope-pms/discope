@@ -10,6 +10,8 @@ export class Order {
         public name: string = '',
         public status: string = '',
         public total: number = 0,
+        public subtotals_vat: {[key: string]: number} = {},
+        public total_vat: number = 0,
         public price: number = 0,
         public has_invoice: boolean = false,
         public session_id: any = {},

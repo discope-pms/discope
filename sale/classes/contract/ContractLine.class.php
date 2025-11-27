@@ -1,11 +1,13 @@
 <?php
 /*
     This file is part of the Discope property management software <https://github.com/discope-pms/discope>
-    Some Rights Reserved, Discope PMS, 2020-2024
+    Some Rights Reserved, Discope PMS, 2020-2025
     Original author(s): Yesbabylon SRL
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
+
 namespace sale\contract;
+
 use equal\orm\Model;
 
 class ContractLine extends Model {
@@ -19,66 +21,75 @@ class ContractLine extends Model {
         return [
             'name' => [
                 'type'              => 'computed',
-                'function'          => 'calcName',
                 'result_type'       => 'string',
+                'description'       => "The display name of the line.",
                 'store'             => true,
-                'description'       => 'The display name of the line.'
+                'function'          => 'calcName'
             ],
 
             'description' => [
                 'type'              => 'string',
-                'description'       => 'Complementary description of the line. If set, replaces the product name.',
+                'description'       => "Complementary description of the line. If set, replaces the product name.",
                 'default'           => ''
             ],
 
             'contract_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\contract\Contract',
-                'description'       => 'The contract the line relates to.',
+                'description'       => "The contract the line relates to."
             ],
 
             'contract_line_group_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\contract\ContractLineGroup',
-                'description'       => 'The contract the line relates to.',
+                'description'       => "The contract the line relates to."
             ],
 
             'product_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\catalog\Product',
-                'description'       => 'The product (SKU) the line relates to.',
+                'description'       => "The product (SKU) the line relates to.",
                 'required'          => true
             ],
 
             'price_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\price\Price',
-                'description'       => 'The price the line relates to, if any.'
+                'description'       => "The price the line relates to, if any."
             ],
 
             'unit_price' => [
                 'type'              => 'float',
                 'usage'             => 'amount/money:4',
-                'description'       => 'Tax-excluded price of the product related to the line.',
+                'description'       => "Tax-excluded price of the product related to the line.",
                 'required'          => true
             ],
 
             'vat_rate' => [
                 'type'              => 'float',
-                'description'       => 'VAT rate to be applied.',
+                'description'       => "VAT rate to be applied.",
                 'required'          => true
             ],
 
             'qty' => [
                 'type'              => 'float',
-                'description'       => 'Quantity of product.',
+                'description'       => "Quantity of product.",
                 'required'          => true
             ],
 
             'free_qty' => [
                 'type'              => 'integer',
-                'description'       => 'Free quantity.',
+                'description'       => "Free quantity.",
                 'default'           => 0
+            ],
+
+            'total_no_discount' => [
+                'type'              => 'computed',
+                'result_type'       => 'float',
+                'usage'             => 'amount/money:2',
+                'description'       => "Total tax-excluded price of the line without the discount applied.",
+                'store'             => false,
+                'function'          => 'calcTotalNoDiscount'
             ],
 
             // #memo - important: to allow the maximum flexibility, percent values can hold 4 decimal digits (must not be rounded, except for display)
@@ -93,9 +104,19 @@ class ContractLine extends Model {
                 'type'              => 'computed',
                 'result_type'       => 'float',
                 'usage'             => 'amount/money:4',
-                'description'       => 'Total tax-excluded price of the line.',
-                'function'          => 'calcTotal',
-                'store'             => true
+                'description'       => "Total tax-excluded price of the line.",
+                'store'             => true,
+                'function'          => 'calcTotal'
+            ],
+
+            'total_vat' => [
+                'type'              => 'computed',
+                'result_type'       => 'float',
+                'usage'             => 'amount/money:4',
+                'description'       => "Total tax price of the line.",
+                'help'              => "Must have 4 decimals allowed because it is used to compute subtotals_vat of Contract.",
+                'store'             => false,
+                'function'          => 'calcTotalVat'
             ],
 
             'price' => [
@@ -103,52 +124,83 @@ class ContractLine extends Model {
                 'result_type'       => 'float',
                 'usage'             => 'amount/money:2',
                 'description'       => 'Final tax-included price of the line.',
-                'function'          => 'calcPrice',
-                'store'             => true
+                'store'             => true,
+                'function'          => 'calcPrice'
             ]
 
         ];
     }
 
-    public static function calcName($om, $oids, $lang) {
+    public static function calcName($self): array {
         $result = [];
-        $res = $om->read(get_called_class(), $oids, ['product_id.label']);
-        foreach($res as $oid => $odata) {
-            $result[$oid] = "{$odata['product_id.label']}";
+        $self->read(['product_id' => ['label']]);
+        foreach($self as $id => $line) {
+            $result[$id] = $line['product_id']['label'];
         }
+
         return $result;
     }
 
     /**
-     * Compute the VAT excl. total price of the line, with discounts applied.
-     *
+     * Get total tax-excluded price of the line before the discount is applied.
      */
-    public static function calcTotal($om, $oids, $lang) {
+    public static function calcTotalNoDiscount($self): array {
         $result = [];
-        $lines = $om->read(__CLASS__, $oids, ['unit_price', 'qty', 'free_qty', 'discount']);
-
-        if($lines > 0 && count($lines)) {
-            foreach($lines as $lid => $line) {
-                $result[$lid] = $line['unit_price'] * (1 - $line['discount']) * ($line['qty'] - $line['free_qty']);
-            }
+        $self->read(['qty', 'free_qty', 'unit_price']);
+        foreach($self as $id => $line) {
+            // #memo - total_no_discount of a line must be rounded to 2 decimals
+            $result[$id] = round(($line['qty'] - $line['free_qty']) * $line['unit_price'], 2);
         }
+
         return $result;
     }
 
     /**
-     * Compute the final VAT incl. price of the line.
-     *
+     * Get total tax-excluded price of the line.
      */
-    public static function calcPrice($om, $oids, $lang) {
+    public static function calcTotal($self): array {
         $result = [];
-        $lines = $om->read(__CLASS__, $oids, ['total', 'vat_rate']);
-
-        if($lines > 0 && count($lines)) {
-            foreach($lines as $lid => $line) {
-                $result[$lid] = round($line['total'] * (1 + $line['vat_rate']), 2);
-            }
+        $self->read(['total_no_discount', 'discount']);
+        foreach($self as $id => $line) {
+            // #memo - total of a line must be rounded to 2 decimals
+            $result[$id] = round($line['total_no_discount'] * (1.0 - $line['discount']), 2);
         }
+
         return $result;
     }
 
+    /**
+     * Get tax amount of the line.
+     */
+    public static function calcTotalVat($self): array {
+        $result = [];
+        $self->read(['vat_rate', 'qty', 'free_qty', 'unit_price', 'discount']);
+        foreach($self as $id => $line) {
+            if($line['vat_rate'] === 0.0) {
+                $result[$id] = 0.0;
+            }
+            else {
+                // #memo - total_vat must be computed using a precision of 4 decimals, it is rounded to 2 decimals at Invoice level for subtotals_vat
+                $total_no_discount = ($line['qty'] - $line['free_qty']) * $line['unit_price'];
+                $total = $total_no_discount - (1.0 * $line['discount']);
+
+                $result[$id] = round($total * $line['vat_rate'], 4);
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * Get final tax-included price of the line.
+     */
+    public static function calcPrice($self): array {
+        $result = [];
+        $self->read(['total', 'total_vat']);
+        foreach($self as $id => $line) {
+            $result[$id] = round($line['total'] + $line['total_vat'], 4);
+        }
+
+        return $result;
+    }
 }

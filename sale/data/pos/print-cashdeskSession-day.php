@@ -168,6 +168,7 @@ foreach($orders_ids as $order_id) {
             'booking_id',
             'created',
             'total',
+            'subtotals_vat',
             'price',
             'total_paid',
             'funding_id'=> ['id','name'],
@@ -191,10 +192,12 @@ foreach($orders_ids as $order_id) {
 
     $order['created'] += $tz->getOffset(new \DateTime('@'.$order['created']));
 
-    foreach($order['order_lines_ids'] as $order_line) {
-        foreach ($result_vat as &$vat_rule) {
-            if ($order_line['vat_rate'] == $vat_rule['rate']) {
-                $vat_rule['total'] += $order_line['price'];
+    foreach($order['subtotals_vat'] as $vat_rate_index => $subtotal_vat) {
+        $vat_rate = ((float) $vat_rate_index) / 100;
+
+        foreach($result_vat as &$vat_rule) {
+            if($vat_rate == $vat_rule['rate']) {
+                $vat_rule['total'] = round($vat_rule['total'] + $subtotal_vat, 2);
             }
         }
     }

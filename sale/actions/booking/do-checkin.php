@@ -77,10 +77,10 @@ if($params['sign_contract']) {
     $pendingContract = Contract::search([
                 ['booking_id', '=', $booking['id']]
             ],
-            ['sort' => ['date' => 'desc']]
+            ['sort' => ['date' => 'desc', 'created' => 'desc']] // 'created' field used to sort, in case multiple contracts were created on same day
         )
         ->read(['id', 'status'])
-        ->first();
+        ->first(true);
 
     if($pendingContract && in_array($pendingContract['status'], ['pending', 'sent'], true)) {
         eQual::run('do', 'sale_contract_signed', ['id' => $pendingContract['id']]);

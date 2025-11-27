@@ -116,16 +116,12 @@ export class SessionOrderTicketComponent extends TreeComponent<Order, OrderCompo
 
     public getVatMap() : {[key: number]: number} {
         let vat_map: any = {};
-        for(let line of this.instance.order_lines_ids) {
-            let vat = parseFloat( (line.total * line.vat_rate).toFixed(2) );
+        for(let [vat_rate_key, vat] of Object.entries(this.instance.subtotals_vat)) {
             if(vat <= 0) {
                 continue;
             }
-            let vat_rate = line.vat_rate * 100;
-            if(!vat_map.hasOwnProperty(vat_rate)) {
-                vat_map[vat_rate] = 0.0;
-            }
-            vat_map[vat_rate] += vat;
+            let vat_rate = parseInt(vat_rate_key);
+            vat_map[vat_rate] = vat;
         }
         return vat_map;
     }

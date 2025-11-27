@@ -1,0 +1,52 @@
+[
+    {
+        "name": "finance\\accounting\\AccountingRule",
+        "lang": "fr",
+        "data": [
+            {
+                "id": 1,
+                "name": "NUITEE.6",
+                "description": "Nuitée 6%",
+                "type": "sale",
+                "stat_section_id": null,
+                "vat_rule_id": 2,
+                "code_legacy": "GITE",
+                "center_category_id": 1,
+                "prices_ids": null
+            },
+            {
+                "id": 2,
+                "name": "PDJ_R.6",
+                "description": "Petit déjeuner 6% avec remise",
+                "type": "sale",
+                "stat_section_id": null,
+                "vat_rule_id": 2,
+                "code_legacy": "PDJRem",
+                "center_category_id": 1,
+                "prices_ids": null
+            },
+            {
+                "id": 3,
+                "name": "RESTO_R.12",
+                "description": "Restauration 12% avec remise",
+                "type": "sale",
+                "stat_section_id": null,
+                "vat_rule_id": 3,
+                "code_legacy": "RESTREM",
+                "center_category_id": 1,
+                "prices_ids": null
+            },
+            {
+                "id": 4,
+                "name": "TAX_SEJ.6",
+                "description": "Taxe de séjour 6%",
+                "type": "sale",
+                "stat_section_id": null,
+                "vat_rule_id": 2,
+                "code_legacy": "TaxSej",
+                "center_category_id": 1,
+                "prices_ids": null
+            }
+        ]
+    }
+]
