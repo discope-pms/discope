@@ -131,7 +131,7 @@ class OrderLine extends Model {
                 'usage'             => 'amount/money:4',
                 'description'       => "Total tax price of the line.",
                 'help'              => "Must have 4 decimals allowed because it is used to compute subtotals_vat of Order.",
-                'store'             => true,
+                'store'             => false,
                 'function'          => 'calcTotalVat'
             ],
 
