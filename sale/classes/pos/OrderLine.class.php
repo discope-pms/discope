@@ -296,6 +296,6 @@ class OrderLine extends Model {
             $orders_ids = array_map(function ($a) {return $a['order_id'];}, $lines);
             $om->write(Order::getType(), $orders_ids, ['total' => null, 'price' => null], $lang);
         }
-        $om->write(self::getType(), $ids, ['total' => null, 'price' => null], $lang);
+        $om->write(self::getType(), $ids, ['total' => null, 'total_vat' => null, 'price' => null], $lang);
     }
 }

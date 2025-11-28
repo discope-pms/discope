@@ -237,7 +237,7 @@ class InvoiceLine extends Model {
     }
 
     public static function onupdatePriceId($om, $oids, $values, $lang) {
-        $om->update(get_called_class(), $oids, ['vat_rate' => null, 'unit_price' => null, 'total' => null, 'price' => null]);
+        $om->update(get_called_class(), $oids, ['vat_rate' => null, 'unit_price' => null, 'total' => null, 'total_vat' => null, 'price' => null]);
         // reset parent invoice computed values
         $om->callonce(self::getType(), '_resetInvoice', $oids, [], $lang);
     }
@@ -249,13 +249,13 @@ class InvoiceLine extends Model {
     }
 
     public static function onupdateQty($om, $oids, $values, $lang) {
-        $om->update(get_called_class(), $oids, ['price' => null, 'total' => null]);
+        $om->update(get_called_class(), $oids, ['price' => null, 'total' => null, 'total_vat' => null]);
         // reset parent invoice computed values
         $om->callonce(self::getType(), '_resetInvoice', $oids, [], $lang);
     }
 
     public static function onupdateDiscount($om, $oids, $values, $lang) {
-        $om->update(get_called_class(), $oids, ['price' => null, 'total' => null]);
+        $om->update(get_called_class(), $oids, ['price' => null, 'total' => null, 'total_vat' => null]);
         // reset parent invoice computed values
         $om->callonce(self::getType(), '_resetInvoice', $oids, [], $lang);
     }
