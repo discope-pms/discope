@@ -292,7 +292,7 @@ class BookingLineGroup extends Model {
                 'description'       => "Total tax price of the group, when relating to a pack_id.",
                 'help'              => "Must have 4 decimals allowed because it is used to compute subtotals_vat of Booking.",
                 'function'          => 'calcTotalVat',
-                'store'             => false,
+                'store'             => true,
                 'visible'           => ['has_pack', '=', true]
             ],
 
@@ -1034,8 +1034,8 @@ class BookingLineGroup extends Model {
                 $result[$id] = 0.0;
             }
             else {
-                // #memo - total_vat must be computed using a precision of 4 decimals, it is rounded to 2 decimals at Invoice level for subtotals_vat
-                $result[$id] = round($group['unit_price'] * $group['vat_rate'], 4);
+                // #memo - total_vat must be computed using a precision of 4 decimals, it is rounded to 2 decimals at Booking level for subtotals_vat
+                $result[$id] = round(round($group['unit_price'], 2) * $group['vat_rate'], 4);
             }
         }
 

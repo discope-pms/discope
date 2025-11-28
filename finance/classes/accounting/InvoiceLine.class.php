@@ -125,7 +125,7 @@ class InvoiceLine extends Model {
                 'description'       => "Total tax price of the line.",
                 'help'              => "Must have 4 decimals allowed because it is used to compute subtotals_vat of Invoice.",
                 'function'          => 'calcTotalVat',
-                'store'             => false
+                'store'             => true
             ],
 
             'price' => [

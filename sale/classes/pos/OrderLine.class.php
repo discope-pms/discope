@@ -131,7 +131,7 @@ class OrderLine extends Model {
                 'usage'             => 'amount/money:4',
                 'description'       => "Total tax price of the line.",
                 'help'              => "Must have 4 decimals allowed because it is used to compute subtotals_vat of Order.",
-                'store'             => false,
+                'store'             => true,
                 'function'          => 'calcTotalVat'
             ],
 
@@ -265,7 +265,7 @@ class OrderLine extends Model {
                 $result[$id] = 0.0;
             }
             else {
-                // #memo - total_vat must be computed using a precision of 4 decimals, it is rounded to 2 decimals at Invoice level for subtotals_vat
+                // #memo - total_vat must be computed using a precision of 4 decimals, it is rounded to 2 decimals at Order level for subtotals_vat
                 $result[$id] = round(round($line['total'], 2) * $line['vat_rate'], 4);
             }
         }
