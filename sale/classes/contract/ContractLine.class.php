@@ -115,7 +115,7 @@ class ContractLine extends Model {
                 'usage'             => 'amount/money:4',
                 'description'       => "Total tax price of the line.",
                 'help'              => "Must have 4 decimals allowed because it is used to compute subtotals_vat of Contract.",
-                'store'             => false,
+                'store'             => true,
                 'function'          => 'calcTotalVat'
             ],
 
@@ -174,17 +174,14 @@ class ContractLine extends Model {
      */
     public static function calcTotalVat($self): array {
         $result = [];
-        $self->read(['vat_rate', 'qty', 'free_qty', 'unit_price', 'discount']);
+        $self->read(['total', 'vat_rate']);
         foreach($self as $id => $line) {
             if($line['vat_rate'] === 0.0) {
                 $result[$id] = 0.0;
             }
             else {
                 // #memo - total_vat must be computed using a precision of 4 decimals, it is rounded to 2 decimals at Invoice level for subtotals_vat
-                $total_no_discount = ($line['qty'] - $line['free_qty']) * $line['unit_price'];
-                $total = $total_no_discount - (1.0 * $line['discount']);
-
-                $result[$id] = round($total * $line['vat_rate'], 4);
+                $result[$id] = round(round($line['total'], 2) * $line['vat_rate'], 4);
             }
         }
 
