@@ -456,8 +456,13 @@ $tests = [
                 return round($sum + $line['price'], 2);
             }, 0.0);
 
+            $total_price_blg = array_reduce($booking['booking_lines_groups_ids'], function($sum, $group) {
+                return round($sum + $group['price'], 2);
+            }, 0);
+
             return $booking['price'] == 1132.79
-                && $total_price_bl == 1132.81;
+                && $total_price_bl == 1132.81
+                && $total_price_blg == 1132.81;
         },
         'rollback'          =>  function () {
             Booking::search(['description', 'like', '%'. 'Booking with Pack for price VAT calculations with subtotals'.'%'])->delete(true);
