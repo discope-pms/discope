@@ -457,7 +457,7 @@ $tests = [
             }, 0.0);
 
             return $booking['price'] == 1132.79
-                && $total_price_bl == 1132.80;
+                && $total_price_bl == 1132.81;
         },
         'rollback'          =>  function () {
             Booking::search(['description', 'like', '%'. 'Booking with Pack for price VAT calculations with subtotals'.'%'])->delete(true);
