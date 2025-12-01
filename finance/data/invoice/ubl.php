@@ -48,8 +48,16 @@ $formatMoney = function($value, $decimals = 2) {
     return number_format($value, $decimals, ".", "");
 };
 
-$formatVatNumber = function($value) {
-    return str_replace([" ", "."], "", $value);
+$formatVatNumber = function($value, $country_code) {
+    $vat_number = str_replace([" ", "."], "", $value);
+    if(strpos($vat_number, $country_code) !== 0) {
+        $vat_number = $country_code.$vat_number;
+    }
+    return $vat_number;
+};
+
+$formatRegistrationNumber = function($value) {
+    return str_replace([" ", "."], "", $value);;
 };
 
 $formatVatRate = function($value) {
@@ -137,21 +145,28 @@ $invoice = Invoice::id($params['id'])
                 'legal_name',
                 'has_vat',
                 'vat_number',
+                'registration_number',
                 'address_street',
                 'address_zip',
                 'address_city',
                 'address_country',
+                'email'
             ]
         ],
         'partner_id' => [
             'partner_identity_id' => [
+                'type_id',
                 'legal_name',
+                'firstname',
+                'lastname',
                 'has_vat',
                 'vat_number',
+                'registration_number',
                 'address_street',
                 'address_zip',
                 'address_city',
                 'address_country',
+                'email'
             ]
         ],
         'invoice_lines_ids' => [
@@ -170,20 +185,72 @@ if(is_null($invoice)) {
     throw new Exception("unknown_invoice", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
+if(!$invoice['center_office_id']['organisation_id']['has_vat'] || !$invoice['partner_id']['partner_identity_id']['has_vat']) {
+    throw new Exception("both_parties_must_have_vat_number", EQ_ERROR_INVALID_PARAM);
+}
+
+// see https://docs.peppol.eu/poacc/billing/3.0/codelist/eas/ for more information
+$map_eas_scheme_codes = [
+    'AD' => '9922',
+    'AL' => '9923',
+    'BA' => '9924',
+    'BE' => '9925',
+    'BG' => '9926',
+    'CH' => '9927',
+    'CY' => '9928',
+    'CZ' => '9929',
+    'DE' => '9930',
+    'EE' => '9931',
+    'GB' => '9932',
+    'GR' => '9933',
+    'HR' => '9934',
+    'IE' => '9935',
+    'LI' => '9936',
+    'LT' => '9937',
+    'LU' => '9938',
+    'LV' => '9939',
+    'MC' => '9940',
+    'ME' => '9941',
+    'MK' => '9942',
+    'MT' => '9943',
+    'NL' => '9944',
+    'PL' => '9945',
+    'PT' => '9946',
+    'RO' => '9947',
+    'RS' => '9948',
+    'SI' => '9949',
+    'SK' => '9950',
+    'SM' => '9951',
+    'TR' => '9952',
+    'VA' => '9953',
+    'SE' => '9955',
+    'FR' => '9957',
+    'US' => '9959',
+];
+
 $ubl = [];
 
 $supplier = [
     'cac:Party' => [
-        'cac:PartyName'     => [
-            'cbc:Name'                  => $invoice['center_office_id']['organisation_id']['legal_name']
+        'cbc:EndpointID'        => [
+            'attributes'            => ['schemeID' => $map_eas_scheme_codes[$invoice['center_office_id']['organisation_id']['address_country']]],
+            'content'               => $formatVatNumber($invoice['center_office_id']['organisation_id']['vat_number'], $invoice['center_office_id']['organisation_id']['address_country']),
         ],
-        'cac:PostalAddress' => [
+        'cac:PostalAddress'     => [
             'cbc:StreetName'            => $invoice['center_office_id']['organisation_id']['address_street'],
             'cbc:CityName'              => $invoice['center_office_id']['organisation_id']['address_city'],
             'cbc:PostalZone'            => $invoice['center_office_id']['organisation_id']['address_zip'],
-            'cbc:Country'               => [
+            'cac:Country'               => [
                 'cbc:IdentificationCode'    => $invoice['center_office_id']['organisation_id']['address_country']
-            ],
+            ]
+        ],
+        'cac:PartyTaxScheme'    => [],
+        'cac:PartyLegalEntity'  => [
+            'cbc:RegistrationName'      => $invoice['center_office_id']['organisation_id']['legal_name'],
+            'cbc:CompanyID'             => $formatRegistrationNumber($invoice['center_office_id']['organisation_id']['registration_number'])
+        ],
+        'cac:Contact' => [
+            'cbc:ElectronicMail' => $invoice['center_office_id']['organisation_id']['email']
         ]
     ]
 ];
@@ -194,25 +261,44 @@ if(!empty($invoice['center_office_id']['organisation_id']['address_dispatch'])) 
 
 if($invoice['center_office_id']['organisation_id']['has_vat']) {
     $supplier['cac:Party']['cac:PartyTaxScheme'] = [
-        'cbc:CompanyID' => $formatVatNumber($invoice['center_office_id']['organisation_id']['vat_number']),
+        'cbc:CompanyID' => $formatVatNumber($invoice['center_office_id']['organisation_id']['vat_number'], $invoice['center_office_id']['organisation_id']['address_country']),
         'cac:TaxScheme' => [
             'cbc:ID'        => 'VAT'
         ]
     ];
 }
+else {
+    unset($supplier['cac:Party']['cac:PartyTaxScheme']);
+}
+
+$customer_name = $invoice['partner_id']['partner_identity_id']['legal_name'];
+if($invoice['partner_id']['partner_identity_id']['type_id'] === 1) {
+    $customer_name = sprintf('%s %s',
+        $invoice['partner_id']['partner_identity_id']['firstname'],
+        $invoice['partner_id']['partner_identity_id']['lastname']
+    );
+}
 
 $customer = [
     'cac:Party' => [
-        'cac:PartyName'     => [
-            'cbc:Name'                  => $invoice['partner_id']['partner_identity_id']['legal_name']
+        'cbc:EndpointID'        => [
+            'attributes'            => ['schemeID' => $map_eas_scheme_codes[$invoice['partner_id']['partner_identity_id']['address_country']]],
+            'content'               => $formatVatNumber($invoice['partner_id']['partner_identity_id']['vat_number'], $invoice['center_office_id']['organisation_id']['address_country']),
         ],
-        'cac:PostalAddress' => [
+        'cac:PostalAddress'     => [
             'cbc:StreetName'            => $invoice['partner_id']['partner_identity_id']['address_street'],
             'cbc:CityName'              => $invoice['partner_id']['partner_identity_id']['address_city'],
             'cbc:PostalZone'            => $invoice['partner_id']['partner_identity_id']['address_zip'],
-            'cbc:Country'               => [
+            'cac:Country'               => [
                 'cbc:IdentificationCode'    => $invoice['partner_id']['partner_identity_id']['address_country']
-            ],
+            ]
+        ],
+        'cac:PartyTaxScheme'    => [],
+        'cac:PartyLegalEntity'  => [
+            'cbc:RegistrationName' => $customer_name
+        ],
+        'cac:Contact' => [
+            'cbc:ElectronicMail' => $invoice['partner_id']['partner_identity_id']['email']
         ]
     ]
 ];
@@ -223,11 +309,18 @@ if(!empty($invoice['partner_id']['partner_identity_id']['address_dispatch'])) {
 
 if($invoice['partner_id']['partner_identity_id']['has_vat']) {
     $customer['cac:Party']['cac:PartyTaxScheme'] = [
-        'cbc:CompanyID' => $formatVatNumber($invoice['partner_id']['partner_identity_id']['vat_number']),
+        'cbc:CompanyID' => $formatVatNumber($invoice['partner_id']['partner_identity_id']['vat_number'], $invoice['partner_id']['partner_identity_id']['address_country']),
         'cac:TaxScheme' => [
             'cbc:ID'        => 'VAT'
         ]
     ];
+}
+else {
+    unset($customer['cac:Party']['cac:PartyTaxScheme']);
+}
+
+if(!empty($invoice['partner_id']['partner_identity_id']['registration_number'])) {
+    $customer['cac:Party']['cac:PartyLegalEntity']['cbc:CompanyID'] = $formatRegistrationNumber($invoice['partner_id']['partner_identity_id']['registration_number']);
 }
 
 switch($invoice['type']) {
@@ -238,12 +331,15 @@ switch($invoice['type']) {
                 'cbc:ProfileID'                 => 'urn:fdc:peppol.eu:2017:poacc:billing:01:1.0',
                 'cbc:ID'                        => $invoice['number'],
                 'cbc:IssueDate'                 => date('Y-m-d', $invoice['date']),
+                'cbc:DueDate'                   => date('Y-m-d', $invoice['due_date']),
                 'cbc:InvoiceTypeCode'           => 380,
                 'cbc:DocumentCurrencyCode'      => 'EUR',
+                'cac:OrderReference'            => ['cbc:ID' => 'NA'],
                 'cac:AccountingSupplierParty'   => $supplier,
                 'cac:AccountingCustomerParty'   => $customer,
+                'cac:TaxTotal'                  => [],
+                'cac:LegalMonetaryTotal'        => [],
                 'cac:InvoiceLine'               => ['items' => []],
-                'cac:TaxTotal'                  => []
             ]
         ];
 
@@ -268,7 +364,9 @@ $index = 0;
 foreach($invoice['invoice_lines_ids'] as $line) {
     $vat_rate = $formatVatRate($line['vat_rate']);
 
-    $ubl['Invoice']['cac:InvoiceLine']['items'][] = [
+    $has_vat = ((float) $vat_rate) !== 0.0;
+
+    $item = [
         'cbc:ID' => ++$index,
         'cbc:InvoicedQuantity' => [
             'attributes'    => ['unitCode' => 'EA'], // Note unit code HEA = heads, EA = unit
@@ -281,7 +379,7 @@ foreach($invoice['invoice_lines_ids'] as $line) {
         'cac:Item' => [
             'cbc:Name'                  => $line['name'],
             'cac:ClassifiedTaxCategory' => [
-                'cbc:ID'                    => ((float) $vat_rate) === 0.0 ? 'E' : 'S',
+                'cbc:ID'                    => $has_vat ? 'S' : 'E',
                 'cbc:Percent'               => $vat_rate,
                 'cac:TaxScheme'             => ['cbc:ID' => 'VAT']
             ]
@@ -293,6 +391,8 @@ foreach($invoice['invoice_lines_ids'] as $line) {
             ]
         ]
     ];
+
+    $ubl['Invoice']['cac:InvoiceLine']['items'][] = $item;
 }
 
 $ubl['Invoice']['cac:TaxTotal'] = [
@@ -303,15 +403,24 @@ $ubl['Invoice']['cac:TaxTotal'] = [
 foreach($invoice['subtotals_vat'] as $vat_rate_index => $total_vat) {
     $vat_rate = ((float) $vat_rate_index) / 100;
 
-    $ubl['Invoice']['cac:TaxTotal']['cac:TaxSubtotal']['items'][] = [
+    $has_vat = $vat_rate !== 0.0;
+
+    $item = [
         'cbc:TaxableAmount' => ['attributes' => ['currencyID' => 'EUR'], 'content' => $formatMoney($invoice['subtotals'][$vat_rate_index])],
         'cbc:TaxAmount'     => ['attributes' => ['currencyID' => 'EUR'], 'content' => $formatMoney($total_vat)],
         'cac:TaxCategory'   => [
-            'cbc:ID'            => $vat_rate === 0.0 ? 'E' : 'S',
-            'cbc:Percent'       => $formatVatRate($vat_rate),
-            'cac:TaxScheme'     => ['cbc:ID' => 'VAT']
+            'cbc:ID'                        => $has_vat ? 'S' : 'E',
+            'cbc:Percent'                   => $formatVatRate($vat_rate),
+            'cbc:TaxExemptionReasonCode'    => 'VATEX-EU-132',                // 'VATEX-EU-132-1L' for organisation without VAT like ASBL
+            'cac:TaxScheme'                 => ['cbc:ID' => 'VAT']
         ]
     ];
+
+    if($has_vat) {
+        unset($item['cac:TaxCategory']['cbc:TaxExemptionReasonCode']);
+    }
+
+    $ubl['Invoice']['cac:TaxTotal']['cac:TaxSubtotal']['items'][] = $item;
 }
 
 $ubl['Invoice']['cac:LegalMonetaryTotal'] = [
@@ -327,13 +436,13 @@ $ubl['Invoice']['cac:LegalMonetaryTotal'] = [
         'attributes'    => ['currencyID' => 'EUR'],
         'content'       => $formatMoney($invoice['price'])
     ],
-    'cbc:ChargeTotalAmount' => [
-        'attributes'    => ['currencyID' => 'EUR'],
-        'content'       => 0
-    ],
     'cbc:AllowanceTotalAmount' => [
         'attributes'    => ['currencyID' => 'EUR'],
         'content'       => $formatMoney($invoice['total_discount'])
+    ],
+    'cbc:ChargeTotalAmount' => [
+        'attributes'    => ['currencyID' => 'EUR'],
+        'content'       => 0
     ],
     'cbc:PayableAmount' => [
         'attributes'    => ['currencyID' => 'EUR'],

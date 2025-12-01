@@ -243,7 +243,7 @@ class InvoiceLine extends Model {
     }
 
     public static function onupdateVatRate($om, $oids, $values, $lang) {
-        $om->update(get_called_class(), $oids, ['price' => null]);
+        $om->update(get_called_class(), $oids, ['price' => null, 'total_vat' => null]);
         // reset parent invoice computed values
         $om->callonce(self::getType(), '_resetInvoice', $oids, [], $lang);
     }
