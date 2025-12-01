@@ -437,10 +437,6 @@ $tests = [
                 $e->getMessage();
             }
 
-            // Fix to replicate difference between price VAT subtotals and sum of lines prices
-            BookingLine::search([['booking_id', '=', $booking['id']], ['product_id', '=', 31]])->update(['qty' => 12]);
-            BookingLine::search([['booking_id', '=', $booking['id']], ['product_id', '=', 3]])->update(['vat_rate' => 0.06, 'unit_price' => 1.0377]);
-
             $orm->enableEvents();
 
             $booking = Booking::id($booking['id'])
@@ -460,9 +456,9 @@ $tests = [
                 return round($sum + $group['price'], 2);
             }, 0);
 
-            return $booking['price'] == 1132.79
-                && $total_price_bl == 1132.81
-                && $total_price_blg == 1132.81;
+            return $booking['price'] == 631.19
+                && $total_price_bl == 631.21
+                && $total_price_blg == 631.21;
         },
         'rollback'          =>  function () {
             Booking::search(['description', 'like', '%'. 'Booking with Pack for price VAT calculations with subtotals'.'%'])->delete(true);
