@@ -239,6 +239,7 @@ if(empty($output)) {
         'is_paid',
         'due_date',
         'total',
+        'subtotals_vat',
         'price',
         'accounting_total',
         'accounting_price',
@@ -677,14 +678,10 @@ if(empty($output)) {
     /*
         retrieve final VAT and group by rate
     */
-    foreach($lines as $line) {
-        $vat_rate = $line['vat_rate'];
-        $tax_label = 'TVA '.strval( intval($vat_rate * 100) ).'%';
-        $vat = round($line['price'] - $line['total'], 2);
-        if(!isset($values['tax_lines'][$tax_label])) {
-            $values['tax_lines'][$tax_label] = 0;
-        }
-        $values['tax_lines'][$tax_label] += $vat;
+    foreach($invoice['subtotals_vat'] as $vat_rate_index => $subtotal_vat) {
+        $vat_rate = ((float) $vat_rate_index) / 100;
+        $tax_label = 'TVA '.intval($vat_rate * 100).'%';
+        $values['tax_lines'][$tax_label] = $subtotal_vat;
     }
 
 

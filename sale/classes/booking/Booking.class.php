@@ -141,9 +141,37 @@ class Booking extends Model {
                 'type'              => 'computed',
                 'result_type'       => 'float',
                 'usage'             => 'amount/money:4',
-                'function'          => 'calcTotal',
-                'description'       => 'Total tax-excluded price of the booking.',
-                'store'             => true
+                'description'       => "Total tax-excluded price of the booking.",
+                'help'              => "Is now rounded to two decimals for UBL compliance.",
+                'store'             => true,
+                'function'          => 'calcTotal'
+            ],
+
+            'subtotals' => [
+                'type'              => 'computed',
+                'result_type'       => 'array',
+                'description'       => "Sub totals, by vat rates, tax-excluded prices of the booking.",
+                'help'              => "Must sum lines prices totals keeping 4 decimals and rounded to 2 decimals at the end. e.g. '0.0', '6.0', '12.0', '21.0'.",
+                'store'             => false,
+                'function'          => 'calcSubTotals'
+            ],
+
+            'subtotals_vat' => [
+                'type'              => 'computed',
+                'result_type'       => 'array',
+                'description'       => "Sub totals, by vat rates, tax prices of the booking.",
+                'help'              => "Must sum lines prices totals keeping 4 decimals and rounded to 2 decimals at the end. e.g. '0.0', '6.0', '12.0', '21.0'.",
+                'store'             => false,
+                'function'          => 'calcSubTotalsVat'
+            ],
+
+            'total_vat' => [
+                'type'              => 'computed',
+                'result_type'       => 'float',
+                'usage'             => 'amount/money:2',
+                'description'       => "Total tax price of the booking.",
+                'store'             => false,
+                'function'          => 'calcTotalVat'
             ],
 
             'is_price_tbc' => [
@@ -156,9 +184,10 @@ class Booking extends Model {
                 'type'              => 'computed',
                 'result_type'       => 'float',
                 'usage'             => 'amount/money:2',
-                'function'          => 'calcPrice',
-                'description'       => 'Final tax-included price of the booking.',
-                'store'             => true
+                'description'       => "Final tax-included price of the booking.",
+                'help'              => "Sum of 'total' and 'subtotals_vat'.",
+                'store'             => true,
+                'function'          => 'calcPrice'
             ],
 
             // #todo - add origin ID (internal, OTA, TO)
@@ -867,31 +896,157 @@ class Booking extends Model {
         return $result;
     }
 
-    public static function calcPrice($om, $oids, $lang) {
+    public static function calcTotal($self): array {
         $result = [];
-        $bookings = $om->read(get_called_class(), $oids, ['booking_lines_groups_ids.price']);
-        if($bookings > 0) {
-            foreach($bookings as $bid => $booking) {
-                $price = array_reduce((array) $booking['booking_lines_groups_ids.price'], function ($c, $group) {
-                    return $c + $group['price'];
-                }, 0.0);
-                $result[$bid] = round($price, 2);
+        $self->read([
+            'booking_lines_groups_ids' => [
+                'is_locked',
+                'has_pack',
+                'total',
+                'booking_lines_ids' => [
+                    'total'
+                ]
+            ]
+        ]);
+        foreach($self as $id => $booking) {
+            $total = 0.0;
+            foreach($booking['booking_lines_groups_ids'] as $group) {
+                if($group['has_pack'] && $group['is_locked']) {
+                    $total = round($total + $group['total'], 2);
+                }
+                else {
+                    foreach($group['booking_lines_ids'] as $line) {
+                        $total = round($total + $line['total'], 2);
+                    }
+                }
             }
+
+            $result[$id] = $total;
         }
+
         return $result;
     }
 
-    public static function calcTotal($om, $oids, $lang) {
+    public static function calcSubTotals($self): array {
         $result = [];
-        $bookings = $om->read(get_called_class(), $oids, ['booking_lines_groups_ids.total']);
-        if($bookings > 0) {
-            foreach($bookings as $bid => $booking) {
-                $total = array_reduce((array) $booking['booking_lines_groups_ids.total'], function ($c, $a) {
-                    return $c + round($a['total'], 2);
-                }, 0.0);
-                $result[$bid] = round($total, 4);
+        $self->read([
+            'booking_lines_groups_ids' => [
+                'is_locked',
+                'has_pack',
+                'vat_rate',
+                'total',
+                'booking_lines_ids' => [
+                    'vat_rate',
+                    'total'
+                ]
+            ]
+        ]);
+        foreach($self as $id => $booking) {
+            $subtotals = [];
+            foreach($booking['booking_lines_groups_ids'] as $group) {
+                if($group['has_pack'] && $group['is_locked']) {
+                    $vat_rate_index = number_format($group['vat_rate'] * 100, 2, '.', '');
+                    if(!isset($subtotals[$vat_rate_index])) {
+                        $subtotals[$vat_rate_index] = 0.0;
+                    }
+
+                    // #memo - total is rounded to 2 decimals for compatibility with older data that were computed with 4 decimals
+                    $subtotals[$vat_rate_index] = round($subtotals[$vat_rate_index] + round($group['total'], 2), 2);
+                }
+                else {
+                    foreach($group['booking_lines_ids'] as $line) {
+                        $vat_rate_index = number_format($line['vat_rate'] * 100, 2, '.', '');
+                        if(!isset($subtotals[$vat_rate_index])) {
+                            $subtotals[$vat_rate_index] = 0.0;
+                        }
+
+                        // #memo - total is rounded to 2 decimals for compatibility with older data that were computed with 4 decimals
+                        $subtotals[$vat_rate_index] = round($subtotals[$vat_rate_index] + round($line['total'], 2), 2);
+                    }
+                }
             }
+
+            // #memo - as to be rounded on 2 decimals here and not on each line
+            $result[$id] = array_map(fn($subtotal) => round($subtotal, 2), $subtotals);
         }
+
+        return $result;
+    }
+
+    /**
+     * #memo - must sum lines prices totals keeping 4 decimals and rounded to 2 decimals at the end
+     */
+    public static function calcSubTotalsVat($self): array {
+        $result = [];
+        $self->read([
+            'booking_lines_groups_ids' => [
+                'is_locked',
+                'has_pack',
+                'vat_rate',
+                'total_vat',
+                'booking_lines_ids' => [
+                    'vat_rate',
+                    'total_vat'
+                ]
+            ]
+        ]);
+        foreach($self as $id => $booking) {
+            $subtotals_vat = [];
+            foreach($booking['booking_lines_groups_ids'] as $group) {
+                if($group['has_pack'] && $group['is_locked']) {
+                    $vat_rate_index = number_format($group['vat_rate'] * 100, 2, '.', '');
+                    if(!isset($subtotals_vat[$vat_rate_index])) {
+                        $subtotals_vat[$vat_rate_index] = 0.0;
+                    }
+
+                    $subtotals_vat[$vat_rate_index] = round($subtotals_vat[$vat_rate_index] + $group['total_vat'], 4);
+                }
+                else {
+                    foreach($group['booking_lines_ids'] as $line) {
+                        $vat_rate_index = number_format($line['vat_rate'] * 100, 2, '.', '');
+                        if(!isset($subtotals_vat[$vat_rate_index])) {
+                            $subtotals_vat[$vat_rate_index] = 0.0;
+                        }
+
+                        $subtotals_vat[$vat_rate_index] = round($subtotals_vat[$vat_rate_index] + $line['total_vat'], 4);
+                    }
+                }
+            }
+
+            // #memo - as to be rounded on 2 decimals here and not on each line
+            $result[$id] = array_map(fn($subtotal) => round($subtotal, 2), $subtotals_vat);
+        }
+
+        return $result;
+    }
+
+    public static function calcTotalVat($self): array {
+        $result = [];
+        $self->read(['subtotals_vat']);
+        foreach($self as $id => $booking) {
+            $total_vat = 0.0;
+            foreach($booking['subtotals_vat'] as $subtotal) {
+                $total_vat = round($total_vat + $subtotal, 2);
+            }
+
+            $result[$id] = $total_vat;
+        }
+
+        return $result;
+    }
+
+    public static function calcPrice($self): array {
+        $result = [];
+        $self->read(['total', 'subtotals_vat']);
+        foreach($self as $id => $booking) {
+            $total_vat = 0.0;
+            foreach($booking['subtotals_vat'] as $subtotal_vat) {
+                $total_vat = round($total_vat + $subtotal_vat, 2);
+            }
+
+            $result[$id] = round($booking['total'] + $total_vat, 2);
+        }
+
         return $result;
     }
 

@@ -28,10 +28,6 @@ export class SessionOrderLinesComponent extends TreeComponent<Order, OrderCompon
 
     public ready: boolean = false;
 
-    public get taxes () {
-        return Math.round( (this.instance.price - this.instance.total) * 100) / 100;
-    }
-
     public selected_field: string = 'qty';
 
     // reference to the selected line component

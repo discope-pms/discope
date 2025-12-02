@@ -18,7 +18,7 @@
                         <h2>Commande</h2>
                         <div class="total">
                             <span class="total"> Total : {{ instance.price | number : '1.2-2' }}€ </span>
-                            <span class="taxes"> Taxes : {{ taxes | number : '1.2-2'}}€ </span>
+                            <span class="taxes"> Taxes : {{ instance.total_vat | number : '1.2-2'}}€ </span>
                         </div>
                     </div>
                     <div *ngIf="instance.session_id?.status != 'pending'">Cette session n'est plus active.</div>
