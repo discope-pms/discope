@@ -23,7 +23,6 @@
                 "groups": ["finance.default.administrator", "finance.default.user", "booking.default.user"]
             }
         }
-
     ],
     "layout": {
         "groups": [
