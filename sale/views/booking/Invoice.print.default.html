@@ -505,6 +505,14 @@ hr {
 </div>
 {% endif %}
 
+{% if (((total_remaining < 0.0) and (type != 'credit_note')) or ((total_remaining > 0.0) and (type == 'credit_note'))) and ( not has_orders) %}
+<div style="position: relative; margin-top: 40px; border: solid 2px black; page-break-inside: avoid;">
+    <div style="font-size: 15px; padding: 15px;">
+        {{ invoice_ask_info_for_refund_html|raw }}
+    </div>
+</div>
+{% endif %}
+
 {% if status == 'proforma' %}
 <div style="position: relative; margin-top: 40px; page-break-inside: avoid;">
     <div style="font-size: 13px; padding: 10px 35px; border: solid 1px black;">
