@@ -530,6 +530,14 @@ if(empty($output)) {
         $values['invoice_proforma_notice_html'] = $template_part['value'];
     }
 
+    $template_part = TemplatePart::search(['name', '=', 'ask_info_for_refund'])
+        ->read(['value'], $params['lang'])
+        ->first(true);
+
+    if($template_part) {
+        $values['invoice_ask_info_for_refund_html'] = $template_part['value'];
+    }
+
     /*
         feed lines
     */
