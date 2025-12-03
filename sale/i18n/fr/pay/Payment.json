@@ -109,6 +109,16 @@
                 }
             }            
         },
+        "form.statement": {
+            "name": "Paiement",
+            "description": "",
+            "actions": {
+                "action.transfer": {
+                    "label": "Transfert de financement",
+                    "description": "Permet de transférer le paiement vers un autre financement."
+                }
+            }
+        },
         "list.default": {
             "name": "Paiements",
             "description": "Liste des paiements.",

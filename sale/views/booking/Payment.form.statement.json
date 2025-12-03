@@ -54,7 +54,8 @@
                                                             ["enrollment_id", "<>", null]
                                                         ]
                                                     ]
-                                                }
+                                                },
+                                                "readonly": true
                                             },
                                             {
                                                 "type": "field",

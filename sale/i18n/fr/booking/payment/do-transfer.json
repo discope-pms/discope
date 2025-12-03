@@ -1,0 +1,23 @@
+{
+    "name": "Transfert financement",
+    "description": "Permet de transférer un paiement vers un autre financement.",
+    "model": {
+        "id": {
+            "label": "Paiement",
+            "description": "Paiement à transférer.",
+            "help": ""
+        },
+        "funding_id": {
+            "label": "Financement",
+            "description": "Financement vers lequel transférer le paiement.",
+            "help": ""
+        }
+    },
+    "error": {
+        "errors": {
+            "unknown_payment": "Paiement inconnu.",
+            "unknown_funding": "Financement inconnu.",
+            "same_src_and_dest": "Financement cible identique à l'actuel."
+        }
+    }
+}
