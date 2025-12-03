@@ -76,7 +76,7 @@
             "access": {
                 "groups": ["finance.default.administrator", "finance.default.user"]
             },
-            "visible": ["is_paid", "=", true]
+            "visible": ["paid_amount", ">", 0]
         },
         {
             "id": "action.mark_paid",

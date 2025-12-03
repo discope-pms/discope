@@ -123,7 +123,8 @@ $payment = Payment ::create([
         'center_office_id'  => $funding['center_office_id'],
         'amount'            => $params['amount'],
         'payment_origin'    => $params['payment_origin'],
-        'payment_method'    => $params['payment_method']
+        'payment_method'    => $params['payment_method'],
+        'is_manual'         => true
     ])
     // this updated funding paid status
     ->update([
