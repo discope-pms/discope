@@ -39,14 +39,14 @@ list($params, $providers) = eQual::announce([
 list($context, $om) = [ $providers['context'], $providers['orm'] ];
 
 $funding = Funding::id($params['id'])
-            ->read(['is_paid', 'booking_id' => ['status']])
-            ->first(true);
+    ->read(['paid_amount', 'booking_id' => ['status']])
+    ->first(true);
 
 if(!$funding) {
     throw new Exception("unknown_funding", QN_ERROR_UNKNOWN_OBJECT);
 }
 
-if(!$funding['is_paid']) {
+if($funding['paid_amount'] === 0.0) {
     throw new Exception("funding_not_paid", QN_ERROR_INVALID_PARAM);
 }
 
