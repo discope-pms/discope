@@ -5,9 +5,10 @@
     "model": {
         "export_type": {
             "label": "Type",
-            "description": "Type de réservation (automatique, selon les produits choisis).",
+            "description": "Type d'export.",
             "selection": {
                 "invoices": "factures",
+                "invoices_peppol": "factures Peppol",
                 "payments": "règlements"
             },
             "help": ""

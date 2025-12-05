@@ -1,10 +1,12 @@
 <?php
 /*
     This file is part of Symbiose Community Edition <https://github.com/yesbabylon/symbiose>
-    Some Rights Reserved, Yesbabylon SRL, 2020-2021
+    Some Rights Reserved, Yesbabylon SRL, 2020-2025
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
+
 namespace finance\accounting;
+
 use equal\orm\Model;
 
 class AccountingJournal extends Model {
@@ -30,7 +32,7 @@ class AccountingJournal extends Model {
 
             'description' => [
                 'type'              => 'string',
-                'description'       => 'Verbose detail of the role of the journale.',
+                'description'       => 'Verbose detail of the role of the journal.',
                 'multilang'         => true
             ],
 
@@ -45,6 +47,7 @@ class AccountingJournal extends Model {
                 'selection'         => [
                     'general_ledger',
                     'sales',
+                    'sales_peppol',
                     'purchases',
                     'bank_cash',
                     'miscellaneous'

@@ -5,6 +5,7 @@
     License: GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 
+use finance\accounting\AccountingJournal;
 use identity\CenterOffice;
 use identity\User;
 
@@ -44,12 +45,31 @@ else {
 }
 
 foreach($center_office_ids as $center_office_id) {
+    $accounting_journals = AccountingJournal::search([
+        ['center_office_id', '=', $center_office_id],
+        ['type', 'in', ['sales', 'sales_peppol']]
+    ])
+        ->read(['type'])
+        ->get();
+
+
+    foreach($accounting_journals as $accounting_journal) {
+        try {
+            eQual::run('do', 'finance_payments_bob_export-invoices', [
+                'center_office_id'  => $center_office_id,
+                'journal_type'      => $accounting_journal['type']
+            ]);
+        }
+        catch(Exception $e) {
+            trigger_error("APP::error while processing invoices (journal type: {$accounting_journal['type']}) for center office $center_office_id", EQ_REPORT_WARNING);
+        }
+    }
+
     try {
-        eQual::run('do', 'finance_payments_bob_export-invoices', compact('center_office_id'));
         eQual::run('do', 'finance_payments_bob_export-payments', compact('center_office_id'));
     }
     catch(Exception $e) {
-        trigger_error("APP::error while processing center office $center_office_id", EQ_REPORT_WARNING);
+        trigger_error("APP::error while processing payments center office $center_office_id", EQ_REPORT_WARNING);
     }
 }
 

@@ -28,6 +28,7 @@
             "selection": {
                 "general_ledger": "grand livre",
                 "sales": "journal des ventes",
+                "sales_peppol": "journal des ventes (Peppol)",
                 "purchases": "journal des achats",
                 "bank_cash": "journal de trésorerie",
                 "miscellaneous": "journal des opérations diverses"
