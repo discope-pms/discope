@@ -12,7 +12,7 @@ use identity\User;
 use sale\booking\Booking;
 use sale\booking\TimeSlot;
 
-list($params, $providers) = announce([
+[$params, $providers] = eQual::announce([
     'description'   => 'Advanced search for Consumptions: returns a collection of Consumptions according to extra parameters.',
     'extends'       => 'core_model_collect',
     'params'        => [
@@ -112,7 +112,7 @@ if(isset($params['time_slot_id'])) {
 
 if(isset($params['is_not_option']) && $params['is_not_option']) {
     $bookings_ids = [];
-    $bookings_ids = Booking::search(['status', 'not in', ['quote','option']], ['is_cancelled', '=', false])->ids();
+    $bookings_ids = Booking::search([['status', 'not in', ['quote','option']], ['is_cancelled', '=', false]])->ids();
     $domain = Domain::conditionAdd($domain, ['booking_id', 'in', $bookings_ids]);
 }
 
@@ -125,7 +125,7 @@ $params['domain'] = $domain;
 
 $result = eQual::run('get', 'model_collect', $params, true);
 
-$time_slots = TimeSlot::search([])->read(['id', 'code', 'order'])->get();
+$time_slots = TimeSlot::search()->read(['id', 'code', 'order'])->get();
 
 $time_slot_details = [];
 foreach ($time_slots as $time_slot) {
