@@ -360,7 +360,19 @@ class Invoice extends Model {
     public static function calcNumber($om, $ids, $lang) {
         $result = [];
 
-        $invoices = $om->read(self::getType(), $ids, ['status', 'date', 'organisation_id', 'center_office_id.code'], $lang);
+        $invoices = $om->read(self::getType(), $ids,
+            [
+                'status',
+                'date',
+                'organisation_id',
+                'organisation_id.has_vat',
+                'organisation_id.vat_number',
+                'partner_id.partner_identity_id.has_vat',
+                'partner_id.partner_identity_id.vat_number',
+                'center_office_id.code'
+            ],
+            $lang
+        );
 
         foreach($invoices as $id => $invoice) {
 
@@ -370,7 +382,6 @@ class Invoice extends Model {
                 continue;
             }
 
-            $organisation_id = $invoice['organisation_id'];
             $format = Setting::get_value('sale', 'accounting', 'invoice.sequence_format', '%05d{sequence}');
 
             $fiscal_year = Setting::get_value('finance', 'accounting', 'fiscal_year');
@@ -386,7 +397,20 @@ class Invoice extends Model {
                 throw new \Exception('invoice_outside_fiscal_year', EQ_ERROR_INVALID_CONFIG);
             }
 
-            $sequence = Setting::fetch_and_add('sale', 'accounting', 'invoice.sequence.' . $invoice['center_office_id.code']);
+            $sequence_code = 'invoice.sequence.' . $invoice['center_office_id.code'];
+            // #todo - remove year 2026 check when not needed anymore
+            if($invoice['organisation_id.has_vat'] && $invoice['partner_id.partner_identity_id.has_vat'] && intval(date('Y')) >= 2026) {
+                // #todo - (temporary) Above "if" could be replaced by a series of configurable conditions to know which accounting journal to use. Then we would store the setting to use in the journal.
+                if(empty($invoice['organisation_id.vat_number'])) {
+                    throw new \Exception('missing_organisation_vat_number', EQ_ERROR_INVALID_PARAM);
+                }
+                if(empty($invoice['partner_id.partner_identity_id.vat_number'])) {
+                    throw new \Exception('missing_partner_vat_number', EQ_ERROR_INVALID_PARAM);
+                }
+                $sequence_code = 'invoice.peppol.sequence.' . $invoice['center_office_id.code'];
+            }
+
+            $sequence = Setting::fetch_and_add('sale', 'accounting', $sequence_code);
 
             if(!$sequence) {
                 throw new \Exception('APP::unable to retrieve sequence for invoice', EQ_ERROR_INVALID_CONFIG);
@@ -395,7 +419,7 @@ class Invoice extends Model {
             $result[$id] = Setting::parse_format($format, [
                 'year'      => $fiscal_year,
                 'office'    => $invoice['center_office_id.code'],
-                'org'       => $organisation_id,
+                'org'       => $invoice['organisation_id'],
                 'sequence'  => $sequence
             ]);
 

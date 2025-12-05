@@ -16,12 +16,24 @@ use sale\catalog\Product;
 list($params, $providers) = eQual::announce([
     'description'   => "Creates an export archive containing all emitted invoices that haven't been exported yet (for external accounting software).",
     'params'        => [
+
         'center_office_id' => [
             'type'              => 'many2one',
             'foreign_object'    => 'identity\CenterOffice',
             'description'       => 'Management Group to which the center belongs.',
             'required'          => true
+        ],
+
+        'journal_type' => [
+            'type'              => 'string',
+            'description'       => "The type of journal to export for the center office.",
+            'selection'         => [
+                'sales',
+                'sales_peppol'
+            ],
+            'default'           => 'sales'
         ]
+
     ],
     'access'        => [
         'groups'        => ['finance.default.user'],
@@ -64,35 +76,39 @@ if(!$office) {
 }
 
 // retrieve the journal of sales
-$journal = AccountingJournal::search([['center_office_id', '=', $params['center_office_id']], ['type', '=', 'sales']])->read(['id', 'code'])->first(true);
+$journal = AccountingJournal::search([
+    ['center_office_id', '=', $params['center_office_id']],
+    ['type', '=', $params['journal_type']]
+])
+    ->read(['id', 'code', 'type'])
+    ->first(true);
 
 if(!$journal) {
-    throw new Exception("unknown_center_office", QN_ERROR_UNKNOWN_OBJECT);
+    throw new Exception("unknown_accounting_journal", QN_ERROR_UNKNOWN_OBJECT);
 }
 
 
 /*
     Retrieve non-exported invoices.
 */
+
+$domain = [
+    [
+        ['is_exported', '=', false],
+        ['center_office_id', '=', $params['center_office_id']],
+        ['booking_id', '>', 0],
+        ['status', '<>', 'proforma'],
+    ],
+    [
+        ['is_exported', '=', false],
+        ['center_office_id', '=', $params['center_office_id']],
+        ['has_orders', '=', true],
+        ['status', '<>', 'proforma'],
+    ]
+];
+
 // #memo - there might be several kind of invoices, we only consider the ones attached either to a booking or to a list of orders
-$invoices = Invoice::search(
-        [
-            [
-                ['is_exported', '=', false],
-                ['center_office_id', '=', $params['center_office_id']],
-                ['booking_id', '>', 0],
-                ['status', '<>', 'proforma'],
-            ],
-            [
-                ['is_exported', '=', false],
-                ['center_office_id', '=', $params['center_office_id']],
-                ['has_orders', '=', true],
-                ['status', '<>', 'proforma'],
-            ]
-        ],
-        [
-            'sort'  => ['number' => 'asc']
-        ])
+$invoices = Invoice::search($domain, ['sort' => ['number' => 'asc']])
     ->read([
         'id',
         'name',
@@ -104,7 +120,11 @@ $invoices = Invoice::search(
         // #memo - accounting price is the amount to be recorded in accountancy (does not include installment payments)
         'accounting_price',
         'is_deposit',
-        'organisation_id',
+        'organisation_id' => [
+            'id',
+            'has_vat',
+            'vat_number'
+        ],
         'partner_id' => [
             'id',
             'name',
@@ -115,6 +135,7 @@ $invoices = Invoice::search(
                 'address_city',
                 'address_zip',
                 'address_country',
+                'has_vat',
                 'vat_number',
                 'phone',
                 'fax',
@@ -162,6 +183,28 @@ $invoices = Invoice::search(
         ]
     ])
     ->get(true);
+
+$invoices = array_filter($invoices, function($invoice) use($journal) {
+    // #todo - remove year 2026 check when not needed anymore
+    $emission_year = intval(date('Y', $invoice['date']));
+    if($emission_year < 2026) {
+        return $journal['type'] === 'sales';
+    }
+
+    if(!$invoice['organisation_id']['has_vat'] || empty($invoice['organisation_id']['vat_number'])) {
+        // #memo - if organisation has no VAT, then all invoices in a single journal "sales"
+        return true;
+    }
+
+    // #memo - if organisation and customer have vat, then separate in two journals "sales" and "sales_peppol"
+    // #todo - (temporary) A link should be created between an invoice and an accounting journal, instead of hardcoded rules. (see Invoice calcNumber for more information)
+    $b2b_vat = $invoice['partner_id']['partner_identity_id']['has_vat'] && !empty($invoice['partner_id']['partner_identity_id']['vat_number']);
+    if($journal['type'] === 'sales_peppol') {
+        return $b2b_vat;
+    }
+
+    return !$b2b_vat;
+});
 
 if(count($invoices) == 0) {
     // exit with no error
@@ -474,7 +517,7 @@ foreach($invoices as $invoice) {
 
     // retrieve downpayment product
     $downpayment_product_id = 0;
-    $downpayment_sku = Setting::get_value('sale', 'organization', 'sku.downpayment.'.$invoice['organisation_id']);
+    $downpayment_sku = Setting::get_value('sale', 'organization', 'sku.downpayment.'.$invoice['organisation_id']['id']);
     if($downpayment_sku) {
         $products_ids = Product::search(['sku', '=', $downpayment_sku])->ids();
         if($products_ids) {
@@ -698,7 +741,7 @@ if(count($invoices_header_data)) {
     // create the export archive
     Export::create([
         'center_office_id'      => $params['center_office_id'],
-        'export_type'           => 'invoices',
+        'export_type'           => $journal['type'] === 'sales' ? 'invoices' : 'invoices_peppol',
         'data'                  => $data
     ]);
 

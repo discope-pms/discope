@@ -34,6 +34,7 @@ class Export extends Document {
                 'type'              => 'string',
                 'selection'         => [
                     'invoices',
+                    'invoices_peppol',
                     'payments'
                 ],
                 'required'          => true,
