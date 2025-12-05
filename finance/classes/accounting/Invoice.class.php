@@ -455,7 +455,7 @@ class Invoice extends Model {
                 $subtotals[$vat_rate_index] = round($subtotals[$vat_rate_index] + round($line['total'], 2), 2);
             }
 
-            // #memo - as to be rounded on 2 decimals here and not on each line
+            // #memo - has to be rounded on 2 decimals here and not on each line
             $result[$id] = array_map(fn($subtotal) => round($subtotal, 2), $subtotals);
         }
 
