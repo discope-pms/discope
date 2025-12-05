@@ -230,7 +230,7 @@ class InvoiceLine extends Model {
         $result = [];
         $self->read(['total', 'total_vat']);
         foreach($self as $id => $line) {
-            $result[$id] = round($line['total'] + $line['total_vat'], 4);
+            $result[$id] = round($line['total'] + $line['total_vat'], 2);
         }
 
         return $result;
