@@ -39,21 +39,14 @@
                                                 "width": "50%",
                                                 "widget": {
                                                     "required": true,
-                                                    "readonly": true,
                                                     "header": {
                                                         "actions": {
                                                             "ACTION.CREATE": false
                                                         }
                                                     },
                                                     "domain": [
-                                                        [
-                                                            ["is_paid", "=", false],
-                                                            ["booking_id", "<>", null]
-                                                        ],
-                                                        [
-                                                            ["is_paid", "=", false],
-                                                            ["enrollment_id", "<>", null]
-                                                        ]
+                                                        [["is_paid", "=", false], ["booking_id", "<>", null]],
+                                                        [["is_paid", "=", false], ["enrollment_id", "<>", null]]
                                                     ]
                                                 }
                                             },
