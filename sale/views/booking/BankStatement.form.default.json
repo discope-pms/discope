@@ -85,9 +85,6 @@
                                                 "width": "100%",
                                                 "widget":{
                                                     "header": {
-                                                        "selection": {
-                                                            "default": false
-                                                        },
                                                         "actions": {
                                                             "ACTION.CREATE": false
                                                         }
