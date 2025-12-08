@@ -321,7 +321,8 @@
                                                     "view": "list.camp",
                                                     "header": {
                                                         "actions": {
-                                                            "ACTION.CREATE": false
+                                                            "ACTION.CREATE": false,
+                                                            "ACTION.CREATE_INLINE": false
                                                         }
                                                     }
                                                 }
