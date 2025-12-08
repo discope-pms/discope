@@ -16,7 +16,7 @@ use sale\camp\Camp;
     ],
     'response'      => [
         'content-type'          => 'text/csv',
-        'content-disposition'   => 'inline; filename="camp-export.csv"',
+        'content-disposition'   => 'inline; filename="site_camps.csv"',
         'charset'               => 'utf-8',
         'accept-origin'         => '*'
     ],
@@ -41,7 +41,7 @@ $camps = Camp::search(
         'max_children',
         'enrollments_qty',
         'product_id' => ['name'],
-        'product_model_id' => ['name']
+        'camp_model_id' => ['name']
     ])
     ->get();
 
@@ -75,7 +75,7 @@ foreach($camps as $camp) {
 
     $data[] = [
         str_pad($camp['sojourn_number'], 3, '0', STR_PAD_LEFT),
-        $camp['product_model_id']['name'],
+        $camp['camp_model_id']['name'],
         '',
         date('d/m/Y', $camp['date_from']),
         date('d/m/Y', $camp['date_to']),
