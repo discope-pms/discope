@@ -168,6 +168,11 @@
             "description": "L'activité est-elle facturable ? (génère une ligne de service lors de la facturation).",
             "help": "Permet d'indiquer si une activité est facturable, ce qui entraînera la création d'une ligne de service dans la facturation."
         },
+        "activity_category_id": {
+            "label": "Catégorie d'activité",
+            "description": "La catégorie de l'activité.",
+            "help": ""
+        },
         "camp_product_type": {
             "label": "Type de produit",
             "description": "Le type de produit du produit de camp.",
