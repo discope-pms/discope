@@ -48,8 +48,12 @@
             "name": "Planning relations",
             "description": "",
             "header": {
-                "action.create-partner-planning-summary": {
-                    "label": "Créer récapitulatif"
+                "selection": {
+                    "actions": {
+                        "action.create-partner-planning-summary": {
+                            "label": "Créer récapitulatif"
+                        }
+                    }
                 }
             },
             "layout": {}
@@ -58,8 +62,12 @@
             "name": "Planning employés",
             "description": "",
             "header": {
-                "action.create-partner-planning-summary": {
-                    "label": "Créer récapitulatif"
+                "selection": {
+                    "actions": {
+                        "action.create-partner-planning-summary": {
+                            "label": "Créer récapitulatif"
+                        }
+                    }
                 }
             },
             "layout": {}
@@ -68,8 +76,12 @@
             "name": "Planning prestataires",
             "description": "",
             "header": {
-                "action.create-partner-planning-summary": {
-                    "label": "Créer récapitulatif"
+                "selection": {
+                    "actions": {
+                        "action.create-partner-planning-summary": {
+                            "label": "Créer récapitulatif"
+                        }
+                    }
                 }
             },
             "layout": {}
