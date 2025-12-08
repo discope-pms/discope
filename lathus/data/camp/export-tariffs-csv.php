@@ -6,7 +6,9 @@
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 
-use sale\camp\CampModel;
+use sale\camp\catalog\Product;
+use sale\camp\price\Price;
+use sale\camp\price\PriceList;
 
 [$params, $provider] = eQual::announce([
     'description'   => "Returns tariffs list in CSV format, for the export to Lathus website.",
@@ -16,7 +18,7 @@ use sale\camp\CampModel;
     ],
     'response'      => [
         'content-type'          => 'text/csv',
-        'content-disposition'   => 'inline; filename="camp-export.csv"',
+        'content-disposition'   => 'inline; filename="site_tarifs.csv"',
         'charset'               => 'utf-8',
         'accept-origin'         => '*'
     ],
@@ -28,24 +30,50 @@ use sale\camp\CampModel;
  */
 ['context' => $context] = $provider;
 
-$camp_models = CampModel::search(['is_clsh', '=', false])
-    ->read(['product_id' => ['name', 'prices_ids' => ['price', 'camp_class']]])
+$year = intval(date('Y'));
+if(intval(date('m')) >= 9) {
+    $year++;
+}
+
+$current_price_list = PriceList::search([
+    ['name', 'ilike', '%camp%'],
+    ['date_from', '>=', strtotime('first day of January '.$year)],
+    ['date_to', '<=', strtotime('last day of December '.$year)]
+])
+    ->read(['id'])
+    ->first();
+
+if(is_null($current_price_list)) {
+    throw new Exception("camp_price_list_not_found", EQ_ERROR_UNKNOWN_OBJECT);
+}
+
+$products_ids = Product::search([
+    ['is_camp', '=', true],
+    ['camp_product_type', '=', 'full']
+])
+    ->ids();
+
+$prices = Price::search([
+    ['price_list_id', '=', $current_price_list['id']],
+    ['product_id', 'in', $products_ids]
+])
+    ->read(['price', 'camp_class', 'product_id' => ['name']])
     ->get(true);
 
-$map_tariffs = [
-    'A' => '',
-    'B' => '',
-    'C' => ''
+$map_tariffs_prices = [
+    'A' => [],
+    'B' => [],
+    'C' => []
 ];
-foreach($camp_models as $camp_model) {
-    if(strpos($camp_model['product_id']['name'], ' A ') !== false) {
-        $map_tariffs['A'] = $camp_model['product_id'];
+foreach($prices as $price) {
+    if(strpos($price['product_id']['name'], ' A ') !== false) {
+        $map_tariffs_prices['A'][] = $price;
     }
-    elseif(strpos($camp_model['product_id']['name'], ' B ') !== false) {
-        $map_tariffs['B'] = $camp_model['product_id'];
+    elseif(strpos($price['product_id']['name'], ' B ') !== false) {
+        $map_tariffs_prices['B'][] = $price;
     }
-    elseif(strpos($camp_model['product_id']['name'], ' C ') !== false) {
-        $map_tariffs['C'] = $camp_model['product_id'];
+    elseif(strpos($price['product_id']['name'], ' C ') !== false) {
+        $map_tariffs_prices['C'][] = $price;
     }
 }
 
@@ -56,11 +84,11 @@ $map_camp_classes_labels = [
 ];
 
 $data = [];
-foreach($map_tariffs as $key => $tariff) {
-    usort($tariff['prices_ids'], fn($a, $b) => $a['price'] <=> $b['price']);
+foreach($map_tariffs_prices as $key => $tariff_prices) {
+    usort($tariff_prices, fn($a, $b) => $a['price'] <=> $b['price']);
 
     $i = 0;
-    foreach($tariff['prices_ids'] as $price) {
+    foreach($tariff_prices as $price) {
         $data[] = [
             $key.++$i,
             intval($price['price']),
