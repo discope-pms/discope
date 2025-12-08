@@ -85,6 +85,17 @@
                                                 "width": "100%",
                                                 "widget":{
                                                     "header": {
+                                                        "selection": {
+                                                            "default": false,
+                                                            "actions" : [
+                                                                {
+                                                                    "id": "header.selection.actions.mark_ignored",
+                                                                    "label": "Mark as ignored",
+                                                                    "icon": "play_arrow",
+                                                                    "controller": "sale_booking_bankstatementline_bulk-ignore"
+                                                                }
+                                                            ]
+                                                        },
                                                         "actions": {
                                                             "ACTION.CREATE": false
                                                         }
