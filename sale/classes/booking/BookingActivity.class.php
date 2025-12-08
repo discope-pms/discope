@@ -656,17 +656,19 @@ class BookingActivity extends Model {
     }
 
     public static function canupdate($self, $values): array {
-        $self->read(['activity_booking_line_id', 'booking_line_group_id', 'camp_group_id']);
+        $self->read(['activity_booking_line_id', 'booking_line_group_id', 'camp_group_id', 'camp_id']);
         foreach($self as $booking_activity) {
             $activity_booking_line_id = $values['activity_booking_line_id'] ?? $booking_activity['activity_booking_line_id'];
             $booking_line_group_id = $values['booking_line_group_id'] ?? $booking_activity['booking_line_group_id'];
             $camp_group_id = $values['camp_group_id'] ?? $booking_activity['camp_group_id'];
+            $camp_id = $values['camp_id'] ?? $booking_activity['camp_id'];
 
-            if(!isset($activity_booking_line_id) && !isset($booking_line_group_id) && !isset($camp_group_id)) {
+            if(!isset($activity_booking_line_id) && !isset($booking_line_group_id) && !isset($camp_group_id) && !isset($camp_id)) {
                 return [
                     'activity_booking_line_id'  => ['invalid' => "The activity needs to be related to a booking line."],
                     'booking_line_group_id'     => ['invalid' => "The activity needs to be related to a booking group."],
-                    'camp_group_id'             => ['invalid' => "The activity needs to be related to a camp group."]
+                    'camp_group_id'             => ['invalid' => "The activity needs to be related to a camp group."],
+                    'camp_id'                   => ['invalid' => "The activity needs to be related to a camp."]
                 ];
             }
         }
