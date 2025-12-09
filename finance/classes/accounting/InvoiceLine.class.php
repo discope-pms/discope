@@ -118,16 +118,6 @@ class InvoiceLine extends Model {
                 'store'             => true
             ],
 
-            'total_vat' => [
-                'type'              => 'computed',
-                'result_type'       => 'float',
-                'usage'             => 'amount/money:4',
-                'description'       => "Total tax price of the line.",
-                'help'              => "Must have 4 decimals allowed because it is used to compute subtotals_vat of Invoice.",
-                'function'          => 'calcTotalVat',
-                'store'             => true
-            ],
-
             'price' => [
                 'type'              => 'computed',
                 'result_type'       => 'float',
@@ -205,57 +195,38 @@ class InvoiceLine extends Model {
     }
 
     /**
-     * Get tax amount of the line.
-     */
-    public static function calcTotalVat($self): array {
-        $result = [];
-        $self->read(['total', 'vat_rate']);
-        foreach($self as $id => $line) {
-            if($line['vat_rate'] === 0.0) {
-                $result[$id] = 0.0;
-            }
-            else {
-                // #memo - total_vat must be computed using a precision of 4 decimals, it is rounded to 2 decimals at Invoice level for subtotals_vat
-                $result[$id] = round(round($line['total'], 2) * $line['vat_rate'], 4);
-            }
-        }
-
-        return $result;
-    }
-
-    /**
      * Get final tax-included price of the line.
      */
     public static function calcPrice($self): array {
         $result = [];
-        $self->read(['total', 'total_vat']);
+        $self->read(['total', 'vat_rate']);
         foreach($self as $id => $line) {
-            $result[$id] = round($line['total'] + $line['total_vat'], 2);
+            $result[$id] = round($line['total'] * (1.0 + $line['vat_rate']), 2);
         }
 
         return $result;
     }
 
     public static function onupdatePriceId($om, $oids, $values, $lang) {
-        $om->update(get_called_class(), $oids, ['vat_rate' => null, 'unit_price' => null, 'total' => null, 'total_vat' => null, 'price' => null]);
+        $om->update(get_called_class(), $oids, ['vat_rate' => null, 'unit_price' => null, 'total' => null, 'price' => null]);
         // reset parent invoice computed values
         $om->callonce(self::getType(), '_resetInvoice', $oids, [], $lang);
     }
 
     public static function onupdateVatRate($om, $oids, $values, $lang) {
-        $om->update(get_called_class(), $oids, ['price' => null, 'total_vat' => null]);
+        $om->update(get_called_class(), $oids, ['price' => null]);
         // reset parent invoice computed values
         $om->callonce(self::getType(), '_resetInvoice', $oids, [], $lang);
     }
 
     public static function onupdateQty($om, $oids, $values, $lang) {
-        $om->update(get_called_class(), $oids, ['price' => null, 'total' => null, 'total_vat' => null]);
+        $om->update(get_called_class(), $oids, ['price' => null, 'total' => null]);
         // reset parent invoice computed values
         $om->callonce(self::getType(), '_resetInvoice', $oids, [], $lang);
     }
 
     public static function onupdateDiscount($om, $oids, $values, $lang) {
-        $om->update(get_called_class(), $oids, ['price' => null, 'total' => null, 'total_vat' => null]);
+        $om->update(get_called_class(), $oids, ['price' => null, 'total' => null]);
         // reset parent invoice computed values
         $om->callonce(self::getType(), '_resetInvoice', $oids, [], $lang);
     }

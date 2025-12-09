@@ -486,25 +486,17 @@ class Invoice extends Model {
         return $result;
     }
 
-    /**
-     * #memo - must sum lines prices totals keeping 4 decimals and rounded to 2 decimals at the end
-     */
     public static function calcSubTotalsVat($self): array {
         $result = [];
-        $self->read(['invoice_lines_ids' => ['vat_rate', 'total_vat']]);
+        $self->read(['subtotals']);
         foreach($self as $id => $invoice) {
             $subtotals_vat = [];
-            foreach($invoice['invoice_lines_ids'] as $line) {
-                $vat_rate_index = number_format($line['vat_rate'] * 100, 2, '.', '');
-                if(!isset($subtotals_vat[$vat_rate_index])) {
-                    $subtotals_vat[$vat_rate_index] = 0.0;
-                }
-
-                $subtotals_vat[$vat_rate_index] = round($subtotals_vat[$vat_rate_index] + $line['total_vat'], 4);
+            foreach($invoice['subtotals'] as $vat_rate_index => $subtotal) {
+                $vat_rate = ((float) $vat_rate_index) / 100;
+                $subtotals_vat[$vat_rate_index] = round($subtotal * $vat_rate, 2);
             }
 
-            // #memo - as to be rounded on 2 decimals here and not on each line
-            $result[$id] = array_map(fn($subtotal) => round($subtotal, 2), $subtotals_vat);
+            $result[$id] = $subtotals_vat;
         }
 
         return $result;
@@ -527,19 +519,12 @@ class Invoice extends Model {
 
     /**
      * #memo - this should not include installment [non-invoiced pre-payments] (we should deal with display_price instead)
-     *
-     * #warning - if displayed rounded on 2 decimals, the sum of all line "price" of and invoice may not match the final "price" of the Invoice (use of subtotals)
      */
     public static function calcPrice($self): array {
         $result = [];
-        $self->read(['total', 'subtotals_vat']);
-        foreach($self as $id => $invoice) {
-            $total_vat = 0.0;
-            foreach($invoice['subtotals_vat'] as $subtotal_vat) {
-                $total_vat = round($total_vat + $subtotal_vat, 2);
-            }
-
-            $result[$id] = round($invoice['total'] + $total_vat, 2);
+        $self->read(['total', 'total_vat']);
+        foreach($self as $id => $booking) {
+            $result[$id] = round($booking['total'] + $booking['total_vat'], 2);
         }
 
         return $result;

@@ -109,16 +109,6 @@ class ContractLine extends Model {
                 'function'          => 'calcTotal'
             ],
 
-            'total_vat' => [
-                'type'              => 'computed',
-                'result_type'       => 'float',
-                'usage'             => 'amount/money:4',
-                'description'       => "Total tax price of the line.",
-                'help'              => "Must have 4 decimals allowed because it is used to compute subtotals_vat of Contract.",
-                'store'             => true,
-                'function'          => 'calcTotalVat'
-            ],
-
             'price' => [
                 'type'              => 'computed',
                 'result_type'       => 'float',
@@ -170,32 +160,13 @@ class ContractLine extends Model {
     }
 
     /**
-     * Get tax amount of the line.
-     */
-    public static function calcTotalVat($self): array {
-        $result = [];
-        $self->read(['total', 'vat_rate']);
-        foreach($self as $id => $line) {
-            if($line['vat_rate'] === 0.0) {
-                $result[$id] = 0.0;
-            }
-            else {
-                // #memo - total_vat must be computed using a precision of 4 decimals, it is rounded to 2 decimals at Contract level for subtotals_vat
-                $result[$id] = round(round($line['total'], 2) * $line['vat_rate'], 4);
-            }
-        }
-
-        return $result;
-    }
-
-    /**
      * Get final tax-included price of the line.
      */
     public static function calcPrice($self): array {
         $result = [];
-        $self->read(['total', 'total_vat']);
+        $self->read(['total', 'vat_rate']);
         foreach($self as $id => $line) {
-            $result[$id] = round($line['total'] + $line['total_vat'], 2);
+            $result[$id] = round($line['total'] * (1.0 + $line['vat_rate']), 2);
         }
 
         return $result;

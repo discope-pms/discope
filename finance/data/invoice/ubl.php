@@ -400,18 +400,19 @@ $ubl['Invoice']['cac:TaxTotal'] = [
     'cac:TaxSubtotal'   => ['items' => []]
 ];
 
-foreach($invoice['subtotals_vat'] as $vat_rate_index => $total_vat) {
+foreach($invoice['subtotals_vat'] as $vat_rate_index => $subtotal_vat) {
     $vat_rate = ((float) $vat_rate_index) / 100;
 
     $has_vat = $vat_rate !== 0.0;
 
     $item = [
         'cbc:TaxableAmount' => ['attributes' => ['currencyID' => 'EUR'], 'content' => $formatMoney($invoice['subtotals'][$vat_rate_index])],
-        'cbc:TaxAmount'     => ['attributes' => ['currencyID' => 'EUR'], 'content' => $formatMoney($total_vat)],
+        'cbc:TaxAmount'     => ['attributes' => ['currencyID' => 'EUR'], 'content' => $formatMoney($subtotal_vat)],
         'cac:TaxCategory'   => [
             'cbc:ID'                        => $has_vat ? 'S' : 'E',
             'cbc:Percent'                   => $formatVatRate($vat_rate),
-            'cbc:TaxExemptionReasonCode'    => 'VATEX-EU-132',                // 'VATEX-EU-132-1L' for organisation without VAT like ASBL
+            // #memo - 'VATEX-EU-132-1L' for organisation without VAT like ASBL
+            'cbc:TaxExemptionReasonCode'    => 'VATEX-EU-132',
             'cac:TaxScheme'                 => ['cbc:ID' => 'VAT']
         ]
     ];

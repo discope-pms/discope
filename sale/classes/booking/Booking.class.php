@@ -973,48 +973,17 @@ class Booking extends Model {
         return $result;
     }
 
-    /**
-     * #memo - must sum lines prices totals keeping 4 decimals and rounded to 2 decimals at the end
-     */
     public static function calcSubTotalsVat($self): array {
         $result = [];
-        $self->read([
-            'booking_lines_groups_ids' => [
-                'is_locked',
-                'has_pack',
-                'vat_rate',
-                'total_vat',
-                'booking_lines_ids' => [
-                    'vat_rate',
-                    'total_vat'
-                ]
-            ]
-        ]);
+        $self->read(['subtotals']);
         foreach($self as $id => $booking) {
             $subtotals_vat = [];
-            foreach($booking['booking_lines_groups_ids'] as $group) {
-                if($group['has_pack'] && $group['is_locked']) {
-                    $vat_rate_index = number_format($group['vat_rate'] * 100, 2, '.', '');
-                    if(!isset($subtotals_vat[$vat_rate_index])) {
-                        $subtotals_vat[$vat_rate_index] = 0.0;
-                    }
-
-                    $subtotals_vat[$vat_rate_index] = round($subtotals_vat[$vat_rate_index] + $group['total_vat'], 4);
-                }
-                else {
-                    foreach($group['booking_lines_ids'] as $line) {
-                        $vat_rate_index = number_format($line['vat_rate'] * 100, 2, '.', '');
-                        if(!isset($subtotals_vat[$vat_rate_index])) {
-                            $subtotals_vat[$vat_rate_index] = 0.0;
-                        }
-
-                        $subtotals_vat[$vat_rate_index] = round($subtotals_vat[$vat_rate_index] + $line['total_vat'], 4);
-                    }
-                }
+            foreach($booking['subtotals'] as $vat_rate_index => $subtotal) {
+                $vat_rate = ((float) $vat_rate_index) / 100;
+                $subtotals_vat[$vat_rate_index] = round($subtotal * $vat_rate, 2);
             }
 
-            // #memo - as to be rounded on 2 decimals here and not on each line
-            $result[$id] = array_map(fn($subtotal) => round($subtotal, 2), $subtotals_vat);
+            $result[$id] = $subtotals_vat;
         }
 
         return $result;
@@ -1037,14 +1006,9 @@ class Booking extends Model {
 
     public static function calcPrice($self): array {
         $result = [];
-        $self->read(['total', 'subtotals_vat']);
+        $self->read(['total', 'total_vat']);
         foreach($self as $id => $booking) {
-            $total_vat = 0.0;
-            foreach($booking['subtotals_vat'] as $subtotal_vat) {
-                $total_vat = round($total_vat + $subtotal_vat, 2);
-            }
-
-            $result[$id] = round($booking['total'] + $total_vat, 2);
+            $result[$id] = round($booking['total'] + $booking['total_vat'], 2);
         }
 
         return $result;
