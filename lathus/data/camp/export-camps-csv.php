@@ -44,7 +44,7 @@ $camps = Camp::search(
 )
     ->read([
         'sojourn_number',
-        'date_form',
+        'date_from',
         'date_to',
         'min_age',
         'max_age',
@@ -112,6 +112,8 @@ foreach($data as $row) {
 fclose($fp);
 
 $output = file_get_contents($tmp_file);
+
+$output = str_replace('"', '', $output);
 
 $context->httpResponse()
         ->body($output)
