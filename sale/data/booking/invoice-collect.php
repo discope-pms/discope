@@ -7,6 +7,7 @@
 */
 
 use equal\orm\Domain;
+use finance\accounting\AccountingJournal;
 use identity\Center;
 use identity\CenterOffice;
 use sale\booking\Booking;
@@ -63,6 +64,14 @@ list($params, $providers) = eQual::announce([
             'type'              => 'date',
             'description'       => 'Date interval Upper limit.'
         ],
+        'journal_type' => [
+            'type'              => 'string',
+            'description'       => 'Type of accounting journal of the invoice.',
+            'selection'         => [
+                'sales',
+                'sales_peppol'
+            ]
+        ]
     ],
     'response'      => [
         'content-type'  => 'application/json',
@@ -118,6 +127,11 @@ if(isset($params['date_from']) && $params['date_from'] > 0) {
 
 if(isset($params['date_to']) && $params['date_to'] > 0) {
     $domain = Domain::conditionAdd($domain, ['date', '<=', $params['date_to']]);
+}
+
+if(isset($params['journal_type'])) {
+    $journals_ids = AccountingJournal::search(['type', '=', $params['journal_type']])->ids();
+    $domain = Domain::conditionAdd($domain, ['journal_id', 'in', $journals_ids]);
 }
 
 $params['domain'] = $domain;

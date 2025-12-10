@@ -62,6 +62,11 @@
                                                 "type": "field",
                                                 "value": "center_office_id",
                                                 "width": "25%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "journal_type",
+                                                "width": "25%"
                                             }
                                         ]
                                     }
