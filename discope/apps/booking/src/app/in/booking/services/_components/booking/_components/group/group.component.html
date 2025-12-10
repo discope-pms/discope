@@ -658,7 +658,7 @@
         </div>
 
         <!-- meals -->
-        <div class="part" *ngIf="vGroup.meals.show && instance.group_type === 'sojourn'">
+        <div class="part" *ngIf="vGroup.meals.show && ['sojourn', 'event'].includes(instance.group_type)">
             <div class="part-toggle" [class.highlight]="!vGroup.meals.folded">
                 <button mat-icon-button *ngIf="!vGroup.meals.folded" (click)="vGroup.meals.folded = !vGroup.meals.folded; sectionFold('meals')">
                     <mat-icon style="font-size: 15px;">keyboard_arrow_up</mat-icon>
