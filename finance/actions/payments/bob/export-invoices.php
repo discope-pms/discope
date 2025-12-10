@@ -122,9 +122,6 @@ $invoices = Invoice::search($domain, ['sort' => ['number' => 'asc']])
         // #memo - accounting price is the amount to be recorded in accountancy (does not include installment payments)
         'accounting_price',
         'is_deposit',
-        'journal_id' => [
-            'type'
-        ],
         'organisation_id',
         'partner_id' => [
             'id',
