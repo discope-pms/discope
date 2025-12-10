@@ -107,6 +107,44 @@ fclose($fp);
 
 $output = file_get_contents($tmp_file);
 
+$output = str_replace('"', '', $output);
+
+// #memo - add historic tariffs because don't know if they are used
+$output .= "D1;610;Adhérents/Partenaires Vienne/Habitants des cantons
+D2;695;Habitants Vienne/Partenaires hors Vienne
+D3;765;Autres
+L01;42.5;ALSH CCVG S
+L02;45;ALSH CCVG S
+L03;47;ALSH CCVG S
+L04;49.5;ALSH CCVG S
+L05;10.5;ALSH CCVG jour
+L06;11;ALSH CCVG jour
+L07;11.5;ALSH CCVG jour
+L08;12;ALSH CCVG jour
+L09;54;ALSH non CCVG S
+L10;56.5;ALSH non CCVG S
+L11;59;ALSH non CCVG S
+L12;61.5;ALSH non CCVG S
+L13;13;ALSH non CCVG jour
+L14;13.5;ALSH non CCVG jour
+L15;14;ALSH non CCVG jour
+L16;14.5;ALSH non CCVG jour
+L17;34.5;ALSH CCVG S 4j
+L18;36;ALSH CCVG S 4j
+L19;38;ALSH CCVG S 4j
+L20;40;ALSH CCVG S 4j
+L21;43;ALSH Non CCVG S 4j
+L22;45;ALSH Non CCVG S 4j
+L23;47;ALSH Non CCVG S 4j
+L24;49;ALSH Non CCVG S 4j
+P1;257;Habitants de Montmorillon, St Savin, Lussac, L'Isle Jourdain, La Trimouille, Availles-Limousines
+P2;294;Partenaires
+P3;337;Autres
+T1;257;Habitants de Montmorillon,St Savin
+T2;294;Partenaires
+T3;337;Autres
+W;92;Week end";
+
 $context->httpResponse()
     ->body($output)
     ->send();

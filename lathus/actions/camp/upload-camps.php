@@ -51,16 +51,25 @@ if(!($conn_id = ftp_connect($ftp_server))) {
 
 if(@ftp_login($conn_id, $ftp_user, $ftp_pass)) {
     trigger_error("FTP::authentication successful to $ftp_server", EQ_REPORT_INFO);
-} else {
+}
+else {
     throw new Exception("ftp_authentication_failed", EQ_ERROR_UNKNOWN);
 }
 
-if(ftp_put($conn_id, $remote_file, $camps_csv)) {
+ftp_pasv($conn_id, true);
+
+$tmp_file = fopen('php://temp', 'r+');
+fwrite($tmp_file, $camps_csv);
+rewind($tmp_file);
+
+if(ftp_fput($conn_id, $remote_file, $tmp_file)) {
     trigger_error("FTP::upload successful of $remote_file to $ftp_server", EQ_REPORT_INFO);
-} else {
+}
+else {
     throw new Exception("ftp_upload_failed", EQ_ERROR_UNKNOWN);
 }
 
+fclose($tmp_file);
 ftp_close($conn_id);
 
 $context->httpResponse()

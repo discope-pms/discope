@@ -28,13 +28,23 @@ use sale\camp\Camp;
  */
 ['context' => $context] = $provider;
 
+$year = intval(date('Y'));
+if(intval(date('m')) >= 9) {
+    $year++;
+}
+
 $camps = Camp::search(
-    ['is_clsh', '=', false],
+    [
+        ['date_from', '>=', strtotime('first day of January '.$year)],
+        ['date_to', '<=', strtotime('last day of December '.$year)],
+        ['is_clsh', '=', false],
+        ['status', '=', 'published']
+    ],
     ['sort' => ['sojourn_number' => 'asc']]
 )
     ->read([
         'sojourn_number',
-        'date_form',
+        'date_from',
         'date_to',
         'min_age',
         'max_age',
@@ -102,6 +112,8 @@ foreach($data as $row) {
 fclose($fp);
 
 $output = file_get_contents($tmp_file);
+
+$output = str_replace('"', '', $output);
 
 $context->httpResponse()
         ->body($output)
