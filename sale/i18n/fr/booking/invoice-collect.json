@@ -40,6 +40,15 @@
             "label": "Date de fin ",
             "description": "Date de fin de l'intervalle de temps.",
             "help": ""
+        },
+        "journal_type": {
+            "label": "Type journal",
+            "description": "Type de journal comptable.",
+            "selection": {
+                "sales": "journal des ventes",
+                "sales_peppol": "journal des ventes (Peppol)"
+            },
+            "help": ""
         }
     }
 }
