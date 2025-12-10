@@ -637,8 +637,7 @@
                                             {
                                                 "type": "field",
                                                 "value": "description",
-                                                "width": "100%",
-                                                "visible": [true, "<>", "env.sale.features.booking.tasks_table"]
+                                                "width": "100%"
                                             }
                                         ]
                                     }
