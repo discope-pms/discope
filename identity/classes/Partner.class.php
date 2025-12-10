@@ -1,12 +1,18 @@
 <?php
 /*
     This file is part of the Discope property management software <https://github.com/discope-pms/discope>
-    Some Rights Reserved, Discope PMS, 2020-2024
+    Some Rights Reserved, Discope PMS, 2020-2025
     Original author(s): Yesbabylon SRL
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
+
 namespace identity;
+
 use equal\orm\Model;
+use hr\employee\Employee;
+use sale\booking\Contact;
+use sale\customer\Customer;
+use sale\provider\Provider;
 
 class Partner extends Model {
 
@@ -56,7 +62,8 @@ class Partner extends Model {
                     'payer',
                     'other'
                 ],
-                'description'       => 'The kind of partnership that exists between the identities.'
+                'description'       => 'The kind of partnership that exists between the identities.',
+                'onupdate'          => 'onupdateRelationship'
             ],
 
             // if partner is a contact, keep the organisation (s)he is a contact from
@@ -183,6 +190,51 @@ class Partner extends Model {
         foreach($self as $id => $partner) {
             if( ($partner['partner_identity_id']['lang_id'] ?? false) ) {
                 self::id($id)->update([ 'lang_id' => $partner['partner_identity_id']['lang_id'] ]);
+            }
+        }
+    }
+
+    public static function onupdateRelationship($self) {
+        $self->read(['relationship']);
+        foreach($self as $id => $partner) {
+            // Set default value depending on partner relationship
+            switch($partner['relationship']) {
+                case 'employee':
+                    $employee = Employee::id($id)->read(['center_id']);
+
+                    if(is_null($employee['center_id'])) {
+                        Employee::id($id)->update(['center_id' => 1]);
+                    }
+                    break;
+                case 'contact':
+                    $contact = Contact::id($id)->read(['origin', 'is_direct_contact']);
+
+                    $contact_data = [];
+                    if(is_null($contact['origin'])) {
+                        $contact_data['origin'] = 'manual';
+                    }
+                    if(is_null($contact['is_direct_contact'])) {
+                        $contact_data['is_direct_contact'] = false;
+                    }
+
+                    if(!empty($contact_data)) {
+                        Contact::id($id)->update($contact_data);
+                    }
+                    break;
+                case 'customer':
+                    $customer = Customer::id($id)->read(['is_tour_operator']);
+
+                    if(is_null($customer['is_tour_operator'])) {
+                        Customer::id($id)->update(['is_tour_operator' => false]);
+                    }
+                    break;
+                case 'provider':
+                    // not specific default value yet
+                    break;
+                case 'payer':
+                case 'other':
+                    // no specific class, so no specific default values
+                    break;
             }
         }
     }
