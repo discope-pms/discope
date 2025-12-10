@@ -123,6 +123,7 @@ $invoices = Invoice::search($domain, ['sort' => ['number' => 'asc']])
         'accounting_price',
         'is_deposit',
         'organisation_id',
+        'subtotals_vat',
         'partner_id' => [
             'id',
             'name',
@@ -596,6 +597,32 @@ foreach($invoices as $invoice) {
             $vat_remaining -= $line_vat;
 
             ++$i;
+        }
+    }
+
+    // #memo - if result of vat "calculation per line" is different from result of vat "calculation per vat_rate" (BE: 6%, 12% and 21%), then adapt it to match Invoices data
+    $subtotals_vat_lines = [];
+    foreach($invoice_lines_accounts as $account_values) {
+        $vat_rate_index = number_format($account_values['vat_rate'] * 100, 2, '.', '');
+        if(!isset($subtotals_vat_lines[$vat_rate_index])) {
+            $subtotals_vat_lines[$vat_rate_index] = 0.0;
+        }
+
+        $subtotals_vat_lines[$vat_rate_index] += $account_values['vat'];
+    }
+    foreach($subtotals_vat_lines as $vat_rate_index => $subtotal_vat) {
+        if($subtotal_vat === $invoice['subtotals_vat'][$vat_rate_index]) {
+            continue;
+        }
+
+        $diff = $invoice['subtotals_vat'][$vat_rate_index] - $subtotal_vat;
+        foreach($invoice_lines_accounts as &$account_values) {
+            $vat_rate = ((float) $vat_rate_index) / 100;
+            if($account_values['vat_rate'] === $vat_rate) {
+                // adapt here
+                $account_values['vat'] = round($account_values['vat'] + $diff, 2);
+                continue 2;
+            }
         }
     }
 
