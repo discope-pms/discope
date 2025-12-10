@@ -50,7 +50,7 @@ if(!($conn_id = ftp_connect($ftp_server))) {
 }
 
 if(@ftp_login($conn_id, $ftp_user, $ftp_pass)) {
-    trigger_error("FTP::authentication successful to $ftp_server", EQ_REPORT_INFO);
+    trigger_error("PHP::authentication successful to $ftp_server", EQ_REPORT_INFO);
 }
 else {
     throw new Exception("ftp_authentication_failed", EQ_ERROR_UNKNOWN);
@@ -63,7 +63,7 @@ fwrite($tmp_file, $tariffs_csv);
 rewind($tmp_file);
 
 if(ftp_fput($conn_id, $remote_file, $tmp_file)) {
-    trigger_error("FTP::upload successful of $remote_file to $ftp_server", EQ_REPORT_INFO);
+    trigger_error("PHP::upload successful of $remote_file to $ftp_server", EQ_REPORT_INFO);
 }
 else {
     throw new Exception("ftp_upload_failed", EQ_ERROR_UNKNOWN);
