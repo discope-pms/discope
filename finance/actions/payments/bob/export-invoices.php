@@ -94,12 +94,14 @@ if(!$journal) {
 
 $domain = [
     [
+        ['journal_id', '=', $journal['id']],
         ['is_exported', '=', false],
         ['center_office_id', '=', $params['center_office_id']],
         ['booking_id', '>', 0],
         ['status', '<>', 'proforma'],
     ],
     [
+        ['journal_id', '=', $journal['id']],
         ['is_exported', '=', false],
         ['center_office_id', '=', $params['center_office_id']],
         ['has_orders', '=', true],
@@ -120,11 +122,7 @@ $invoices = Invoice::search($domain, ['sort' => ['number' => 'asc']])
         // #memo - accounting price is the amount to be recorded in accountancy (does not include installment payments)
         'accounting_price',
         'is_deposit',
-        'organisation_id' => [
-            'id',
-            'has_vat',
-            'vat_number'
-        ],
+        'organisation_id',
         'partner_id' => [
             'id',
             'name',
@@ -135,7 +133,6 @@ $invoices = Invoice::search($domain, ['sort' => ['number' => 'asc']])
                 'address_city',
                 'address_zip',
                 'address_country',
-                'has_vat',
                 'vat_number',
                 'phone',
                 'fax',
@@ -183,28 +180,6 @@ $invoices = Invoice::search($domain, ['sort' => ['number' => 'asc']])
         ]
     ])
     ->get(true);
-
-$invoices = array_filter($invoices, function($invoice) use($journal) {
-    // #todo - remove year 2026 check when not needed anymore
-    $emission_year = intval(date('Y', $invoice['date']));
-    if($emission_year < 2026) {
-        return $journal['type'] === 'sales';
-    }
-
-    if(!$invoice['organisation_id']['has_vat'] || empty($invoice['organisation_id']['vat_number'])) {
-        // #memo - if organisation has no VAT, then all invoices in a single journal "sales"
-        return true;
-    }
-
-    // #memo - if organisation and customer have vat, then separate in two journals "sales" and "sales_peppol"
-    // #todo - (temporary) A link should be created between an invoice and an accounting journal, instead of hardcoded rules. (see Invoice calcNumber for more information)
-    $b2b_vat = $invoice['partner_id']['partner_identity_id']['has_vat'] && !empty($invoice['partner_id']['partner_identity_id']['vat_number']);
-    if($journal['type'] === 'sales_peppol') {
-        return $b2b_vat;
-    }
-
-    return !$b2b_vat;
-});
 
 if(count($invoices) == 0) {
     // exit with no error
@@ -517,7 +492,7 @@ foreach($invoices as $invoice) {
 
     // retrieve downpayment product
     $downpayment_product_id = 0;
-    $downpayment_sku = Setting::get_value('sale', 'organization', 'sku.downpayment.'.$invoice['organisation_id']['id']);
+    $downpayment_sku = Setting::get_value('sale', 'organization', 'sku.downpayment.'.$invoice['organisation_id']);
     if($downpayment_sku) {
         $products_ids = Product::search(['sku', '=', $downpayment_sku])->ids();
         if($products_ids) {

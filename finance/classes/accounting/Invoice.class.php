@@ -82,6 +82,15 @@ class Invoice extends Model {
                 'default'           => 'invoice'
             ],
 
+            'journal_id' => [
+                'type'              => 'computed',
+                'result_type'       => 'many2one',
+                'foreign_object'    => 'finance\accounting\AccountingJournal',
+                'description'       => "Accounting journal the invoice relates to.",
+                'store'             => true,
+                'function'          => 'calcJournalId'
+            ],
+
             'number' => [
                 'type'              => 'computed',
                 'result_type'       => 'string',
@@ -357,29 +366,69 @@ class Invoice extends Model {
         return $result;
     }
 
-    public static function calcNumber($om, $ids, $lang) {
+    public static function calcJournalId($self): array {
         $result = [];
-
-        $invoices = $om->read(self::getType(), $ids,
-            [
-                'status',
-                'date',
-                'organisation_id',
-                'organisation_id.has_vat',
-                'organisation_id.vat_number',
-                'partner_id.partner_identity_id.has_vat',
-                'partner_id.partner_identity_id.vat_number',
-                'center_office_id.code'
+        $self->read([
+            'status',
+            'center_office_id',
+            'organisation_id'   => [
+                'has_vat'
             ],
-            $lang
-        );
+            'partner_id'        => [
+                'partner_identity_id' => [
+                    'has_vat'
+                ]
+            ]
+        ]);
+        foreach($self as $id => $invoice) {
+            if(is_null($invoice['center_office_id']) || $invoice['status'] === 'proforma') {
+                continue;
+            }
 
-        foreach($invoices as $id => $invoice) {
+            $accounting_journals = AccountingJournal::search([
+                ['center_office_id', '=', $invoice['center_office_id']],
+                ['type', 'in', ['sales', 'sales_peppol']]
+            ])
+                ->read(['type'])
+                ->get();
 
+            $map_types_accounting_journals_ids = [];
+            foreach($accounting_journals as $jid => $accounting_journal) {
+                $map_types_accounting_journals_ids[$accounting_journal['type']] = $jid;
+            }
+
+            $journal_type = 'sales';
+            // #todo - remove year 2026 check when not needed anymore
+            if($invoice['organisation_id']['has_vat'] && $invoice['partner_id']['partner_identity_id']['has_vat'] && intval(date('Y')) >= 2026) {
+                $journal_type = 'sales_peppol';
+            }
+
+            $journal_id = $map_types_accounting_journals_ids[$journal_type];
+
+            $result[$id] = $journal_id;
+        }
+
+        return $result;
+    }
+
+    public static function calcNumber($self): array {
+        $result = [];
+        $self->read([
+            'status',
+            'date',
+            'organisation_id',
+            'journal_id'        => ['type'],
+            'center_office_id'  => ['code']
+        ]);
+        foreach($self as $id => $invoice) {
             // no code is generated for proforma
             if($invoice['status'] == 'proforma') {
                 $result[$id] = '[proforma]';
                 continue;
+            }
+
+            if(is_null($invoice['journal_id'])) {
+                throw new \Exception("unknown_journal_id", EQ_ERROR_INVALID_CONFIG);
             }
 
             $format = Setting::get_value('sale', 'accounting', 'invoice.sequence_format', '%05d{sequence}');
@@ -389,41 +438,32 @@ class Invoice extends Model {
             $fiscal_date_to = Setting::get_value('finance', 'accounting', 'fiscal_year.date_to');
 
             if(!$fiscal_year || !$fiscal_date_from || !$fiscal_date_to) {
-                trigger_error('APP::unable to retrieve sequence for invoice', EQ_REPORT_ERROR);
-                throw new \Exception('missing_mandatory_fiscal_config', EQ_ERROR_INVALID_CONFIG);
+                trigger_error("APP::unable to retrieve sequence for invoice", EQ_REPORT_ERROR);
+                throw new \Exception("missing_mandatory_fiscal_config", EQ_ERROR_INVALID_CONFIG);
             }
 
             if($invoice['date'] < strtotime($fiscal_date_from) || $invoice['date'] > strtotime($fiscal_date_to)) {
-                throw new \Exception('invoice_outside_fiscal_year', EQ_ERROR_INVALID_CONFIG);
+                throw new \Exception("invoice_outside_fiscal_year", EQ_ERROR_INVALID_CONFIG);
             }
 
-            $sequence_code = 'invoice.sequence.' . $invoice['center_office_id.code'];
-            // #todo - remove year 2026 check when not needed anymore
-            if($invoice['organisation_id.has_vat'] && $invoice['partner_id.partner_identity_id.has_vat'] && intval(date('Y')) >= 2026) {
-                // #todo - (temporary) Above "if" could be replaced by a series of configurable conditions to know which accounting journal to use. Then we would store the setting to use in the journal.
-                if(empty($invoice['organisation_id.vat_number'])) {
-                    throw new \Exception('missing_organisation_vat_number', EQ_ERROR_INVALID_PARAM);
-                }
-                if(empty($invoice['partner_id.partner_identity_id.vat_number'])) {
-                    throw new \Exception('missing_partner_vat_number', EQ_ERROR_INVALID_PARAM);
-                }
-                $sequence_code = 'invoice.peppol.sequence.' . $invoice['center_office_id.code'];
+            $sequence_code = 'invoice.sequence.' . $invoice['center_office_id']['code'];
+            if($invoice['journal_id']['type'] === 'sales_peppol') {
+                $sequence_code = 'invoice.peppol.sequence.' . $invoice['center_office_id']['code'];
             }
 
             $sequence = Setting::fetch_and_add('sale', 'accounting', $sequence_code);
-
             if(!$sequence) {
-                throw new \Exception('APP::unable to retrieve sequence for invoice', EQ_ERROR_INVALID_CONFIG);
+                throw new \Exception("APP::unable to retrieve sequence for invoice", EQ_ERROR_INVALID_CONFIG);
             }
 
             $result[$id] = Setting::parse_format($format, [
                 'year'      => $fiscal_year,
-                'office'    => $invoice['center_office_id.code'],
+                'office'    => $invoice['center_office_id']['code'],
                 'org'       => $invoice['organisation_id'],
                 'sequence'  => $sequence
             ]);
-
         }
+
         return $result;
     }
 
@@ -695,7 +735,7 @@ class Invoice extends Model {
         if(isset($values['status']) && $values['status'] == 'invoice') {
 
             // pass-1 - assign invoice number and check the date consistency
-            $invoices = $om->read(self::getType(), $oids, ['number', 'date', 'center_office_id', 'organisation_id'], $lang);
+            $invoices = $om->read(self::getType(), $oids, ['journal_id', 'number', 'date', 'center_office_id', 'organisation_id'], $lang);
 
             foreach($invoices as $oid => $invoice) {
                 // #memo - we don't want to assign a new number to invoiced and cancelled invoices
@@ -731,14 +771,11 @@ class Invoice extends Model {
                 // generate accounting entries
                 $invoices_accounting_entries = self::_generateAccountingEntries($om, $oid, [], $lang);
 
-                $res = $om->search(AccountingJournal::getType(), [['center_office_id', '=', $invoice['center_office_id']], ['type', '=', 'sales']]);
-                $journal_id = reset($res);
-
-                if($journal_id && isset($invoices_accounting_entries[$oid])) {
+                if($invoice['journal_id'] && isset($invoices_accounting_entries[$oid])) {
                     $accounting_entries = $invoices_accounting_entries[$oid];
                     // create new entries objects and assign to the sale journal relating to the center_office_id
                     foreach($accounting_entries as $entry) {
-                        $entry['journal_id'] = $journal_id;
+                        $entry['journal_id'] = $invoice['journal_id'];
                         $om->create(\finance\accounting\AccountingEntry::getType(), $entry);
                     }
                 }
