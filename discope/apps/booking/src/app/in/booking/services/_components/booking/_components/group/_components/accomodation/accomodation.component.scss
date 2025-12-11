@@ -38,6 +38,12 @@
                     line-height: 40px;
                 }
 
+                .row-products-title.error-one-accommodation-allowed {
+                    .product-name {
+                        color: red;
+                    }
+                }
+
                 .cell:not(:first-child) {
                     margin-left: 40px;
                 }
@@ -96,6 +102,10 @@
                                     text-decoration: none;
                                 }
                             }
+                        }
+
+                        .name-disabled{
+                            color: grey;
                         }
 
                         .rentalunit-filter {

@@ -56,6 +56,9 @@ export class BookingServicesBookingGroupAccomodationComponent extends TreeCompon
     public filterBy$ = new BehaviorSubject<string>('');
     public filterBy = '';
 
+    // #memo - only one accommodation rental unit is allowed for a group
+    public errorOneAccommodationAllowed = false;
+
     constructor(
         private api: ApiService,
         private dialog: MatDialog
@@ -74,6 +77,19 @@ export class BookingServicesBookingGroupAccomodationComponent extends TreeCompon
 
     public async ngOnInit() {
         this.ready = true;
+
+        if(this.instance.product_model_id.is_accomodation) {
+            for(let sojournProductModel of this.group.sojourn_product_models_ids) {
+                if(sojournProductModel.id === this.instance.id) {
+                    break;
+                }
+
+                if(sojournProductModel.product_model_id.is_accomodation) {
+                    this.errorOneAccommodationAllowed = true;
+                    break;
+                }
+            }
+        }
 
         this.selectedRentalUnits$.subscribe((selectedRentalUnits) => {
             this.selectedRentalUnits = selectedRentalUnits;
@@ -289,6 +305,10 @@ export class BookingServicesBookingGroupAccomodationComponent extends TreeCompon
     }
 
     public leftSelectRentalUnit(checked: boolean, rental_unit_id: number) {
+        if(this.errorOneAccommodationAllowed) {
+            return;
+        }
+
         let index = this.selectedRentalUnits.indexOf(rental_unit_id);
         if(index == -1) {
             this.selectedRentalUnits$.next([

@@ -13,7 +13,7 @@
 
     <div class="part-container" *ngIf="vGroup.rental_units.folded">
         <div class="row">
-            <div class="row-products-title">{{instance.product_model_id?.name}} : <b>{{instance.qty}} p.</b>
+            <div class="row-products-title" [class.error-one-accommodation-allowed]="errorOneAccommodationAllowed"><span class="product-name">{{instance.product_model_id?.name}} : <b>{{instance.qty}} p.</b></span>
                 <!-- <button mat-mini-fab color="primary" style="transform: scale(0.65);" (click)="oncreateAssignment()"><mat-icon>add</mat-icon></button> -->
             </div>
         </div>
@@ -21,8 +21,10 @@
 
     <div class="part-container" *ngIf="!vGroup.rental_units.folded">
         <div class="row">
-            <div class="row-products-title" style="display: flex; align-items: center;">
-                <div style="flex: 1; max-width: calc(50% + 30px);">{{instance.product_model_id?.name}}</div>
+            <div class="row-products-title" [class.error-one-accommodation-allowed]="errorOneAccommodationAllowed" style="display: flex; align-items: center;">
+                <div class="product-name" style="flex: 1; max-width: calc(50% + 30px);">
+                    {{instance.product_model_id?.name}}
+                </div>
 
                 <ng-container *ngIf="!group.is_extra || !group.has_consumptions">
                     <button mat-button *ngIf="mode == 'view' && !assignments_editor_enabled"
@@ -53,7 +55,9 @@
             </div>
         </div>
 
-
+        <div *ngIf="errorOneAccommodationAllowed" style="color: red; height: 30px; font-size: 0.7rem;">
+            Une seule offre de logement est autorisée par groupe de services.
+        </div>
 
         <!-- handle assignment edition here -->
         <!--
@@ -110,12 +114,12 @@
                 <div style="display: flex; flex-direction: column; flex: 0 1 calc(50% - 10px); max-width: 50%;">
                     <div style="margin-bottom: 5px;">
                         <div style="display: flex; padding: 0 6px;">
-                            <mat-checkbox [checked]="allRentalUnitsSelected" (change)="leftSelectAllRentalUnits()" style="min-width: 140px;">
+                            <mat-checkbox [disabled]="errorOneAccommodationAllowed" [checked]="allRentalUnitsSelected" (change)="leftSelectAllRentalUnits()" style="min-width: 140px;">
                                 Toutes <span style="font-size: 0.8rem;">({{selectedRentalUnits.length}}/{{filteredRentalUnits.length}})</span>
                             </mat-checkbox>
-                            <input class="rentalunit-filter" [value]="filterBy" (keyup)="leftFilterBy($event)" type="text" placeholder="Filtrer">
-                            <mat-slide-toggle [checked]="showOnlyParents" (change)="leftShowOnlyParents($event.checked)" style="margin-left: 20px; transform: scale(0.8);">Unités Parentes</mat-slide-toggle>
-                            <mat-slide-toggle [checked]="showOnlyChildren" (change)="leftShowOnlyChildren($event.checked)" style="transform: scale(0.8);">Unités Enfants</mat-slide-toggle>
+                            <input class="rentalunit-filter" [disabled]="errorOneAccommodationAllowed" [value]="filterBy" (keyup)="leftFilterBy($event)" type="text" placeholder="Filtrer">
+                            <mat-slide-toggle [disabled]="errorOneAccommodationAllowed" [checked]="showOnlyParents" (change)="leftShowOnlyParents($event.checked)" style="margin-left: 20px; transform: scale(0.8);">Unités Parentes</mat-slide-toggle>
+                            <mat-slide-toggle [disabled]="errorOneAccommodationAllowed" [checked]="showOnlyChildren" (change)="leftShowOnlyChildren($event.checked)" style="transform: scale(0.8);">Unités Enfants</mat-slide-toggle>
                         </div>
                     </div>
                     <div class="list" cdkDropList cdkDropListSortingDisabled style="flex-grow: 1; border: solid 1px darkgrey;">
@@ -137,6 +141,7 @@
 
                             <div>
                                 <mat-checkbox
+                                    [disabled]="errorOneAccommodationAllowed"
                                     [checked]="selectedRentalUnits.indexOf(unit.id) > -1"
                                     (change)="leftSelectRentalUnit($event.checked, unit.id)">
                                 </mat-checkbox>
@@ -144,7 +149,7 @@
                             <div style="display: flex; justify-content: space-between; padding: 0 5px; width: calc(100% - 20px)"
                                  (mousedown)="leftSelectRentalUnit(true, unit.id)"
                             >
-                                <div>
+                                <div [class.name-disabled]="errorOneAccommodationAllowed">
                                     {{unit.name}} <small *ngIf="unit.is_accomodation">({{unit.capacity}})</small>
                                 </div>
                                 <a class="rentalunit-description"
@@ -158,10 +163,10 @@
                 </div>
                 <!-- action area -->
                 <div class="actions">
-                    <button mat-mini-fab color="primary" (click)="addSelection()">
+                    <button mat-mini-fab color="primary" [disabled]="errorOneAccommodationAllowed" (click)="addSelection()">
                         <mat-icon>keyboard_arrow_right</mat-icon>
                     </button>
-                    <button mat-mini-fab color="primary" (click)="addAll()">
+                    <button mat-mini-fab color="primary" [disabled]="errorOneAccommodationAllowed" (click)="addAll()">
                         <mat-icon>keyboard_double_arrow_right</mat-icon>
                     </button>
                 </div>
