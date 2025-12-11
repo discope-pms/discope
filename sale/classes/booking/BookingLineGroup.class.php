@@ -3346,12 +3346,18 @@ class BookingLineGroup extends Model {
             }
         }
 
+        $domain = [
+            ['booking_line_group_id', '=', $id]
+        ];
+        if(!empty($affected_meals_ids)) {
+            $domain[] = ['id', 'not in', $affected_meals_ids];
+        }
+        $not_affected_meals_ids = $om->search(BookingMeal::getType(), $domain);
+
         // #memo - set all previously created meals that aren't affected by lines as self provided (we want to keep the other information like meal_type and meal_place)
-        BookingMeal::search([
-            ['booking_line_group_id', '=', $id],
-            ['id', 'not in', $affected_meals_ids]
-        ])
-            ->update(['is_self_provided' => true]);
+        $om->update(BookingMeal::getType(), $not_affected_meals_ids, [
+            'is_self_provided' => true
+        ]);
 
         $outside_dates_meals_ids = $om->search(BookingMeal::getType(), [
                 [['booking_line_group_id', '=', $id], ['date', '<', $group['date_from']]],

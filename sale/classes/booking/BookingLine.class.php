@@ -1976,7 +1976,6 @@ class BookingLine extends Model {
                     }
                 }
 
-
                 if($service_date > $booking_line['booking_line_group_id']['date_to']) {
                     $service_date = $booking_line['booking_line_group_id']['date_to'];
                 }
