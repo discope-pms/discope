@@ -708,7 +708,6 @@
                             <!-- booking-meals -->
                             <div class="booking-meal-item" *ngFor="let bookingMealDay of bookingMealsDays">
                                 <booking-services-booking-group-day-meals
-                                        *ngIf="instance.booking_meals_ids.length > 0"
                                         [bookingMealDay]="bookingMealDay"
                                         [booking]="booking"
                                         [group]="instance"
