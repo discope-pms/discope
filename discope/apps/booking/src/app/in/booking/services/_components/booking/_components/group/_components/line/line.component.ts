@@ -173,7 +173,7 @@ export class BookingServicesBookingGroupLineComponent extends TreeComponent<Book
             }
             else {
                 this.vm.service_date.formControl.enable();
-                if(!this.instance.product_id.product_model_id.time_slot_id) {
+                if(this.instance.is_activity || !this.instance.product_id.product_model_id.time_slot_id) {
                     this.vm.time_slot_id.formControl.enable();
                 }
                 else {
@@ -230,7 +230,7 @@ export class BookingServicesBookingGroupLineComponent extends TreeComponent<Book
         }
         else {
             this.vm.service_date.formControl.enable();
-            if(!this.instance.product_id.product_model_id.time_slot_id) {
+            if(this.instance.is_activity || !this.instance.product_id.product_model_id.time_slot_id) {
                 this.vm.time_slot_id.formControl.enable();
             }
             else {
