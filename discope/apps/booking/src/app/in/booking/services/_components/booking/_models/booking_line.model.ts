@@ -23,6 +23,7 @@ export class BookingLine {
         public fare_benefit: number = 0,
         public is_rental_unit: boolean = false,
         public is_accomodation: boolean = false,
+        public is_snack: boolean = false,
         public is_meal: boolean = false,
         public is_activity: boolean = false,
         public is_transport: boolean = false,

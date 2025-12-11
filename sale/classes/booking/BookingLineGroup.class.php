@@ -3246,6 +3246,7 @@ class BookingLineGroup extends Model {
         $lines = $om->read(BookingLine::getType(), $group['booking_lines_ids'], [
             'is_meal',
             'is_snack',
+            'service_date',
             'time_slot_id',
             'qty',
             'qty_vars',
@@ -3300,15 +3301,8 @@ class BookingLineGroup extends Model {
                     }
                 }
                 elseif($line['qty'] > 0) {
-                    if($line['product_model_id.schedule_offset'] >= 0) {
-                        if($line['product_model_id.schedule_offset'] === $day_index) {
-                            $is_self_provided = false;
-                        }
-                    }
-                    else {
-                        if(($days_qty + $line['product_model_id.schedule_offset']) === $day_index) {
-                            $is_self_provided = false;
-                        }
+                    if($line['service_date'] === $date) {
+                        $is_self_provided = false;
                     }
                 }
 
