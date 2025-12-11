@@ -134,6 +134,7 @@ $tree = [
             'qty_accounting_method',
             'is_rental_unit',
             'is_accomodation',
+            'is_snack',
             'is_meal',
             'meal_location',
             'is_activity',
@@ -162,6 +163,7 @@ $tree = [
                     'is_fullday',
                     'has_provider',
                     'has_rental_unit',
+                    'time_slot_id',
                     'providers_ids'             => ['name'],
                     'activity_rental_units_ids' => ['name'],
                     'time_slots_ids'            => ['name', 'code']

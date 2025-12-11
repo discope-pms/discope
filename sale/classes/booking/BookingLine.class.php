@@ -1960,8 +1960,23 @@ class BookingLine extends Model {
                 && $product_model['service_type'] === 'schedulable'
                 && !$product_model['is_repeatable']
             ) {
-                $offset_seconds = $product_model['schedule_offset'] * 86400;
-                $service_date = $booking_line['booking_line_group_id']['date_from'] + $offset_seconds;
+                if($product_model['schedule_offset'] >= 0) {
+                    $offset_seconds = $product_model['schedule_offset'] * 86400;
+                    $service_date = $booking_line['booking_line_group_id']['date_from'] + $offset_seconds;
+                    if($service_date > $booking_line['booking_line_group_id']['date_to']) {
+                        $service_date = $booking_line['booking_line_group_id']['date_to'];
+                    }
+                }
+                else {
+                    // #memo - schedule_offset of -1 is for last day of stay
+                    $offset_seconds = ($product_model['schedule_offset'] + 1) * 86400;
+                    $service_date = $booking_line['booking_line_group_id']['date_to'] + $offset_seconds;
+                    if($service_date < $booking_line['booking_line_group_id']['date_from']) {
+                        $service_date = $booking_line['booking_line_group_id']['date_from'];
+                    }
+                }
+
+
                 if($service_date > $booking_line['booking_line_group_id']['date_to']) {
                     $service_date = $booking_line['booking_line_group_id']['date_to'];
                 }
@@ -2286,6 +2301,21 @@ class BookingLine extends Model {
                 }
             }
         }
+
+        $map_groups_refresh_meals = [];
+        $self->read(['is_meal', 'is_snack', 'booking_line_group_id']);
+        foreach($self as $booking_line) {
+            if($booking_line['is_meal'] || $booking_line['is_snack']) {
+                $map_groups_refresh_meals[$booking_line['booking_line_group_id']] = true;
+            }
+        }
+        if(!empty($map_groups_refresh_meals)) {
+            /** @var \equal\orm\ObjectManager $orm */
+            ['orm' => $orm] = \eQual::inject(['orm']);
+            foreach(array_keys($map_groups_refresh_meals) as $group_id) {
+                BookingLineGroup::refreshMeals($orm, $group_id);
+            }
+        }
     }
 
     public static function onupdateTimeSlotId($self) {
@@ -2306,6 +2336,21 @@ class BookingLine extends Model {
 
             BookingActivity::id($booking_line['booking_activity_id']['id'])
                 ->update(['time_slot_id' => $booking_line['time_slot_id']]);
+        }
+
+        $map_groups_refresh_meals = [];
+        $self->read(['is_meal', 'is_snack', 'booking_line_group_id']);
+        foreach($self as $booking_line) {
+            if($booking_line['is_meal'] || $booking_line['is_snack']) {
+                $map_groups_refresh_meals[$booking_line['booking_line_group_id']] = true;
+            }
+        }
+        if(!empty($map_groups_refresh_meals)) {
+            /** @var \equal\orm\ObjectManager $orm */
+            ['orm' => $orm] = \eQual::inject(['orm']);
+            foreach(array_keys($map_groups_refresh_meals) as $group_id) {
+                BookingLineGroup::refreshMeals($orm, $group_id);
+            }
         }
     }
 }

@@ -79,10 +79,7 @@ export class BookingServicesBookingGroupDayMealsMealComponent implements OnInit,
         this.ready = true;
 
         if(this.meal) {
-            if(this.meal.booking_lines_ids.length === 0 && this.meal.is_self_provided) {
-                this.vm.is_self_provided.formControl.disable();
-            }
-
+            this.vm.is_self_provided.formControl.disable();
             this.vm.is_self_provided.formControl.setValue(this.meal.is_self_provided);
             this.vm.meal_type_id.formControl.setValue(this.meal.meal_type_id);
             this.vm.meal_place_id.formControl.setValue(this.meal.meal_place_id);
