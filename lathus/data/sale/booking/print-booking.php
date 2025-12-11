@@ -132,7 +132,7 @@ if(is_null($booking)) {
 
 $data_to_inject = [
     'booking' => [
-        'date_expiry', 'date_from', 'date_to', 'time_from', 'time_to', 'price',
+        'date_expiry', 'date_from', 'date_to', 'time_from', 'time_to', 'time_arrival', 'time_departure', 'price',
     ],
     'customer' => [
         'display_name', 'address_street', 'address_zip', 'address_dispatch', 'address_city'
@@ -169,6 +169,8 @@ $booking['date_to'] = $formatDate($booking['date_to']);
 $booking['date_expiry'] = $formatDate($booking['date_expiry']);
 $booking['time_from'] = $formatTime($booking['time_from']);
 $booking['time_to'] = $formatTime($booking['time_to']);
+$booking['time_arrival'] = $formatTime($booking['time_arrival']);
+$booking['time_departure'] = $formatTime($booking['time_departure']);
 
 // nb_pers are used to inject in GroupingCode name
 $nb_pers = 0;

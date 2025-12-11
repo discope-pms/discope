@@ -413,6 +413,20 @@ class Booking extends Model {
                 'store'             => true
             ],
 
+            'time_arrival' => [
+                'type'              => 'time',
+                'description'       => "Arrival time.",
+                'default'           => Setting::get_value('sale', 'features', 'booking.arrival.default', 14 * 3600),
+                'visible'           => Setting::get_value('sale', 'features', 'booking.arrival_departure_times', false)
+            ],
+
+            'time_departure' => [
+                'type'              => 'time',
+                'description'       => "Departure time.",
+                'default'           => Setting::get_value('sale', 'features', 'booking.departure.default', 10 * 3600),
+                'visible'           => Setting::get_value('sale', 'features', 'booking.arrival_departure_times', false)
+            ],
+
             'nb_pers' => [
                 'type'              => 'computed',
                 'result_type'       => 'integer',

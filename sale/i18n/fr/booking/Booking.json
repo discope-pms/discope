@@ -99,11 +99,21 @@
         },
         "time_from": {
             "label": "Checkin",
-            "description": "Heure d'arrivée.",
+            "description": "Heure de checkin logements.",
             "help": ""
         },
         "time_to": {
             "label": "Checkout",
+            "description": "Heure de checkout logements.",
+            "help": ""
+        },
+        "time_arrival": {
+            "label": "Arrivée",
+            "description": "Heure d'arrivée.",
+            "help": ""
+        },
+        "time_departure": {
+            "label": "Départ",
             "description": "Heure de départ.",
             "help": ""
         },
