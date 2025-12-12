@@ -127,6 +127,20 @@
             </div>
         </div>
 
+        <div *ngIf="featureRoomPlansEnabled || featureActivity" class="row" style="margin-top: 30px;">
+            <div class="column" style="width: 100%;">
+                <mat-slide-toggle *ngIf="featureRoomPlansEnabled" [formControl]="vm.roomPlans.formControl" style="transform: scale(0.8);">
+                    Plans de chambre
+                </mat-slide-toggle>
+                <mat-slide-toggle *ngIf="featureActivity" [formControl]="vm.activitiesPlanningWeekly.formControl" style="transform: scale(0.8);">
+                    Programme par semaine
+                </mat-slide-toggle>
+                <mat-slide-toggle *ngIf="featureActivity" [formControl]="vm.activitiesPlanningGlobal.formControl" style="transform: scale(0.8);">
+                    Programme par groupe
+                </mat-slide-toggle>
+            </div>
+        </div>
+
         <div class="row" style="margin-top: 30px;">
             <div class="column" style="width: 100%; flex-direction: column;">
 

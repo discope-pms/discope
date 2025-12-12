@@ -281,25 +281,24 @@ if($params['output'] == 'html') {
             ->header('Content-Type', 'text/html')
             ->body($html)
             ->send();
-
-    exit(0);
 }
+else {
+    $options = new DompdfOptions();
+    $options->set('isRemoteEnabled', true);
+    $dompdf = new Dompdf($options);
 
-$options = new DompdfOptions();
-$options->set('isRemoteEnabled', true);
-$dompdf = new Dompdf($options);
+    $dompdf->setPaper('A4', 'landscape');
+    $dompdf->loadHtml($html);
+    $dompdf->render();
 
-$dompdf->setPaper('A4', 'landscape');
-$dompdf->loadHtml($html);
-$dompdf->render();
+    $canvas = $dompdf->getCanvas();
+    $font = $dompdf->getFontMetrics()->getFont('helvetica', 'regular');
+    $canvas->page_text(780, $canvas->get_height() - 35, 'p. {PAGE_NUM} / {PAGE_COUNT}', $font, 9);
 
-$canvas = $dompdf->getCanvas();
-$font = $dompdf->getFontMetrics()->getFont('helvetica', 'regular');
-$canvas->page_text(780, $canvas->get_height() - 35, 'p. {PAGE_NUM} / {PAGE_COUNT}', $font, 9);
+    $output = $dompdf->output();
 
-$output = $dompdf->output();
-
-$context->httpResponse()
-        ->header('Content-Disposition', 'inline; filename="document.pdf"')
-        ->body($output)
-        ->send();
+    $context->httpResponse()
+            ->header('Content-Disposition', 'inline; filename="document.pdf"')
+            ->body($output)
+            ->send();
+}
