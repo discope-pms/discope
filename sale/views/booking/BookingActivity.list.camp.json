@@ -14,15 +14,25 @@
             ]
         }
     },
-    "group_by": ["activity_date"],
+    "group_by": [{ "field":  "activity_date", "usage": "date/plain.day" }],
     "order": "activity_date,time_slot_order",
     "sort": "asc",
     "layout": {
         "items": [
             {
                 "type": "field",
+                "value": "id",
+                "width": "10%",
+                "sortable": false,
+                "readonly": true,
+                "visible": false
+            },
+            {
+                "type": "field",
                 "value": "activity_date",
                 "width": "20%",
+                "sortable": false,
+                "readonly": true,
                 "visible": false
             },
             {
@@ -36,11 +46,6 @@
                 "value": "name",
                 "width": "20%",
                 "visible": false
-            },
-            {
-                "type": "field",
-                "value": "activity_date",
-                "width": "20%"
             },
             {
                 "type": "field",
