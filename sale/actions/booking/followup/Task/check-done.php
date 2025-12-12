@@ -5,13 +5,19 @@
     Licensed under GNU GPL 3 license <http://www.gnu.org/licenses/>
 */
 
-use core\alert\MessageModel;
 use sale\booking\Booking;
 use sale\booking\followup\Task;
 
 [$params, $providers] = eQual::announce([
-    'description'   => "Alerts followup tasks that should have be done by today.",
+    'description'   => "Dismisses an alert related to given task if it is done.",
     'params'        => [
+
+        'id' => [
+            'type'              => 'many2one',
+            'foreign_object'    => 'sale\booking\followup\Task',
+            'description'       => "Identifier of the task that needs a check.",
+            'required'          => true
+        ],
 
         'message_model' => [
             'type'              => 'string',
@@ -49,52 +55,35 @@ use sale\booking\followup\Task;
  */
 ['context' => $context, 'dispatch' => $dispatch] = $providers;
 
-$domain = [
-    ['is_done', '=', false],
-    ['deadline_date', '<=', time()],
-    ['entity', '=', Booking::getType()]
-];
+$task = Task::id($params['id'])
+    ->read(['is_done', 'booking_id' => ['center_office_id']])
+    ->first(true);
 
-$tasks = Task::search($domain)
-    ->read(['booking_id' => ['center_office_id']])
-    ->get();
+if(is_null($task)) {
+    throw new Exception("unknown_task", EQ_ERROR_UNKNOWN_OBJECT);
+}
 
-if(!empty($tasks)) {
-    $message_model = MessageModel::search([
-        ['name', '=', $params['message_model']]
-    ])
-        ->read(['name'])
-        ->first();
+if($task['is_done']) {
+    eQual::run('do', 'core_alert_dismiss', ['id' => $task['id']]);
+}
+else {
+    $dispatch_params = [
+        'id'            => $task['id'],
+        'message_model' => $params['message_model'],
+        'severity'      => $params['severity']
+    ];
 
-    if(is_null($message_model)) {
-        $message_model = MessageModel::create([
-            'name'          => $params['message_model'],
-            'label'         => "Booking task deadline has expired",
-            'description'   => "A booking task was not handled within the required timeframe."
-        ])
-            ->read(['name'])
-            ->first();
-    }
-
-    foreach($tasks as $id => $task) {
-        $dispatch_params = [
-            'id'            => $id,
-            'message_model' => $message_model['name'],
-            'severity'      => $params['severity']
-        ];
-
-        $dispatch->dispatch(
-            $message_model['name'],
-            Booking::getType(),
-            $task['booking_id']['id'],
-            $params['severity'],
-            'sale_booking_followup_Task_check-done',
-            $dispatch_params,
-            [],
-            null,
-            $task['booking_id']['center_office_id']
-        );
-    }
+    $dispatch->dispatch(
+        $params['message_model'],
+        Booking::getType(),
+        $task['booking_id']['id'],
+        $params['severity'],
+        'sale_booking_followup_Task_check-done',
+        $dispatch_params,
+        [],
+        null,
+        $task['booking_id']['center_office_id']
+    );
 }
 
 $context->httpResponse()

@@ -51,7 +51,7 @@ use sale\camp\followup\Task;
 
 $domain = [
     ['is_done', '=', false],
-    ['deadline_date', '=', time()],
+    ['deadline_date', '<=', time()],
     ['entity', '=', Enrollment::getType()]
 ];
 
@@ -88,7 +88,7 @@ if(!empty($tasks)) {
             Enrollment::getType(),
             $task['enrollment_id']['id'],
             $params['severity'],
-            'sale_camp_followup_check-task-done',
+            'sale_camp_followup_Task_check-done',
             $dispatch_params,
             [],
             null,

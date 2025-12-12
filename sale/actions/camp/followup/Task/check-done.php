@@ -5,15 +5,16 @@
     Licensed under GNU GPL 3 license <http://www.gnu.org/licenses/>
 */
 
-use sale\booking\Booking;
-use sale\booking\followup\Task;
+use sale\camp\Enrollment;
+use sale\camp\followup\Task;
 
 [$params, $providers] = eQual::announce([
     'description'   => "Dismisses an alert related to given task if it is done.",
     'params'        => [
 
         'id' => [
-            'type'              => 'integer',
+            'type'              => 'many2one',
+            'foreign_object'    => 'sale\camp\followup\Task',
             'description'       => "Identifier of the task that needs a check.",
             'required'          => true
         ],
@@ -21,7 +22,7 @@ use sale\booking\followup\Task;
         'message_model' => [
             'type'              => 'string',
             'description'       => "The name of the message model to use for the alert.",
-            'default'           => 'sale.booking.followup.task.reminder'
+            'default'           => 'sale.enrollment.followup.task.reminder'
         ],
 
         'severity' => [
@@ -55,7 +56,7 @@ use sale\booking\followup\Task;
 ['context' => $context, 'dispatch' => $dispatch] = $providers;
 
 $task = Task::id($params['id'])
-    ->read(['is_done', 'booking_id' => ['center_office_id']])
+    ->read(['is_done', 'enrollment_id' => ['center_office_id']])
     ->first(true);
 
 if(is_null($task)) {
@@ -74,14 +75,14 @@ else {
 
     $dispatch->dispatch(
         $params['message_model'],
-        Booking::getType(),
-        $task['booking_id']['id'],
+        Enrollment::getType(),
+        $task['enrollment_id']['id'],
         $params['severity'],
-        'sale_booking_followup_check-task-done',
+        'sale_camp_followup_Task_check-done',
         $dispatch_params,
         [],
         null,
-        $task['booking_id']['center_office_id']
+        $task['enrollment_id']['center_office_id']
     );
 }
 
