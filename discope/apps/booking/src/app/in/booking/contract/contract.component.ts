@@ -104,7 +104,10 @@ interface vmModel {
     roomPlans: {
         formControl: FormControl
     },
-    activitiesPlanning: {
+    activitiesPlanningGlobal: {
+        formControl: FormControl
+    },
+    activitiesPlanningWeekly: {
         formControl: FormControl
     }
 }
@@ -150,8 +153,9 @@ export class BookingContractComponent implements OnInit, AfterContentInit {
     // list of secondary recipients (addresses comma separated)
     public recipients: string[] = [];
 
-    public roomPlans: boolean = true;
-    public activitiesPlanning: boolean = false;
+    public roomPlans: boolean = false;
+    public activitiesPlanningGlobal: boolean = false;
+    public activitiesPlanningWeekly: boolean = false;
 
     public vm: vmModel;
 
@@ -211,11 +215,14 @@ export class BookingContractComponent implements OnInit, AfterContentInit {
                 items:          []
             },
             roomPlans: {
-                formControl:    new FormControl(true),
+                formControl:    new FormControl(false),
             },
-            activitiesPlanning: {
+            activitiesPlanningGlobal: {
                 formControl:    new FormControl(false)
             },
+            activitiesPlanningWeekly: {
+                formControl:    new FormControl(false)
+            }
         };
     }
 
@@ -233,7 +240,8 @@ export class BookingContractComponent implements OnInit, AfterContentInit {
         this.vm.recipient.formControl.valueChanges.subscribe( (recipient:string) => this.recipient = recipient);
         this.vm.recipients.formControl.valueChanges.subscribe( (recipients:string[]) => this.recipients = recipients);
         this.vm.roomPlans.formControl.valueChanges.subscribe( (roomPlans:boolean) => this.roomPlans = roomPlans);
-        this.vm.activitiesPlanning.formControl.valueChanges.subscribe( (activitiesPlanning:boolean) => this.activitiesPlanning = activitiesPlanning);
+        this.vm.activitiesPlanningGlobal.formControl.valueChanges.subscribe( (activitiesPlanningGlobal:boolean) => this.activitiesPlanningGlobal = activitiesPlanningGlobal);
+        this.vm.activitiesPlanningWeekly.formControl.valueChanges.subscribe( (activitiesPlanningWeekly:boolean) => this.activitiesPlanningWeekly = activitiesPlanningWeekly);
     }
 
     /**
@@ -694,7 +702,8 @@ export class BookingContractComponent implements OnInit, AfterContentInit {
                 attachments_ids: this.vm.attachments.items.map( (e:any) => e.id ),
                 documents_ids: this.vm.documents.items.map( (e:any) => e.id ),
                 room_plans: this.roomPlans,
-                activities_planning: this.activitiesPlanning
+                activities_planning_global: this.activitiesPlanningGlobal,
+                activities_planning_weekly: this.activitiesPlanningWeekly
             });
             this.is_sent = true;
             this.snack.open("Contrat envoyé avec succès.");

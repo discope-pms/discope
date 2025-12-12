@@ -234,7 +234,7 @@
             "label": "Weekly activities program",
             "description": "",
             "icon": "list_alt",
-            "route": "/?get=sale_booking_print-booking-activity-weekly&id=object.id",
+            "route": "/?get=sale_booking_print-booking-activity&id=object.id&type=weekly",
             "target": "_blank",
             "absolute": true,
             "visible": [true, "=", "env.sale.features.booking.activity_schedule_table"]
@@ -244,7 +244,7 @@
             "label": "Grouped activities program",
             "description": "",
             "icon": "list_alt",
-            "route": "/?get=sale_booking_print-booking-activity&id=object.id",
+            "route": "/?get=sale_booking_print-booking-activity&id=object.id&type=global",
             "target": "_blank",
             "absolute": true,
             "visible": [true, "=", "env.sale.features.booking.activity"]

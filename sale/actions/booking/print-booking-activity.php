@@ -14,6 +14,11 @@
             'type'          => 'integer',
             'required'      => true
         ],
+        'type' => [
+            'description'   => 'The type of activities planning.',
+            'type'          => 'string',
+            'default'       => 'global'
+        ],
         'booking_line_group_id' => [
             'type'          => 'many2one',
             'foreign_object'=> 'sale\booking\BookingLineGroup',

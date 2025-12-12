@@ -82,8 +82,14 @@ list($params, $providers) = eQual::announce([
             'default'       => false,
             'help'          => 'Only available if setting sale.features.booking.room_plans is activated.'
         ],
-        'activities_planning' => [
-            'description'   => 'Join the activities planning to the mail.',
+        'activities_planning_global' => [
+            'description'   => 'Join the global activities planning to the mail.',
+            'type'          => 'boolean',
+            'default'       => false,
+            'help'          => 'Only available if setting sale.features.booking.activity is activated.'
+        ],
+        'activities_planning_weekly' => [
+            'description'   => 'Join the weekly activities planning to the mail.',
             'type'          => 'boolean',
             'default'       => false,
             'help'          => 'Only available if setting sale.features.booking.activity is activated.'
@@ -159,13 +165,24 @@ if($room_plans_needed) {
     ]);
 }
 
-// generate activities planning attachment if needed
-$activities_planning_needed = Setting::get_value('sale', 'features', 'booking.activity', false) && $params['activities_planning'];
-$activities_planning_attachment = null;
-if($activities_planning_needed) {
-    $activities_planning_attachment = eQual::run('get', 'sale_booking_print-booking-activity', [
+// generate global activities planning attachment if needed
+$activities_planning_global_needed = Setting::get_value('sale', 'features', 'booking.activity', false) && $params['activities_planning_global'];
+$activities_planning_global_attachment = null;
+if($activities_planning_global_needed) {
+    $activities_planning_global_attachment = eQual::run('get', 'sale_booking_print-booking-activity', [
         'id'        => $params['booking_id'],
-        'view_id'   => 'print.activity',
+        'type'      => 'global',
+        'lang'      => $params['lang']
+    ]);
+}
+
+// generate weekly activities planning attachment if needed
+$activities_planning_weekly_needed = Setting::get_value('sale', 'features', 'booking.activity', false) && $params['activities_planning_weekly'];
+$activities_planning_weekly_attachment = null;
+if($activities_planning_weekly_needed) {
+    $activities_planning_weekly_attachment = eQual::run('get', 'sale_booking_print-booking-activity', [
+        'id'        => $params['booking_id'],
+        'type'      => 'weekly',
         'lang'      => $params['lang']
     ]);
 }
@@ -196,9 +213,14 @@ if(!is_null($room_plans_attachment)) {
     $attachments[] = new EmailAttachment('room_plans.pdf', (string) $room_plans_attachment, 'application/pdf');
 }
 
-// push activities planning attachment if required by setting and needed
-if(!is_null($activities_planning_attachment)) {
-    $attachments[] = new EmailAttachment('activities_planning.pdf', (string) $activities_planning_attachment, 'application/pdf');
+// push global activities planning attachment if required by setting and needed
+if(!is_null($activities_planning_global_attachment)) {
+    $attachments[] = new EmailAttachment('activities_planning_global.pdf', (string) $activities_planning_global_attachment, 'application/pdf');
+}
+
+// push weekly activities planning attachment if required by setting and needed
+if(!is_null($activities_planning_weekly_attachment)) {
+    $attachments[] = new EmailAttachment('activities_planning_weekly.pdf', (string) $activities_planning_weekly_attachment, 'application/pdf');
 }
 
 // add attachments whose ids have been received as param ($params['attachments_ids'])
