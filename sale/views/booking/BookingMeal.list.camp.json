@@ -21,7 +21,10 @@
                 "width": "20%",
                 "sortable": false,
                 "readonly": true,
-                "visible": false
+                "visible": false,
+                "widget": {
+                    "usage": "date/plain.day"
+                }
             },
             {
                 "type": "field",

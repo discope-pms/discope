@@ -21,9 +21,22 @@
         "items": [
             {
                 "type": "field",
+                "value": "id",
+                "width": "10%",
+                "sortable": false,
+                "readonly": true,
+                "visible": false
+            },
+            {
+                "type": "field",
                 "value": "activity_date",
                 "width": "20%",
-                "visible": false
+                "sortable": false,
+                "readonly": true,
+                "visible": false,
+                "widget": {
+                    "usage": "date/plain.day"
+                }
             },
             {
                 "type": "field",
@@ -36,11 +49,6 @@
                 "value": "name",
                 "width": "20%",
                 "visible": false
-            },
-            {
-                "type": "field",
-                "value": "activity_date",
-                "width": "20%"
             },
             {
                 "type": "field",
