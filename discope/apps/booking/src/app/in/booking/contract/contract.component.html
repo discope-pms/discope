@@ -128,6 +128,18 @@
         </div>
 
         <div class="row" style="margin-top: 30px;">
+            <div class="column" style="width: 100%;">
+                <mat-slide-toggle [formControl]="vm.roomPlans.formControl" style="transform: scale(0.8);">
+                    Plans de chambre
+                </mat-slide-toggle>
+
+                <mat-slide-toggle [formControl]="vm.activitiesPlanning.formControl" style="transform: scale(0.8);">
+                    Programme activités
+                </mat-slide-toggle>
+            </div>
+        </div>
+
+        <div class="row" style="margin-top: 30px;">
             <div class="column" style="width: 100%; flex-direction: column;">
 
                 <div style="display: flex;"><mat-icon>attach_file</mat-icon> Pièces jointes ({{center.name}})</div>

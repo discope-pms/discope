@@ -100,8 +100,14 @@ interface vmModel {
     },
     documents: {
         items:        any[]
+    },
+    roomPlans: {
+        formControl: FormControl
+    },
+    activitiesPlanning: {
+        formControl: FormControl
     }
-};
+}
 
 @Component({
   selector: 'booking-contract',
@@ -143,6 +149,9 @@ export class BookingContractComponent implements OnInit, AfterContentInit {
     public recipient: string = '';
     // list of secondary recipients (addresses comma separated)
     public recipients: string[] = [];
+
+    public roomPlans: boolean = true;
+    public activitiesPlanning: boolean = false;
 
     public vm: vmModel;
 
@@ -200,7 +209,13 @@ export class BookingContractComponent implements OnInit, AfterContentInit {
             },
             documents: {
                 items:          []
-            }
+            },
+            roomPlans: {
+                formControl:    new FormControl(true),
+            },
+            activitiesPlanning: {
+                formControl:    new FormControl(false)
+            },
         };
     }
 
@@ -217,6 +232,8 @@ export class BookingContractComponent implements OnInit, AfterContentInit {
         this.vm.sender.formControl.valueChanges.subscribe( (sender:string) => this.sender = sender);
         this.vm.recipient.formControl.valueChanges.subscribe( (recipient:string) => this.recipient = recipient);
         this.vm.recipients.formControl.valueChanges.subscribe( (recipients:string[]) => this.recipients = recipients);
+        this.vm.roomPlans.formControl.valueChanges.subscribe( (roomPlans:boolean) => this.roomPlans = roomPlans);
+        this.vm.activitiesPlanning.formControl.valueChanges.subscribe( (activitiesPlanning:boolean) => this.activitiesPlanning = activitiesPlanning);
     }
 
     /**
@@ -675,8 +692,9 @@ export class BookingContractComponent implements OnInit, AfterContentInit {
                 lang: this.lang,
                 mode: this.mode,
                 attachments_ids: this.vm.attachments.items.map( (e:any) => e.id ),
-                documents_ids: this.vm.documents.items.map( (e:any) => e.id )
-
+                documents_ids: this.vm.documents.items.map( (e:any) => e.id ),
+                room_plans: this.roomPlans,
+                activities_planning: this.activitiesPlanning
             });
             this.is_sent = true;
             this.snack.open("Contrat envoyé avec succès.");
