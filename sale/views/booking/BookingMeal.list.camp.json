@@ -3,7 +3,7 @@
     "description": "List view for Booking meals.",
     "order": "date,time_slot_order",
     "sort": "asc",
-    "group_by": ["date"],
+    "group_by": [{ "field":  "date", "usage": "date/plain.day" }],
     "domain": ["camp_id", "<>", null],
     "layout": {
         "items": [
@@ -21,10 +21,7 @@
                 "width": "20%",
                 "sortable": false,
                 "readonly": true,
-                "visible": false,
-                "widget": {
-                    "usage": "date/plain.day"
-                }
+                "visible": false
             },
             {
                 "type": "field",
