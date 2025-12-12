@@ -157,6 +157,9 @@ export class BookingContractComponent implements OnInit, AfterContentInit {
     public activitiesPlanningGlobal: boolean = false;
     public activitiesPlanningWeekly: boolean = false;
 
+    public featureRoomPlansEnabled: boolean = false;
+    public featureActivity: boolean = false;
+
     public vm: vmModel;
 
     public quillCustomModules = {
@@ -260,6 +263,7 @@ export class BookingContractComponent implements OnInit, AfterContentInit {
 
     public ngOnInit() {
         this.loadLanguages();
+        this.initFeaturesSettings();
 
         this.auth.getObservable().subscribe( async (user: UserClass) => {
             this.user = user;
@@ -415,6 +419,16 @@ export class BookingContractComponent implements OnInit, AfterContentInit {
                     this.lang_id = lang.id;
                 }
             }
+        }
+    }
+
+    private async initFeaturesSettings() {
+        const environment:any = await this.env.getEnv();
+        if(environment.hasOwnProperty('sale.features.booking.room_plans')) {
+            this.featureRoomPlansEnabled = environment['sale.features.booking.room_plans'];
+        }
+        if(environment.hasOwnProperty('sale.features.booking.activity')) {
+            this.featureActivity = environment['sale.features.booking.activity'];
         }
     }
 
