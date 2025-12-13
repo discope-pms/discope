@@ -56,8 +56,13 @@ if(count($bookings_ids)) {
     $bookings = Booking::ids($bookings_ids)->read(['id', 'name'])->get();
     $links = [];
 
+    $count = 0;
+    $max = 3;
     foreach($bookings as $booking_id => $conflict_booking) {
-        $links[] = "[{$conflict_booking['name']}](/booking/#/booking/{$booking_id})";
+        ++$count;
+        if($count <= $max) {
+            $links[] = "[{$conflict_booking['name']}](/booking/#/booking/{$booking_id})";
+        }
         $result[] = $booking_id;
     }
     // raise a notice
