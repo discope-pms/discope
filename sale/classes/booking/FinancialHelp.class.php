@@ -60,7 +60,7 @@ class FinancialHelp extends Model {
                 'description'       => "The total amount of the financial help.",
                 'required'          => true,
                 'min'               => 0,
-                'dependencies'      => ['remaining_amount']
+                'dependents'        => ['remaining_amount']
             ],
 
             'remaining_amount' => [
