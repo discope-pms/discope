@@ -4,6 +4,15 @@
     "access": {
         "groups": ["booking.default.user"]
     },
+    "actions": [
+        {
+            "id": "action.delete",
+            "label": "Delete",
+            "description": "Delete activity that isn't linked to a booking or a camp.",
+            "controller": "sale_booking_bookingactivity_do-delete",
+            "confirm": true
+        }
+    ],
     "layout": {
         "groups": [
             {

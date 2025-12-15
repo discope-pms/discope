@@ -317,9 +317,10 @@
             [style.height.px]="selection.height"></div>
     </div>
 
+    <button style="margin: 5px 15px;" mat-flat-button color="primary" (click)="oncreateActivities()">Créer activités</button>
+
     <!-- non-assigned activities area -->
     <div class="container-footer">
-
         <table  #actTable
                 cdkDropList
                 [cdkDropListSortingDisabled]="true"
@@ -343,7 +344,8 @@
                                         [width]="cellsWidth"
                                         [tableRect]="tableRect"
                                         [day]="day"
-                                        [activity]="activity">
+                                        [activity]="activity"
+                                        (selected)="onSelectedActivity($event)">
                                     </planning-employees-calendar-activity>
                                 </ng-container>
                             </div>
@@ -364,7 +366,8 @@
                                         [width]="cellsWidth"
                                         [tableRect]="tableRect"
                                         [day]="day"
-                                        [activity]="activity">
+                                        [activity]="activity"
+                                        (selected)="onSelectedActivity($event)">
                                     </planning-employees-calendar-activity>
                                 </ng-container>
                             </div>
@@ -385,7 +388,8 @@
                                         [width]="cellsWidth"
                                         [tableRect]="tableRect"
                                         [day]="day"
-                                        [activity]="activity">
+                                        [activity]="activity"
+                                        (selected)="onSelectedActivity($event)">
                                     </planning-employees-calendar-activity>
                                 </ng-container>
                             </div>

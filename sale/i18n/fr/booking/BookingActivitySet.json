@@ -1,0 +1,74 @@
+{
+    "name": "Série d'activités",
+    "plural": "Séries d'activités",
+    "description": "Série d'activités.",
+    "model": {
+        "partner_id": {
+            "label": "Relation",
+            "description": "Relation concernée.",
+            "help": ""
+        },
+        "product_id": {
+            "label": "Produit",
+            "description": "Le produit auquel l’activité se rapporte.",
+            "help": ""
+        },
+        "date_from": {
+            "label": "Du",
+            "description": "Date de début de la série d'événements.",
+            "help": ""
+        },
+        "date_to": {
+            "label": "Au",
+            "description": "Date de fin de la série d'événements.",
+            "help": ""
+        },
+        "time_slot_id": {
+            "label": "Tranche horaire",
+            "description": "Plage horaire précise du jour où la prestation est délivrée.",
+            "help": ""
+        },
+        "schedule_from": {
+            "label": "De",
+            "description": "Heure à laquelle l'activité commence.",
+            "help": ""
+        },
+        "schedule_to": {
+            "label": "À",
+            "description": "Heure à laquelle l'activité se termine.",
+            "help": ""
+        },
+        "day_of_week": {
+            "label": "Jour de la semaine",
+            "description": "Jour de la semaine pour lequel créer une activité.",
+            "selection": {
+                "all": "Tous",
+                "monday": "Lundi",
+                "tuesday": "Mardi",
+                "wednesday": "Mercredi",
+                "thursday": "Jeudi",
+                "friday": "Vendredi",
+                "saturday": "Samedi",
+                "sunday": "Dimanche"
+            },
+            "help": ""
+        }
+    },
+    "view": {
+        "form.default": {
+            "name": "Série d'activités",
+            "description": "",
+            "layout": {
+                "section.booking-activities": {
+                    "label": "Activités"
+                }
+            }
+        },
+        "list.default": {
+            "name": "Séries d'activités",
+            "description": "",
+            "layout": {}
+        }
+    },
+    "error": {}
+}

@@ -332,4 +332,29 @@ export class PlanningEmployeesComponent implements OnInit, AfterViewInit, OnDest
         this.cd.detach();
         this.context.change(descriptor);
     }
+
+    public onCreateActivities() {
+        let descriptor: any = {
+            context_silent: true, // do not update sidebar
+            context: {
+                entity: 'sale\\booking\\BookingActivitySet',
+                type: 'form',
+                name: 'default',
+                domain: [],
+                mode: 'edit',
+                purpose: 'create',
+                display_mode: 'popup',
+                callback: (data: any) => {
+                    // restart angular lifecycles
+                    this.cd.reattach();
+                    // force a refresh
+                    this.planningCalendar.onRefresh();
+                }
+            }
+        };
+
+        // prevent angular lifecycles while a context is open
+        this.cd.detach();
+        this.context.change(descriptor);
+    }
 }

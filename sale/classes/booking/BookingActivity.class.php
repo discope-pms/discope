@@ -258,7 +258,7 @@ class BookingActivity extends Model {
                 'type'              => 'computed',
                 'result_type'       => 'boolean',
                 'description'       => 'Is the activity exclusive to the employee\'s time slot?',
-                'help'              => "When activitiy is exclusive, a single activity can be assigned to the employee, whatever the start and end times.",
+                'help'              => "When activity is exclusive, a single activity can be assigned to the employee, whatever the start and end times.",
                 'store'             => true,
                 'instant'           => true,
                 'relation'          => ['product_model_id' => 'is_exclusive']
@@ -302,6 +302,13 @@ class BookingActivity extends Model {
                 'type'              => 'boolean',
                 'description'       => "Is the activity cancelled?",
                 'default'           => false
+            ],
+
+            'booking_activity_set_id' => [
+                'type'              => 'many2one',
+                'foreign_object'    => 'sale\booking\BookingActivitySet',
+                'description'       => "Set this activity is part of.",
+                'readonly'          => true
             ]
 
         ];
@@ -618,15 +625,6 @@ class BookingActivity extends Model {
     }
 
     public static function cancreate($orm, $values, $lang): array {
-        if(!isset($values['activity_booking_line_id']) && !isset($values['booking_line_group_id']) && !isset($values['camp_group_id'])) {
-            // an activity should be linked to either a line, a booking line group or a camp group
-            return [
-                'activity_booking_line_id'  => ['missing_line_id' => "The activity must be linked to a booking line."],
-                'booking_line_group_id'     => ['missing_group_id' => "The activity must be linked to a booking group."],
-                'camp_group_id'             => ['missing_group_id' => "The activity must be linked to a camp group."]
-            ];
-        }
-
         // checks if the moment of the activity is free (if activity_booking_line_id the check is done in BookingLine)
         if((isset($values['booking_line_group_id']) || isset($values['camp_group_id'])) && isset($values['activity_date'], $values['time_slot_id'])) {
             $domain = [
@@ -656,21 +654,6 @@ class BookingActivity extends Model {
     }
 
     public static function canupdate($self, $values): array {
-        $self->read(['activity_booking_line_id', 'booking_line_group_id', 'camp_group_id']);
-        foreach($self as $booking_activity) {
-            $activity_booking_line_id = $values['activity_booking_line_id'] ?? $booking_activity['activity_booking_line_id'];
-            $booking_line_group_id = $values['booking_line_group_id'] ?? $booking_activity['booking_line_group_id'];
-            $camp_group_id = $values['camp_group_id'] ?? $booking_activity['camp_group_id'];
-
-            if(!isset($activity_booking_line_id) && !isset($booking_line_group_id) && !isset($camp_group_id)) {
-                return [
-                    'activity_booking_line_id'  => ['invalid' => "The activity needs to be related to a booking line."],
-                    'booking_line_group_id'     => ['invalid' => "The activity needs to be related to a booking group."],
-                    'camp_group_id'             => ['invalid' => "The activity needs to be related to a camp group."]
-                ];
-            }
-        }
-
         $common_fields = [
             'name', 'description', 'providers_ids', 'counter', 'counter_total', 'employee_id', 'activity_date',
             'time_slot_id', 'schedule_from', 'schedule_to', 'rental_unit_id', 'has_staff_required', 'has_provider',

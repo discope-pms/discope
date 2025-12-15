@@ -14,12 +14,12 @@
             "help": ""
         },
         "date_from": {
-            "label": "De",
+            "label": "Du",
             "description": "Date de début de la série d'événements.",
             "help": ""
         },
         "date_to": {
-            "label": "A",
+            "label": "Au",
             "description": "Date de fin de la série d'événements.",
             "help": ""
         },
@@ -39,16 +39,16 @@
     },
     "view": {
         "form.default": {
-            "name": "Evénement relation",
+            "name": "Série d'événements",
             "description": "",
             "layout": {
                 "section.partner-events": {
-                    "label": "Evénements"
+                    "label": "Événements"
                 }
             }
         },
         "list.default": {
-            "name": "Evénements relation",
+            "name": "Séries d'événements",
             "description": "",
             "layout": {}
         }

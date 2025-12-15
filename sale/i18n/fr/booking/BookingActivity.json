@@ -117,12 +117,22 @@
             "label": "Numéro groupe",
             "description": "Numéro du groupe.",
             "help": ""
+        },
+        "booking_activity_set_id": {
+            "label": "Série d'activités",
+            "description": "Série d'activités à l'origine de l'activité.",
+            "help": ""
         }
     },
     "view": {
         "form.default": {
             "name": "Activité",
             "description": "",
+            "actions": {
+                "action.delete": {
+                    "label": "Supprimer"
+                }
+            },
             "layout": {
                 "section.details": {
                     "label": "Détails"

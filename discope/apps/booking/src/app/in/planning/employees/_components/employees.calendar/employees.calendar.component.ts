@@ -44,6 +44,7 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
     @Output() showPartner = new EventEmitter();
     @Output() showPartnerEvent = new EventEmitter();
     @Output() createPartnerEvent = new EventEmitter();
+    @Output() createActivities = new EventEmitter();
 
     @Output() openLegendDialog = new EventEmitter();
     @Output() openPrefDialog = new EventEmitter();
@@ -326,7 +327,7 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
                 `<dt>${activity.schedule_from} - ${activity.schedule_to}</dt>` +
                 '</dl>';
         }
-        else {
+        else if(activity.camp_id) {
             // camp activity
             return '<dl>' +
                 `<dt>${activity.camp_id.short_name}</dt>` +
@@ -334,6 +335,14 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
                 `<dt>Camp du ${activity.camp_id.date_from} au ${activity.camp_id.date_to}</dt>` +
                 `<br>` +
                 `<dt>${activity.name} <b>${activity.counter}/${activity.counter_total}</b></dt>` +
+                `<br>` +
+                `<dt>${activity.schedule_from} - ${activity.schedule_to}</dt>` +
+                '</dl>';
+        }
+        else {
+            // activity not linked to a booking or a camp
+            return '<dl>' +
+                `<dt>${activity.name}</dt>` +
                 `<br>` +
                 `<dt>${activity.schedule_from} - ${activity.schedule_to}</dt>` +
                 '</dl>';
@@ -503,6 +512,10 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
         });
     }
 
+    public oncreateActivities() {
+        this.createActivities.emit();
+    }
+
     public onhoverActivity(activity: any) {
         if(this.currentDraggedActivity) {
             this.hovered_activity = null;
@@ -543,12 +556,7 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
         if(activity.is_partner_event) {
             this.showPartnerEvent.emit(activity);
         }
-        else if(activity.booking_id) {
-            // this.showBooking.emit(activity);
-            this.showActivity.emit(activity);
-        }
-        else if(activity.camp_id) {
-            // this.showCamp.emit(activity);
+        else {
             this.showActivity.emit(activity);
         }
     }
