@@ -30,7 +30,13 @@ Une activité peut être liée à une **réservation** ou un **camp** ou indépe
 **Création/Configuration :**
   - Réservation : **Depuis une fiche d'une réservation** `(Menu droite) Planning activités`
   - Camp : **Depuis une fiche d'un groupe de camp** `(Onglet) Activités`
-  - Indépendante : **Calendrier Animateurs** `(Bouton) Créer activités` (en bas à gauche)
+  - Indépendante : **Calendrier Animateurs** `(Bouton en bas à gauche) Créer activités` (_Série d'activités_)
+
+**Suppression :**
+  - Les activités indépendantes peuvent être supprimées depuis le Calendrier Animateurs.
+  - Les activités réservation/camp doivent être supprimées depuis les fiches réservation/camp, pas dans le Calendrier Animateurs.
+
+> ⚡ Les **séries d'activités** permettent la création **rapide** d'activités indépendantes récurrentes entre deux dates.
 
 ---
 
