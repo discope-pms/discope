@@ -472,7 +472,9 @@ Types de document :
 
 #### Inscription via site web
 
-Une action Discope permet de récupérer les inscriptions depuis l'API du site web du CPA Lathus et les ajouter dans Discope.
+De www.cpa-lathus.asso.fr → Discope
+
+Une action Discope (`lathus_camp_pull-enrollments`) permet de récupérer les inscriptions depuis l'API du site web du CPA Lathus et les ajouter dans Discope.
 
 Si le camp ciblé par une inscription a au moins une place libre, alors l'état de l'inscription est `Confirmée`.
 Le champ "Week-end extra" peut être modifié pour une réservation confirmée si elle est externe.
@@ -505,6 +507,64 @@ Liste des alertes :
     - Code : `lodging.camp.pull_enrollments.price_mismatch`
 
 > 💡 **Astuce :** Des informations supplémentaires sur les alertes peuvent avoir été ajoutées à la description de l'inscription.
+
+#### Mise à jour des camps et tarifs de www.cpa-lathus.asso.fr
+
+De Discope → www.cpa-lathus.asso.fr
+
+Une action Discope (`lathus_camp_sync-website`) permet de mettre à jour les camps publiés et tarifs de Discope vers le site web du CPA Lathus.
+
+> La mise à jour se fait en téléversant deux fichiers CSV sur un serveur FTP, configuration :
+>  - `camp.sync_website.ftp_server` hôte FTP
+>  - `camp.sync_website.ftp_user` utilisateur accès FTP
+>  - `camp.sync_website.ftp_password` mot de passe accès FTP
+>  - `camp.sync_website.ftp_tariffs_file_path` chemin du fichier de mise à jour des tarifs sur le serveur
+>  - `camp.sync_website.ftp_camps_file_path` chemin du fichier de mise à jour des camps sur le serveur
+
+**Format fichier site_camps.csv**
+
+```csv
+010;Tous en selle;;05/07/2026;10/07/2026;13;16;Camping;-1;B;;20;0;;20
+100;P'tits Cavaliers;;05/07/2026;10/07/2026;6;9;;-1;B;;10;0;;10
+...
+```
+
+Colones :
+  - Code camp
+  - Nom modèle de camp
+  - _Vide_
+  - Date début
+  - Date fin
+  - Âge min
+  - Âge max
+  - Camping
+  - Niveau équitation
+  - Lettre du tarif
+  - Vide
+  - Nombre max d'inscriptions
+  - _0_
+  - _Vide_
+  - Nombre de places restantes
+
+**Format fichier site_tarifs.csv**
+
+```csv
+A1;367;Adhérents/Partenaires Vienne/Habitants des cantons
+A2;435;Habitants Vienne/Partenaires hors Vienne
+A3;476;Autres
+...
+```
+
+Colones :
+  - Code tarif
+  - Prix
+  - Nom
+
+> Après avoir mis à jour les fichiers CSV, il faut faire une require GET à l'URL du paramètre `camp.sync_website.sync_uri`
+
+> 💡 **Astuce :** Des tâches planifiées existent :
+>   - Camps - Envoi des infos vers site www.cpa-lathus.asso.fr
+>   - Camps - Récupération infos du site www.cpa-lathus.asso.fr (inscriptions)
 
 #### Présences
 
