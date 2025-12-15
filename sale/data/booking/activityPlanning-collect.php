@@ -116,7 +116,7 @@ foreach($booking_activities as $id => $activity) {
             strtoupper($activity['booking_id']['customer_identity_id']['address_city'])
         );
     }
-    else {
+    elseif(!is_null($activity['camp_id'])) {
         // camp activity
         $status = $activity['camp_id']['status'];
         $customer_name = sprintf('%d. %s %s',
