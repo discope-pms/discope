@@ -21,11 +21,16 @@ Le calendrier permet d'assigner des activités aux animateurs et prestataires, l
 
 ### 🎯 Activités
 
-Une activité peut être liée à une **réservation** ou un **camp**.
+Une activité peut être liée à une **réservation** ou un **camp** ou indépendante.
 
 **Règles :**
   - Si le champ **_Nécessite du personnel_** (`has_staff_required`) est activé → l'activité **doit être assignée** à un animateur.
   - Si le champ **_Exclusive_** (`is_exclusive`) est activé → l'activité **ne peut pas partager la même tranche horaire** avec une autre activité pour un même animateur.
+
+**Création/Configuration :**
+  - Réservation : **Depuis une fiche d'une réservation** `(Menu droite) Planning activités`
+  - Camp : **Depuis une fiche d'un groupe de camp** `(Onglet) Activités`
+  - Indépendante : **Calendrier Animateurs** `(Bouton) Créer activités` (en bas à gauche)
 
 ---
 
@@ -99,7 +104,7 @@ Informations :
   - Groupes (Nom du client de la réservation)
   - Dates (Date de début et fin de la réservation)
   - Nombre (Nombre d'`enfants + adultes` participants)
-  - Age (Tranche d'âge des enfants s'il y en à, sinon tranche d'âge des adultes)
+  - Age (Tranche d'âge des enfants s'il y en a, sinon tranche d'âge des adultes)
   - Planning (Des activités sont planifiées durant le séjour)
   - Frigo (Mise à disposition d'un frigo)
   - Répartition (Unités locatives assignées)
@@ -143,7 +148,7 @@ Il existe **deux types** de camps :
     - Peut durer 4 à 5 jours, jamais durant le week-end
 
 > **Notes** :
->   - Le nombre de places maximum dans un camp en égale à `Qté groupe * Max enfants`.
+>   - Le nombre de places maximum dans un camp est égale à `Qté groupe * Max enfants`.
 >   - Les inscriptions de status `Brouillon`, `Confirmée` et `Validée` sont prises en compte.
 >   - Le **site** d'un camp en déterminé en fonction de sa tranche d'âge.
 >     - Criquets `6-9 ans`
@@ -805,7 +810,7 @@ Informations :
 
 #### Inscriptions par mois
 
-Liste les mois quand se déroule les camps entre deux dates données et donnes des informations sur les quantités d'inscriptions aux camps par status.
+Liste les mois quand se déroulent les camps entre deux dates données et fournis des informations sur les quantités d'inscriptions aux camps par status.
 
 Informations :
   - Qté brouillon
