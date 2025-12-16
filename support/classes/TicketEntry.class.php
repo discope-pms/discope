@@ -105,12 +105,18 @@ class TicketEntry extends Model {
      */
     public static function onupdateStatus($om, $oids, $values, $lang) {
         $entries = $om->read(self::getType(), $oids, ['status', 'creator', 'ticket_id', 'ticket_id.name', 'ticket_id.type', 'ticket_id.priority', 'ticket_id.creator', 'ticket_id.creator.login', 'ticket_id.assignee_id.login']);
+        $map_priority = [
+                1       => 'Low',
+                2       => 'Medium',
+                3       => 'High',
+                4       => 'Critical'
+            ];
         if($entries > 0 && count($entries)) {
             foreach($entries as $eid => $entry) {
                 // if ticket status just changed to 'open',
                 if($entry['status'] == 'sent') {
                     $address = 'support@yesbabylon.com';
-                    $title = 'Nouveau ticket de support ['.$entry['ticket_id.priority'].' - '.$entry['ticket_id.type'].']';
+                    $title = 'Nouveau ticket de support [' . $map_priority[$entry['ticket_id.priority']] . ' - '.$entry['ticket_id.type'] . ']';
                     $body = 'Un nouveau ticket a été soumis';
                     if($entry['creator'] == $entry['ticket_id.creator']) {
                         if($entry['ticket_id.assignee_id.login'] && strlen($entry['ticket_id.assignee_id.login'])) {
