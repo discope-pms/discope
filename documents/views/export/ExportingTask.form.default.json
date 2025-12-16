@@ -1,0 +1,93 @@
+{
+    "name": "Exporting Task",
+    "actions": [
+        {
+            "id": "action.retry",
+            "inline": true,
+            "label": "Retry",
+            "icon": "sync",
+            "description": "Retry to execute the exporting task.",
+            "controller": "core_model_do",
+            "params": {
+                "action": "retry",
+                "entity": "documents\\export\\ExportingTask",
+                "id": "object.id"
+            },
+            "visible": ["failing", "=", "object.status"]
+        }
+    ],
+    "routes": [
+        {
+            "id": "route.download",
+            "type": "entry",
+            "label": "Download",
+            "icon": "download",
+            "description": "",
+            "route": "/?get=documents_export_ExportingTask_download&id=object.id",
+            "target": "_blank",
+            "absolute": true,
+            "visible": ["status", "=", "ready"]
+        }
+    ],
+    "layout": {
+        "groups": [
+            {
+                "sections": [
+                    {
+                        "rows": [
+                            {
+                                "columns": [
+                                    {
+                                        "width": "100%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "condo_id",
+                                                "width": "100%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "name",
+                                                "width": "100%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "status",
+                                                "width": "100%",
+                                                "visible": false
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "sections": [
+                    {
+                        "id": "section.export_lines",
+                        "label": "Jobs",
+                        "rows": [
+                            {
+                                "columns": [
+                                    {
+                                        "width": "100%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "exporting_task_lines_ids",
+                                                "width": "100%"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+}

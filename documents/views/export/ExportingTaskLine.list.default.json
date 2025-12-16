@@ -1,0 +1,33 @@
+{
+    "name": "Exporting Task Line",
+    "layout": {
+        "items": [
+            {
+                "type": "field",
+                "value": "name",
+                "width": "33%"
+            },
+            {
+                "type": "field",
+                "value": "exporting_task_id",
+                "width": "16%",
+                "visible": false
+            },
+            {
+                "type": "field",
+                "value": "controller",
+                "width": "33%"
+            },
+            {
+                "type": "field",
+                "value": "document_id",
+                "width": "20%"
+            },
+            {
+                "type": "field",
+                "value": "status",
+                "width": "15%"
+            }
+        ]
+    }
+}

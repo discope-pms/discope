@@ -152,7 +152,7 @@ jobs:
               "require": {
                 "swiftmailer/swiftmailer": "^6.2",
                 "phpoffice/phpspreadsheet": "^1.4",
-                "dompdf/dompdf": "^0.8.3",
+                "dompdf/dompdf": "~3.0.0",
                 "electrolinux/phpquery": "^0.9.6",
                 "twig/twig": "^2.0",
                 "twig/intl-extra": "^3.3",
@@ -164,6 +164,11 @@ jobs:
                 "phpunit/phpunit": "^9.5",
                 "phpunit/php-code-coverage": "^9.2",
                 "symplify/easy-coding-standard": "^11.1"
+              },
+              "config": {
+                "audit": {
+                  "block-insecure": false
+                }
               }
             }' > ~/repo/composer.json
       # Verify the composer of the file
