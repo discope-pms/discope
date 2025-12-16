@@ -5,7 +5,7 @@
     "model": {
         "booking_id": {
             "label": "Réservation",
-            "description": "La réservation à laquelle est lié l'invité.",
+            "description": "La réservation à laquelle est lié la liste des hôtes.",
             "help": ""
         },
         "status": {
