@@ -46,7 +46,14 @@ class Contract extends Model {
                     'cancelled'             // outdated or rejected
                 ],
                 'description'       => "Status of the contract.",
-                'default'           => 'pending'
+                'default'           => 'pending',
+                'onupdate'          => 'onupdateStatus'
+            ],
+
+            'is_signed' => [
+                'type'              => 'boolean',
+                'description'       => "Was contract was signed by the customer?",
+                'default'           => false
             ],
 
             'date' => [
@@ -211,4 +218,12 @@ class Contract extends Model {
         return $result;
     }
 
+    public static function onupdateStatus($self) {
+        $self->read(['status']);
+        foreach($self as $id => $contract) {
+            if($contract['status'] === 'signed') {
+                Contract::id($id)->update(['is_signed' => true]);
+            }
+        }
+    }
 }

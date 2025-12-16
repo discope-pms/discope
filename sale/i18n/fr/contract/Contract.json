@@ -24,6 +24,11 @@
             },
             "help": ""
         },
+        "is_signed": {
+            "label": "Signé",
+            "description": "Le client a signé le contract.",
+            "help": ""
+        },
         "date": {
             "label": "Date",
             "description": "Date à laquelle le contrat a été émis.",
