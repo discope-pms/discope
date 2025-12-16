@@ -3,9 +3,74 @@
     "plural": "Hotes",
     "description": "La personne physique faisant partie d'une réservation.",
     "model": {
+        "firstname": {
+            "label": "Prénom",
+            "description": "",
+            "help": ""
+        },
+        "lastname": {
+            "label": "Nom",
+            "description": "",
+            "help": ""
+        },
+        "gender": {
+            "label": "Genre",
+            "description": "",
+            "selection": {
+                "M": "Masculin",
+                "F": "Féminin",
+                "X": "Non-binaire"
+            },
+            "help": ""
+        },
+        "date_of_birth": {
+            "label": "Date de naissance",
+            "description": "",
+            "help": ""
+        },
+        "citizen_identification": {
+            "label": "Numéro d'enregistrement du citoyen",
+            "description": "",
+            "help": ""
+        },
         "is_coordinator": {
             "label": "Responsable ?",
             "description": "L'hôte est-il le responsable ?",
+            "help": ""
+        },
+        "guest_list_id": {
+            "label": "List d'hôtes",
+            "description": "",
+            "help": ""
+        },
+        "booking_id": {
+            "label": "Réservation",
+            "description": "",
+            "help": ""
+        },
+        "booking_line_group_id": {
+            "label": "Groupe de réservation",
+            "description": "",
+            "help": ""
+        },
+        "address_street": {
+            "label": "Rue",
+            "description": "Rue et numéro.",
+            "help": ""
+        },
+        "address_zip": {
+            "label": "Code Postal",
+            "description": "",
+            "help": ""
+        },
+        "address_city": {
+            "label": "Ville",
+            "description": "",
+            "help": ""
+        },
+        "address_country": {
+            "label": "Pays",
+            "description": "",
             "help": ""
         }
     },
