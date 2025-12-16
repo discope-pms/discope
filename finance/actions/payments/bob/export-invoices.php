@@ -8,6 +8,7 @@
 use core\setting\Setting;
 use documents\Export;
 use equal\text\TextTransformer;
+use finance\tax\VatRule;
 use identity\CenterOffice;
 use finance\accounting\AccountingJournal;
 use sale\booking\Invoice;
@@ -486,6 +487,10 @@ $account_discount = Setting::get_value('finance', 'accounting', 'account.discoun
 // discount product is the same for all organisations: KA-Remise-A [65]
 $discount_product_id = 65;
 
+// allowed vat rates from config
+$vat_rules = VatRule::search(['type', '=', 'sale'])->read(['rate'])->get(true);
+$allowed_rates = array_map(fn ($vat_rule) => $vat_rule['rate'], $vat_rules);
+
 $invoices_lines_data = [];
 
 foreach($invoices as $invoice) {
@@ -517,8 +522,6 @@ foreach($invoices as $invoice) {
         // #memo - we don't use $line['price_id']['vat_rate'] since VAT rate can be set manually
         // #memo - this might lead to incorrect values if distinct VAT rates have been applied on distinct products relating to a same account id (in such case, the accounting software will mark the import as invalid)
         // #memo - for small amounts (< 1 $) `price-total` may lead to a rounding issue, so we must make sure applied VTA rate is amongst a predefined list
-        // #todo - use VAT rates from config
-        $allowed_rates = [0.0, 0.06, 0.12, 0.21];
 
         $raw_rate = ($amount != 0.0) ? abs(round($vat / $amount, 2)) : 0.0;
         $vat_rate = array_reduce($allowed_rates, function ($c, $r) use ($raw_rate) {
