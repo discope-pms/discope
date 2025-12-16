@@ -1,37 +1,34 @@
 <?php
 /*
-    This file is part of the eQual framework <http://www.github.com/equalframework/equal>
-    Some Rights Reserved, eQual framework, 2010-2024
-    Original author(s): Cédric FRANCOYS
-    Licensed under GNU GPL 3 license <http://www.gnu.org/licenses/>
+    Developed by Yesbabylon - https://yesbabylon.com
+    (c) 2025-2026 Yesbabylon SA
+    Licensed under the GNU AGPL v3 License - https://www.gnu.org/licenses/agpl-3.0.html
 */
+
 namespace documents\export;
 
 use equal\orm\Model;
 
 class ExportingTaskLog extends Model {
 
-    public static function getDescription() {
+    public static function getDescription(): string {
         return "A TaskLog is an entry that relates to a task. One TaskLog is created after each execution of a task.";
     }
 
-    /**
-     * 	Tasks are executed by the CRON service if moment (timestamp) is lower or equal to the current time
-     */
-    public static function getColumns() {
+    public static function getColumns(): array {
         return [
 
             'task_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'documents\export\ExportingTask',
-                'description'       => 'The Task the log entry refers to.',
+                'description'       => "The Task the log entry refers to.",
                 'required'          => true
             ],
 
             'task_line_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'documents\export\ExportingTaskLine',
-                'description'       => 'The Task line the log entry refers to.',
+                'description'       => "The Task line the log entry refers to.",
                 'required'          => true
             ],
 
@@ -41,7 +38,7 @@ class ExportingTaskLog extends Model {
                     'success',
                     'error'
                 ],
-                'description'       => 'Status depending on the Task execution outcome.'
+                'description'       => "Status depending on the Task execution outcome."
             ],
 
             'log' => [
