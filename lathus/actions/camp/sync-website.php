@@ -60,6 +60,11 @@ if(is_null($sync_uri)) {
 }
 
 $request = new HttpRequest('GET '.$sync_uri);
+
+// #memo - mandatory user agent and content type, else an http response with code 429 is returned
+$request->header('User-Agent', 'Yesbabylon-Lathus/1.0 (+https://yesbabylon.com; contact@yesbabylon.com)');
+$request->header('Content-Type', 'text/html');
+
 $response = $request->send();
 
 $status = $response->getStatusCode();
