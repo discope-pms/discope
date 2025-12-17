@@ -63,8 +63,8 @@ $request = new HttpRequest('GET '.$sync_uri);
 $response = $request->send();
 
 $status = $response->getStatusCode();
-if($status !== 200) {
-    throw new Exception("request_rejected", QN_ERROR_INVALID_PARAM);
+if($status < 200 || $status >= 400) {
+    throw new Exception("request_rejected", EQ_ERROR_INVALID_PARAM);
 }
 
 $context->httpResponse()
