@@ -1090,6 +1090,16 @@
                             "entity": "documents\\DocumentTag",
                             "view": "list.default"
                         }
+                    },
+                    {
+                        "id": "documents.exporting_tasks",
+                        "type": "entry",
+                        "label": "Exporting tasks",
+                        "description": "",
+                        "context": {
+                            "entity": "documents\\export\\ExportingTask",
+                            "view": "list.default"
+                        }
                     }
                 ]
             },

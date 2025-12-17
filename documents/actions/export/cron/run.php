@@ -89,8 +89,9 @@ foreach($exportingTask['exporting_task_lines_ids'] as $exporting_task_line_id =>
         // #memo - documents linked to ExportingTaskLine are not visible in the EDMS, and are meant to be removed when at ExportingTask expiry
         ExportingTaskLine::id($exporting_task_line_id)
             ->update([
-                'document_id'   => $data['document_id'],
-                'status'        => 'ready'
+                'document_id'       => !$exportingTask['is_temp'] ? $data['document_id'] : null,
+                'document_temp_id'  => $exportingTask['is_temp'] ? $data['document_id'] : null,
+                'status'            => 'ready'
             ]);
     }
     catch(\Exception $e) {

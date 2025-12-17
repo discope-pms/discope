@@ -4,6 +4,12 @@
         "items": [
             {
                 "type": "field",
+                "value": "id",
+                "width": "5%",
+                "visible": false
+            },
+            {
+                "type": "field",
                 "value": "name",
                 "width": "33%"
             },
@@ -12,6 +18,11 @@
                 "value": "exporting_task_id",
                 "width": "16%",
                 "visible": false
+            },
+            {
+                "type": "field",
+                "value": "status",
+                "width": "16%"
             },
             {
                 "type": "field",
@@ -25,8 +36,8 @@
             },
             {
                 "type": "field",
-                "value": "status",
-                "width": "15%"
+                "value": "document_temp_id",
+                "width": "20%"
             }
         ]
     }

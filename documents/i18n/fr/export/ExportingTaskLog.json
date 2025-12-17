@@ -1,0 +1,47 @@
+{
+    "name": "Log tâche d'export",
+    "plural": "Logs tâches d'export",
+    "description": "Vue par défaut pour la liste des logs de tâche d'export.",
+    "model": {
+        "name": {
+            "label": "Nom",
+            "description": "Nom du log de tâche d'export.",
+            "help": ""
+        },
+        "task_id": {
+            "label": "Tâche d'export",
+            "description": "Tâche d'export du log.",
+            "help": ""
+        },
+        "task_line_id": {
+            "label": "Ligne tâche d'export",
+            "description": "Tâche d'export de la ligne du log.",
+            "help": ""
+        },
+        "status": {
+            "label": "Status",
+            "description": "Le status d'exécution de la ligne de tâche.",
+            "selection": {
+                "success": "Succès",
+                "error": "Erreurs"
+            },
+            "help": ""
+        },
+        "log": {
+            "label": "Contenu log",
+            "description": "Le contenu du log.",
+            "help": ""
+        }
+    },
+    "view": {
+        "form.default": {
+            "name": "Log tâche d'export",
+            "description": ""
+        },
+        "list.default": {
+            "name": "Logs tâches d'export",
+            "description": "Liste des logs de tâches d'export.",
+            "layout": {}
+        }
+    }
+}

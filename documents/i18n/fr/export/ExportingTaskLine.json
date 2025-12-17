@@ -1,0 +1,69 @@
+{
+    "name": "Ligne tâche d'export",
+    "plural": "Lignes tâches d'export",
+    "description": "Vue par défaut pour la liste des lignes de tâche d'export.",
+    "model": {
+        "name": {
+            "label": "Nom",
+            "description": "Nom de la ligne de tâche d'export.",
+            "help": ""
+        },
+        "exporting_task_id": {
+            "label": "Tâche d'export",
+            "description": "Tâche d'export de la ligne.",
+            "help": ""
+        },
+        "pid": {
+            "label": "PID",
+            "description": "Identifiant processus.",
+            "help": ""
+        },
+        "controller": {
+            "label": "Controleur",
+            "description": "Contrôleur a invoquer.",
+            "help": ""
+        },
+        "params": {
+            "label": "Paramètres",
+            "description": "Paramètres à transmettre au contrôleur.",
+            "help": ""
+        },
+        "document_id": {
+            "label": "Document",
+            "description": "Le document généré.",
+            "help": ""
+        },
+        "document_temp_id": {
+            "label": "Document temporaire",
+            "description": "Le document temporaire généré.",
+            "help": ""
+        },
+        "status": {
+            "label": "Status",
+            "description": "Le status d'exécution de la ligne de tâche.",
+            "selection": {
+                "idle": "En attente",
+                "running": "En cours",
+                "ready": "Terminée",
+                "failing": "Échouée"
+            },
+            "help": ""
+        }
+    },
+    "view": {
+        "form.default": {
+            "name": "Ligne tâche d'export",
+            "description": "",
+            "layout": {
+                "section.logs": {
+                    "label": "Logs"
+                }
+            }
+        },
+        "list.default": {
+            "name": "Lignes tâches d'export",
+            "description": "Liste des lignes de tâches d'export.",
+            "layout": {}
+        }
+    }
+}

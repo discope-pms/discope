@@ -1,0 +1,54 @@
+{
+    "name": "Tâche d'export",
+    "plural": "Tâches d'export",
+    "description": "Vue par défaut pour la liste des tâche d'export.",
+    "model": {
+        "name": {
+            "label": "Nom",
+            "description": "Nom du document.",
+            "help": ""
+        },
+        "download_link": {
+            "label": "Lien téléchargement",
+            "description": "Lien de téléchargement du document.",
+            "help": ""
+        },
+        "is_exported": {
+            "label": "Exporté",
+            "description": "L'export a été téléchargé.",
+            "help": ""
+        },
+        "is_temp": {
+            "label": "Temporaire",
+            "description": "Les documents générés doivent-ils être temporaires.",
+            "help": ""
+        },
+        "status": {
+            "label": "Status",
+            "description": "Le status d'exécution de la tâche.",
+            "selection": {
+                "idle": "En attente",
+                "running": "En cours",
+                "ready": "Terminée",
+                "failing": "Échouée"
+            },
+            "help": ""
+        }
+    },
+    "view": {
+        "form.default": {
+            "name": "Tâche d'export",
+            "description": "",
+            "layout": {
+                "section.export_lines": {
+                    "label": "Lignes"
+                }
+            }
+        },
+        "list.default": {
+            "name": "Tâches d'export",
+            "description": "Liste des tâches d'export.",
+            "layout": {}
+        }
+    }
+}

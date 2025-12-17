@@ -45,7 +45,17 @@
                                         ]
                                     }
                                 ]
-                            },
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "sections": [
+                    {
+                        "id": "section.logs",
+                        "label": "Logs",
+                        "rows": [
                             {
                                 "columns": [
                                     {

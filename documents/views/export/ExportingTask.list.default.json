@@ -9,12 +9,6 @@
         "items": [
             {
                 "type": "field",
-                "label": "Condominium",
-                "value": "condo_id",
-                "width": "33%"
-            },
-            {
-                "type": "field",
                 "value": "name",
                 "width": "33%"
             },
@@ -31,6 +25,16 @@
                 "widget": {
                     "link": "icon"
                 }
+            },
+            {
+                "type": "field",
+                "value": "is_exported",
+                "width": "20%"
+            },
+            {
+                "type": "field",
+                "value": "is_temp",
+                "width": "20%"
             }
         ]
     }

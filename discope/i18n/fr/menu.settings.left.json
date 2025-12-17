@@ -374,6 +374,10 @@
             "label": "Étiquettes",
             "help": ""
         },
+        "documents.exporting_tasks": {
+            "label": "Tâches d'export",
+            "help": ""
+        },
         "finance.invoices": {
             "label": "Factures",
             "help": ""
