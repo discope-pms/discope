@@ -23,6 +23,19 @@
                         }
                     },
                     {
+                        "id": "item.all_temp_documents",
+                        "type": "entry",
+                        "label": "All temp documents",
+                        "description": "",
+                        "route": "/",
+                        "context": {
+                            "entity": "documents\\DocumentTemp",
+                            "view": "list.default",
+                            "order": "id",
+                            "sort": "desc"
+                        }
+                    },
+                    {
                         "id": "item.all_categories",
                         "type": "entry",
                         "label": "All categories",

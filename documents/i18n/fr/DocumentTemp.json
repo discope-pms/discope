@@ -1,7 +1,7 @@
 {
     "name": "Document",
     "plural": "Documents",
-    "description": "Vue par défaut pour la liste des documents.",
+    "description": "Vue par défaut pour la liste des documents temporaires.",
     "model": {
         "name": {
             "label": "Nom",

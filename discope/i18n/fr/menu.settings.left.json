@@ -358,8 +358,20 @@
             "label": "Documents",
             "help": ""
         },
-        "documents_documents": {
+        "documents.documents": {
             "label": "Documents",
+            "help": ""
+        },
+        "documents.temp_documents": {
+            "label": "Documents temporaires",
+            "help": ""
+        },
+        "documents.categories": {
+            "label": "Catégories",
+            "help": ""
+        },
+        "documents.tags": {
+            "label": "Étiquettes",
             "help": ""
         },
         "finance.invoices": {

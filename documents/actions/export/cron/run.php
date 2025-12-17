@@ -1,33 +1,37 @@
 <?php
 /*
-    Developed by Yesbabylon - https://yesbabylon.com
-    (c) 2025-2026 Yesbabylon SA
-    Licensed under the GNU AGPL v3 License - https://www.gnu.org/licenses/agpl-3.0.html
+    This file is part of the Discope property management software <https://github.com/discope-pms/discope>
+    Some Rights Reserved, Discope PMS, 2020-2025
+    Original author(s): Yesbabylon SRL
+    Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 
 use documents\export\ExportingTask;
 use documents\export\ExportingTaskLine;
 
 [$params, $providers] = eQual::announce([
-    'description' => 'Handle next task in ExportingTask queue.',
-    'params' => [
+    'description'   => 'Handle next task in ExportingTask queue.',
+    'params'        => [
+
         'id' =>  [
-            'description'       => 'Optional identifier of a specific exporting task to run.',
+            'description'       => "Optional identifier of a specific exporting task to run.",
             'type'              => 'many2one',
             'foreign_object'    => 'documents\export\ExportingTask'
         ]
+
     ],
-    'response' => [
+    'response'      => [
         'content-type'  => 'application/json',
         'charset'       => 'utf-8'
     ],
     // #todo - mark as private (only from scheduler)
-    'access'        => [ 'visibility' => 'protected' ],
+    'access'        => [
+        'visibility'    => 'protected'
+    ],
     'providers'     => ['context', 'orm', 'dispatch']
 ]);
 
 ['context' => $context, 'orm' => $orm, 'dispatch' => $dispatch] = $providers;
-
 
 $now = time();
 
@@ -49,7 +53,7 @@ $exportingTask = ExportingTask::search([
         ['limit' => 1, 'sort' => ['created' => 'asc']]
     )
     ->update(['status' => 'running'])
-    ->read(['condo_id', 'exporting_task_lines_ids' => ['controller', 'params']])
+    ->read(['is_temp', 'exporting_task_lines_ids' => ['controller', 'params']])
     ->first();
 
 // no task in queue
@@ -73,6 +77,7 @@ foreach($exportingTask['exporting_task_lines_ids'] as $exporting_task_line_id =>
 
     try {
         $body = json_decode($exportingTaskLine['params'], true);
+        $body['is_temp'] = $exportingTask['is_temp'];
         // run the task - expected to generate a PDF document
         $data = \eQual::run('do', $exportingTaskLine['controller'], $body);
         $status = 'success';
@@ -123,16 +128,18 @@ if($has_failing_line) {
     ExportingTask::id($exportingTask['id'])
         ->update(['status' => 'failing']);
 
-    $dispatch->dispatch('documents.export.export_failing', 'documents\export\ExportingTask', $exportingTask['id'], 'important', null, [], [], null, $exportingTask['condo_id']);
+    // #todo - handle alert failing
+    // $dispatch->dispatch('documents.export.export_failing', 'documents\export\ExportingTask', $exportingTask['id'], 'important', null, [], [], null, $exportingTask['condo_id']);
 }
 else {
     ExportingTask::id($exportingTask['id'])
         ->update(['status' => 'ready']);
 
-    $dispatch->dispatch('documents.export.export_ready', 'documents\export\ExportingTask', $exportingTask['id'], 'notice', null, [], [], null, $exportingTask['condo_id']);
+    // #todo - handle alert success
+    // $dispatch->dispatch('documents.export.export_ready', 'documents\export\ExportingTask', $exportingTask['id'], 'notice', null, [], [], null, $exportingTask['condo_id']);
 }
 
 
 $context->httpResponse()
-    ->status(204)
-    ->send();
+        ->status(204)
+        ->send();

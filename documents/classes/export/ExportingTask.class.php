@@ -1,55 +1,48 @@
 <?php
 /*
-    Developed by Yesbabylon - https://yesbabylon.com
-    (c) 2025-2026 Yesbabylon SA
-    Licensed under the GNU AGPL v3 License - https://www.gnu.org/licenses/agpl-3.0.html
+    This file is part of the Discope property management software <https://github.com/discope-pms/discope>
+    Some Rights Reserved, Discope PMS, 2020-2025
+    Original author(s): Yesbabylon SRL
+    Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 
 namespace documents\export;
 
-class ExportingTask extends \equal\orm\Model {
+use equal\orm\Model;
 
-    /**
-     * 	Tasks are executed by the CRON service if moment (timestamp) is lower or equal to the current time
-     */
+class ExportingTask extends Model {
+
     public static function getColumns() {
         return [
-            'condo_id' => [
-                'type'              => 'many2one',
-                'description'       => "The condominium the document belongs to.",
-                'foreign_object'    => 'realestate\property\Condominium',
-                // #memo - some exports may be organisation-wide (e.g., reports)
-                // 'required'          => true
-            ],
 
             'name' => [
                 'type'              => 'string',
-                'description'       => 'Name of the task, as set at creation.',
+                'description'       => "Name of the task, as set at creation.",
                 'required'          => true
             ],
 
             'object_class' => [
                 'type'              => 'string',
-                'description'       => 'Class of the object object_id points to.'
+                'description'       => "Class of the object object_id points to."
             ],
 
             'object_id' => [
                 'type'              => 'integer',
-                'description'       => 'Identifier of the object the email originates from.'
+                'description'       => "Identifier of the object the email originates from."
             ],
 
             'exporting_task_lines_ids' => [
                 'type'              => 'one2many',
                 'foreign_object'    => 'documents\export\ExportingTaskLine',
                 'foreign_field'     => 'exporting_task_id',
-                'description'       => 'Lines of the task.'
+                'description'       => "Lines of the task."
             ],
 
             'download_link' => [
                 'type'              => 'computed',
                 'result_type'       => 'string',
                 'usage'             => 'uri/url.relative',
-                'description'       => 'URL for downloading the export.',
+                'description'       => "URL for downloading the export.",
                 'function'          => 'calcDownloadLink',
                 'store'             => true,
                 'readonly'          => true,
@@ -64,7 +57,13 @@ class ExportingTask extends \equal\orm\Model {
 
             'is_exported' => [
                 'type'              => 'boolean',
-                'description'       => 'Flag marking the export as downloaded by the user.',
+                'description'       => "Flag marking the export as downloaded by the user.",
+                'default'           => false
+            ],
+
+            'is_temp' => [
+                'type'              => 'boolean',
+                'description'       => "Flag marking the tasks lines resulting documents as Document (false) or DocumentTemp (true).",
                 'default'           => false
             ],
 
@@ -79,18 +78,20 @@ class ExportingTask extends \equal\orm\Model {
                 'default'           => 'idle',
                 'description'       => 'Current status of the processing (to avoid concurrent executions).',
                 'help'              => "Remains `running` while all lines haven't been processed."
-            ],
+            ]
 
         ];
     }
 
-    public static function getActions() {
+    public static function getActions(): array {
         return [
+
             'retry' => [
-                'description'   => 'Request a new export attempt, by resetting status to `idle`.',
+                'description'   => "Request a new export attempt, by resetting status to `idle`.",
                 'policies'      => [],
                 'function'      => 'doRetry'
             ]
+
         ];
     }
 
@@ -105,7 +106,7 @@ class ExportingTask extends \equal\orm\Model {
         }
     }
 
-    protected static function calcDownloadLink($self) {
+    protected static function calcDownloadLink($self): array {
         $result = [];
         $self->read(['status']);
         foreach($self as $id => $exportingTask) {

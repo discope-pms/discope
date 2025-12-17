@@ -7,6 +7,7 @@
 */
 
 use documents\Document;
+use documents\DocumentTemp;
 use sale\booking\Booking;
 
 [$params, $providers] = eQual::announce([
@@ -22,6 +23,12 @@ use sale\booking\Booking;
         'document_name' => [
             'type'          => 'string',
             'description'   => "Name of the generated xls document."
+        ],
+
+        'is_temp' => [
+            'type'          => 'boolean',
+            'description'   => "Should the generated document be temporary?",
+            'default'       => true
         ],
 
         'lang' =>  [
@@ -79,7 +86,13 @@ if(!str_ends_with($document_name, '.xlsx')) {
     $document_name .= '.xlsx';
 }
 
-$document = Document::create([
+/** @var Document $document_class */
+$document_class = Document::getType();
+if($params['is_temp']) {
+    $document_class = DocumentTemp::getType();
+}
+
+$document = $document_class::create([
     'name' => $document_name,
     'data' => $guest_list_xls,
     'type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
@@ -88,6 +101,6 @@ $document = Document::create([
     ->first();
 
 $context->httpResponse()
-        ->body($document['id'])
+        ->body(['document_id' => $document['id']])
         ->status(201)
         ->send();
