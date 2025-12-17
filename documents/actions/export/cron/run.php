@@ -53,7 +53,7 @@ $exportingTask = ExportingTask::search([
         ['limit' => 1, 'sort' => ['created' => 'asc']]
     )
     ->update(['status' => 'running'])
-    ->read(['exporting_task_lines_ids' => ['controller', 'params']])
+    ->read(['is_temp', 'exporting_task_lines_ids' => ['controller', 'params']])
     ->first();
 
 // no task in queue
@@ -77,6 +77,7 @@ foreach($exportingTask['exporting_task_lines_ids'] as $exporting_task_line_id =>
 
     try {
         $body = json_decode($exportingTaskLine['params'], true);
+        $body['is_temp'] = $exportingTask['is_temp'];
         // run the task - expected to generate a PDF document
         $data = \eQual::run('do', $exportingTaskLine['controller'], $body);
         $status = 'success';

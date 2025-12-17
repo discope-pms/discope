@@ -13,4 +13,16 @@ class DocumentTemp extends Document {
     public function getTable(): string {
         return 'documents_document_temp';
     }
+
+    public static function calcLink($self): array {
+        $result = [];
+        $self->read(['hash']);
+        foreach($self as $id => $document) {
+            if(strlen($document['hash'])) {
+                $result[$id] = '/document/'.$document['hash'].'?is_temp=true';
+            }
+        }
+
+        return $result;
+    }
 }

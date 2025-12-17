@@ -1062,6 +1062,16 @@
                         }
                     },
                     {
+                        "id": "documents.temp_documents",
+                        "type": "entry",
+                        "label": "Temp. documents",
+                        "description": "",
+                        "context": {
+                            "entity": "documents\\DocumentTemp",
+                            "view": "list.default"
+                        }
+                    },
+                    {
                         "id": "documents.categories",
                         "type": "entry",
                         "label": "Categories",
