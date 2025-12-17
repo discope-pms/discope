@@ -1,8 +1,9 @@
 <?php
 /*
-    Developed by Yesbabylon - https://yesbabylon.com
-    (c) 2025-2026 Yesbabylon SA
-    Licensed under the GNU AGPL v3 License - https://www.gnu.org/licenses/agpl-3.0.html
+    This file is part of the Discope property management software <https://github.com/discope-pms/discope>
+    Some Rights Reserved, Discope PMS, 2020-2025
+    Original author(s): Yesbabylon SRL
+    Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 
 use documents\Document;
@@ -12,26 +13,27 @@ use equal\text\TextTransformer;
 [$params, $providers] = eQual::announce([
     'description'   => "Checks if all owners have been invited to the target assembly.",
     'params'        => [
+
         'id' =>  [
             'type'              => 'many2one',
             'description'       => "The assembly the invitation refers to.",
             'foreign_object'    => 'documents\export\ExportingTask',
             'required'          => true
         ]
+
     ],
     'response'      => [
         'content-type'  => 'application/zip',
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'     => ['context', 'dispatch']
+    'providers'     => ['context']
 ]);
 
 /**
- * @var \equal\php\Context                 $context
- * @var \equal\dispatch\Dispatcher         $dispatch
+ * @var \equal\php\Context  $context
  */
-['context' => $context, 'dispatch' => $dispatch] = $providers;
+['context' => $context] = $providers;
 
 $exportingTask = ExportingTask::id($params['id'])
     ->read(['status', 'name', 'exporting_task_lines_ids' => ['status', 'document_id']])

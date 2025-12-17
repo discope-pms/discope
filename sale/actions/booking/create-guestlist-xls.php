@@ -88,6 +88,6 @@ $document = Document::create([
     ->first();
 
 $context->httpResponse()
-        ->body($document['id'])
+        ->body(['document_id' => $document['id']])
         ->status(201)
         ->send();

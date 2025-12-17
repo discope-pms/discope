@@ -1,8 +1,9 @@
 <?php
 /*
-    Developed by Yesbabylon - https://yesbabylon.com
-    (c) 2025-2026 Yesbabylon SA
-    Licensed under the GNU AGPL v3 License - https://www.gnu.org/licenses/agpl-3.0.html
+    This file is part of the Discope property management software <https://github.com/discope-pms/discope>
+    Some Rights Reserved, Discope PMS, 2020-2025
+    Original author(s): Yesbabylon SRL
+    Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 
 namespace documents\export;
@@ -57,6 +58,12 @@ class ExportingTask extends Model {
             'is_exported' => [
                 'type'              => 'boolean',
                 'description'       => "Flag marking the export as downloaded by the user.",
+                'default'           => false
+            ],
+
+            'is_temp' => [
+                'type'              => 'boolean',
+                'description'       => "Flag marking the tasks lines resulting documents as Document (false) or DocumentTemp (true).",
                 'default'           => false
             ],
 
