@@ -98,6 +98,9 @@ $payments_ids = Payment::search([
             ['payment_origin', '=', 'cashdesk'],
             ['payment_method', 'in', ['bank_card', 'cash']]
         ]
+    ], [
+        'limit' => 100,
+        'sort'  => ['created' => 'asc']
     ])
     ->ids();
 
