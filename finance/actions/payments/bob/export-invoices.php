@@ -522,8 +522,9 @@ foreach($invoices as $invoice) {
 
         $raw_rate = ($amount != 0.0) ? abs(round($vat / $amount, 2)) : 0.0;
         $vat_rate = array_reduce($allowed_rates, function ($c, $r) use ($raw_rate) {
-            return (abs($r - $raw_rate) < abs($c - $raw_rate)) ? $r : $c;
-        });
+                return (abs($r - $raw_rate) < abs($c - $raw_rate)) ? $r : $c;
+            },
+            0.0);
 
         $accounting_rule_lines_ids = [];
         if($line['product_id'] == $downpayment_product_id) {
@@ -611,19 +612,24 @@ foreach($invoices as $invoice) {
         $subtotals_vat_lines[$vat_rate_index] += $account_values['vat'];
     }
     foreach($subtotals_vat_lines as $vat_rate_index => $subtotal_vat) {
-        if($subtotal_vat === $invoice['subtotals_vat'][$vat_rate_index]) {
+        if(abs($subtotal_vat - $invoice['subtotals_vat'][$vat_rate_index]) < 0.01) {
             continue;
         }
 
         $diff = $invoice['subtotals_vat'][$vat_rate_index] - $subtotal_vat;
+        if(round($diff, 2) == 0.0) {
+            continue;
+        }
         foreach($invoice_lines_accounts as &$account_values) {
             $vat_rate = ((float) $vat_rate_index) / 100;
             if($account_values['vat_rate'] === $vat_rate) {
                 // adapt here
                 $account_values['vat'] = round($account_values['vat'] + $diff, 2);
+                unset($account_values);
                 continue 2;
             }
         }
+        unset($account_values);
     }
 
     // pass-2 : generate lines based on account entries
