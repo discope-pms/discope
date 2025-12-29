@@ -63,7 +63,7 @@ list($context, $orm, $auth, $dispatch) = [$providers['context'], $providers['orm
     Postulats
     * l'origine des fichiers n'a pas d'importance
     * les noms de fichiers peuvent avoir de l'importance
-    * les fichiers peuvent regrouper des lignes issues de différents centres
+    * les fichiers peuvent regrouper des lignes issues de differents centres
     * les imports COMPTA se font par centre de gestion : il faut un export par centre de gestion
 
 */
@@ -110,7 +110,7 @@ $domain = [
 ];
 
 // #memo - there might be several kind of invoices, we only consider the ones attached either to a booking or to a list of orders
-$invoices = Invoice::search($domain, ['sort' => ['number' => 'asc']])
+$invoices = Invoice::search($domain, ['limit' => 100, 'sort' => ['number' => 'asc']])
     ->read([
         'id',
         'name',
