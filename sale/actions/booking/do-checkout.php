@@ -48,11 +48,11 @@ if(!$booking) {
 
 // a booking cannot switch back to "checkedout" if it has a non-cancelled balance invoice
 $balance_invoice = Invoice::search([
-    ['booking_id', '=', $params['id']],
-    ['is_deposit', '=', false],
-    ['type', '=', 'invoice'],
-    ['status', '<>', 'cancelled']
-])
+        ['booking_id', '=', $params['id']],
+        ['is_deposit', '=', false],
+        ['type', '=', 'invoice'],
+        ['status', '=', 'invoice']
+    ])
     ->read(['id'])
     ->first(true);
 
