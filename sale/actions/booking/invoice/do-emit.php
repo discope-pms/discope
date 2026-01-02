@@ -66,7 +66,10 @@ if(!$fiscal_year || !$fiscal_date_from || !$fiscal_date_to) {
     throw new Exception('missing_fiscal_year', EQ_ERROR_INVALID_CONFIG);
 }
 
-if($invoice['date'] < strtotime($fiscal_date_from) || $invoice['date'] > strtotime($fiscal_date_to)) {
+$date_from = strtotime($fiscal_date_from . ' 00:00:00');
+$date_to   = strtotime($fiscal_date_to   . ' 23:59:59');
+
+if($invoice['date'] < $date_from || $invoice['date'] > $date_to) {
     throw new \Exception('fiscal_year_mismatch', EQ_ERROR_INVALID_CONFIG);
 }
 
