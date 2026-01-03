@@ -109,5 +109,4 @@ jobs:
 workflows:
   build_and_test:
     jobs:
-      - php_7-4
       - php_8-3
