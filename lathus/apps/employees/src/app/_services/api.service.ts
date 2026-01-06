@@ -7,7 +7,8 @@ import {
     Partner,
     Employee,
     Provider,
-    ProductModel
+    ProductModel,
+    ActivityMap
 } from '../../type';
 import { EnvService } from 'sb-shared-lib';
 import { from, Observable } from 'rxjs';
@@ -79,6 +80,15 @@ export class ApiService {
         );
     }
 
+    public fetchCentersByIds(centerIds: number[]): Observable<Center[]> {
+        return this.modelCollect<Center>(
+            'identity\\Center',
+            ['id', 'name'],
+            ['id', 'in', centerIds],
+            { limit: centerIds.length }
+        );
+    }
+
     public fetchTimeSlots(): Observable<TimeSlot[]> {
         return this.modelCollect<TimeSlot>(
             'sale\\booking\\TimeSlot',
@@ -128,12 +138,19 @@ export class ApiService {
         );
     }
 
-    public fetchCentersByIds(centerIds: number[]): Observable<Center[]> {
-        return this.modelCollect<Center>(
-            'identity\\Center',
-            ['id', 'name'],
-            ['id', 'in', centerIds],
-            { limit: centerIds.length }
+    public fetchActivityMap(dateFrom: Date, dateTo: Date, partnersIds: number[], productModelsIds: number[]): Observable<ActivityMap> {
+        const options = {
+            headers: this.headers,
+            params: {
+                date_from: dateFrom.toISOString(),
+                date_to: dateTo.toISOString(),
+                partners_ids: JSON.stringify(partnersIds),
+                product_model_ids: JSON.stringify(productModelsIds)
+            }
+        };
+
+        return this.getBackendUrl().pipe(
+            switchMap((backend_url: string) => this.http.get<ActivityMap>(`${backend_url}?get=sale_booking_activity_map`, options))
         );
     }
 

@@ -35,6 +35,107 @@ export interface Provider extends Partner {
 export interface ProductModel extends Model {
 }
 
+export interface ActivityMap {
+    [index: number]: { // partner_id or 0 if not assigned
+        [date: string]: ActivityMapDay;
+    };
+}
+
+interface ActivityMapDay {
+    AM: ActivityMapActivity[];
+    PM: ActivityMapActivity[];
+    EV: ActivityMapActivity[];
+}
+
+interface ActivityMapActivity {
+    counter: number;
+    counter_total: number;
+    id: number;
+    name: string;
+    has_staff_required: boolean;
+    employee_id: number | null;
+    has_provider: boolean;
+    qty: number;
+    providers_ids: number[];
+    activity_date: string; // ISO date string
+    time_slot_id: number;
+    is_exclusive: boolean;
+    schedule_from: string; // HH:mm:ss
+    schedule_to: string;   // HH:mm:ss
+    booking_id: ActivityMapBooking | null;
+    booking_line_group_id: ActivityMapBookingLineGroup | null;
+    product_model_id: ActivityMapProductModel;
+    activity_booking_line_id: number | null;
+    camp_id: ActivityMapCamp | null;
+    group_num: number | null;
+    is_partner_event: boolean;
+    time_slot: "AM" | "PM" | "EV";
+    customer_id: ActivityMapCustomer | null;
+    partner_identity_id: ActivityMapPartnerIdentity | null;
+    age_range_assignments_ids: ActivityMapAgeRangeAssignment[];
+    partner_id: number | null;
+}
+
+interface ActivityMapBooking {
+    id: number;
+    name: string;
+    description: string;
+    status: "quote" | "option" | "confirmed" | "validated" | "checkedin" | "checkedout" | "proforma" | "invoiced" | "debit_balance" | "credit_balance" | "balanced" | "cancelled";
+    date_from: string; // DD/MM/YYYY
+    date_to: string;   // DD/MM/YYYY
+    payment_status: "due" | "paid";
+    customer_id: number;
+    nb_pers: number;
+}
+
+export interface ActivityMapBookingLineGroup {
+    id: number;
+    nb_pers: number;
+    has_person_with_disability: boolean;
+    person_disability_description: string | null;
+    age_range_assignments_ids: number[];
+}
+
+export interface ActivityMapCamp {
+    id: number,
+    status: "draft" | "published" | "cancelled",
+    name: string,
+    short_name: string,
+    date_from: string, // ISO date string
+    date_to: string, // ISO date string
+    min_age: number,
+    max_age: number,
+    enrollments_qty: number,
+    employee_ratio: number
+}
+
+export interface ActivityMapProductModel {
+    id: number;
+    name: string;
+    activity_color: string | null;
+    providers_ids: number[];
+}
+
+export interface ActivityMapCustomer {
+    id: number;
+    name: string;
+    partner_identity_id: number;
+}
+
+export interface ActivityMapPartnerIdentity {
+    id: number;
+    name: string;
+    address_city: string;
+}
+
+export interface ActivityMapAgeRangeAssignment {
+    id: number;
+    booking_line_group_id: number;
+    qty: number;
+    age_from: number;
+    age_to: number;
+}
+
 export interface CustomerIdentity extends Model {
     display_name: string
 }
