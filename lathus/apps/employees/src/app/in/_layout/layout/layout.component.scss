@@ -1,0 +1,15 @@
+:host {
+    display: flex;
+    height: 100%;
+    flex-direction: column;
+
+    // TODO: is this needed (no header for the moment)
+    .header {
+        height: 60px;
+    }
+
+    .content {
+        max-height: calc(100% - 60px);
+        flex-grow: 1;
+    }
+}
