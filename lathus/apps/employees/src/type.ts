@@ -73,7 +73,7 @@ interface ActivityMapActivity {
     customer_id: ActivityMapCustomer | null;
     partner_identity_id: ActivityMapPartnerIdentity | null;
     age_range_assignments_ids: ActivityMapAgeRangeAssignment[];
-    partner_id: number | null;
+    partner_id: ActivityMapPartner | null;
 }
 
 interface ActivityMapBooking {
@@ -88,7 +88,7 @@ interface ActivityMapBooking {
     nb_pers: number;
 }
 
-export interface ActivityMapBookingLineGroup {
+interface ActivityMapBookingLineGroup {
     id: number;
     nb_pers: number;
     has_person_with_disability: boolean;
@@ -96,7 +96,7 @@ export interface ActivityMapBookingLineGroup {
     age_range_assignments_ids: number[];
 }
 
-export interface ActivityMapCamp {
+interface ActivityMapCamp {
     id: number,
     status: "draft" | "published" | "cancelled",
     name: string,
@@ -109,26 +109,32 @@ export interface ActivityMapCamp {
     employee_ratio: number
 }
 
-export interface ActivityMapProductModel {
+interface ActivityMapProductModel {
     id: number;
     name: string;
     activity_color: string | null;
     providers_ids: number[];
 }
 
-export interface ActivityMapCustomer {
+interface ActivityMapCustomer {
     id: number;
     name: string;
     partner_identity_id: number;
 }
 
-export interface ActivityMapPartnerIdentity {
+interface ActivityMapPartnerIdentity {
     id: number;
     name: string;
     address_city: string;
 }
 
-export interface ActivityMapAgeRangeAssignment {
+interface ActivityMapPartner {
+    id: number,
+    name: string,
+    relationship: "employee" | "provider"
+}
+
+interface ActivityMapAgeRangeAssignment {
     id: number;
     booking_line_group_id: number;
     qty: number;
