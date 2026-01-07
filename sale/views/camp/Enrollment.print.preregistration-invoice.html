@@ -241,33 +241,6 @@
                         <td style="width: 70%;">Total des séjours</td>
                         <td style="text-align: right;">{{ total_amount|format_money() }}</td>
                     </tr>
-                    {% for child in children %}
-                        {% for enrollment in child.enrollments_ids%}
-                            {% for price_adapter in enrollment.price_adapters_ids %}
-                                {% if price_adapter.price_adapter_type == 'amount' %}
-                                    <tr>
-                                        {% if child.enrollments_ids|length == 1 %}
-                                            <td style="width: 70%;">{{ price_adapter.name }}</td>
-                                        {% else %}
-                                            <td style="width: 70%;">Séj. n°{{enrollment.camp_id.sojourn_number}} - {{ price_adapter.name }}</td>
-                                        {% endif %}
-                                        <td style="text-align: right;">{{ price_adapter.value|format_money() }}</td>
-                                    </tr>
-                                {% endif %}
-                            {% endfor %}
-
-                            {% if map_enrollment_percent_price_adapter[enrollment.id] is defined %}
-                                <tr>
-                                    {% if child.enrollments_ids|length == 1 %}
-                                        <td style="width: 70%;">{{ map_enrollment_percent_price_adapter[enrollment.id].name }}</td>
-                                    {% else %}
-                                        <td style="width: 70%;">Séj. n°{{enrollment.camp_id.sojourn_number}} - {{ map_enrollment_percent_price_adapter[enrollment.id].name }}</td>
-                                    {% endif %}
-                                    <td style="text-align: right;">{{ map_enrollment_percent_price_adapter[enrollment.id].value|format_money() }}</td>
-                                </tr>
-                            {% endif %}
-                        {% endfor %}
-                    {% endfor %}
 
                     <tr style="background-color: #cfcfcf;">
                         <td style="width: 70%;">Reste total à payer</td>

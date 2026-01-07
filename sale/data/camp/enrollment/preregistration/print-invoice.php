@@ -121,11 +121,8 @@ $children = Child::ids($ids)
                 'price',
                 'product_id' => ['label']
             ],
-            'price_adapters_ids' => [
-                'name',
-                'price_adapter_type',
-                'origin_type',
-                'value'
+            'fundings_ids' => [
+                'paid_amount'
             ]
         ]
     ])
@@ -140,6 +137,7 @@ foreach($children as &$child) {
         return $enrollment['camp_id']['center_id'] === $center['id'] && $enrollment['camp_id']['date_from'] > time() && $enrollment['status'] === 'confirmed';
     });
 }
+unset($child);
 
 $children = array_filter($children, function($child) {
     return !empty($child['enrollments_ids']);
@@ -170,39 +168,8 @@ $remaining_amount = 0;
 foreach($children as $child) {
     foreach($child['enrollments_ids'] as $enrollment) {
         $remaining_amount += $enrollment['price'];
-
-        foreach($enrollment['price_adapters_ids'] as $price_adapter) {
-            // #memo - the 'other' and 'loyalty-discount' price-adapters are already applied on price
-            if(in_array($price_adapter['origin_type'], ['other', 'loyalty-discount'])) {
-                continue;
-            }
-
-            $remaining_amount -= $price_adapter['value'];
-        }
-    }
-}
-
-$map_enrollment_percent_price_adapter = [];
-foreach($children as $child) {
-    foreach($child['enrollments_ids'] as $enrollment) {
-        foreach($enrollment['price_adapters_ids'] as $price_adapter) {
-            if($price_adapter['price_adapter_type'] === 'percent') {
-                if(strpos($price_adapter['name'], '%') === false) {
-                    $price_adapter['name'] .= ' ('.$price_adapter['value'].'%)';
-                }
-
-                $camp_enrollment_line = null;
-                foreach($enrollment['enrollment_lines_ids'] as $enrollment_line) {
-                    if(in_array($enrollment_line['product_id']['id'], [$enrollment['camp_id']['product_id'], $enrollment['camp_id']['day_product_id']])) {
-                        $camp_enrollment_line = $enrollment_line;
-                    }
-                }
-
-                $price_adapter['value'] = $price_adapter['value'] / 100 * $camp_enrollment_line['price'];
-
-                $map_enrollment_percent_price_adapter[$enrollment['id']] = $price_adapter;
-                break;
-            }
+        foreach($enrollment['fundings_ids'] as $funding) {
+            $remaining_amount -= $funding['paid_amount'];
         }
     }
 }
@@ -213,8 +180,7 @@ $values = [
     'children'                              => $children,
     'date'                                  => strtotime('now'),
     'total_amount'                          => $total_amount,
-    'remaining_amount'                      => $remaining_amount,
-    'map_enrollment_percent_price_adapter'  => $map_enrollment_percent_price_adapter
+    'remaining_amount'                      => $remaining_amount
 ];
 
 $entity = 'sale\camp\Enrollment';
