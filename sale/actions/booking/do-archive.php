@@ -68,6 +68,9 @@ elseif($booking['status'] == 'checkedout') {
     }
     Booking::id($booking['id'])->update(['state' => 'archive']);
 }
+elseif($booking['status'] === 'cancelled') {
+    Booking::id($booking['id'])->update(['state' => 'archive']);
+}
 else {
     throw new Exception("invalid_status_booking", QN_ERROR_INVALID_PARAM);
 }
