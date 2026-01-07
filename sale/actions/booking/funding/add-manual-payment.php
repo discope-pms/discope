@@ -5,6 +5,8 @@
     Original author(s): Yesbabylon SRL
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
+
+use sale\booking\Booking;
 use sale\booking\Payment;
 use sale\booking\Funding;
 
@@ -132,6 +134,8 @@ $payment = Payment::create([
     ])
     ->read(['id'])
     ->first();
+
+Booking::updateStatusFromFundings($orm, [$funding['booking_id']['id']]);
 
 $context->httpResponse()
         ->status(205)
