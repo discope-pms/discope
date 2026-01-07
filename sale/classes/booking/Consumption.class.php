@@ -214,7 +214,13 @@ class Consumption extends Model {
 
             'make_beds' => [
                 'type'              => 'boolean',
-                'description'       => "Should bed linens be provided to the customer and should the beds be made.",
+                'description'       => "Should the beds be made.",
+                'default'           => false
+            ],
+
+            'bed_linens' => [
+                'type'              => 'boolean',
+                'description'       => "Should bed linens be provided to the customer.",
                 'default'           => false
             ],
 
@@ -248,7 +254,18 @@ class Consumption extends Model {
     }
 
     public static function onupdateRentalUnitId($om, $oids, $values, $lang) {
-        $consumptions = $om->read(self::getType(), $oids, ['rental_unit_id', 'rental_unit_id.is_accomodation', 'date', 'booking_line_group_id.date_from', 'booking_line_group_id.date_to', 'booking_line_group_id.make_beds'], $lang);
+        $consumptions = $om->read(self::getType(), $oids,
+            [
+                'rental_unit_id',
+                'rental_unit_id.is_accomodation',
+                'date',
+                'booking_line_group_id.date_from',
+                'booking_line_group_id.date_to',
+                'booking_line_group_id.make_beds',
+                'booking_line_group_id.bed_linens'
+            ],
+            $lang
+        );
 
         if($consumptions > 0) {
             foreach($consumptions as $consumption) {
@@ -259,12 +276,14 @@ class Consumption extends Model {
                 $is_accommodation = $consumption['rental_unit_id.is_accomodation'];
                 $cleanup_type = 'none';
                 $make_beds = false;
+                $bed_linens = false;
 
                 if($is_accommodation) {
                     $is_first_day = $consumption['booking_line_group_id.date_from'] === $consumption['date'];
                     $is_last_day = $consumption['booking_line_group_id.date_to'] === $consumption['date'];
                     if($is_first_day) {
                         $make_beds = $consumption['booking_line_group_id.make_beds'];
+                        $bed_linens = $consumption['booking_line_group_id.bed_linens'];
                     }
                     elseif($is_last_day) {
                         $cleanup_type = 'full';
@@ -278,7 +297,8 @@ class Consumption extends Model {
                     'is_rental_unit'    => true,
                     'is_accomodation'   => $is_accommodation,
                     'cleanup_type'      => $cleanup_type,
-                    'make_beds'         => $make_beds
+                    'make_beds'         => $make_beds,
+                    'bed_linens'        => $bed_linens
                 ]);
             }
         }

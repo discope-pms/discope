@@ -37,6 +37,12 @@
             ["is_accomodation", "=", true],
             ["make_beds", "=", true],
             ["type", "=", "book"]
+        ],
+        [
+            ["center_id", "in", "user.centers_ids"],
+            ["is_accomodation", "=", true],
+            ["bed_linens", "=", true],
+            ["type", "=", "book"]
         ]
     ],
     "operations": {
@@ -85,6 +91,11 @@
             {
                 "type": "field",
                 "value": "make_beds",
+                "width": "20%"
+            },
+            {
+                "type": "field",
+                "value": "bed_linens",
                 "width": "20%"
             }
         ]

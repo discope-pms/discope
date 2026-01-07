@@ -117,6 +117,11 @@
             "description": "Est-ce que les lits doivent être faits?",
             "help": ""
         },
+        "bed_linens": {
+            "label": "Draps fournis",
+            "description": "Est-ce que des draps doivent être fournis?",
+            "help": ""
+        },
         "center_id": {
             "label": "Centre",
             "description": "Le centre auquel se rapporte la consommation.",
