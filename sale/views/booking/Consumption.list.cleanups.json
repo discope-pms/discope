@@ -53,6 +53,12 @@
         "items": [
             {
                 "type": "field",
+                "value": "is_accomodation",
+                "width": "20%",
+                "visible": false
+            },
+            {
+                "type": "field",
                 "value": "date",
                 "width": "20%"
             },
