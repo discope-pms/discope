@@ -84,7 +84,7 @@ $lodgingBookingPrintBookingFormatMember = function($booking) {
 };
 
 $lodgingBookingPrintAgeRangesText = function($booking, $connection_names) {
-    $age_rang_maps = [];
+    $map_age_ranges = [];
 
     foreach($booking['booking_lines_groups_ids'] as $booking_line_group) {
         if(!$booking_line_group['is_sojourn'] || $booking_line_group['group_type'] !== 'sojourn') {
@@ -92,19 +92,19 @@ $lodgingBookingPrintAgeRangesText = function($booking, $connection_names) {
         }
         foreach($booking_line_group['age_range_assignments_ids'] as $age_range_assignment) {
             $age_range_assignment_code = $age_range_assignment['age_range_id']['id'];
-            if(!isset($age_rang_maps[$age_range_assignment_code])) {
-                $age_rang_maps[$age_range_assignment_code] = [
+            if(!isset($map_age_ranges[$age_range_assignment_code])) {
+                $map_age_ranges[$age_range_assignment_code] = [
                     'age_range' => $age_range_assignment['age_range_id']['name'],
                     'qty'       => 0
                 ];
             }
-            $age_rang_maps[$age_range_assignment_code]['qty'] += $age_range_assignment['qty'];
+            $map_age_ranges[$age_range_assignment_code]['qty'] += $age_range_assignment['qty'];
         }
     }
 
-    $parts = array_map(function($item) { return $item['qty'] . ' ' . strtolower($item['age_range']); }, $age_rang_maps);
+    $parts = array_map(function($item) { return $item['qty'] . ' ' . strtolower($item['age_range']) . '(s)'; }, $map_age_ranges);
     $last = array_pop($parts);
-    return count($parts) ? implode(', ', $parts) . ' ' . $connection_names[0] . ' ' . $last : $last;
+    return count($parts) ? (implode(', ', $parts) . ' ' . $connection_names[0] . ' ' . $last) : $last;
 };
 
 /*
