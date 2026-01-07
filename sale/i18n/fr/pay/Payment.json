@@ -127,7 +127,8 @@
     },
     "error": {
         "amount": {
-            "excessive_amount": "Le montant du paiement ne peut pas être supérieur à celui de la ligne d'extrait."
+            "excessive_amount": "Le montant du paiement ne peut pas être supérieur à celui de la ligne d'extrait.",
+            "update_not_allowed": "Le montant du paiement ne peut pas être modifié."
         }
     }
 }

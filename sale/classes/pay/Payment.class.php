@@ -350,6 +350,11 @@ class Payment extends Model {
                     }
                 }
             }
+            elseif($payment['is_manual']) {
+                if(isset($payment['amount'])) {
+                    return ['amount' => ['update_not_allowed' => 'A manual payment amount cannot be updated.']];
+                }
+            }
         }
         return parent::canupdate($om, $ids, $values, $lang);
     }
