@@ -310,12 +310,12 @@ class Payment extends Model {
             return [];
         }
 
-        $payments = $om->read(self::getType(), $ids, ['state', 'is_exported', 'payment_origin', 'amount', 'statement_line_id.amount', 'statement_line_id.remaining_amount'], $lang);
+        $payments = $om->read(self::getType(), $ids, ['state', 'is_exported', 'is_manual', 'payment_origin', 'amount', 'statement_line_id.amount', 'statement_line_id.remaining_amount'], $lang);
         foreach($payments as $pid => $payment) {
             if($payment['is_exported']) {
                 return ['is_exported' => ['non_editable' => 'Once exported a payment can no longer be updated.']];
             }
-            if($payment['payment_origin'] == 'bank') {
+            if($payment['payment_origin'] == 'bank' && !$payment['is_manual']) {
                 if(isset($values['amount'])) {
                     $sign_line = intval($payment['statement_line_id.amount'] > 0) - intval($payment['statement_line_id.amount'] < 0);
                     $sign_payment = intval($values['amount'] > 0) - intval($values['amount'] < 0);
