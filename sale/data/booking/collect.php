@@ -27,6 +27,19 @@ use sale\booking\SojournProductModelRentalUnitAssignement;
             'default'       => 'sale\booking\Booking'
         ],
 
+        'date_filter_type' => [
+            'type'          => 'string',
+            'description'   => "The type of date filter that is used.",
+            'help'          => "First choice date_from: check if the booking's date_from is within the given range. Second choice overlap: check if the booking dates overlap with the given range.",
+            'selection'     => [
+                'date_from',
+                'overlap'
+            ],
+            'default'       => function () {
+                return Setting::get_value('sale', 'features', 'ui.booking.date_filter_type', 'date_from');
+            }
+        ],
+
         'date_from' => [
             'type'          => 'date',
             'description'   => "First date of the time interval.",
@@ -137,11 +150,25 @@ use sale\booking\SojournProductModelRentalUnitAssignement;
 $domain = $params['domain'];
 $bookings_ids = [];
 
-if(isset($params['date_from'])) {
-    $domain = Domain::conditionAdd($domain, ['date_from', '>=', $params['date_from']]);
-}
-if(isset($params['date_to'])) {
-    $domain = Domain::conditionAdd($domain, ['date_from', '<=', $params['date_to']]);
+switch($params['date_filter_type']) {
+    case 'date_from':
+        // Filter on date_from
+        if(isset($params['date_from'])) {
+            $domain = Domain::conditionAdd($domain, ['date_from', '>=', $params['date_from']]);
+        }
+        if(isset($params['date_to'])) {
+            $domain = Domain::conditionAdd($domain, ['date_from', '<=', $params['date_to']]);
+        }
+        break;
+    case 'overlap':
+        // Filter on dates overlap
+        if(isset($params['date_from'])) {
+            $domain = Domain::conditionAdd($domain, ['date_to', '>=', $params['date_from']]);
+        }
+        if(isset($params['date_to'])) {
+            $domain = Domain::conditionAdd($domain, ['date_from', '<=', $params['date_to']]);
+        }
+        break;
 }
 
 if(!empty($params['display_name'])) {
