@@ -117,7 +117,7 @@ if(!in_array($params['payment_method'], $maps_origins_allowed_payment_methods[$p
     throw new Exception("invalid_payment_method", EQ_ERROR_INVALID_PARAM);
 }
 
-$payment = Payment ::create([
+$payment = Payment::create([
         'booking_id'        => $funding['booking_id']['id'],
         'partner_id'        => $funding['booking_id']['customer_id'],
         'center_office_id'  => $funding['center_office_id'],
