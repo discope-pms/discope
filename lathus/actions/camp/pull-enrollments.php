@@ -262,6 +262,11 @@ if(!empty($data)) {
     //  2.3) Add external enrollments
 
     foreach($data as $ext_enrollment) {
+        $ext_enrollment_created = (new DateTime($ext_enrollment['date']))->getTimestamp();
+        if($ext_enrollment_created < strtotime('first day of january this year')) {
+            continue;
+        }
+
         if(!isset($map_soj_nums_camps[$ext_enrollment['metaJson']['numeroCamp']])) {
             continue;
         }
@@ -344,7 +349,7 @@ if(!empty($data)) {
         }
 
         $enrollment = Enrollment::create([
-            'date_created'      => (new DateTime($ext_enrollment['date']))->getTimestamp(),
+            'date_created'      => $ext_enrollment_created,
             'camp_id'           => $camp['id'],
             'child_id'          => $child['id'],
             'main_guardian_id'  => $main_guardian['id'],
