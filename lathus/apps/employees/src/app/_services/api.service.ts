@@ -23,8 +23,8 @@ interface CollectOptions {
 type EntityNamespace = 'identity\\Center'
     | 'sale\\booking\\TimeSlot'
     | 'sale\\catalog\\Category'
-    | 'hr\\Employee'
-    | 'sale\\Provider'
+    | 'hr\\employee\\Employee'
+    | 'sale\\provider\\Provider'
     | 'sale\\catalog\\ProductModel';
 
 @Injectable({
@@ -116,7 +116,7 @@ export class ApiService {
 
     public fetchEmployees(): Observable<Employee[]> {
         return this.modelCollect<Employee>(
-            'hr\\Employee',
+            'hr\\employee\\Employee',
             ['id', 'name', 'relationship', 'is_active', 'activity_product_models_ids'],
             [['relationship', '=', 'employee'], ['is_active', '=', true]]
         );
@@ -124,7 +124,7 @@ export class ApiService {
 
     public fetchProviders(): Observable<Provider[]> {
         return this.modelCollect<Provider>(
-            'sale\\Provider',
+            'sale\\provider\\Provider',
             ['id', 'name', 'relationship', 'is_active'],
             ['relationship', '=', 'provider']
         );
