@@ -111,7 +111,6 @@ if(isset($params['time_slot_id'])) {
 }
 
 if(isset($params['is_not_option']) && $params['is_not_option']) {
-    $bookings_ids = [];
     $bookings_ids = Booking::search([['status', 'not in', ['quote','option']], ['is_cancelled', '=', false]])->ids();
     $domain = Domain::conditionAdd($domain, ['booking_id', 'in', $bookings_ids]);
 }
