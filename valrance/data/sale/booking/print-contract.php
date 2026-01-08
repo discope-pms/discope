@@ -144,7 +144,17 @@ $lodgingBookingPrintAgeRangesText = function($booking, $connection_names) {
         }
     }
 
-    $parts = array_map(function($item) { return $item['qty'] . ' ' . strtolower($item['age_range']) . '(s)'; }, $map_age_ranges);
+    $parts = array_map(
+        function($item) {
+            $age_range = strtolower($item['age_range']);
+            if(str_ends_with($age_range, 's')) {
+                $age_range = substr($age_range, 0, -1);
+            }
+            return $item['qty'] . ' ' . $age_range . '(s)';
+        },
+        $map_age_ranges
+    );
+
     $last = array_pop($parts);
     return count($parts) ? (implode(', ', $parts) . ' ' . $connection_names[0] . ' ' . $last) : $last;
 };
