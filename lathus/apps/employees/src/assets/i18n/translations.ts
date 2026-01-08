@@ -2,6 +2,11 @@ export const translations: { [lang: string]: { [key: string]: string } } = {
     'en': {
 
         /**
+         * Routes
+         */
+        'TITLE_PLANNING_EMPLOYEES': 'Employees planning',
+
+        /**
          * /auth
          */
         'SIGN_IN_CARD_TITLE': 'Connection',
@@ -13,6 +18,11 @@ export const translations: { [lang: string]: { [key: string]: string } } = {
 
     },
     'fr': {
+
+        /**
+         * Routes
+         */
+        'TITLE_PLANNING_EMPLOYEES': 'Calendrier Animateurs',
 
         /**
          * /auth

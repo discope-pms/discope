@@ -14,6 +14,7 @@ import { AppRootComponent } from './app.root.component';
 import { AppComponent } from './in/app.component';
 import { LayoutComponent } from './in/_layout/layout/layout.component';
 import { SignInComponent } from './in/auth/sign-in/sign-in.component';
+import { AppSharedComponentsModule } from './in/_components/shared-components.module';
 
 import { AppSharedPipesModule } from './_pipes/shared-pipes.module';
 import { TranslationService } from './_services/translation.service';
@@ -41,10 +42,12 @@ registerLocaleData(localeFr);
         BrowserModule,
         BrowserAnimationsModule,
         SharedLibModule,
+        AppSharedComponentsModule,
         MatNativeDateModule,
         PlatformModule,
         AppSharedPipesModule,
-        NgxMaterialTimepickerModule.setOpts('fr-BE', 'latn')
+        NgxMaterialTimepickerModule.setOpts('fr-BE', 'latn'),
+        AppSharedComponentsModule
     ],
     providers: [
         { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptorService, multi: true },

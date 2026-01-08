@@ -1,4 +1,5 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit } from '@angular/core';
+import { AppService } from '../../../_services/app.service';
 
 @Component({
     selector: 'planning-employees',
@@ -6,6 +7,12 @@ import { Component, OnInit } from "@angular/core";
     styleUrls: ['planning-employees.component.scss']
 })
 export class PlanningEmployeesComponent implements OnInit  {
+
+    constructor(
+        private app: AppService
+    ) {
+    }
+
     ngOnInit() {
         console.log("test");
     }

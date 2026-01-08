@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AuthService } from 'sb-shared-lib';
 import { Router } from '@angular/router';
@@ -10,7 +10,7 @@ import { Subject } from 'rxjs';
     templateUrl: 'sign-in.component.html',
     styleUrls: ['sign-in.component.scss']
 })
-export class SignInComponent implements OnInit  {
+export class SignInComponent implements OnInit, OnDestroy  {
 
     public showConnectionErrorMsg: boolean = false;
 
@@ -24,7 +24,7 @@ export class SignInComponent implements OnInit  {
         private router: Router
     ) {}
 
-    public ngOnInit() {
+    ngOnInit() {
         this.auth.getObservable().pipe(takeUntil(this.destroy$)).subscribe(user => {
             if(user.id !== 0) {
                 this.router.navigate(['/']);
@@ -37,7 +37,7 @@ export class SignInComponent implements OnInit  {
         });
     }
 
-    public ngOnDestroy() {
+    ngOnDestroy() {
         this.destroy$.next();
         this.destroy$.complete();
     }

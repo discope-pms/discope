@@ -7,7 +7,7 @@ const routes: Routes = [
     {
         path: 'employees',
         component: PlanningEmployeesComponent,
-        data: { showCenterSettingsBtn: true }
+        data: { title: 'TITLE_PLANNING_EMPLOYEES' }
     }
 ];
 

@@ -11,11 +11,7 @@ import { filter } from 'rxjs/operators';
 })
 export class LayoutComponent implements OnInit {
 
-    public centerList: Center[] = [];
-
-    public selectedCenter: Center|null = null;
-
-    public showCenterSettingsBtn: boolean = false;
+    public title = '';
 
     constructor(
         private app: AppService,
@@ -23,15 +19,7 @@ export class LayoutComponent implements OnInit {
         private route: ActivatedRoute
     ) {}
 
-    public ngOnInit() {
-        this.app.centerList$.subscribe(centerList => {
-            this.centerList = centerList;
-        });
-
-        this.app.center$.subscribe(center => {
-            this.selectedCenter = center;
-        });
-
+    ngOnInit() {
         this.router.events.pipe(
             filter(event => event instanceof NavigationEnd)
         ).subscribe(() => {
@@ -48,14 +36,18 @@ export class LayoutComponent implements OnInit {
         }
 
         if (route?.snapshot.data) {
-            this.showCenterSettingsBtn = route.snapshot.data['showCenterSettingsBtn'] ?? false;
+            this.title = route.snapshot.data['title'] ?? '';
         }
         else {
-            this.showCenterSettingsBtn = false;
+            this.title = '';
         }
     }
 
-    public centerChange(center: Center) {
-        this.app.setCenter(center);
+    public back() {
+        console.log('BACK');
+    }
+
+    public goTo(route: string) {
+        console.log('GO TO ' + route);
     }
 }

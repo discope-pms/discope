@@ -106,7 +106,7 @@ export class AppService implements OnDestroy {
         this.loadProductModelList();
     }
 
-    public ngOnDestroy() {
+    ngOnDestroy() {
         this.destroy$.next();
         this.destroy$.complete();
     }
