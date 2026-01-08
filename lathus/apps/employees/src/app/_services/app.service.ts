@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import {BehaviorSubject, combineLatest, forkJoin, Subject} from 'rxjs';
-import {ActivityMap, Category, Center, Partner, ProductModel, TimeSlot} from '../../type';
+import {ActivityMap, Category, Center, Employee, Partner, ProductModel, TimeSlot} from '../../type';
 import { ApiService } from './api.service';
 import { AuthService } from 'sb-shared-lib';
 import {switchMap, takeUntil} from 'rxjs/operators';
@@ -9,11 +9,11 @@ import {switchMap, takeUntil} from 'rxjs/operators';
     providedIn: 'root'
 })
 export class AppService {
-    private centerSubject = new BehaviorSubject<Center|null>(null);
-    public center$ = this.centerSubject.asObservable();
-
     private centerListSubject = new BehaviorSubject<Center[]>([]);
     public centerList$ = this.centerListSubject.asObservable();
+
+    private centerSubject = new BehaviorSubject<Center|null>(null);
+    public center$ = this.centerSubject.asObservable();
 
     private displayTypeSubject = new BehaviorSubject<'day'|'week'>('day');
     public displayType$ = this.displayTypeSubject.asObservable();
@@ -30,33 +30,25 @@ export class AppService {
     private categoryListSubject = new BehaviorSubject<Category[]>([]);
     public categoryList$ = this.categoryListSubject.asObservable();
 
+    private selectedCategoryIdSubject = new BehaviorSubject<number|null>(null);
+    public selectedCategoryId$ = this.selectedCategoryIdSubject.asObservable();
+
     private partnerListSubject = new BehaviorSubject<Partner[]>([]);
     public partnerList$ = this.partnerListSubject.asObservable();
 
-    // TODO: handle selected partners
+    private selectedPartnersIdsSubject = new BehaviorSubject<number[]>([]);
+    public selectedPartnersIds$ = this.selectedPartnersIdsSubject.asObservable();
 
     private productModelListSubject = new BehaviorSubject<ProductModel[]>([]);
     public productModelList$ = this.productModelListSubject.asObservable();
 
-    // TODO: handle product models
+    private selectedProductModelsIdsSubject = new BehaviorSubject<number[]>([]);
+    public selectedProductModelsIds$ = this.selectedProductModelsIdsSubject.asObservable();
 
     private activityMapSubject = new BehaviorSubject<ActivityMap>({});
     public activityMap$ = this.activityMapSubject.asObservable();
 
     private destroy$ = new Subject<void>();
-
-    // Variables:
-    //  - Show only auth user activities (remove the first column)
-    //  - Display type day/week
-    //  - Date (date_from, date_to) (date_to is linked to display type and date from)
-    //  - Timeslots when AM/PM/EV
-    //  - Categories
-    //     - Selected category (auto select product models)
-    //  - Partners
-    //     - Selected partners (with product models ids)
-    //  - Product Models
-    //     - Selected product models (with categories_ids)
-    //  - Activities map (loaded using the variables above, should listen to modifications?)
 
     constructor(
         private api: ApiService,
@@ -74,14 +66,14 @@ export class AppService {
         this.loadProductModelList();
 
         combineLatest([
-            this.partnerList$,
-            this.productModelList$
+            this.selectedPartnersIds$,
+            this.selectedProductModelsIds$
         ])
             .pipe(
                 takeUntil(this.destroy$),
-                switchMap(([partners, productModels]) => {
+                switchMap(([partnersIds, productModelsIds]) => {
                     // Only fetch if all data is available
-                    if (!partners.length || !productModels.length) {
+                    if(!partnersIds.length || !productModelsIds.length) {
                         return []; // or EMPTY from rxjs
                     }
 
@@ -89,8 +81,8 @@ export class AppService {
                     return this.api.fetchActivityMap(
                         this.dateFromSubject.value,
                         this.dateToSubject.value,
-                        partners.map(({ id }) => id),
-                        productModels.map(({ id }) => id)
+                        partnersIds,
+                        productModelsIds
                     );
                 })
             )
@@ -109,10 +101,10 @@ export class AppService {
         this.api.fetchCentersByIds(centerIds)
             .pipe(takeUntil(this.destroy$))
             .subscribe({
-                next: (data) => {
-                    if(data.length > 0) {
-                        this.centerListSubject.next(data);
-                        this.centerSubject.next(data[0]);
+                next: (centers) => {
+                    if(centers.length > 0) {
+                        this.centerListSubject.next(centers);
+                        this.centerSubject.next(centers[0]);
                     }
                     else {
                         console.error('No access to any center!');
@@ -128,9 +120,9 @@ export class AppService {
         this.api.fetchTimeSlots()
             .pipe(takeUntil(this.destroy$))
             .subscribe({
-                next: (data) => {
-                    if(data.length > 0) {
-                        this.timeSlotListSubject.next(data);
+                next: (timeSlots) => {
+                    if(timeSlots.length > 0) {
+                        this.timeSlotListSubject.next(timeSlots);
                     }
                     else {
                         console.error('No time slots AM, PM and EV defined!');
@@ -146,9 +138,9 @@ export class AppService {
         this.api.fetchActivityCategories()
             .pipe(takeUntil(this.destroy$))
             .subscribe({
-                next: (data) => {
-                    if(data.length > 0) {
-                        this.categoryListSubject.next(data);
+                next: (categories) => {
+                    if(categories.length > 0) {
+                        this.categoryListSubject.next(categories);
                     }
                     else {
                         console.error('No categories defined!');
@@ -169,9 +161,11 @@ export class AppService {
             .subscribe({
                 next: ({ employees, providers }) => {
                     const combined = [...employees, ...providers]; // merge the two arrays
-                    if (combined.length > 0) {
+                    if(combined.length > 0) {
                         this.partnerListSubject.next(combined);
-                    } else {
+                        this.selectedPartnersIdsSubject.next(combined.map(partner => partner.id));
+                    }
+                    else {
                         console.error('No partners defined!');
                     }
                 },
@@ -185,9 +179,10 @@ export class AppService {
         this.api.fetchProductModels()
             .pipe(takeUntil(this.destroy$))
             .subscribe({
-                next: (data) => {
-                    if(data.length > 0) {
-                        this.productModelListSubject.next(data);
+                next: (productModels) => {
+                    if(productModels.length > 0) {
+                        this.productModelListSubject.next(productModels);
+                        this.selectedProductModelsIdsSubject.next(productModels.map(productModel => productModel.id));
                     }
                     else {
                         console.error('No product models defined!');

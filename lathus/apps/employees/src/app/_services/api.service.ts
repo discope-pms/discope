@@ -139,11 +139,14 @@ export class ApiService {
     }
 
     public fetchActivityMap(dateFrom: Date, dateTo: Date, partnersIds: number[], productModelsIds: number[]): Observable<ActivityMap> {
+        // date_to isn't included
+        dateTo.setDate(dateTo.getDate() + 1);
+
         const options = {
             headers: this.headers,
             params: {
-                date_from: dateFrom.toISOString(),
-                date_to: dateTo.toISOString(),
+                date_from: dateFrom.toISOString().split('T')[0],
+                date_to: dateTo.toISOString().split('T')[0],
                 partners_ids: JSON.stringify(partnersIds),
                 product_model_ids: JSON.stringify(productModelsIds)
             }
