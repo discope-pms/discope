@@ -980,7 +980,7 @@ if($booking['center_id']['template_category_id']) {
             $value = str_replace('{nb_pers}', $text_pers, $value);
 
             if($booking['customer_id']['rate_class_id']) {
-                $part_name = 'service_'. $booking['customer_id']['rate_class_id']['name'];
+                $part_name = 'service_'. $booking['customer_id']['rate_class_id']['code'];
                 $template_part = TemplatePart::search([['name', '=', $part_name], ['template_id', '=', $template['id']] ])
                         ->read(['value'], $params['lang'])
                         ->first(true);
@@ -998,7 +998,7 @@ if($booking['center_id']['template_category_id']) {
         // engagements the customer pledges to comply with
         elseif($part['name'] == 'engage') {
             if($booking['customer_id']['rate_class_id']) {
-                $part_name = 'engage_'. $booking['customer_id']['rate_class_id']['name'];
+                $part_name = 'engage_'. $booking['customer_id']['rate_class_id']['code'];
                 $template_part = TemplatePart::search([['name', '=', $part_name], ['template_id', '=', $template['id']] ])
                         ->read(['value'], $params['lang'])
                         ->first(true);
