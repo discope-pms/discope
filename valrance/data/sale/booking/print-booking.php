@@ -164,7 +164,9 @@ $fields = [
         'rate_class_id' => ['id', 'name', 'code'],
         'partner_identity_id' => [
             'id',
+            'type_id',
             'display_name',
+            'legal_name',
             'accounting_account',
             'type',
             'address_street', 'address_dispatch', 'address_city', 'address_zip', 'address_country',
@@ -327,6 +329,12 @@ $center_office_code = (isset( $booking['center_id']['center_office_id']['code'])
 // $has_activity = Setting::get_value('sale', 'features', 'booking.activity', true);
 $has_activity = false;
 
+$customer_name = $booking['customer_id']['partner_identity_id']['display_name'];
+if($booking['customer_id']['partner_identity_id']['type_id'] !== 1) {
+    $customer_name = $booking['customer_id']['partner_identity_id']['legal_name'];
+}
+$customer_name = substr($customer_name, 0, 66);
+
 $consumption_table_show  = Setting::get_value('sale', 'features', 'templates.quote.consumption_table', 1);
 $values = [
     'attn_address1'              => '',
@@ -364,7 +372,7 @@ $values = [
     'customer_address2'          => $booking['customer_id']['partner_identity_id']['address_zip'].' '.$booking['customer_id']['partner_identity_id']['address_city'].(($booking['customer_id']['partner_identity_id']['address_country'] != 'BE')?(' - '.$booking['customer_id']['partner_identity_id']['address_country']):''),
     'customer_country'           => $booking['customer_id']['partner_identity_id']['address_country'],
     'customer_has_vat'           => (int) $booking['customer_id']['partner_identity_id']['has_vat'],
-    'customer_name'              => substr($booking['customer_id']['partner_identity_id']['display_name'], 0, 66),
+    'customer_name'              => $customer_name,
     'customer_vat'               => $booking['customer_id']['partner_identity_id']['vat_number'],
     'date'                       => date('d/m/Y', $booking['modified']),
     'has_footer'                 => 0,

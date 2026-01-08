@@ -119,6 +119,8 @@ if(empty($output)) {
             'partner_identity_id' => [
                 'id',
                 'display_name',
+                'legal_name',
+                'type_id',
                 'type',
                 'address_street', 'address_dispatch', 'address_city', 'address_zip', 'address_country',
                 'type',
@@ -192,6 +194,12 @@ if(empty($output)) {
         $printable_code = substr($printable_code, 1);
     }
 
+    $customer_name = $booking['customer_id']['partner_identity_id']['display_name'];
+    if($booking['customer_id']['partner_identity_id']['type_id'] !== 1) {
+        $customer_name = $booking['customer_id']['partner_identity_id']['legal_name'];
+    }
+    $customer_name = substr($customer_name, 0, 66);
+
     $values = [
         'activities_map'             => '',
         'attn_address1'              => '',
@@ -202,7 +210,7 @@ if(empty($output)) {
         'company_reg_number'         => $booking['center_id']['organisation_id']['registration_number'],
         'customer_address1'          => $booking['customer_id']['partner_identity_id']['address_street'],
         'customer_address2'          => $booking['customer_id']['partner_identity_id']['address_zip'].' '.$booking['customer_id']['partner_identity_id']['address_city'].(($booking['customer_id']['partner_identity_id']['address_country'] != 'BE')?(' - '.$booking['customer_id']['partner_identity_id']['address_country']):''),
-        'customer_name'              => substr($booking['customer_id']['partner_identity_id']['display_name'], 0, 66),
+        'customer_name'              => $customer_name,
         'header_img_url'             => $img_url ?? 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8Xw8AAoMBgDTD2qgAAAAASUVORK5CYII=',
         'postal_address'             => sprintf("%s - %s %s", $booking['center_id']['organisation_id']['address_street'], $booking['center_id']['organisation_id']['address_zip'], $booking['center_id']['organisation_id']['address_city']),
         'time_slots_activities'      => [],
