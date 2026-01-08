@@ -33,6 +33,8 @@ export interface Provider extends Partner {
 }
 
 export interface ProductModel extends Model {
+    categories_ids: number[],
+    has_transport_required: boolean
 }
 
 export interface ActivityMap {
@@ -131,7 +133,7 @@ interface ActivityMapPartnerIdentity {
 interface ActivityMapPartner {
     id: number,
     name: string,
-    relationship: "employee" | "provider"
+    relationship: 'employee' | 'provider'
 }
 
 interface ActivityMapAgeRangeAssignment {
@@ -142,62 +144,4 @@ interface ActivityMapAgeRangeAssignment {
     age_to: number;
 }
 
-export interface CustomerIdentity extends Model {
-    display_name: string
-}
-
-export interface Booking extends Model {
-    date_from: string,
-    date_to: string,
-    customer_identity_id: CustomerIdentity|number,
-    center_id: Center|number
-}
-
-export type TypeMeter = 'water'|'gas'|'electricity'|'gas tank'|'oil tank';
-export type MeterUnit = 'm3'|'kWh'|'L'|'%'|'cm';
-
-export interface ConsumptionMeter extends Model {
-    center_id: number,
-    type_meter: TypeMeter,
-    index_value: number,
-    coefficient: number,
-    meter_number: string,
-    has_ean: boolean,
-    meter_ean: string,
-    meter_unit: MeterUnit,
-    product_id: number,
-    description_meter: string
-}
-
-export type TypeInspection = 'checkedin'|'checkedout';
-export type InspectionStatus = 'pending'|'submitted'|'billed';
-
-export interface BookingInspection extends Model {
-    booking_id: Booking|number,
-    type_inspection: TypeInspection,
-    date_inspection: string,
-    status: InspectionStatus
-}
-
-export interface ConsumptionMeterReading extends Model {
-    booking_inspection_id: BookingInspection|number,
-    consumption_meter_id: ConsumptionMeter|number,
-    booking_id: Booking|number,
-    center_id: Center|number,
-    date_reading: string,
-    index_value: number,
-    unit_price: number
-}
-
-export interface Product extends Model {
-}
-
-export interface ContactIdentity extends Model {
-    email: string|null
-}
-
-export interface BookingContact extends Model {
-    booking_id: Booking|number,
-    partner_identity_id: ContactIdentity|number,
-    type: 'booking'|'invoice'|'contract'|'sojourn'
-}
+export type TypeDisplay = 'day' | 'week';

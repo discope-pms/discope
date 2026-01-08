@@ -1,21 +1,22 @@
-import { Injectable } from '@angular/core';
-import {BehaviorSubject, combineLatest, forkJoin, Subject} from 'rxjs';
-import {ActivityMap, Category, Center, Employee, Partner, ProductModel, TimeSlot} from '../../type';
+import { Injectable, OnDestroy } from '@angular/core';
+import { BehaviorSubject, combineLatest, forkJoin, Subject } from 'rxjs';
+import { ActivityMap, Category, Center, Partner, ProductModel, TimeSlot, TypeDisplay } from '../../type';
 import { ApiService } from './api.service';
 import { AuthService } from 'sb-shared-lib';
-import {switchMap, takeUntil} from 'rxjs/operators';
+import { switchMap, takeUntil } from 'rxjs/operators';
 
 @Injectable({
     providedIn: 'root'
 })
-export class AppService {
+export class AppService implements OnDestroy {
+
     private centerListSubject = new BehaviorSubject<Center[]>([]);
     public centerList$ = this.centerListSubject.asObservable();
 
     private centerSubject = new BehaviorSubject<Center|null>(null);
     public center$ = this.centerSubject.asObservable();
 
-    private displayTypeSubject = new BehaviorSubject<'day'|'week'>('day');
+    private displayTypeSubject = new BehaviorSubject<TypeDisplay>('day');
     public displayType$ = this.displayTypeSubject.asObservable();
 
     private dateFromSubject = new BehaviorSubject<Date>(new Date());
@@ -54,17 +55,14 @@ export class AppService {
         private api: ApiService,
         private auth: AuthService
     ) {
+        // Load center when user authenticated
         this.auth.getObservable()
             .pipe(takeUntil(this.destroy$))
             .subscribe(user => {
                 this.loadCenterList(user.centers_ids);
             });
 
-        this.loadTimeSlotList();
-        this.loadCategoryList();
-        this.loadPartnerList();
-        this.loadProductModelList();
-
+        // Listen to change of selected partners or product models to reload the activity map
         combineLatest([
             this.selectedPartnersIds$,
             this.selectedProductModelsIds$
@@ -78,12 +76,7 @@ export class AppService {
                     }
 
                     // Call API to fetch activity map
-                    return this.api.fetchActivityMap(
-                        this.dateFromSubject.value,
-                        this.dateToSubject.value,
-                        partnersIds,
-                        productModelsIds
-                    );
+                    return this.api.fetchActivityMap(this.dateFromSubject.value, this.dateToSubject.value, partnersIds, productModelsIds);
                 })
             )
             .subscribe({
@@ -95,7 +88,32 @@ export class AppService {
                     console.error('Error fetching activity map:', error);
                 }
             });
+
+        // Listen to change of "date from" to modify "date to", if necessary
+        this.dateFrom$
+            .pipe(takeUntil(this.destroy$))
+            .subscribe(dateFrom => this.handleChangeDateFrom(dateFrom));
+
+        // Listen to change of selected category to update selected product models
+        this.selectedCategoryId$
+            .pipe(takeUntil(this.destroy$))
+            .subscribe(categoryId => this.handleChangeCategory(categoryId));
+
+        // Load needed data
+        this.loadTimeSlotList();
+        this.loadCategoryList();
+        this.loadPartnerList();
+        this.loadProductModelList();
     }
+
+    public ngOnDestroy() {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
+
+    /**
+     * LOADERS
+     */
 
     private loadCenterList(centerIds: number[]) {
         this.api.fetchCentersByIds(centerIds)
@@ -194,16 +212,53 @@ export class AppService {
             });
     }
 
-    public ngOnDestroy() {
-        this.destroy$.next();
-        this.destroy$.complete();
-    }
+    /**
+     * SETTERS
+     */
 
     public setCenter(center: Center|null) {
         this.centerSubject.next(center);
     }
 
-    public setDisplayType(displayType: 'day'|'week') {
+    public setDisplayType(displayType: TypeDisplay) {
         this.displayTypeSubject.next(displayType);
+    }
+
+    public setCategory(categoryId: number) {
+        this.selectedCategoryIdSubject.next(categoryId);
+    }
+
+    public setSelectedPartnersIds(partnersIds: number[]) {
+        this.selectedPartnersIdsSubject.next(partnersIds);
+    }
+
+    public setSelectedProductModelsIds(productModelsIds: number[]) {
+        this.selectedProductModelsIdsSubject.next(productModelsIds);
+    }
+
+    /**
+     * CHANGE HANDLERS
+     */
+
+    private handleChangeDateFrom(dateFrom: Date) {
+        const dateTo = this.dateToSubject.value;
+        if(dateTo.getTime() < dateFrom.getTime()) {
+            this.dateToSubject.next(new Date(dateFrom.getTime()));
+        }
+    }
+
+    private handleChangeCategory(categoryId: number|null) {
+        if(!categoryId) {
+            this.selectedProductModelsIdsSubject.next(this.productModelListSubject.value.map(productModel => productModel.id));
+            return;
+        }
+
+        const productModelsIds: number[] = [];
+        for(let productModel of this.productModelListSubject.value) {
+            if(productModel.categories_ids.includes(categoryId)) {
+                productModelsIds.push(productModel.id);
+            }
+        }
+        this.selectedProductModelsIdsSubject.next(productModelsIds);
     }
 }
