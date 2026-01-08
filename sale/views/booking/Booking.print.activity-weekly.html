@@ -113,7 +113,14 @@ div.footer {
     </div>
 
     <div class="sojourn-info">
-        <div><b>{{ booking.customer_identity_id.name }}</b> ({{ booking.customer_identity_id.address_city }})</div>
+        <div>
+            {% if booking.customer_identity_id.type_id == 1 %}
+                <b>{{ booking.customer_identity_id.display_name }}</b>
+            {% else %}
+                <b>{{ booking.customer_identity_id.legal_name }}</b>
+            {% endif %}
+            <span>({{ booking.customer_identity_id.address_city }})</span>
+        </div>
         <div style="margin-top: 5px;">Du {{ booking.date_from|format_date() }} au {{ booking.date_to|format_date() }}</div>
     </div>
 </div>

@@ -140,7 +140,9 @@ $booking = Booking::id($params['id'])
         'date_to',
         'activity_weeks_descriptions',
         'customer_identity_id' => [
-            'name',
+            'type_id',
+            'display_name',
+            'legal_name',
             'address_city'
         ],
         'booking_activities_ids' => [
