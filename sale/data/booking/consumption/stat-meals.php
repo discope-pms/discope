@@ -1,7 +1,7 @@
 <?php
 /*
     This file is part of the Discope property management software <https://github.com/discope-pms/discope>
-    Some Rights Reserved, Discope PMS, 2020-2024
+    Some Rights Reserved, Discope PMS, 2020-2026
     Original author(s): Yesbabylon SRL
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
@@ -11,23 +11,24 @@ use sale\booking\Booking;
 use sale\booking\Consumption;
 use sale\customer\AgeRange;
 
-list($params, $providers) = announce([
-    'description'   => 'Provides data about current Centers capacities (according to configuration).',
+[$params, $providers] = eQual::announce([
+    'description'   => "Provides data about current Centers capacities (according to configuration).",
     'params'        => [
         'center_id' => [
             'type'              => 'many2one',
             'foreign_object'    => 'identity\Center',
-            'description'       => "Output: Center of the sojourn / Input: The center for which the stats are required."
+            'description'       => "Output: Center of the sojourn / Input: The center for which the stats are required.",
+            'default'           => fn() => Center::search()->ids()[0] ?? null
         ],
         'date_from' => [
-            'type'          => 'date',
-            'description'   => "Last date of the time interval.",
-            'default'       => strtotime("-1 Week")
+            'type'              => 'date',
+            'description'       => "Last date of the time interval.",
+            'default'           => strtotime("-1 Week")
         ],
         'date_to' => [
-            'type'          => 'date',
-            'description'   => "First date of the time interval.",
-            'default'       => strtotime("+1 Week")
+            'type'              => 'date',
+            'description'       => "First date of the time interval.",
+            'default'           => strtotime("+1 Week")
         ],
         'booking_options' => [
             'type'              => 'string',
@@ -74,150 +75,152 @@ list($params, $providers) = announce([
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'     => [ 'context', 'orm', 'adapt' ]
+    'providers'     => ['context', 'orm', 'adapt']
 ]);
 
 /**
- * @var \equal\php\Context          $context
- * @var \equal\orm\ObjectManager    $orm
- * @var \equal\data\DataAdapter     $adapter
+ * @var \equal\php\Context  $context
  */
-list($context, $orm, $adapter) = [ $providers['context'], $providers['orm'], $providers['adapt'] ];
+['context' => $context] = $providers;
 
+$center = Center::id($params['center_id'])
+    ->read(['id', 'name'])
+    ->first();
 
-$center = Center::id($params['center_id'])->read(['id', 'name'])->first(true);
-if($center){
-    $consumptions = Consumption::search([[
-                ['center_id', '=', $center['id']],
-                ['is_meal', '=', true],
-                ['disclaimed', '=', false],
-                ['date', '>=', $params['date_from']],
-                ['date', '<=', $params['date_to']]
-        ],
-        [
-                ['center_id', '=', $center['id']],
-                ['is_snack', '=', true],
-                ['disclaimed', '=', false],
-                ['date', '>=', $params['date_from']],
-                ['date', '<=', $params['date_to']]
-        ]])
-        ->read([
-            'id',
-            'date',
-            'time_slot_id' => ['id', 'code'],
-            'schedule_from',
-            'schedule_to',
-            'booking_id',
-            'age_range_id',
-            'is_meal',
-            'is_snack',
-            'product_model_id' => ['id','name'],
-            'qty'
-        ])
-        ->get();
-
-
-    $bookings_ids = Booking::search()->ids();
-    $bookings = Booking::ids($bookings_ids)->read(['id','status','is_cancelled'])->get();
-
-    $map_bookings  = [];
-    foreach($bookings as $booking_id => $booking) {
-        if($params['booking_options'] == 'is_not_option' && in_array($booking['status'], ['quote', 'option'])) {
-            continue;
-        }
-        if($booking['is_cancelled']) {
-            continue;
-        }
-        $map_bookings[$booking_id] = true;
-    }
-
-    $ages_ranges = AgeRange::search()->ids();
-    $map_consumptions = [];
-    foreach($consumptions as $id => $consumption) {
-
-        if(!isset($map_bookings[$consumption['booking_id']])){
-            continue;
-        }
-
-        $date_index = date('Y-m-d', $consumption['date']);
-
-        if(!isset($map_consumptions[$date_index])) {
-            $map_consumptions[$date_index] = [];
-        }
-        $age_index = isset($consumption['age_range_id']) ? $consumption['age_range_id'] : $ages_ranges[0];
-        if(!isset($map_consumptions[$date_index][$age_index])) {
-            $map_consumptions[$date_index][$age_index] = [];
-        }
-
-        $total_snack = 0;
-        $total_breakfast = 0;
-        $total_lunch = 0;
-        $total_diner = 0;
-        if ($consumption['is_meal']){
-            if(isset($consumption['time_slot_id']['code'])) {
-                switch($consumption['time_slot_id']['code']) {
-                    case "B":
-                        $total_breakfast += $consumption['qty'];
-                        break;
-                    case "L":
-                        $total_lunch += $consumption['qty'];
-                        break;
-                    case "D":
-                        $total_diner += $consumption['qty'];
-                        break;
-                }
-            }
-            else {
-                if(stripos($consumption['product_model_id']['name'], 'matin') !== false) {
-                    $total_breakfast += $consumption['qty'];
-                }
-                elseif(stripos($consumption['product_model_id']['name'], 'midi') !== false) {
-                    $total_lunch += $consumption['qty'];
-                }
-                elseif(stripos($consumption['product_model_id']['name'], 'soir') !== false) {
-                    $total_diner += $consumption['qty'];
-                }
-            }
-        } else if($consumption['is_snack']) {
-            $total_snack += $consumption['qty'];
-        }
-
-
-        $map_consumptions[$date_index][$age_index][] = [
-            'date'                       => $consumption['date'],
-            'age_range_id'               => $age_index,
-            'total_snack'                => $total_snack,
-            'total_breakfast'            => $total_breakfast,
-            'total_lunch'                => $total_lunch,
-            'total_diner'                => $total_diner
-        ];
-
-    }
+if(!$center) {
+    throw new Exception("unknown_center", EQ_ERROR_UNKNOWN_OBJECT);
 }
+
+$consumptions_domain = [
+    [
+        ['center_id', '=', $center['id']],
+        ['is_meal', '=', true],
+        ['disclaimed', '=', false],
+        ['date', '>=', $params['date_from']],
+        ['date', '<=', $params['date_to']]
+    ],
+    [
+        ['center_id', '=', $center['id']],
+        ['is_snack', '=', true],
+        ['disclaimed', '=', false],
+        ['date', '>=', $params['date_from']],
+        ['date', '<=', $params['date_to']]
+    ]
+];
+
+$consumptions = Consumption::search($consumptions_domain)
+    ->read([
+        'date',
+        'qty',
+        'schedule_from',
+        'schedule_to',
+        'age_range_id',
+        'is_meal',
+        'is_snack',
+        'booking_id',
+        'time_slot_id'      => ['code'],
+        'product_model_id'  => ['name']
+    ])
+    ->get();
+
+$map_bookings_ids = [];
+foreach($consumptions as $consumption) {
+    $map_bookings_ids[$consumption['booking_id']] = true;
+}
+
+$bookings = Booking::ids(array_keys($map_bookings_ids))
+    ->read(['status', 'is_cancelled'])
+    ->get();
+
+$age_ranges_ids = AgeRange::search()->ids();
+$map_consumptions_totals = [];
+foreach($consumptions as $id => $consumption) {
+    $booking = $bookings[$consumption['booking_id']];
+    if($params['booking_options'] === 'is_not_option' && in_array($booking['status'], ['quote', 'option'])) {
+        continue;
+    }
+    if($booking['is_cancelled']) {
+        continue;
+    }
+
+    $date_index = date('Y-m-d', $consumption['date']);
+    if(!isset($map_consumptions_totals[$date_index])) {
+        $map_consumptions_totals[$date_index] = [];
+    }
+
+    $age_range_id = $consumption['age_range_id'] ?? $age_ranges_ids[0];
+    if(!isset($map_consumptions_totals[$date_index][$age_range_id])) {
+        $map_consumptions_totals[$date_index][$age_range_id] = [];
+    }
+
+    $total_snack = 0;
+    $total_breakfast = 0;
+    $total_lunch = 0;
+    $total_diner = 0;
+    if($consumption['is_meal']) {
+        if(isset($consumption['time_slot_id']['code'])) {
+            switch($consumption['time_slot_id']['code']) {
+                case 'B':
+                    $total_breakfast += $consumption['qty'];
+                    break;
+                case 'L':
+                    $total_lunch += $consumption['qty'];
+                    break;
+                case 'D':
+                    $total_diner += $consumption['qty'];
+                    break;
+            }
+        }
+        else {
+            if(stripos($consumption['product_model_id']['name'], 'matin') !== false) {
+                $total_breakfast += $consumption['qty'];
+            }
+            elseif(stripos($consumption['product_model_id']['name'], 'midi') !== false) {
+                $total_lunch += $consumption['qty'];
+            }
+            elseif(stripos($consumption['product_model_id']['name'], 'soir') !== false) {
+                $total_diner += $consumption['qty'];
+            }
+        }
+    }
+    elseif($consumption['is_snack']) {
+        $total_snack += $consumption['qty'];
+    }
+
+    if(!isset($map_consumptions_totals[$date_index][$age_range_id])) {
+        $map_consumptions_totals[$date_index][$age_range_id] = [
+            'date'                       => $consumption['date'],
+            'age_range_id'               => $age_range_id,
+            'total_snack'                => 0,
+            'total_breakfast'            => 0,
+            'total_lunch'                => 0,
+            'total_diner'                => 0
+        ];
+    }
+
+    $map_consumptions_totals[$date_index][$age_range_id]['total_snack'] += $total_snack;
+    $map_consumptions_totals[$date_index][$age_range_id]['total_breakfast'] += $total_breakfast;
+    $map_consumptions_totals[$date_index][$age_range_id]['total_lunch'] += $total_lunch;
+    $map_consumptions_totals[$date_index][$age_range_id]['total_diner'] += $total_diner;
+}
+
 $result = [];
 
-$ages_ranges = AgeRange::search()->read(['id','name'])->get(true);
-foreach($map_consumptions as $date => $ages) {
-    foreach($ages as $age_index => $items) {
-        $total_breakfast  = 0 ;
-        $total_snack  = 0 ;
-        $total_lunch  = 0 ;
-        $total_diner  = 0 ;
-        $total = 0;
-        foreach($items as $item) {
-            $total_snack += $item['total_snack'];
-            $total_breakfast += $item['total_breakfast'];
-            $total_lunch += $item['total_lunch'];
-            $total_diner += $item['total_diner'];
-            $total = $total_snack + $total_breakfast + $total_lunch + $total_diner;
-        }
+$ages_ranges = AgeRange::search()
+    ->read(['id','name'])
+    ->get();
+
+foreach($map_consumptions_totals as $date => $ages) {
+    foreach($ages as $age_range_id => $consumptions_totals) {
+        $total = $consumptions_totals['total_snack'] + $consumptions_totals['total_breakfast'] + $consumptions_totals['total_lunch'] + $consumptions_totals['total_diner'];
+
         $result[] = [
             'date'                   => $date,
-            'age_range_id'           => $ages_ranges[$age_index],
-            'total_snack'            => $total_snack,
-            'total_breakfast'        => $total_breakfast,
-            'total_lunch'            => $total_lunch,
-            'total_diner'            => $total_diner,
+            'age_range_id'           => $ages_ranges[$age_range_id],
+            'total_snack'            => $consumptions_totals['total_snack'],
+            'total_breakfast'        => $consumptions_totals['total_breakfast'],
+            'total_lunch'            => $consumptions_totals['total_lunch'],
+            'total_diner'            => $consumptions_totals['total_diner'],
             'total'                  => $total
         ];
     }
