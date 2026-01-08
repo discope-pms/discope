@@ -173,8 +173,10 @@ $fields = [
                 'id',
                 'display_name',
                 'legal_name',
+                'short_name',
                 'accounting_account',
                 'type',
+                'type_id',
                 'address_street', 'address_dispatch', 'address_city', 'address_zip', 'address_country',
                 'type',
                 'phone',
@@ -227,6 +229,7 @@ $fields = [
         'contacts_ids' => [
             'type',
             'partner_identity_id' => [
+                'type_id',
                 'display_name',
                 'legal_name',
                 'phone',
@@ -419,7 +422,15 @@ $member_name = $lodgingBookingPrintBookingFormatMember($booking);
 $center_office_code = (isset( $booking['center_id']['center_office_id']['code']) && $booking['center_id']['center_office_id']['code'] == 1) ? 'GG' : 'GA';
 
 $postal_address = sprintf("%s - %s %s", $booking['center_id']['organisation_id']['address_street'], $booking['center_id']['organisation_id']['address_zip'], $booking['center_id']['organisation_id']['address_city']);
-$customer_name = substr($booking['customer_id']['partner_identity_id']['legal_name'], 0,  65);
+
+$customer_name = $customer_short_name = $booking['customer_id']['partner_identity_id']['display_name'];
+if($booking['customer_id']['partner_identity_id']['type_id'] !== 1) {
+    $customer_name = $booking['customer_id']['partner_identity_id']['legal_name'];
+    $customer_short_name = $booking['customer_id']['partner_identity_id']['short_name'];
+}
+
+$customer_name = substr($customer_name, 0,  65);
+$customer_short_name = substr($customer_short_name, 0,  65);
 $customer_address = $booking['customer_id']['partner_identity_id']['address_street'] .' '. $booking['customer_id']['partner_identity_id']['address_zip'].' '.$booking['customer_id']['partner_identity_id']['address_city'];
 
 // #memo - client has request no to show activites on booking/contract but always use disctint doc (print-booking-activity)
@@ -510,6 +521,7 @@ $values = [
     'customer_country'              => $booking['customer_id']['partner_identity_id']['address_country'],
     'customer_has_vat'              => (int) $booking['customer_id']['partner_identity_id']['has_vat'],
     'customer_name'                 => $customer_name,
+    'customer_short_name'           => $customer_short_name,
     'customer_vat'                  => $booking['customer_id']['partner_identity_id']['vat_number'],
     'date'                          => date('d/m/Y', $contract['created']),
     'fundings'                      => [],
@@ -617,15 +629,36 @@ if($booking['customer_id']['partner_identity_id']['id'] != $booking['customer_id
 /*
     retrieve contact for booking
 */
+$contract_contact = null;
+$booking_contact = null;
+$other_contacts = [];
 foreach($booking['contacts_ids'] as $contact) {
-    if(strlen($values['contact_name']) == 0 || $contact['type'] == 'booking') {
-        // overwrite data of customer with contact info
-
-        $contact_name = str_replace(["Dr", "Ms", "Mrs", "Mr", "Pr"], ["Dr", "Melle", "Mme", "Mr", "Pr"], $contact['partner_identity_id']['title']) . ' ' . $contact['partner_identity_id']['display_name'];
-        $values['contact_name'] =  $contact_name;
-        $values['contact_phone'] = (strlen($contact['partner_identity_id']['phone']))?$contact['partner_identity_id']['phone']:$contact['partner_identity_id']['mobile'];
-        $values['contact_email'] = $contact['partner_identity_id']['email'];
+    switch($contact['type']) {
+        case 'contract':
+            $contract_contact = $contact;
+            break;
+        case 'booking':
+            $booking_contact = $contact;
+            break;
+        default:
+            $other_contacts[] = $contact;
+            break;
     }
+}
+
+$contact = $contract_contact ?? ($booking_contact ?? ($other_contacts[0] ?? null));
+if(!is_null($contact)) {
+    $contact_name = $contact['partner_identity_id']['display_name'];
+    if($contact['partner_identity_id']['type_id'] !== 1) {
+        $contact_name = $contact['partner_identity_id']['legal_name'];
+    }
+    if(!empty($contact['partner_identity_id']['title'])) {
+        $contact_name = str_replace(["Dr", "Ms", "Mrs", "Mr", "Pr"], ["Dr", "Melle", "Mme", "Mr", "Pr"], $contact['partner_identity_id']['title']) . ' ' . $contact_name;
+    }
+
+    $values['contact_name'] =  $contact_name;
+    $values['contact_phone'] = !empty($contact['partner_identity_id']['phone']) ? $contact['partner_identity_id']['phone'] : $contact['partner_identity_id']['mobile'];
+    $values['contact_email'] = $contact['partner_identity_id']['email'];
 }
 
 /*
@@ -709,6 +742,7 @@ if($booking['center_id']['template_category_id']) {
         $value = str_replace('{center}', $booking['center_id']['name'], $value);
         $value = str_replace('{address}', $postal_address, $value);
         $value = str_replace('{customer}', $customer_name, $value);
+        $value = str_replace('{customer_short}', $customer_short_name, $value);
         $value = str_replace('{customer_address}', $customer_address, $value);
         $value = str_replace('{contact}', $contact_name, $value);
         $value = str_replace('{price}', $booking['price'], $value);
@@ -946,7 +980,7 @@ if($booking['center_id']['template_category_id']) {
             $value = str_replace('{nb_pers}', $text_pers, $value);
 
             if($booking['customer_id']['rate_class_id']) {
-                $part_name = 'service_'. $booking['customer_id']['rate_class_id']['name'];
+                $part_name = 'service_'. $booking['customer_id']['rate_class_id']['code'];
                 $template_part = TemplatePart::search([['name', '=', $part_name], ['template_id', '=', $template['id']] ])
                         ->read(['value'], $params['lang'])
                         ->first(true);
@@ -964,7 +998,7 @@ if($booking['center_id']['template_category_id']) {
         // engagements the customer pledges to comply with
         elseif($part['name'] == 'engage') {
             if($booking['customer_id']['rate_class_id']) {
-                $part_name = 'engage_'. $booking['customer_id']['rate_class_id']['name'];
+                $part_name = 'engage_'. $booking['customer_id']['rate_class_id']['code'];
                 $template_part = TemplatePart::search([['name', '=', $part_name], ['template_id', '=', $template['id']] ])
                         ->read(['value'], $params['lang'])
                         ->first(true);

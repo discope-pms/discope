@@ -627,9 +627,14 @@ div.footer {
     <table style="width: 100%; page-break-inside: avoid;">
         <tr>
             <td style="width: 60%;">
-                <div>{{i18n['member']}} {{ member }}
+                <div>
+                    <span>{{i18n['member']}} {{ member }}</span>
                     {% if contact_name|length > 0 %}
-                    <br />{{ contact_name }}
+                        <br />
+                        <span><i>{{ contact_name }}</i></span>
+                        {% if customer_short_name|length > 0 and customer_short_name != contact_name  %}
+                            <span> pour <i>{{ customer_short_name }}</i></span>
+                        {% endif %}
                     {% endif %}
                 </div>
                 <div>
