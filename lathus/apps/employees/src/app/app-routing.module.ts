@@ -3,7 +3,6 @@ import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
 import { AppComponent } from './in/app.component';
 import { SignInComponent } from './in/auth/sign-in/sign-in.component';
 import { LayoutComponent } from './in/_layout/layout/layout.component';
-import {AppPlanningModule} from "./in/planning/planning.module";
 
 const routes: Routes = [
     /*
@@ -34,7 +33,7 @@ const routes: Routes = [
         children: [
             {
                 path: 'planning',
-                loadChildren: () => import('./in/planning/planning.module').then(m => m.AppPlanningModule)
+                loadChildren: () => import('./in/planning-employees/planning-employees.module').then(m => m.AppPlanningEmployeesModule)
             },
             /*{
                 path: 'user-settings',
