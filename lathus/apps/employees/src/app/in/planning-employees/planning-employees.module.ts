@@ -9,12 +9,14 @@ import { PlanningEmployeesComponent } from './planning-employees.component';
 import { PlanningEmployeesFiltersComponent } from './_components/planning-employees-filters/planning-employees-filters.component';
 import {PlanningEmployeesCalendarComponent} from "./_components/planning-employees-calendar/planning-employees-calendar.component";
 import { AppSharedPipesModule } from '../../_pipes/shared-pipes.module';
+import {AppSharedComponentsModule} from "../_components/shared-components.module";
 
 @NgModule({
     imports: [
         SharedLibModule,
         PlanningModule,
-        AppSharedPipesModule
+        AppSharedPipesModule,
+        AppSharedComponentsModule
     ],
     declarations: [
         PlanningEmployeesComponent,

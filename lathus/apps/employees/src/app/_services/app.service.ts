@@ -64,19 +64,21 @@ export class AppService implements OnDestroy {
 
         // Listen to change of selected partners or product models to reload the activity map
         combineLatest([
+            this.dateFrom$,
+            this.dateTo$,
             this.selectedPartnersIds$,
             this.selectedProductModelsIds$
         ])
             .pipe(
                 takeUntil(this.destroy$),
-                switchMap(([partnersIds, productModelsIds]) => {
+                switchMap(([dateFrom, dateTo, partnersIds, productModelsIds]) => {
                     // Only fetch if all data is available
                     if(!partnersIds.length || !productModelsIds.length) {
                         return []; // or EMPTY from rxjs
                     }
 
                     // Call API to fetch activity map
-                    return this.api.fetchActivityMap(this.dateFromSubject.value, this.dateToSubject.value, partnersIds, productModelsIds);
+                    return this.api.fetchActivityMap(dateFrom, dateTo, partnersIds, productModelsIds);
                 })
             )
             .subscribe({
@@ -222,6 +224,20 @@ export class AppService implements OnDestroy {
 
     public setDisplayType(displayType: TypeDisplay) {
         this.displayTypeSubject.next(displayType);
+    }
+
+    public setPreviousDate() {
+        const previousDateFrom = new Date(this.dateFromSubject.value.getTime());
+        previousDateFrom.setDate(this.dateFromSubject.value.getDate() - 1);
+
+        this.dateFromSubject.next(previousDateFrom);
+    }
+
+    public setNextDate() {
+        const nextDateFrom = new Date(this.dateFromSubject.value.getTime());
+        nextDateFrom.setDate(this.dateFromSubject.value.getDate() + 1);
+
+        this.dateFromSubject.next(nextDateFrom);
     }
 
     public setCategory(categoryId: number) {
