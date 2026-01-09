@@ -318,6 +318,11 @@
             "label": "Institution",
             "description": "L'institution qui prend en charge l'enfant.",
             "help": ""
+        },
+        "external_ref": {
+            "label": "Référence externe",
+            "description": "Référence externe de l'inscription permettant son identification.",
+            "help": ""
         }
     },
     "view": {
