@@ -94,6 +94,11 @@
             "label": "Chèque bancaire",
             "description": "La chèque bancaire à laquelle est lié le paiement",
             "help": ""
+        },
+        "external_ref": {
+            "label": "Référence externe",
+            "description": "Référence externe du paiement permettant son identification.",
+            "help": ""
         }
     },
     "view": {
