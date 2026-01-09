@@ -1,16 +1,24 @@
 import { Component, OnInit } from '@angular/core';
+import { AppService } from '../../../../_services/app.service';
+import { ActivityMap } from '../../../../../type';
 
 @Component({
     selector: 'planning-employees-calendar',
     templateUrl: 'planning-employees-calendar.component.html',
     styleUrls: ['planning-employees-calendar.component.scss']
 })
-export class PlanningEmployeesCalendarComponent implements OnInit  {
+export class PlanningEmployeesCalendarComponent implements OnInit {
 
-    constructor() {
+    public activityMap: ActivityMap = {};
+
+    constructor(
+        private app: AppService
+    ) {
     }
 
     ngOnInit() {
-        console.log("test filters");
+        this.app.activityMap$.subscribe((activityMap) => {
+            this.activityMap = activityMap;
+        });
     }
 }
