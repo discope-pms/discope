@@ -172,6 +172,12 @@
                                                 "width": "33%",
                                                 "readonly":  true,
                                                 "visible": ["state", "<>", "draft"]
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "external_ref",
+                                                "width": "33%",
+                                                "visible": ["external_ref", "is not", null]
                                             }
                                         ]
                                     },
