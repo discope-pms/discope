@@ -9,7 +9,6 @@
 use core\setting\Setting;
 use lathus\sale\camp\Guardian as LathusGuardian;
 use lathus\sale\camp\Institution as LathusInstitution;
-use sale\booking\Payment;
 use sale\camp\Camp;
 use sale\camp\Child;
 use sale\camp\Enrollment;
@@ -20,6 +19,7 @@ use sale\camp\price\PriceAdapter;
 use sale\camp\Sponsor;
 use sale\camp\WorksCouncil;
 use sale\pay\Funding;
+use sale\pay\Payment;
 
 [$params, $providers] = eQual::announce([
     'description'   => "Pull enrollments from CPA Lathus API.",
@@ -666,7 +666,8 @@ if(!empty($data)) {
                             'is_manual'         => false,
                             'amount'            => floatval($ext_enrollment['metaJson']['reglement']['montantCB']),
                             'payment_origin'    => 'online',
-                            'payment_method'    => 'bank_card'
+                            'payment_method'    => 'bank_card',
+                            'external_ref'      => $ext_enrollment['metaJson']['payment']['transactionId']
                         ])
                             ->update(['funding_id' => $funding['id']]);
                     }
