@@ -1,11 +1,10 @@
 :host {
     display: flex;
-    height: 60px;
+    min-height: 60px;
     align-items: center;
     background-color: white;
     border-radius: 8px;
     box-shadow: 0 1px 3px #0000000a, 0 1px 2px #0000000a;
-    touch-action: pan-y;
 
     .add-wrapper {
         width: 70px;

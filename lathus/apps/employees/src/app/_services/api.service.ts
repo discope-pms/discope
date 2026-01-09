@@ -140,6 +140,7 @@ export class ApiService {
 
     public fetchActivityMap(dateFrom: Date, dateTo: Date, partnersIds: number[], productModelsIds: number[]): Observable<ActivityMap> {
         // date_to isn't included
+        dateTo = new Date(dateTo.getTime());
         dateTo.setDate(dateTo.getDate() + 1);
 
         const options = {

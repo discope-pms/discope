@@ -1,5 +1,5 @@
 import { Injectable, OnDestroy } from '@angular/core';
-import { BehaviorSubject, combineLatest, forkJoin, Subject } from 'rxjs';
+import {BehaviorSubject, combineLatest, forkJoin, of, Subject} from 'rxjs';
 import { ActivityMap, Category, Center, Partner, ProductModel, TimeSlot, TypeDisplay } from '../../type';
 import { ApiService } from './api.service';
 import { AuthService } from 'sb-shared-lib';
@@ -74,7 +74,7 @@ export class AppService implements OnDestroy {
                 switchMap(([dateFrom, dateTo, partnersIds, productModelsIds]) => {
                     // Only fetch if all data is available
                     if(!partnersIds.length || !productModelsIds.length) {
-                        return []; // or EMPTY from rxjs
+                        return of({});
                     }
 
                     // Call API to fetch activity map
@@ -84,7 +84,7 @@ export class AppService implements OnDestroy {
             .subscribe({
                 next: (activityMap) => {
                     console.log('Activity map loaded:', activityMap);
-                    this.activityMapSubject.next(activityMap);
+                    this.activityMapSubject.next({...activityMap});
                 },
                 error: (error) => {
                     console.error('Error fetching activity map:', error);
@@ -258,7 +258,7 @@ export class AppService implements OnDestroy {
 
     private handleChangeDateFrom(dateFrom: Date) {
         const dateTo = this.dateToSubject.value;
-        if(dateTo.getTime() < dateFrom.getTime()) {
+        if(this.displayTypeSubject.value === 'day' || dateTo.getTime() < dateFrom.getTime()) {
             this.dateToSubject.next(new Date(dateFrom.getTime()));
         }
     }

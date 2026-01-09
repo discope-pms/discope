@@ -1,14 +1,16 @@
 import { Component, HostListener, OnInit } from '@angular/core';
 import { AppService } from '../../../../_services/app.service';
-import { ActivityMap } from '../../../../../type';
+import { Partner, ActivityMapDay, ActivityMap } from '../../../../../type';
 
 @Component({
-    selector: 'planning-employees-calendar',
-    templateUrl: 'planning-employees-calendar.component.html',
-    styleUrls: ['planning-employees-calendar.component.scss']
+    selector: 'planning-employees-calendar-day',
+    templateUrl: 'planning-employees-calendar-day.component.html',
+    styleUrls: ['planning-employees-calendar-day.component.scss']
 })
-export class PlanningEmployeesCalendarComponent implements OnInit {
+export class PlanningEmployeesCalendarDayComponent implements OnInit {
 
+    public dateIndex: string = (new Date()).toISOString().split('T')[0];
+    public partnerList: Partner[] = [];
     public activityMap: ActivityMap = {};
 
     private startX = 0;
@@ -18,7 +20,6 @@ export class PlanningEmployeesCalendarComponent implements OnInit {
 
     @HostListener('touchstart', ['$event'])
     onTouchStart(event: TouchEvent) {
-        event.preventDefault();
         this.startX = event.touches[0].clientX;
         this.isSwiping = true;
     }
@@ -26,16 +27,7 @@ export class PlanningEmployeesCalendarComponent implements OnInit {
     @HostListener('touchmove', ['$event'])
     onTouchMove(event: TouchEvent) {
         if (!this.isSwiping) return;
-        event.preventDefault();
         this.currentX = event.touches[0].clientX;
-        let deltaX = this.currentX - this.startX;
-        if(deltaX > this.swipeThreshold) {
-            deltaX = this.swipeThreshold;
-        }
-        else if(deltaX < -this.swipeThreshold) {
-            deltaX = -this.swipeThreshold;
-        }
-        (event.target as HTMLElement).style.transform = `translateX(${deltaX}px)`;
     }
 
     @HostListener('touchend', ['$event'])
@@ -44,16 +36,12 @@ export class PlanningEmployeesCalendarComponent implements OnInit {
         this.isSwiping = false;
 
         const deltaX = this.currentX - this.startX;
-        const host = event.target as HTMLElement;
-
         if (deltaX < -this.swipeThreshold) {
             this.onNextDate();
         }
         else if (deltaX > this.swipeThreshold) {
             this.onPreviousDate();
         }
-
-        host.style.transform = `translateX(0px)`;
     }
 
     constructor(
@@ -62,18 +50,24 @@ export class PlanningEmployeesCalendarComponent implements OnInit {
     }
 
     ngOnInit() {
+        this.app.dateFrom$.subscribe((dateFrom) => {
+            this.dateIndex = dateFrom.toISOString().split('T')[0];
+        });
+
+        this.app.partnerList$.subscribe((partnerList) => {
+            this.partnerList = partnerList;
+        });
+
         this.app.activityMap$.subscribe((activityMap) => {
             this.activityMap = activityMap;
         });
     }
 
     private onPreviousDate() {
-        console.log('onPreviousDate');
         this.app.setPreviousDate();
     }
 
     private onNextDate() {
-        console.log('onNextDate');
         this.app.setNextDate();
     }
 }

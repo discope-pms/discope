@@ -43,7 +43,7 @@ export interface ActivityMap {
     };
 }
 
-interface ActivityMapDay {
+export interface ActivityMapDay {
     AM: ActivityMapActivity[];
     PM: ActivityMapActivity[];
     EV: ActivityMapActivity[];
