@@ -118,7 +118,8 @@ export class ApiService {
         return this.modelCollect<Employee>(
             'hr\\employee\\Employee',
             ['id', 'name', 'relationship', 'is_active', 'activity_product_models_ids'],
-            [['relationship', '=', 'employee'], ['is_active', '=', true]]
+            [['relationship', '=', 'employee'], ['is_active', '=', true]],
+            { order: 'name', sort: "asc" }
         );
     }
 
@@ -126,7 +127,8 @@ export class ApiService {
         return this.modelCollect<Provider>(
             'sale\\provider\\Provider',
             ['id', 'name', 'relationship', 'is_active'],
-            ['relationship', '=', 'provider']
+            ['relationship', '=', 'provider'],
+            { order: 'name', sort: "asc" }
         );
     }
 
