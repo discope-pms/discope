@@ -51,6 +51,18 @@
                                                 "type": "field",
                                                 "value": "payment_origin",
                                                 "width": "50%"
+                                            },
+                                            {
+                                                "type": "label",
+                                                "label": "",
+                                                "value": "",
+                                                "width": "100%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "external_ref",
+                                                "width": "50%",
+                                                "visible": ["external_ref", "is not", null]
                                             }
                                         ]
                                     },
@@ -79,7 +91,7 @@
                                                 "type": "field",
                                                 "value": "funding_id",
                                                 "width": "100%"
-                                            }                                            
+                                            }
                                         ]
                                     }
                                 ]

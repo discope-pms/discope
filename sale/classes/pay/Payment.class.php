@@ -149,6 +149,11 @@ class Payment extends Model {
             'description' => [
                 'type'              => 'string',
                 'description'       => "Description of the payment."
+            ],
+
+            'external_ref' => [
+                'type'              => 'string',
+                'description'       => "External reference for payment, if any."
             ]
 
         ];
