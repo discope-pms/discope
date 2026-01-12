@@ -13,17 +13,17 @@
                             {
                                 "columns": [
                                     {
-                                        "width": "25%",
+                                        "width": "33%",
                                         "items": [
                                             {
                                                 "type": "field",
                                                 "value": "date_from",
-                                                "width": "100%"
+                                                "width": "50%"
                                             },
                                             {
                                                 "type": "field",
                                                 "value": "date_to",
-                                                "width": "100%"
+                                                "width": "50%"
                                             }
                                         ]
                                     }
