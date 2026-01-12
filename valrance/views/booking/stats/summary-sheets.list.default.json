@@ -1,0 +1,172 @@
+{
+    "name": "Summary sheets",
+    "description": "",
+    "controller": "valrance_booking_stats_summary-sheets",
+    "header": {
+        "actions": {
+            "ACTION.CREATE" : false
+        },
+        "advanced_search": {
+            "open": true
+        }
+    },
+    "layout": {
+        "items": [
+            {
+                "type": "field",
+                "value": "name",
+                "width": "10%"
+            },
+            {
+                "type": "field",
+                "value": "customer_name",
+                "width": "10%"
+            },
+            {
+                "type": "field",
+                "value": "accounting_account",
+                "width": "10%"
+            },
+            {
+                "type": "field",
+                "value": "date_from_string",
+                "width": "10%"
+            },
+            {
+                "type": "field",
+                "value": "date_to_string",
+                "width": "10%"
+            },
+            {
+                "type": "field",
+                "value": "rate_class",
+                "width": "10%"
+            },
+            {
+                "type": "field",
+                "value": "status",
+                "width": "10%"
+            },
+            {
+                "type": "field",
+                "value": "customer_address_street",
+                "width": "10%"
+            },
+            {
+                "type": "field",
+                "value": "customer_address_zip",
+                "width": "10%"
+            },
+            {
+                "type": "field",
+                "value": "customer_address_city",
+                "width": "10%"
+            },
+            {
+                "type": "field",
+                "value": "customer_email",
+                "width": "10%"
+            },
+            {
+                "type": "field",
+                "value": "customer_phone",
+                "width": "10%"
+            },
+            {
+                "type": "field",
+                "value": "contact_title",
+                "width": "10%"
+            },
+            {
+                "type": "field",
+                "value": "contact_firstname",
+                "width": "10%"
+            },
+            {
+                "type": "field",
+                "value": "contact_lastname",
+                "width": "10%"
+            },
+            {
+                "type": "field",
+                "value": "contact_email",
+                "width": "10%"
+            },
+            {
+                "type": "field",
+                "value": "contact_phone",
+                "width": "10%"
+            },
+            {
+                "type": "field",
+                "value": "contact_2_title",
+                "width": "10%"
+            },
+            {
+                "type": "field",
+                "value": "contact_2_firstname",
+                "width": "10%"
+            },
+            {
+                "type": "field",
+                "value": "contact_2_lastname",
+                "width": "10%"
+            },
+            {
+                "type": "field",
+                "value": "contact_2_email",
+                "width": "10%"
+            },
+            {
+                "type": "field",
+                "value": "contact_2_phone",
+                "width": "10%"
+            },
+            {
+                "type": "field",
+                "value": "first_meal",
+                "width": "10%"
+            },
+            {
+                "type": "field",
+                "value": "last_meal",
+                "width": "10%"
+            },
+            {
+                "type": "field",
+                "value": "nb_children",
+                "width": "10%"
+            },
+            {
+                "type": "field",
+                "value": "nb_teachers",
+                "width": "10%"
+            },
+            {
+                "type": "field",
+                "value": "nb_adults",
+                "width": "10%"
+            },
+            {
+                "type": "field",
+                "value": "nb_drivers",
+                "width": "10%"
+            },
+            {
+                "type": "field",
+                "value": "kindergarten",
+                "width": "10%"
+            },
+            {
+                "type": "field",
+                "value": "travel",
+                "width": "10%"
+            },
+            {
+                "type": "field",
+                "value": "rental_units",
+                "width": "10%"
+            }
+        ]
+    }
+}
