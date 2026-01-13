@@ -61,38 +61,62 @@ $normalizeName = function($city) {
 $findOrCreateGuardian = function($ext_guardian, $ext_child, $child_id) use($sanitizePhoneNumber) {
     $guardian = null;
 
+    $ext_guardian_firstname = trim($ext_guardian['prenom']);
+    $ext_guardian_lastname = trim($ext_guardian['nom']);
+
+    $ext_guardian_phones = [
+        'mobile'        => '',
+        'phone'         => '',
+        'work_phone'    => ''
+    ];
+    if(isset($ext_guardian['telephonePortable'])) {
+        $ext_guardian_phones['mobile'] = trim($ext_guardian['telephonePortable']);
+    }
+    if(isset($ext_guardian['telephoneDomicile'])) {
+        $ext_guardian_phones['phone'] = trim($ext_guardian['telephoneDomicile']);
+    }
+    if(isset($ext_guardian['telephoneTravail'])) {
+        $ext_guardian_phones['work_phone'] = trim($ext_guardian['telephoneTravail']);
+    }
+
     $child = Child::id($child_id)
         ->read(['guardians_ids'])
         ->first();
 
     if(!empty($child['guardians_ids'])) {
         $guardian = Guardian::search([
-            ['firstname', 'ilike', trim($ext_guardian['prenom'])],
-            ['lastname', 'ilike', trim($ext_guardian['nom'])],
+            ['firstname', 'ilike', $ext_guardian_firstname],
+            ['lastname', 'ilike', $ext_guardian_lastname],
             ['id', 'in', $child['guardians_ids']]
         ])
             ->read(['id'])
             ->first();
     }
-    elseif(isset($ext_guardian['telephonePortable']) || isset($ext_guardian['telephoneDomicile']) || isset($ext_guardian['telephoneTravail'])) {
-        $domain = [
-            ['firstname', 'ilike', trim($ext_guardian['prenom'])],
-            ['lastname', 'ilike', trim($ext_guardian['nom'])]
-        ];
-        if(!empty($ext_guardian['telephonePortable'])) {
-            $domain[] = ['mobile', '=', trim($ext_guardian['telephonePortable'])];
+    elseif(!empty($ext_guardian_phones['mobile']) || !empty($ext_guardian_phones['phone']) || !empty($ext_guardian_phones['work_phone'])) {
+        $domain = [];
+        if(!empty($ext_guardian_phones['mobile'])) {
+            $domain[] = [
+                ['firstname', 'ilike', $ext_guardian_firstname],
+                ['lastname', 'ilike', $ext_guardian_lastname],
+                ['mobile', '=', $ext_guardian_phones['mobile']]
+            ];
         }
-        elseif(!empty($ext_guardian['telephoneDomicile'])) {
-            $domain[] = ['phone', '=', trim($ext_guardian['telephoneDomicile'])];
+        elseif(!empty($ext_guardian_phones['phone'])) {
+            $domain[] = [
+                ['firstname', 'ilike', $ext_guardian_firstname],
+                ['lastname', 'ilike', $ext_guardian_lastname],
+                ['phone', '=', $ext_guardian_phones['phone']]
+            ];
         }
-        elseif(!empty($ext_guardian['telephoneTravail'])) {
-            $domain[] = ['work_phone', '=', trim($ext_guardian['telephoneTravail'])];
+        elseif(!empty($ext_guardian_phones['work_phone'])) {
+            $domain[] = [
+                ['firstname', 'ilike', $ext_guardian_firstname],
+                ['lastname', 'ilike', $ext_guardian_lastname],
+                ['work_phone', '=', $ext_guardian_phones['work_phone']]
+            ];
         }
 
-        $guardian = Guardian::search([
-            ['firstname', 'ilike', trim($ext_guardian['prenom'])],
-            ['lastname', 'ilike', trim($ext_guardian['nom'])]
-        ])
+        $guardian = Guardian::search($domain)
             ->read(['id'])
             ->first();
 
@@ -133,6 +157,21 @@ $findOrCreateGuardian = function($ext_guardian, $ext_child, $child_id) use($sani
         $guardian = LathusGuardian::create($guardian_data)
             ->read(['id'])
             ->first();
+    }
+    elseif(!empty($ext_guardian_phones['mobile']) || !empty($ext_guardian_phones['phone']) || !empty($ext_guardian_phones['work_phone'])) {
+        $updated_phones_data = [];
+        if(!empty($ext_guardian_phones['mobile'])) {
+            $updated_phones_data['mobile'] = $ext_guardian_phones['mobile'];
+        }
+        if(!empty($ext_guardian_phones['phone'])) {
+            $updated_phones_data['phone'] = $ext_guardian_phones['phone'];
+        }
+        if(!empty($ext_guardian_phones['work_phone'])) {
+            $updated_phones_data['work_phone'] = $ext_guardian_phones['work_phone'];
+        }
+        if(!empty($updated_phones_data)) {
+            LathusGuardian::id($guardian['id'])->update($updated_phones_data);
+        }
     }
 
     return $guardian;
