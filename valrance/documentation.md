@@ -56,7 +56,9 @@ _2ème partie_ (si le déjeuner est un picnic) :
 | avec pique-nique amenés par vos soins et goûter fourni par le Relais Valrance | Si le déjeuner est un picnic et que le déjeuner n'est pas fourni par Valrance, mais le goûter est fourni par Valrance. |
 | avec pique-nique et goûter amenés par vos soins                               | Si le déjeuner est un picnic et que ni le déjeuner ou le goûter sont fournis par Valrance.                             |
 
-Format (partie 2 optionnel) : {_1èr partie_}, {_2ème partie_}
+Format : {_1èr partie_}, {_2ème partie_}
+
+Note format : la 2ème partie est optionnel
 
 Exemples : 
 
@@ -66,6 +68,30 @@ Exemples :
  - ...
 
 #### Note : "Repas dernier jour"
+
+_1ère partie_ :
+
+| Valeur                  | Conditions                                                                                                                                         |
+|-------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------|
+| après le dîner          | Si le dîner est fourni par Valrance et n'est pas pris en extérieur.                                                                                |
+| après le goûter         | Si le dîner n'est pas fourni par Valrance, mais que le goûter est fourni et qu'il n'est pas pris en extérieur.                                     |
+| après le déjeuner       | Si le dîner et le goûter ne sont pas fourni par Valrance, mais que le déjeuner est fourni et qu'il n'est pas pris en extérieur.                    |
+| après le petit-déjeuner | Si le dîner, le goûter et le déjeuner ne sont pas fourni par Valrance, mais que le petit-déjeuner est fourni et qu'il n'est pas pris en extérieur. |
+
+_2ème partie_ :
+
+| Valeur                                                                                | Conditions                                                                                                                                |
+|---------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------|
+| avec collation petit-déjeuner, pique-nique, goûter, et pique-nique du soir à emporter | Si le petit-déjeuner est fourni par Valrance et que tous les repas/snack sont pris en extérieur.                                          |
+| avec collation petit-déjeuner, pique-nique et goûter à emporter                       | Si le petit-déjeuner est fourni par Valrance et que tous les repas/snack sont pris en extérieur, sauf le dîner.                           |
+| avec collation petit-déjeuner et pique-nique à emporter                               | Si le petit-déjeuner est fourni par Valrance et que le petit-déjeuner et le déjeuner sont pris en extérieur, mais pas le goûter et dîner. |
+| avec collation petit-déjeuner à emporter                                              | Si le petit-déjeuner est fourni par Valrance et que le petit-déjeuner est pris en extérieur, mais pas le déjeuner, le goûter et dîner.    |
+| avec pique-nique, goûter, et pique-nique du soir à emporter                           |                                                                                                                                           |
+| avec pique-nique et goûter à emporter                                                 |                                                                                                                                           |
+| avec pique-nique à emporter                                                           |                                                                                                                                           |
+| avec goûter et pique-nique du soir à emporter                                         |                                                                                                                                           |
+| avec goûter à emporter                                                                |                                                                                                                                           |
+| avec pique-nique du soir à emporter                                                   |                                                                                                                                           |
 
 #### Note : "Deplacements"
 
