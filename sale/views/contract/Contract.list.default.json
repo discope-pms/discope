@@ -23,6 +23,11 @@
             },
             {
                 "type": "field",
+                "value": "is_signed",
+                "width": "20%"
+            },
+            {
+                "type": "field",
                 "value": "valid_until",
                 "width": "20%"
             }
