@@ -187,7 +187,7 @@ $bookings = Booking::search([
 ])
     ->read([
         'name',
-        'date_from',  // jeudi 30 janvier 2025
+        'date_from',
         'date_to',
         'status',
         'customer_id' => [
@@ -207,7 +207,7 @@ $bookings = Booking::search([
             'mobile'
         ],
         'contacts_ids' => [
-            'type', // if booking
+            'type',
             'partner_identity_id' => [
                 'type_id',
                 'firstname',
@@ -220,7 +220,7 @@ $bookings = Booking::search([
             ]
         ],
         'booking_lines_groups_ids' => [
-            'group_type', // if sojourn
+            'group_type',
             'age_range_assignments_ids' => [
                 'age_range_id',
                 'qty'
@@ -369,7 +369,116 @@ foreach($bookings as $id => $booking) {
      * Last day meal description
      */
 
-    // TODO: handle last meal
+    $last_day_meals = BookingMeal::search([
+        ['booking_id', '=', $booking['id']],
+        ['date', '=', $booking['date_to']]
+    ])
+        ->read([
+            'is_self_provided',
+            'time_slot_id'      => ['code'],
+            'meal_place_id'     => ['place_type']
+        ])
+        ->get();
+
+    $last_day_meals_config = [
+        'has_breakfast'         => false,
+        'has_lunch'             => false,
+        'has_diner'             => false,
+        'has_snack'             => false,
+        'is_breakfast_offsite'  => false,
+        'is_lunch_offsite'      => false,
+        'is_snack_offsite'      => false,
+        'is_diner_offsite'      => false
+    ];
+
+    foreach($last_day_meals as $meal_id => $meal) {
+        $offsite = in_array($meal['meal_place_id']['place_type'], ['offsite', 'auto']);
+        if($meal['time_slot_id']['code'] === 'B' && !$meal['is_self_provided']) {
+            $last_day_meals_config['has_breakfast'] = true;
+            $last_day_meals_config['is_breakfast_offsite'] = $offsite;
+        }
+        elseif($meal['time_slot_id']['code'] === 'L' && !$meal['is_self_provided']) {
+            $last_day_meals_config['has_lunch'] = true;
+            $last_day_meals_config['is_lunch_offsite'] = $offsite;
+        }
+        elseif($meal['time_slot_id']['code'] === 'PM' && !$meal['is_self_provided']) {
+            $last_day_meals_config['has_snack'] = true;
+            $last_day_meals_config['is_snack_offsite'] = $offsite;
+        }
+        elseif($meal['time_slot_id']['code'] === 'D' && !$meal['is_self_provided']) {
+            $last_day_meals_config['has_diner'] = true;
+            $last_day_meals_config['is_diner_offsite'] = $offsite;
+        }
+    }
+
+    $last_meal_description = '';
+    if($last_day_meals_config['has_diner'] && !$last_day_meals_config['is_diner_offsite']) {
+        $last_meal_description .= 'après le dîner';
+    }
+    elseif($last_day_meals_config['has_snack'] && !$last_day_meals_config['is_snack_offsite']) {
+        $last_meal_description .= 'après le goûter';
+    }
+    elseif($last_day_meals_config['has_lunch'] && !$last_day_meals_config['is_lunch_offsite']) {
+        $last_meal_description .= 'après le déjeuner';
+    }
+    elseif($last_day_meals_config['has_breakfast'] && !$last_day_meals_config['is_breakfast_offsite']) {
+        $last_meal_description .= 'après le petit-déjeuner';
+    }
+
+    if($last_day_meals_config['has_breakfast'] && $last_day_meals_config['is_breakfast_offsite']) {
+        if(strlen($last_meal_description) > 0) {
+            $last_meal_description .= ', ';
+        }
+        if($last_day_meals_config['is_lunch_offsite']) {
+            if($last_day_meals_config['is_snack_offsite']) {
+                if($last_day_meals_config['is_diner_offsite']) {
+                    $last_meal_description .= 'avec collation petit-déjeuner, pique-nique, goûter, et pique-nique du soir à emporter';
+                }
+                else {
+                    $last_meal_description .= 'avec collation petit-déjeuner, pique-nique et goûter à emporter';
+                }
+            }
+            else {
+                $last_meal_description .= 'avec collation petit-déjeuner et pique-nique à emporter';
+            }
+        }
+        else {
+            $last_meal_description .= 'avec collation petit-déjeuner à emporter';
+        }
+    }
+    elseif($last_day_meals_config['has_lunch'] && $last_day_meals_config['is_lunch_offsite']) {
+        if(strlen($last_meal_description) > 0) {
+            $last_meal_description .= ', ';
+        }
+        if($last_day_meals_config['is_snack_offsite']) {
+            if($last_day_meals_config['is_diner_offsite']) {
+                $last_meal_description .= 'avec pique-nique, goûter, et pique-nique du soir à emporter';
+            }
+            else {
+                $last_meal_description .= 'avec pique-nique et goûter à emporter';
+            }
+        }
+        else {
+            $last_meal_description .= 'avec pique-nique à emporter';
+        }
+    }
+    elseif($last_day_meals_config['has_snack'] && $last_day_meals_config['is_snack_offsite']) {
+        if(strlen($last_meal_description) > 0) {
+            $last_meal_description .= ', ';
+        }
+        if($last_day_meals_config['is_diner_offsite']) {
+            $last_meal_description .= 'avec goûter et pique-nique du soir à emporter';
+        }
+        else {
+            $last_meal_description .= 'avec goûter à emporter';
+        }
+    }
+    elseif($last_day_meals_config['has_diner'] && $last_day_meals_config['is_diner_offsite']) {
+        if(strlen($last_meal_description) > 0) {
+            $last_meal_description .= ', ';
+        }
+        $last_meal_description .= 'avec pique-nique du soir à emporter';
+    }
 
     /*
      * Quantities of people
@@ -447,7 +556,7 @@ foreach($bookings as $id => $booking) {
         'contact_2_email'           => !empty($contact_second['partner_identity_id']['email']) ? $contact_second['partner_identity_id']['email'] : '',
         'contact_2_phone'           => !empty($contact_second['partner_identity_id']['phone']) ? $contact_second['partner_identity_id']['phone'] : $contact_second['partner_identity_id']['mobile'],
         'first_meal'                => $first_meal_description,
-        'last_meal'                 => '', // TODO: handle last meal
+        'last_meal'                 => $last_meal_description,
         'nb_children'               => $people_qty_conf['children'],
         'nb_teachers'               => $people_qty_conf['teachers'],
         'nb_adults'                 => $people_qty_conf['adults'],
