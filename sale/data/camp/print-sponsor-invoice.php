@@ -55,10 +55,6 @@ use Twig\TwigFilter;
 
     ],
     'constants'     => ['L10N_LOCALE', 'L10N_TIMEZONE'],
-    'access'        => [
-        'visibility'        => 'protected',
-        'groups'            => ['camp.default.user'],
-    ],
     'response'      => [
         'content-type'      => 'application/pdf',
         'accept-origin'     => '*'

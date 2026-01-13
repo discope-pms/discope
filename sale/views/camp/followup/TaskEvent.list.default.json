@@ -2,7 +2,7 @@
     "name": "Task Events",
     "description": "List of follow up task events.",
     "access": {
-        "groups": ["camp.default.user"]
+        "groups": ["camp.default.administrator", "camp.default.user"]
     },
     "layout": {
         "items": [

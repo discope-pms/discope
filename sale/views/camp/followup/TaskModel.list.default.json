@@ -2,7 +2,7 @@
     "name": "Task Models",
     "description": "This view is intended for displaying the list of task models.",
     "access": {
-        "groups": ["camp.default.user"]
+        "groups": ["camp.default.administrator", "camp.default.user"]
     },
     "layout": {
         "items": [

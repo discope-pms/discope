@@ -43,10 +43,6 @@ use sale\camp\Camp;
         ]
 
     ],
-    'access'        => [
-        'visibility'    => 'protected',
-        'groups'        => ['camp.default.user'],
-    ],
     'response'      => [
         'content-type'  => 'application/json',
         'charset'       => 'utf-8',

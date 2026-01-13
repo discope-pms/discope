@@ -49,10 +49,6 @@ use core\setting\Setting;
 
     ],
     'constants'     => [],
-    'access'        => [
-        'visibility'        => 'protected',
-        'groups'            => ['camp.default.user'],
-    ],
     'response'      => [
         'content-type'      => 'application/pdf',
         'accept-origin'     => '*'

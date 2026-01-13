@@ -3,7 +3,7 @@
     "description": "This view is intended for displaying the list of fundings for camps.",
     "domain": ["enrollment_id", "<>", null],
     "access": {
-        "groups": ["camp.default.user"]
+        "groups": ["camp.default.administrator", "camp.default.user"]
      },
     "operations": {
         "total": {

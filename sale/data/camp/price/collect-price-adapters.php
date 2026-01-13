@@ -47,10 +47,6 @@ use sale\camp\Camp;
             'default'           => fn() => strtotime('last day of December this year')
         ],
     ],
-    'access'        => [
-        'visibility'    => 'protected',
-        'groups'        => ['camp.default.user'],
-    ],
     'response'      => [
         'content-type'  => 'application/json',
         'charset'       => 'utf-8',
