@@ -6,7 +6,9 @@
 */
 
 use sale\booking\Booking;
+use sale\booking\BookingLine;
 use sale\booking\BookingMeal;
+use sale\catalog\Product;
 use sale\customer\AgeRange;
 
 [$params, $providers] = eQual::announce([
@@ -520,7 +522,57 @@ foreach($bookings as $id => $booking) {
      * Travel description
      */
 
-    // TODO: handle travel
+    $products_ids = Product::search(['sku', 'in', ['RV-transport_aller_retour-2926', 'RV-Transport-Massol', 'RV-Transport-Verbus']])->ids();
+
+    $booking_lines = BookingLine::search([
+        ['booking_id', '=', $id],
+        ['product_id', 'in', $products_ids]
+    ])
+        ->read(['product_id' => ['sku']])
+        ->get();
+
+    $travel_products_config = [
+        'round_trip'        => false,
+        'massol_activities' => false,
+        'verbus_activities' => false
+    ];
+
+    foreach($booking_lines as $line) {
+        switch($line['product_id']['sku']) {
+            case 'RV-transport_aller_retour-2926':
+                $travel_products_config['round_trip'] = true;
+                break;
+            case 'RV-Transport-Massol':
+                $travel_products_config['massol_activities'] = true;
+                break;
+            case 'RV-Transport-Verbus':
+                $travel_products_config['verbus_activities'] = true;
+                break;
+        }
+    }
+
+    $travel_description = '';
+    if($travel_products_config['round_trip']) {
+        $travel_description .= 'A/R avec les Voyages MASSOL';
+    }
+    if($people_qty_conf['drivers'] > 0) {
+        if(strlen($travel_description) > 0) {
+            $travel_description .= ', ';
+        }
+        $travel_description = 'Le bus reste sur place';
+    }
+    if($travel_products_config['massol_activities']) {
+        if(strlen($travel_description) > 0) {
+            $travel_description .= ', ';
+        }
+        $travel_description .= 'Déplacement avec les Voyages MASSOL';
+    }
+    if($travel_products_config['verbus_activities']) {
+        if(strlen($travel_description) > 0) {
+            $travel_description .= ', ';
+        }
+        $travel_description .= 'Déplacement avec VERBUS';
+    }
 
     /*
      * Rental units
@@ -562,7 +614,7 @@ foreach($bookings as $id => $booking) {
         'nb_adults'                 => $people_qty_conf['adults'],
         'nb_drivers'                => $people_qty_conf['drivers'],
         'kindergarten'              => '', // #todo - handle kindergarten
-        'travel'                    => '', // TODO: handle travel
+        'travel'                    => $travel_description,
         'rental_units'              => implode(', ', $rental_units)
     ];
 }
