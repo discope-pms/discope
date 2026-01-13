@@ -56,16 +56,16 @@ _2ème partie_ (si le déjeuner est un picnic) :
 | avec pique-nique amenés par vos soins et goûter fourni par le Relais Valrance | Si le déjeuner est un picnic et que le déjeuner n'est pas fourni par Valrance, mais le goûter est fourni par Valrance. |
 | avec pique-nique et goûter amenés par vos soins                               | Si le déjeuner est un picnic et que ni le déjeuner ou le goûter sont fournis par Valrance.                             |
 
-Format : {_1èr partie_}, {_2ème partie_}
+Format : {_1ère partie_}, {_2ème partie_}
 
 Note format : la 2ème partie est optionnel
 
 Exemples : 
 
- - pour le déjeuner
- - pour le dîner
- - pour le dîner, avec pique-nique et goûter amenés par vos soins
- - ...
+  - pour le déjeuner
+  - pour le dîner
+  - pour le dîner, avec pique-nique et goûter amenés par vos soins
+  - ...
 
 #### Note : "Repas dernier jour"
 
@@ -80,18 +80,38 @@ _1ère partie_ :
 
 _2ème partie_ :
 
-| Valeur                                                                                | Conditions                                                                                                                                |
-|---------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------|
-| avec collation petit-déjeuner, pique-nique, goûter, et pique-nique du soir à emporter | Si le petit-déjeuner est fourni par Valrance et que tous les repas/snack sont pris en extérieur.                                          |
-| avec collation petit-déjeuner, pique-nique et goûter à emporter                       | Si le petit-déjeuner est fourni par Valrance et que tous les repas/snack sont pris en extérieur, sauf le dîner.                           |
-| avec collation petit-déjeuner et pique-nique à emporter                               | Si le petit-déjeuner est fourni par Valrance et que le petit-déjeuner et le déjeuner sont pris en extérieur, mais pas le goûter et dîner. |
-| avec collation petit-déjeuner à emporter                                              | Si le petit-déjeuner est fourni par Valrance et que le petit-déjeuner est pris en extérieur, mais pas le déjeuner, le goûter et dîner.    |
-| avec pique-nique, goûter, et pique-nique du soir à emporter                           |                                                                                                                                           |
-| avec pique-nique et goûter à emporter                                                 |                                                                                                                                           |
-| avec pique-nique à emporter                                                           |                                                                                                                                           |
-| avec goûter et pique-nique du soir à emporter                                         |                                                                                                                                           |
-| avec goûter à emporter                                                                |                                                                                                                                           |
-| avec pique-nique du soir à emporter                                                   |                                                                                                                                           |
+| Valeur                                                                                | Conditions                                                                                       |
+|---------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------|
+|                                                                                       | Si le petit-déjeuner est fourni par Valrance                                                     |
+| avec collation petit-déjeuner, pique-nique, goûter, et pique-nique du soir à emporter | ... et que tous les repas/snack sont pris en extérieur.                                          |
+| avec collation petit-déjeuner, pique-nique et goûter à emporter                       | ... et que tous les repas/snack sont pris en extérieur, sauf le dîner.                           |
+| avec collation petit-déjeuner et pique-nique à emporter                               | ... et que le petit-déjeuner et le déjeuner sont pris en extérieur, mais pas le goûter et dîner. |
+| avec collation petit-déjeuner à emporter                                              | ... et que le petit-déjeuner est pris en extérieur, mais pas le déjeuner, le goûter et dîner.    |
+|                                                                                       | Si le petit-déjeuner n'est pas fourni par Valrance ou qu'il n'est pas pris en extérieur          |
+|                                                                                       | et que le déjeuner est fourni par Valrance et pris extérieur                                     |
+| avec pique-nique, goûter, et pique-nique du soir à emporter                           | ... et que le goûter et le dîner sont pris en extérieur.                                         |
+| avec pique-nique et goûter à emporter                                                 | ... et que le goûter est pris en extérieur, mais pas le dîner.                                   |
+| avec pique-nique à emporter                                                           | ... et que le goûter et le diner ne sont pas pris en extérieur.                                  |
+|                                                                                       | Si le petit-déjeuner n'est pas fourni par Valrance ou qu'il n'est pas pris en extérieur          |
+|                                                                                       | et que le déjeuner n'est pas fourni par Valrance ou qu'il n'est pas pris en extérieur            |
+|                                                                                       | et que le goûter est fourni par Valrance et pris en extérieur                                    |
+| avec goûter et pique-nique du soir à emporter                                         | ... et que le dîner est pris en extérieur                                                        |
+| avec goûter à emporter                                                                | ... et que le dîner n'est pas pris en extérieur                                                  |
+|                                                                                       | Si le petit-déjeuner n'est pas fourni par Valrance ou qu'il n'est pas pris en extérieur          |
+|                                                                                       | et que le déjeuner n'est pas fourni par Valrance ou qu'il n'est pas pris en extérieur            |
+|                                                                                       | et que le goûter n'est pas fourni par Valrance ou qu'il n'est pas pris en extérieur              |
+| avec pique-nique du soir à emporter                                                   | ... et que le dîner est fourni par Valrance et qu'il est pris en extérieur.                      |
+
+Format : {_1ère partie_}, {_2ème partie_}
+
+Note format : les 1ère et 2ème parties sont optionnels
+
+Exemples :
+
+  - après le goûter
+  - après le petit-déjeuner, avec goûter à emporter
+  - près le petit-déjeuner, avec pique-nique et goûter à emporter
+  - ...
 
 #### Note : "Deplacements"
 
