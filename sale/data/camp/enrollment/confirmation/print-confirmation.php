@@ -42,10 +42,6 @@ use Twig\TwigFilter;
 
     ],
     'constants'             => ['DEFAULT_LANG', 'L10N_LOCALE'],
-    'access' => [
-        'visibility'        => 'protected',
-        'groups'            => ['camp.default.user'],
-    ],
     'response'      => [
         'content-type'      => 'application/pdf',
         'accept-origin'     => '*'

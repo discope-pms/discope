@@ -31,7 +31,7 @@ use sale\camp\Enrollment;
     ],
     'access'        => [
         'visibility'    => 'protected',
-        'groups'        => ['camp.default.user'],
+        'groups'        => ['camp.default.administrator', 'camp.default.user'],
     ],
     'response'      => [
         'content-type'  => 'application/json',
