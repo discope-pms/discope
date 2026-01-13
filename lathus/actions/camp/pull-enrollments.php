@@ -139,19 +139,19 @@ $findOrCreateGuardian = function($ext_guardian, $ext_child, $child_id) use($sani
             'children_ids'      => [$child['id']]
         ];
 
-        if(!empty($ext_guardian['telephonePortable'])) {
-            $guardian_data['mobile'] = $sanitizePhoneNumber($ext_guardian['telephonePortable']);
+        if(!empty($ext_guardian_phones['mobile'])) {
+            $guardian_data['mobile'] = $sanitizePhoneNumber($ext_guardian_phones['mobile']);
         }
 
-        if(!empty($ext_guardian['telephoneDomicile'])) {
-            $guardian_data['phone'] = $sanitizePhoneNumber($ext_guardian['telephoneDomicile']);
+        if(!empty($ext_guardian_phones['phone'])) {
+            $guardian_data['phone'] = $sanitizePhoneNumber($ext_guardian_phones['phone']);
         }
         elseif(!empty($ext_child['telephone'])) {
             $guardian_data['phone'] = $sanitizePhoneNumber($ext_child['telephone']);
         }
 
-        if(!empty($ext_guardian['telephoneTravail'])) {
-            $guardian_data['work_phone'] = $sanitizePhoneNumber($ext_guardian['telephoneTravail']);
+        if(!empty($ext_guardian_phones['work_phone'])) {
+            $guardian_data['work_phone'] = $sanitizePhoneNumber($ext_guardian_phones['work_phone']);
         }
 
         $guardian = LathusGuardian::create($guardian_data)
@@ -159,18 +159,22 @@ $findOrCreateGuardian = function($ext_guardian, $ext_child, $child_id) use($sani
             ->first();
     }
     elseif(!empty($ext_guardian_phones['mobile']) || !empty($ext_guardian_phones['phone']) || !empty($ext_guardian_phones['work_phone'])) {
-        $updated_phones_data = [];
+        $guardian_data = [];
+
         if(!empty($ext_guardian_phones['mobile'])) {
-            $updated_phones_data['mobile'] = $ext_guardian_phones['mobile'];
+            $guardian_data['mobile'] = $sanitizePhoneNumber($ext_guardian_phones['mobile']);
         }
+
         if(!empty($ext_guardian_phones['phone'])) {
-            $updated_phones_data['phone'] = $ext_guardian_phones['phone'];
+            $guardian_data['phone'] = $sanitizePhoneNumber($ext_guardian_phones['phone']);
         }
+
         if(!empty($ext_guardian_phones['work_phone'])) {
-            $updated_phones_data['work_phone'] = $ext_guardian_phones['work_phone'];
+            $guardian_data['work_phone'] = $sanitizePhoneNumber($ext_guardian_phones['work_phone']);
         }
-        if(!empty($updated_phones_data)) {
-            LathusGuardian::id($guardian['id'])->update($updated_phones_data);
+
+        if(!empty($guardian_data)) {
+            LathusGuardian::id($guardian['id'])->update($guardian_data);
         }
     }
 
