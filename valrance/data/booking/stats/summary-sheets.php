@@ -6,6 +6,9 @@
 */
 
 use sale\booking\Booking;
+use sale\booking\BookingLine;
+use sale\booking\BookingMeal;
+use sale\catalog\Product;
 use sale\customer\AgeRange;
 
 [$params, $providers] = eQual::announce([
@@ -186,7 +189,7 @@ $bookings = Booking::search([
 ])
     ->read([
         'name',
-        'date_from',  // jeudi 30 janvier 2025
+        'date_from',
         'date_to',
         'status',
         'customer_id' => [
@@ -206,7 +209,7 @@ $bookings = Booking::search([
             'mobile'
         ],
         'contacts_ids' => [
-            'type', // if booking
+            'type',
             'partner_identity_id' => [
                 'type_id',
                 'firstname',
@@ -219,7 +222,7 @@ $bookings = Booking::search([
             ]
         ],
         'booking_lines_groups_ids' => [
-            'group_type', // if sojourn
+            'group_type',
             'age_range_assignments_ids' => [
                 'age_range_id',
                 'qty'
@@ -249,10 +252,19 @@ $map_rate_classes = [
 $result = [];
 
 foreach($bookings as $id => $booking) {
+
+    /*
+     * Customer name
+     */
+
     $customer_name = $booking['customer_identity_id']['display_name'];
     if($booking['customer_identity_id']['type_id'] !== 1) {
         $customer_name = $booking['customer_identity_id']['legal_name'];
     }
+
+    /*
+     * Contacts
+     */
 
     $contact_booking = null;
     foreach($booking['contacts_ids'] as $contact) {
@@ -273,29 +285,214 @@ foreach($bookings as $id => $booking) {
         break;
     }
 
-    $map_first_meal = [
-        'avec PN et goûter amenés par leurs soins',
-        'avec le PN amenés par leurs soins',
-        'pour le déjeuner',
-        'pour le dîner'
+    /*
+     * First day meal description
+     */
+
+    $first_day_meals = BookingMeal::search([
+        ['booking_id', '=', $booking['id']],
+        ['date', '=', $booking['date_from']]
+    ])
+        ->read([
+            'is_self_provided',
+            'time_slot_id'      => ['code'],
+            'meal_type_id'      => ['code']
+        ])
+        ->get();
+
+    $first_day_meals_config = [
+        'has_breakfast'     => false,
+        'has_lunch'         => false,
+        'has_diner'         => false,
+        'has_snack'         => false,
+        'is_lunch_picnic'   => false
     ];
 
-    $map_last_meal = [
-        'avec collation pdj, PND et goûter à emporter',
-        'avec PND et goûter à emporter',
-        'avec PND à emporter',
-        'avec le goûter à emporter',
-        'après le petit déjeuner',
-        'après le déjeuner',
-        'après le goûter',
+    foreach($first_day_meals as $meal_id => $meal) {
+        if($meal['time_slot_id']['code'] === 'B' && !$meal['is_self_provided']) {
+            $first_day_meals_config['has_breakfast'] = true;
+        }
+        elseif($meal['time_slot_id']['code'] === 'L') {
+            if(!$meal['is_self_provided']) {
+                $first_day_meals_config['has_lunch'] = true;
+            }
+            if($meal['meal_type_id']['code'] === 'picnic') {
+                $first_day_meals_config['is_lunch_picnic'] = true;
+            }
+        }
+        elseif($meal['time_slot_id']['code'] === 'D' && !$meal['is_self_provided']) {
+            $first_day_meals_config['has_diner'] = true;
+            $has_diner = true;
+        }
+        elseif($meal['time_slot_id']['code'] === 'PM' && !$meal['is_self_provided']) {
+            $first_day_meals_config['has_snack'] = true;
+        }
+    }
+
+    $first_meal_description = '';
+    if($first_day_meals_config['has_breakfast']) {
+        $first_meal_description = 'pour le petit-déjeuner';
+    }
+    elseif($first_day_meals_config['has_lunch']) {
+        $first_meal_description = 'pour le déjeuner';
+    }
+    elseif($first_day_meals_config['has_snack']) {
+        $first_meal_description = 'pour le goûter';
+    }
+    elseif($first_day_meals_config['has_diner']) {
+        $first_meal_description = 'pour le dîner';
+    }
+    else {
+        $first_meal_description = 'pour la nuitée';
+    }
+
+    if($first_day_meals_config['is_lunch_picnic']) {
+        $first_meal_description .= ', ';
+
+        if($first_day_meals_config['has_lunch']) {
+            if($first_day_meals_config['has_snack']) {
+                $first_meal_description .= 'avec pique-nique et goûter fournis par le Relais Valrance';
+            }
+            else {
+                $first_meal_description .= 'avec pique-nique fourni par le Relais Valrance';
+            }
+        }
+        else {
+            if($first_day_meals_config['has_snack']) {
+                $first_meal_description .= 'avec pique-nique amenés par vos soins et goûter fourni par le Relais Valrance';
+            }
+            else {
+                $first_meal_description .= 'avec pique-nique et goûter amenés par vos soins';
+            }
+        }
+    }
+
+    /*
+     * Last day meal description
+     */
+
+    $last_day_meals = BookingMeal::search([
+        ['booking_id', '=', $booking['id']],
+        ['date', '=', $booking['date_to']]
+    ])
+        ->read([
+            'is_self_provided',
+            'time_slot_id'      => ['code'],
+            'meal_place_id'     => ['place_type']
+        ])
+        ->get();
+
+    $last_day_meals_config = [
+        'has_breakfast'         => false,
+        'has_lunch'             => false,
+        'has_diner'             => false,
+        'has_snack'             => false,
+        'is_breakfast_offsite'  => false,
+        'is_lunch_offsite'      => false,
+        'is_snack_offsite'      => false,
+        'is_diner_offsite'      => false
     ];
 
-    // TODO: handle first and last meal
+    foreach($last_day_meals as $meal_id => $meal) {
+        $offsite = in_array($meal['meal_place_id']['place_type'], ['offsite', 'auto']);
+        if($meal['time_slot_id']['code'] === 'B' && !$meal['is_self_provided']) {
+            $last_day_meals_config['has_breakfast'] = true;
+            $last_day_meals_config['is_breakfast_offsite'] = $offsite;
+        }
+        elseif($meal['time_slot_id']['code'] === 'L' && !$meal['is_self_provided']) {
+            $last_day_meals_config['has_lunch'] = true;
+            $last_day_meals_config['is_lunch_offsite'] = $offsite;
+        }
+        elseif($meal['time_slot_id']['code'] === 'PM' && !$meal['is_self_provided']) {
+            $last_day_meals_config['has_snack'] = true;
+            $last_day_meals_config['is_snack_offsite'] = $offsite;
+        }
+        elseif($meal['time_slot_id']['code'] === 'D' && !$meal['is_self_provided']) {
+            $last_day_meals_config['has_diner'] = true;
+            $last_day_meals_config['is_diner_offsite'] = $offsite;
+        }
+    }
 
-    $nb_children = 0;
-    $nb_teachers = 0;
-    $nb_adults = 0;
-    $nb_drivers = 0;
+    $last_meal_description = '';
+    if($last_day_meals_config['has_diner'] && !$last_day_meals_config['is_diner_offsite']) {
+        $last_meal_description .= 'après le dîner';
+    }
+    elseif($last_day_meals_config['has_snack'] && !$last_day_meals_config['is_snack_offsite']) {
+        $last_meal_description .= 'après le goûter';
+    }
+    elseif($last_day_meals_config['has_lunch'] && !$last_day_meals_config['is_lunch_offsite']) {
+        $last_meal_description .= 'après le déjeuner';
+    }
+    elseif($last_day_meals_config['has_breakfast'] && !$last_day_meals_config['is_breakfast_offsite']) {
+        $last_meal_description .= 'après le petit-déjeuner';
+    }
+
+    if($last_day_meals_config['has_breakfast'] && $last_day_meals_config['is_breakfast_offsite']) {
+        if(strlen($last_meal_description) > 0) {
+            $last_meal_description .= ', ';
+        }
+        if($last_day_meals_config['is_lunch_offsite']) {
+            if($last_day_meals_config['is_snack_offsite']) {
+                if($last_day_meals_config['is_diner_offsite']) {
+                    $last_meal_description .= 'avec collation petit-déjeuner, pique-nique, goûter, et pique-nique du soir à emporter';
+                }
+                else {
+                    $last_meal_description .= 'avec collation petit-déjeuner, pique-nique et goûter à emporter';
+                }
+            }
+            else {
+                $last_meal_description .= 'avec collation petit-déjeuner et pique-nique à emporter';
+            }
+        }
+        else {
+            $last_meal_description .= 'avec collation petit-déjeuner à emporter';
+        }
+    }
+    elseif($last_day_meals_config['has_lunch'] && $last_day_meals_config['is_lunch_offsite']) {
+        if(strlen($last_meal_description) > 0) {
+            $last_meal_description .= ', ';
+        }
+        if($last_day_meals_config['is_snack_offsite']) {
+            if($last_day_meals_config['is_diner_offsite']) {
+                $last_meal_description .= 'avec pique-nique, goûter, et pique-nique du soir à emporter';
+            }
+            else {
+                $last_meal_description .= 'avec pique-nique et goûter à emporter';
+            }
+        }
+        else {
+            $last_meal_description .= 'avec pique-nique à emporter';
+        }
+    }
+    elseif($last_day_meals_config['has_snack'] && $last_day_meals_config['is_snack_offsite']) {
+        if(strlen($last_meal_description) > 0) {
+            $last_meal_description .= ', ';
+        }
+        if($last_day_meals_config['is_diner_offsite']) {
+            $last_meal_description .= 'avec goûter et pique-nique du soir à emporter';
+        }
+        else {
+            $last_meal_description .= 'avec goûter à emporter';
+        }
+    }
+    elseif($last_day_meals_config['has_diner'] && $last_day_meals_config['is_diner_offsite']) {
+        if(strlen($last_meal_description) > 0) {
+            $last_meal_description .= ', ';
+        }
+        $last_meal_description .= 'avec pique-nique du soir à emporter';
+    }
+
+    /*
+     * Quantities of people
+     */
+
+    $people_qty_conf = [
+        'children'  => 0,
+        'teachers'  => 0,
+        'adults'    => 0,
+        'drivers'   => 0,
+    ];
+
     foreach($booking['booking_lines_groups_ids'] as $group) {
         if($group['group_type'] !== 'sojourn') {
             continue;
@@ -304,16 +501,16 @@ foreach($bookings as $id => $booking) {
         foreach($group['age_range_assignments_ids'] as $age_range_assignment) {
             switch($age_range_assignment['age_range_id']) {
                 case 2:
-                    $nb_children += $age_range_assignment['qty'];
+                    $people_qty_conf['children'] += $age_range_assignment['qty'];
                     break;
                 case 7:
-                    $nb_teachers += $age_range_assignment['qty'];
+                    $people_qty_conf['teachers'] += $age_range_assignment['qty'];
                     break;
                 case 9:
-                    $nb_drivers += $age_range_assignment['qty'];
+                    $people_qty_conf['drivers'] += $age_range_assignment['qty'];
                     break;
                 case 10:
-                    $nb_adults += $age_range_assignment['qty'];
+                    $people_qty_conf['adults'] += $age_range_assignment['qty'];
                     break;
                 default:
                     throw new Exception("not_handled_age_range", EQ_ERROR_INVALID_PARAM);
@@ -321,9 +518,71 @@ foreach($bookings as $id => $booking) {
         }
     }
 
-    // TODO: handle travel
+    /*
+     * Travel description
+     */
+
+    $products_ids = Product::search(['sku', 'in', ['RV-transport_aller_retour-2926', 'RV-Transport-Massol', 'RV-Transport-Verbus']])->ids();
+
+    $booking_lines = BookingLine::search([
+        ['booking_id', '=', $id],
+        ['product_id', 'in', $products_ids]
+    ])
+        ->read(['product_id' => ['sku']])
+        ->get();
+
+    $travel_products_config = [
+        'round_trip'        => false,
+        'massol_activities' => false,
+        'verbus_activities' => false
+    ];
+
+    foreach($booking_lines as $line) {
+        switch($line['product_id']['sku']) {
+            case 'RV-transport_aller_retour-2926':
+                $travel_products_config['round_trip'] = true;
+                break;
+            case 'RV-Transport-Massol':
+                $travel_products_config['massol_activities'] = true;
+                break;
+            case 'RV-Transport-Verbus':
+                $travel_products_config['verbus_activities'] = true;
+                break;
+        }
+    }
+
+    $travel_description = '';
+    if($travel_products_config['round_trip']) {
+        $travel_description .= 'A/R avec les Voyages MASSOL';
+    }
+    if($people_qty_conf['drivers'] > 0) {
+        if(strlen($travel_description) > 0) {
+            $travel_description .= ', ';
+        }
+        $travel_description = 'Le bus reste sur place';
+    }
+    if($travel_products_config['massol_activities']) {
+        if(strlen($travel_description) > 0) {
+            $travel_description .= ', ';
+        }
+        $travel_description .= 'Déplacement avec les Voyages MASSOL';
+    }
+    if($travel_products_config['verbus_activities']) {
+        if(strlen($travel_description) > 0) {
+            $travel_description .= ', ';
+        }
+        $travel_description .= 'Déplacement avec VERBUS';
+    }
+
+    /*
+     * Rental units
+     */
 
     $rental_units = array_map(fn($rental_unit) => $rental_unit['name'], $booking['rental_unit_assignments_ids']);
+
+    /*
+     * Add data to result
+     */
 
     $result[] = [
         'name'                      => $booking['name'],
@@ -348,14 +607,14 @@ foreach($bookings as $id => $booking) {
         'contact_2_firstname'       => !empty($contact_second['partner_identity_id']['firstname']) ? $contact_second['partner_identity_id']['firstname'] : '',
         'contact_2_email'           => !empty($contact_second['partner_identity_id']['email']) ? $contact_second['partner_identity_id']['email'] : '',
         'contact_2_phone'           => !empty($contact_second['partner_identity_id']['phone']) ? $contact_second['partner_identity_id']['phone'] : $contact_second['partner_identity_id']['mobile'],
-        'first_meal'                => '', // TODO: handle first meal
-        'last_meal'                 => '', // TODO: handle last meal
-        'nb_children'               => $nb_children,
-        'nb_teachers'               => $nb_teachers,
-        'nb_adults'                 => $nb_adults,
-        'nb_drivers'                => $nb_drivers,
+        'first_meal'                => $first_meal_description,
+        'last_meal'                 => $last_meal_description,
+        'nb_children'               => $people_qty_conf['children'],
+        'nb_teachers'               => $people_qty_conf['teachers'],
+        'nb_adults'                 => $people_qty_conf['adults'],
+        'nb_drivers'                => $people_qty_conf['drivers'],
         'kindergarten'              => '', // #todo - handle kindergarten
-        'travel'                    => '', // TODO: handle travel
+        'travel'                    => $travel_description,
         'rental_units'              => implode(', ', $rental_units)
     ];
 }
