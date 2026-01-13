@@ -24,6 +24,8 @@ Il est possible d'ajouter des commentaires à certain moment d'une journée est 
 
 Par exemple un commentaire le dernier jour au matin peut-être ajouté pour dire **Ranger et libérer les chambres avant 9h00**.
 
+---
+
 ## Stats
 
 ### Fiches récapitulatives
@@ -95,8 +97,8 @@ _2ème partie_ :
 |                                                                                       | Si le petit-déjeuner n'est pas fourni par Valrance ou qu'il n'est pas pris en extérieur          |
 |                                                                                       | et que le déjeuner n'est pas fourni par Valrance ou qu'il n'est pas pris en extérieur            |
 |                                                                                       | et que le goûter est fourni par Valrance et pris en extérieur                                    |
-| avec goûter et pique-nique du soir à emporter                                         | ... et que le dîner est pris en extérieur                                                        |
-| avec goûter à emporter                                                                | ... et que le dîner n'est pas pris en extérieur                                                  |
+| avec goûter et pique-nique du soir à emporter                                         | ... et que le dîner est pris en extérieur.                                                       |
+| avec goûter à emporter                                                                | ... et que le dîner n'est pas pris en extérieur.                                                 |
 |                                                                                       | Si le petit-déjeuner n'est pas fourni par Valrance ou qu'il n'est pas pris en extérieur          |
 |                                                                                       | et que le déjeuner n'est pas fourni par Valrance ou qu'il n'est pas pris en extérieur            |
 |                                                                                       | et que le goûter n'est pas fourni par Valrance ou qu'il n'est pas pris en extérieur              |
@@ -115,4 +117,9 @@ Exemples :
 
 #### Note : "Deplacements"
 
-
+| Valeur                              | Conditions                                                                  |
+|-------------------------------------|-----------------------------------------------------------------------------|
+| A/R avec les Voyages MASSOL         | Si un transport SKU "RV-transport_aller_retour-2926" dans le groupe séjour. |
+| Le bus reste sur place              | Si au moins un chauffeur présent dans les tranches d'âges du groupe séjour. |
+| Déplacement avec les Voyages MASSOL | Si un transport d'une activité est SKU "RV-Transport-Massol".               |
+| Déplacement avec VERBUS             | Si un transport d'une activité est SKU "RV-Transport-Verbus".               |
