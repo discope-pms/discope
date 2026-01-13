@@ -322,7 +322,6 @@ foreach($bookings as $id => $booking) {
         }
         elseif($meal['time_slot_id']['code'] === 'D' && !$meal['is_self_provided']) {
             $first_day_meals_config['has_diner'] = true;
-            $has_diner = true;
         }
         elseif($meal['time_slot_id']['code'] === 'PM' && !$meal['is_self_provided']) {
             $first_day_meals_config['has_snack'] = true;
@@ -623,4 +622,3 @@ $context->httpResponse()
         ->header('X-Total-Count', count($result))
         ->body($result)
         ->send();
-
