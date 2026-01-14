@@ -118,12 +118,14 @@ $invoices = Invoice::search($domain, ['limit' => 100, 'sort' => ['number' => 'as
         'due_date',
         'type',
         'status',
-        // 'price',
         // #memo - accounting price is the amount to be recorded in accountancy (does not include installment payments)
         'accounting_price',
         'is_deposit',
         'organisation_id',
         'subtotals_vat',
+        'total',
+        'total_vat',
+        'price',
         'partner_id' => [
             'id',
             'name',
@@ -601,35 +603,40 @@ foreach($invoices as $invoice) {
         }
     }
 
-    // #memo - if result of vat "calculation per line" is different from result of vat "calculation per vat_rate" (BE: 6%, 12% and 21%), then adapt it to match Invoices data
-    $subtotals_vat_lines = [];
-    foreach($invoice_lines_accounts as $account_values) {
-        $vat_rate_index = number_format($account_values['vat_rate'] * 100, 2, '.', '');
-        if(!isset($subtotals_vat_lines[$vat_rate_index])) {
-            $subtotals_vat_lines[$vat_rate_index] = 0.0;
-        }
-
-        $subtotals_vat_lines[$vat_rate_index] += $account_values['vat'];
-    }
-    foreach($subtotals_vat_lines as $vat_rate_index => $subtotal_vat) {
-        if(abs($subtotal_vat - $invoice['subtotals_vat'][$vat_rate_index]) < 0.01) {
-            continue;
-        }
-
-        $diff = $invoice['subtotals_vat'][$vat_rate_index] - $subtotal_vat;
-        if(round($diff, 2) == 0.0) {
-            continue;
-        }
-        foreach($invoice_lines_accounts as &$account_values) {
-            $vat_rate = ((float) $vat_rate_index) / 100;
-            if($account_values['vat_rate'] === $vat_rate) {
-                // adapt here
-                $account_values['vat'] = round($account_values['vat'] + $diff, 2);
-                unset($account_values);
-                continue 2;
+    // the check $invoice['price'] === $new_calculation_price can be removed when the new vat calculation price (peppol compatible) is the only used (no more old invoice to export)
+    $new_calculation_price = round($invoice['total_vat'] + $invoice['total'], 2);
+    if($invoice['price'] === $new_calculation_price) {
+        // #memo - if result of vat "calculation per line" is different from result of vat "calculation per vat_rate" (BE: 6%, 12% and 21%), then adapt it to match Invoices data
+        $subtotals_vat_lines = [];
+        foreach($invoice_lines_accounts as $account_values) {
+            $vat_rate_index = number_format($account_values['vat_rate'] * 100, 2, '.', '');
+            if(!isset($subtotals_vat_lines[$vat_rate_index])) {
+                $subtotals_vat_lines[$vat_rate_index] = 0.0;
             }
+
+            $subtotals_vat_lines[$vat_rate_index] += $account_values['vat'];
         }
-        unset($account_values);
+
+        foreach($subtotals_vat_lines as $vat_rate_index => $subtotal_vat) {
+            if(abs($subtotal_vat - $invoice['subtotals_vat'][$vat_rate_index]) < 0.01) {
+                continue;
+            }
+
+            $diff = $invoice['subtotals_vat'][$vat_rate_index] - $subtotal_vat;
+            if(round($diff, 2) == 0.0) {
+                continue;
+            }
+            foreach($invoice_lines_accounts as &$account_values) {
+                $vat_rate = ((float) $vat_rate_index) / 100;
+                if($account_values['vat_rate'] === $vat_rate) {
+                    // adapt here
+                    $account_values['vat'] = round($account_values['vat'] + $diff, 2);
+                    unset($account_values);
+                    continue 2;
+                }
+            }
+            unset($account_values);
+        }
     }
 
     // pass-2 : generate lines based on account entries
