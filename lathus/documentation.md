@@ -161,6 +161,261 @@ Il existe **deux types** de camps :
 >     - Coccinelles `10-12 ans`
 >     - Libellules `13-16 ans`
 
+
+
+### Modèles impliqués dans la gestion des Camps
+
+#### 1. Camp
+
+##### Rôle
+
+Modèle central représentant un camp/stage.
+
+##### Responsabilités principales
+
+- **Paramétrage** : dates, centre/bureau, tranche d’âge, lieu, type (CLSH / non-CLSH), ratios animateurs, nombre de groupes, produits associés.
+- **Workflow** : `draft` → `published` → `cancelled`.
+- **Politiques métier** :
+  - Publication conditionnée à l’existence d’au moins un groupe.
+  - Hooks automatiques lors des transitions (génération/suppression repas & activités).
+- **Contrôles de cohérence** :
+  - Validité des dates (ex : dimanche→vendredi vs CLSH 4/5 jours).
+  - Tranches d’âge compatibles avec le type de camp.
+  - Capacité globale calculée via groupes × ratio animateur.
+- **Logistique** :
+  - Génération des repas (matin, midi, goûter, dîner).
+  - Gestion du week-end pour les camps non-CLSH.
+
+
+
+#### 2. Groupes de Camp (`CampGroup`)
+
+##### Rôle
+
+Découpage opérationnel d’un camp en groupes d’enfants.
+
+##### Responsabilités
+
+- Responsable de groupe.
+- Numéro de groupe.
+- Capacité calculée automatiquement.
+- Rattachement des activités.
+
+##### Actions
+
+- Génération / annulation des activités.
+- Rafraîchissement des dates et événements partenaires.
+
+
+
+#### 3. Inscriptions (`Enrollment`)
+
+##### Rôle
+
+Lien entre un enfant et un camp.
+
+##### Contenu
+
+- Enfant inscrit.
+- Camp et groupe.
+- Classe tarifaire.
+- Produits et lignes d’inscription.
+- Options spécifiques :
+  - Week-end.
+  - CLSH par jour.
+  - Garderies matin / soir.
+
+##### Workflow
+
+- `pending`
+- `waitlisted`
+- `confirmed`
+- `validated`
+- `cancelled`
+
+##### Politiques
+
+- Capacité du camp/groupe.
+- Quota ASE.
+- Présence et complétude des documents requis.
+
+##### Automatisations
+
+- **À la confirmation** :
+  - Verrouillage de l’inscription.
+  - Génération des financements.
+  - Génération des présences.
+- **À l’annulation** :
+  - Déverrouillage.
+  - Suppression des présences.
+  - Nettoyage des financements et paiements.
+
+
+
+#### 4. Présences & Repas
+
+##### Présences
+
+- Génération automatique par jour.
+- CLSH : basée sur les champs `presence_day_X` + garderies AM/PM.
+- Non-CLSH : gestion spécifique du week-end.
+
+###### Modèle `Presence`
+
+- Une présence par date et par enfant.
+- Indicateurs garderie matin / soir.
+
+##### Repas
+
+- Générés au niveau du camp.
+- Types : matin, déjeuner, goûter, dîner.
+- Inclusion du week-end pour les camps non-CLSH.
+
+
+
+#### 5. Tarification & Produits
+
+##### Catalogue
+
+- Produits et modèles de produits spécifiques aux camps.
+- Produits standards : séjour complet, week-end, samedi matin, CLSH 4/5 jours.
+
+##### Tarification
+
+- Classes de camp :
+  - `other`
+  - `member`
+  - `close-member`
+- CLSH : tarification par quotient familial.
+
+##### Lignes d’inscription (`EnrollmentLine`)
+
+- Calcul des montants HT / TTC.
+- TVA.
+- Quantités.
+- Recalculs cohérents en cascade.
+
+
+
+#### 6. Réductions, Aides & Parrains
+
+##### Adaptateurs de prix (`PriceAdapter`)
+
+- Réductions manuelles.
+- Fidélité.
+- Aides collectivités.
+- CAF / MSA.
+- Contraintes métier :
+  - Un seul adaptateur de type `percent` par inscription.
+  - Sponsors en montant fixe (`amount`).
+
+##### Sponsors
+
+- Montant.
+- Type de sponsor.
+- Alimentation des adaptateurs de prix.
+
+##### Comité d’entreprise (`WorksCouncil`)
+
+- Peut surclasser la classe de camp appliquée.
+
+
+
+#### 7. Paiements & Financements
+
+##### Gestion financière
+
+- Statut de paiement : `due` / `paid`.
+- Montant payé cumulé.
+- Références structurées (VCS / RN / RF).
+
+##### Automatisation
+
+- Création, mise à jour et nettoyage des financements et paiements selon les transitions de workflow des inscriptions.
+
+
+
+#### 8. Documents & Emails
+
+##### Documents
+
+- Définition des documents requis par modèle ou camp.
+- Génération automatique des documents d’inscription.
+- Suivi de complétude (“tous reçus”).
+
+##### Emails
+
+- Suivi des mails liés aux inscriptions :
+  - Pré-inscription.
+  - Confirmation.
+- Modèle dédié pour tracer l’historique d’envoi.
+
+
+
+#### 9. Enfants, Responsables & Institutions
+
+##### Enfant (`Child`)
+
+- Identité, âge.
+- Licences (FFE / CPA).
+- Compétences.
+- Classe de camp calculée.
+- Lien vers inscriptions et présences.
+
+##### Responsable légal (`Guardian`)
+
+- Coordonnées.
+- Adresses de facturation.
+- Détermination géographique (Vienne / CCVG) influençant la classe tarifaire.
+
+##### Institution
+
+- Structures d’accueil (ASE, foyer, lieu de vie).
+- Rattachement aux enfants.
+
+
+
+#### 10. Compétences & Exigences
+
+##### Compétences (`Skill`)
+
+- Compétences requises par camp ou modèle.
+- Compétences détenues par les enfants.
+- Vérifications automatiques lors des inscriptions.
+
+
+
+#### 11. Modèles de Camp (`CampModel`)
+
+##### Rôle
+
+Modèle de référence pour la création des camps.
+
+##### Contenu
+
+- Type de camp.
+- CLSH vs non-CLSH.
+- Produits requis.
+- Documents requis.
+- Compétences requises.
+- Quotas ASE.
+
+
+
+#### 12. Suivi Opérationnel
+
+##### Tâches & Événements
+
+- **TaskModel** : modèles de tâches.
+- **TaskEvent** : événements déclencheurs (changement de statut, date).
+- **Task** : tâches opérationnelles rattachées aux inscriptions.
+
+##### Objectif
+
+- Suivi administratif et opérationnel.
+- Anticipation des actions à mener (documents, paiements, confirmations).
+
+
 ---
 
 ### Produits
