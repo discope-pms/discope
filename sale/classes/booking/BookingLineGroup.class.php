@@ -386,6 +386,16 @@ class BookingLineGroup extends Model {
                 'description'       => "Does the group include a product related to bed-making at the beginning of the stay?",
                 'help'              => "Bed linens are always provided when make_beds is true.",
                 'default'           => false
+            ],
+
+            'booking_line_group_attributes_ids' => [
+                'type'              => 'many2many',
+                'foreign_object'    => 'sale\booking\BookingLineGroupAttribute',
+                'foreign_field'     => 'booking_line_group_attributes_ids',
+                'rel_table'         => 'sale_booking_line_group_rel_sale_booking_line_group_attribute',
+                'rel_local_key'     => 'booking_line_group_id',
+                'rel_foreign_key'   => 'booking_line_group_attribute_id',
+                'description'       => "Booking attributes that flag the group."
             ]
 
         ];
@@ -2022,7 +2032,8 @@ class BookingLineGroup extends Model {
             'time_to',
             'age_range_assignments_ids',
             'rental_unit_assignments_ids',
-            'meal_preferences_ids'
+            'meal_preferences_ids',
+            'booking_line_group_attributes_ids'
         ],
             $lang);
 
@@ -2463,6 +2474,10 @@ class BookingLineGroup extends Model {
                             // for meals, we store the age ranges and prefs within the description field
                             if($is_meal) {
                                 $description = '';
+                                $attributes = $om->read(BookingLineGroupAttribute::getType(), $group['booking_line_group_attributes_ids'], ['name'], $lang);
+                                foreach($attributes as $oid => $attribute) {
+                                    $description .= "<p>{$attribute['name']} ; </p>";
+                                }
                                 $age_range_assignments = $om->read(BookingLineGroupAgeRangeAssignment::getType(), $group['age_range_assignments_ids'], ['age_range_id.name','qty'], $lang);
                                 foreach($age_range_assignments as $oid => $assignment) {
                                     $description .= "<p>{$assignment['age_range_id.name']} : {$assignment['qty']} ; </p>";

@@ -259,10 +259,12 @@ class Consumption extends Model {
                 'rental_unit_id',
                 'rental_unit_id.is_accomodation',
                 'date',
+                'description',
                 'booking_line_group_id.date_from',
                 'booking_line_group_id.date_to',
                 'booking_line_group_id.make_beds',
-                'booking_line_group_id.bed_linens'
+                'booking_line_group_id.bed_linens',
+                'booking_line_group_id.booking_line_group_attributes_ids'
             ],
             $lang
         );
@@ -277,6 +279,7 @@ class Consumption extends Model {
                 $cleanup_type = 'none';
                 $make_beds = false;
                 $bed_linens = false;
+                $description = $consumption['description'];
 
                 if($is_accommodation) {
                     $is_first_day = $consumption['booking_line_group_id.date_from'] === $consumption['date'];
@@ -291,6 +294,11 @@ class Consumption extends Model {
                     else {
                         $cleanup_type = 'daily';
                     }
+
+                    $attributes = $om->read(BookingLineGroupAttribute::getType(), $consumption['booking_line_group_id.booking_line_group_attributes_ids'], ['name'], $lang);
+                    foreach($attributes as $oid => $attribute) {
+                        $description .= "<p>{$attribute['name']} ; </p>";
+                    }
                 }
 
                 $om->update(self::getType(), $oids, [
@@ -298,7 +306,8 @@ class Consumption extends Model {
                     'is_accomodation'   => $is_accommodation,
                     'cleanup_type'      => $cleanup_type,
                     'make_beds'         => $make_beds,
-                    'bed_linens'        => $bed_linens
+                    'bed_linens'        => $bed_linens,
+                    'description'       => $description
                 ]);
             }
         }

@@ -67,6 +67,7 @@ export class BookingServicesBookingComponent
     public sojourn_types: { id: number, name: 'GA'|'GG' }[] = [];
     public meal_types: { id: number, name: string, code: string }[] = [];
     public meal_places: { id: number, name: string, code: string }[] = [];
+    public group_attributes: { id: number, name: string, code: string }[] = [];
 
     private mapGroupsIdsHasActivity: {[key: number]: boolean};
 
@@ -108,17 +109,19 @@ export class BookingServicesBookingComponent
 
     public async ngOnInit() {
         console.debug('BookingServicesBookingComponent::ngOnInit');
-        const [timeSlots, sojournTypes, mealTypes, mealPlaces] = await Promise.all([
+        const [timeSlots, sojournTypes, mealTypes, mealPlaces, groupAttributes] = await Promise.all([
             this.api.collect('sale\\booking\\TimeSlot', [], ['id','name','code']),
             this.api.collect('sale\\booking\\SojournType', [], ['id','name']),
             this.api.collect('sale\\booking\\MealType', [], ['id','name','code']),
-            this.api.collect('sale\\booking\\MealPlace', [], ['id','name','code'])
+            this.api.collect('sale\\booking\\MealPlace', [], ['id','name','code']),
+            this.api.collect('sale\\booking\\BookingLineGroupAttribute', [], ['id','name','code'])
         ]);
 
         this.time_slots = timeSlots;
         this.sojourn_types = sojournTypes;
         this.meal_types = mealTypes;
         this.meal_places = mealPlaces;
+        this.group_attributes = groupAttributes;
 
         this.load$.pipe(debounceTime(500)).subscribe(() => {
             this.load(this.instance.id);
