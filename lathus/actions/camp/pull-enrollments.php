@@ -344,7 +344,7 @@ if(!empty($data)) {
                 'cpa_club'          => $ext_enrollment['metaJson']['aides']['clubCpa'] ?? null,
                 'has_license_ffe'   => !is_null($ext_child_horseriding),
                 'license_ffe'       => $ext_child_horseriding ? $ext_child_horseriding['dernierGalopValide'] : null,
-                'year_license_ffe'  => $ext_child_horseriding ? $ext_child_horseriding['anneeLicence'] : null,
+                'year_license_ffe'  => !empty($ext_child_horseriding['anneeLicence']) && is_numeric($ext_child_horseriding['anneeLicence']) ? $ext_child_horseriding['anneeLicence'] : null,
                 'external_ref'      => $ext_enrollment['wpOrderId']
             ])
                 ->read(['id'])
