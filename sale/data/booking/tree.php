@@ -214,6 +214,10 @@ $tree = [
             'meal_type_id',
             'meal_place_id',
             'booking_lines_ids'
+        ],
+        'booking_line_group_attributes_ids' => [
+            'name',
+            'code'
         ]
     ]
 ];

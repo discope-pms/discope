@@ -41,6 +41,7 @@ export class BookingLineGroup {
         public booking_meals_ids: any[] = [],
         public has_person_with_disability: boolean = false,
         public person_disability_description: string = '',
-        public meal_prefs_description: string = ''
+        public meal_prefs_description: string = '',
+        public booking_line_group_attributes_ids: any[] = []
     ) {}
 }

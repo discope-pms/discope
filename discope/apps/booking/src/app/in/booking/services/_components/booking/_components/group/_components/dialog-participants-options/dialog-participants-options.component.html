@@ -14,6 +14,15 @@
                   theme="snow"
                   [placeholder]="'Description'"
     ></quill-editor>
+
+    <div *ngFor="let groupAttribute of vm.attributes">
+        <mat-slide-toggle class="disability-toggle" [formControl]="groupAttribute.formControl">
+            {{ groupAttribute.data.name }}
+        </mat-slide-toggle>
+        <mat-hint *ngIf="groupAttribute.data.description && groupAttribute.data.description.length > 0">
+            {{ groupAttribute.data.description }}
+        </mat-hint>
+    </div>
 </div>
 
 <div mat-dialog-actions style="justify-content: flex-end; border-top: solid 1px lightgrey;">

@@ -34,6 +34,10 @@
             "label": "Types de réservations",
             "help": ""
         },
+        "sales.booking.booking_group_attributes": {
+            "label": "Attributs de groupes",
+            "help": ""
+        },
         "sales.camp": {
             "label": "Camps",
             "help": ""

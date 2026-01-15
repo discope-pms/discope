@@ -386,6 +386,16 @@ class BookingLineGroup extends Model {
                 'description'       => "Does the group include a product related to bed-making at the beginning of the stay?",
                 'help'              => "Bed linens are always provided when make_beds is true.",
                 'default'           => false
+            ],
+
+            'booking_line_group_attributes_ids' => [
+                'type'              => 'many2many',
+                'foreign_object'    => 'sale\booking\BookingLineGroupAttribute',
+                'foreign_field'     => 'booking_line_group_attributes_ids',
+                'rel_table'         => 'sale_booking_line_group_rel_sale_booking_line_group_attribute',
+                'rel_local_key'     => 'booking_line_group_id',
+                'rel_foreign_key'   => 'booking_line_group_attribute_id',
+                'description'       => "Booking attributes that flag the group."
             ]
 
         ];
