@@ -225,10 +225,10 @@ class Child extends Model {
      */
     public static function onupdateBirthdate($self) {
         $reset_age_enrollments_ids = [];
-        $self->read(['enrollments_ids' => ['is_locked']]);
+        $self->read(['enrollments_ids' => ['date_from']]);
         foreach($self as $child) {
             foreach($child['enrollments_ids'] as $enrollment) {
-                if(!$enrollment['is_locked']) {
+                if($enrollment['date_from'] > time()) {
                     $reset_age_enrollments_ids[] = $enrollment['id'];
                 }
             }
