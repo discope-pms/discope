@@ -74,7 +74,7 @@ Setting::set_value('finance', 'accounting', 'fiscal_year', $new_fiscal_year);
 // reset invoice sequences for all Center Offices
 $center_offices = CenterOffice::search()->read(['id', 'code'])->get(true);
 foreach($center_offices as $center_office) {
-    Setting::set_value('sale', 'accounting', 'invoice.sequence.'.$center_office['code'], 1);
+    Setting::set_sequence('sale', 'accounting', 'invoice.sequence.'.$center_office['code'], 1);
 }
 
 $context->httpResponse()

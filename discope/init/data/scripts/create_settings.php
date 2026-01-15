@@ -90,6 +90,7 @@ Setting::assert_value('sale', 'accounting', 'invoice.sequence_format', '%2d{year
 Setting::assert_value('sale', 'accounting', 'invoice.sequence', 1);
 // for compatibility when there are more than one center office
 Setting::assert_value('sale', 'accounting', 'invoice.sequence.1', 1);
+Setting::assert_sequence('sale', 'accounting', 'invoice.sequence.1', 1);
 // === identity.accounting ===
 Setting::assert_value('identity', 'accounting', 'customer_account.prefix', '411');
 Setting::assert_value('identity', 'accounting', 'customer_account.sequence', 1);
