@@ -1,7 +1,6 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { FormControl } from '@angular/forms';
-import {logger} from "codelyzer/util/logger";
 
 interface vmModel {
     has_person_with_disability: {

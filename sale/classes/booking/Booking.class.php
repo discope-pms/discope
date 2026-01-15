@@ -610,14 +610,6 @@ class Booking extends Model {
                 'foreign_field'     => 'booking_apply_id',
                 'foreign_object'    => 'sale\booking\BookingPoint',
                 'description'       => "Loyalty points that are applied on the booking."
-            ],
-
-            'booking_line_group_attributes_ids' => [
-                'type'              => 'computed',
-                'result_type'       => 'array',
-                'description'       => "All the attributes ids that are set on the booking groupes.",
-                'store'             => false,
-                'function'          => 'calcBookingLineGroupAttributesIds'
             ]
 
         ];
@@ -1185,19 +1177,6 @@ class Booking extends Model {
             }
         }
         return $result;
-    }
-
-    public static function calcBookingLineGroupAttributesIds($self) {
-        $map_attributes = [];
-        $self->read(['booking_lines_groups_ids' => ['booking_line_group_attributes_ids']]);
-        foreach($self as $id => $booking) {
-            foreach($booking['booking_lines_groups_ids'] as $group) {
-                foreach($group['booking_line_group_attributes_ids'] as $attribute_id) {
-                    $map_attributes[$attribute_id] = true;
-                }
-            }
-        }
-        return array_keys($map_attributes);
     }
 
     /**
