@@ -15,7 +15,7 @@
                   [placeholder]="'Description'"
     ></quill-editor>
 
-    <h4 style="margin-top: 20px; margin-bottom: 10px;">Attributs :</h4>
+    <h4 *ngIf="vm.attributes.length > 0" style="margin-top: 20px; margin-bottom: 10px;">Attributs :</h4>
 
     <div *ngFor="let groupAttribute of vm.attributes">
         <mat-slide-toggle class="disability-toggle" [formControl]="groupAttribute.formControl">
