@@ -629,7 +629,7 @@ foreach($bookings as $id => $booking) {
         'nb_teachers'               => $people_qty_conf['teachers'],
         'nb_adults'                 => $people_qty_conf['adults'],
         'nb_drivers'                => $people_qty_conf['drivers'],
-        'kindergarten'              => $has_kindergarten,
+        'kindergarten'              => $has_kindergarten ? 'oui' : '',
         'travel'                    => $travel_description,
         'rental_units'              => implode(', ', $rental_units)
     ];
