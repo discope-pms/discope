@@ -503,6 +503,8 @@ foreach($invoices as $invoice) {
         }
     }
 
+    $subtotals_vat_lines = [];
+
     // pass-1 : group all lines by account_id
     foreach($invoice['invoice_lines_ids'] as $lid => $line) {
         $vat = round($line['price'] - round($line['total'], 2), 2);
@@ -596,6 +598,13 @@ foreach($invoices as $invoice) {
             $invoice_lines_accounts[$rline['account_id']['code']]['vat'] += $line_vat;
             $invoice_lines_accounts[$rline['account_id']['code']]['amount'] += $line_amount;
 
+            // update vat subtotals map that will be used to adapt the vats amount later (to match Peppol style calculation of vat)
+            $vat_rate_index = number_format($vat_rate * 100, 2, '.', '');
+            if(!isset($subtotals_vat_lines[$vat_rate_index])) {
+                $subtotals_vat_lines[$vat_rate_index] = 0.0;
+            }
+            $subtotals_vat_lines[$vat_rate_index] = round($subtotals_vat_lines[$vat_rate_index] + $line_vat, 2);
+
             $amount_remaining -= $line_amount;
             $vat_remaining -= $line_vat;
 
@@ -607,23 +616,9 @@ foreach($invoices as $invoice) {
     $new_calculation_price = round($invoice['total_vat'] + $invoice['total'], 2);
     if($invoice['price'] === $new_calculation_price) {
         // #memo - if result of vat "calculation per line" is different from result of vat "calculation per vat_rate" (BE: 6%, 12% and 21%), then adapt it to match Invoices data
-        $subtotals_vat_lines = [];
-        foreach($invoice_lines_accounts as $account_values) {
-            $vat_rate_index = number_format($account_values['vat_rate'] * 100, 2, '.', '');
-            if(!isset($subtotals_vat_lines[$vat_rate_index])) {
-                $subtotals_vat_lines[$vat_rate_index] = 0.0;
-            }
-
-            $subtotals_vat_lines[$vat_rate_index] += $account_values['vat'];
-        }
-
         foreach($subtotals_vat_lines as $vat_rate_index => $subtotal_vat) {
-            if(abs($subtotal_vat - $invoice['subtotals_vat'][$vat_rate_index]) < 0.01) {
-                continue;
-            }
-
             $diff = $invoice['subtotals_vat'][$vat_rate_index] - $subtotal_vat;
-            if(round($diff, 2) == 0.0) {
+            if(round(abs($diff), 2) == 0.0) {
                 continue;
             }
             foreach($invoice_lines_accounts as &$account_values) {
