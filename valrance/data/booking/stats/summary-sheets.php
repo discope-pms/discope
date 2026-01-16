@@ -226,6 +226,9 @@ $bookings = Booking::search([
             'age_range_assignments_ids' => [
                 'age_range_id',
                 'qty'
+            ],
+            'booking_line_group_attributes_ids' => [
+                'code'
             ]
         ],
         'rental_unit_assignments_ids' => [
@@ -574,6 +577,20 @@ foreach($bookings as $id => $booking) {
     }
 
     /*
+     * Kindergarten attribute
+     */
+
+    $has_kindergarten = false;
+    foreach($booking['booking_lines_groups_ids'] as $group) {
+        foreach($group['booking_line_group_attributes_ids'] as $attribute) {
+            if($attribute['code'] === 'kindergarten') {
+                $has_kindergarten = true;
+                break 2;
+            }
+        }
+    }
+
+    /*
      * Rental units
      */
 
@@ -612,7 +629,7 @@ foreach($bookings as $id => $booking) {
         'nb_teachers'               => $people_qty_conf['teachers'],
         'nb_adults'                 => $people_qty_conf['adults'],
         'nb_drivers'                => $people_qty_conf['drivers'],
-        'kindergarten'              => '', // #todo - handle kindergarten
+        'kindergarten'              => $has_kindergarten,
         'travel'                    => $travel_description,
         'rental_units'              => implode(', ', $rental_units)
     ];
