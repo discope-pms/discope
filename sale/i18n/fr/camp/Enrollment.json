@@ -299,19 +299,19 @@
             "description": "Le tuteur principal responsable de l'enfant.",
             "help": "Utilisé pour savoir quelle adresse utiliser pour la facturation."
         },
+        "phone": {
+            "label": "Téléphone inscription",
+            "description": "Numéro de téléphone inscription.",
+            "help": ""
+        },
         "main_guardian_mobile": {
-            "label": "Mobile",
+            "label": "Mobile tuteur",
             "description": "Numéro de téléphone mobile du tuteur.",
             "help": ""
         },
         "main_guardian_phone": {
             "label": "Téléphone tuteur",
             "description": "Numéro de téléphone du tuteur.",
-            "help": ""
-        },
-        "phone": {
-            "label": "Téléphone",
-            "description": "Numéro de téléphone inscription.",
             "help": ""
         },
         "is_foster": {
