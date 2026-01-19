@@ -390,8 +390,8 @@ if(!empty($data)) {
         }
 
         $enrollment_phone = null;
-        if(!empty($ext_enrollment['telephone'])) {
-            $enrollment_phone = $sanitizePhoneNumber($ext_enrollment['telephone']);
+        if(!empty($ext_child['telephone'])) {
+            $enrollment_phone = $sanitizePhoneNumber($ext_child['telephone']);
             if(empty($enrollment_phone)) {
                 $enrollment_phone = null;
             }
