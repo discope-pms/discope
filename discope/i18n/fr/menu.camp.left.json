@@ -75,12 +75,16 @@
             "help": "Inscriptions en liste d'attente, pour transfert ou attente nouveau groupe."
         },
         "pending.enrollments.pending": {
-            "label": "À confirmer",
-            "help": "Inscriptions en cours, a confirmer."
+            "label": "Brouillons",
+            "help": "Inscriptions en cours de création, à confirmer."
+        },
+        "pending.enrollments.confirmed-not-handled": {
+            "label": "À traiter",
+            "help": "Inscriptions confirmées, mais pas encore traitées."
         },
         "pending.enrollments.confirmed": {
             "label": "À valider",
-            "help": "Inscriptions en cours, récupération des documents et paiements."
+            "help": "Inscriptions confirmées, récupération des documents et paiements."
         },
         "pending.enrollments.registration-file": {
             "label": "Gestion dossiers",

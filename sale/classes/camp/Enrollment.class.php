@@ -455,11 +455,18 @@ class Enrollment extends Model {
                 'default'           => 'pending'
             ],
 
+            'is_handled' => [
+                'type'              => 'boolean',
+                'description'       => "Was the enrollment handled to confirm it.",
+                'default'           => false
+            ],
+
             'preregistration_sent' => [
                 'type'              => 'boolean',
                 'description'       => "The preregistration mail asking for documents was sent.",
                 'default'           => false,
-                'visible'           => ['status', 'in', ['confirmed', 'validated']]
+                'visible'           => ['status', 'in', ['confirmed', 'validated']],
+                'onupdate'          => 'onupdatePreregistrationSent'
             ],
 
             'confirmation_sent' => [
@@ -1294,7 +1301,7 @@ class Enrollment extends Model {
             'presence_day_1', 'presence_day_2', 'presence_day_3', 'presence_day_4', 'presence_day_5'
         ]);
 
-        $allowed_keys = ['is_locked', 'status', 'description', 'child_age', 'all_documents_received', 'doc_aquatic_skills_received', 'payment_status', 'paid_amount', 'cancellation_date', 'preregistration_sent', 'confirmation_sent', 'enrollment_mails_ids'];
+        $allowed_keys = ['is_locked', 'status', 'is_handled', 'description', 'child_age', 'all_documents_received', 'doc_aquatic_skills_received', 'payment_status', 'paid_amount', 'cancellation_date', 'preregistration_sent', 'confirmation_sent', 'enrollment_mails_ids'];
 
         // weekend_extra can be modified to alter presences, but it'll not affect lines for external enrollments, only presences
         $external_allowed_keys = ['weekend_extra'];
@@ -1739,6 +1746,15 @@ class Enrollment extends Model {
 
     public static function onupdateCampClass($self) {
         $self->do('refresh_camp_product_line');
+    }
+
+    public static function onupdatePreregistrationSent($self) {
+        $self->read(['preregistration_sent']);
+        foreach($self as $id => $enrollment) {
+            if($enrollment['preregistration_sent']) {
+                Enrollment::id($id)->update(['is_handled' => true]);
+            }
+        }
     }
 
     public static function onupdate($self, $values) {
