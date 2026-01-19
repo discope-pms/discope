@@ -7,6 +7,7 @@
 */
 
 use core\setting\Setting;
+use lathus\sale\camp\Enrollment as LathusEnrollment;
 use lathus\sale\camp\Guardian as LathusGuardian;
 use lathus\sale\camp\Institution as LathusInstitution;
 use sale\camp\Camp;
@@ -145,9 +146,6 @@ $findOrCreateGuardian = function($ext_guardian, $ext_child, $child_id) use($sani
 
         if(!empty($ext_guardian_phones['phone'])) {
             $guardian_data['phone'] = $sanitizePhoneNumber($ext_guardian_phones['phone']);
-        }
-        elseif(!empty($ext_child['telephone'])) {
-            $guardian_data['phone'] = $sanitizePhoneNumber($ext_child['telephone']);
         }
 
         if(!empty($ext_guardian_phones['work_phone'])) {
@@ -391,7 +389,15 @@ if(!empty($data)) {
             $enrollment_status = 'waitlisted';
         }
 
-        $enrollment = Enrollment::create([
+        $enrollment_phone = null;
+        if(!empty($ext_enrollment['telephone'])) {
+            $enrollment_phone = $sanitizePhoneNumber($ext_enrollment['telephone']);
+            if(empty($enrollment_phone)) {
+                $enrollment_phone = null;
+            }
+        }
+
+        $enrollment = LathusEnrollment::create([
             'date_created'      => $ext_enrollment_created,
             'camp_id'           => $camp['id'],
             'child_id'          => $child['id'],
@@ -399,7 +405,8 @@ if(!empty($data)) {
             'is_external'       => true,
             'external_ref'      => $ext_enrollment['wpOrderId'],
             'external_data'     => json_encode($ext_enrollment),
-            'status'            => $enrollment_status
+            'status'            => $enrollment_status,
+            'phone'             => $enrollment_phone
         ])
             ->read(['center_office_id', 'camp_id' => ['date_from']])
             ->first();
