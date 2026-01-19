@@ -400,7 +400,9 @@ $ubl['Invoice']['cac:TaxTotal'] = [
     'cac:TaxSubtotal'   => ['items' => []]
 ];
 
-foreach($invoice['subtotals_vat'] as $vat_rate_index => $subtotal_vat) {
+$subtotals_vat = json_decode($invoice['subtotals_vat'], true);
+
+foreach($subtotals_vat as $vat_rate_index => $subtotal_vat) {
     $vat_rate = ((float) $vat_rate_index) / 100;
 
     $has_vat = $vat_rate !== 0.0;
