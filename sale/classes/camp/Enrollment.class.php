@@ -149,6 +149,12 @@ class Enrollment extends Model {
                 'relation'          => ['main_guardian_id' => ['phone']]
             ],
 
+            'phone' => [
+                'type'              => 'string',
+                'usage'             => 'phone',
+                'description'       => "Specific phone number given by the person who's handling the enrollment."
+            ],
+
             'is_foster' => [
                 'type'              => 'computed',
                 'result_type'       => 'boolean',
