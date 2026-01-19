@@ -250,7 +250,7 @@
                                 "id": "pending.enrollments.pending",
                                 "type": "entry",
                                 "label": "Pending enrollments",
-                                "description": "List all pending enrollments, not confirmed yet.",
+                                "description": "List all pending enrollments, still draft.",
                                 "icon": "",
                                 "route": "/camps",
                                 "context": {
@@ -259,10 +259,22 @@
                                 }
                             },
                             {
+                                "id": "pending.enrollments.confirmed-not-handled",
+                                "type": "entry",
+                                "label": "Confirmed not handled",
+                                "description": "List confirmed enrollments that aren't handled yet.",
+                                "icon": "",
+                                "route": "/camps",
+                                "context": {
+                                    "entity": "sale\\camp\\Enrollment",
+                                    "view": "list.confirmed-not-handled"
+                                }
+                            },
+                            {
                                 "id": "pending.enrollments.confirmed",
                                 "type": "entry",
                                 "label": "Confirmed enrollments",
-                                "description": "List all confirmed enrollments, with missing documents and/or payments.",
+                                "description": "List handled confirmed enrollments, with missing documents and/or payments.",
                                 "icon": "",
                                 "route": "/camps",
                                 "context": {

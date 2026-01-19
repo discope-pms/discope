@@ -217,6 +217,11 @@
                 "cancelled": "Annulée"
             }
         },
+        "is_handled": {
+            "label": "Est traitée",
+            "description": "Est-ce que l'inscription est considérée comme traitée?",
+            "help": ""
+        },
         "preregistration_sent": {
             "label": "Pré-inscription envoyée",
             "description": "Est-ce que le mail de pré-inscription a été envoyé?",
@@ -557,7 +562,18 @@
             "layout": {}
         },
         "list.pending": {
-            "name": "Inscriptions à confirmer",
+            "name": "Inscriptions brouillons",
+            "description": "",
+            "header": {
+                "action.validate": {
+                    "label": "Valider"
+                }
+            },
+            "layout": {
+            }
+        },
+        "list.confirmed-not-handled": {
+            "name": "Inscriptions à traiter",
             "description": "",
             "header": {
                 "action.validate": {

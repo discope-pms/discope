@@ -354,13 +354,18 @@
                                         "items": [
                                             {
                                                 "type": "field",
+                                                "value": "is_handled",
+                                                "width": "33%"
+                                            },
+                                            {
+                                                "type": "field",
                                                 "value": "preregistration_sent",
-                                                "width": "50%"
+                                                "width": "33%"
                                             },
                                             {
                                                 "type": "field",
                                                 "value": "confirmation_sent",
-                                                "width": "50%"
+                                                "width": "33%"
                                             }
                                         ]
                                     }

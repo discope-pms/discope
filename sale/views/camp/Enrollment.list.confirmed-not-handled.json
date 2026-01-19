@@ -1,10 +1,10 @@
 {
-    "name": "Confirmed enrollments",
+    "name": "Not handled confirmed enrollments",
     "order": "date_created",
     "sort": "asc",
     "domain": [
         ["status", "=", "confirmed"],
-        ["is_handled", "=", true]
+        ["is_handled", "=", false]
     ],
     "header": {
         "actions": {
