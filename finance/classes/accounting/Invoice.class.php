@@ -175,19 +175,21 @@ class Invoice extends Model {
 
             'subtotals' => [
                 'type'              => 'computed',
-                'result_type'       => 'array',
+                'result_type'       => 'string',
+                'usage'             => 'text/json',
                 'description'       => "Sub totals, by vat rates, tax-excluded prices of the invoice.",
                 'help'              => "Must sum lines prices totals keeping 4 decimals and rounded to 2 decimals at the end. e.g. '0.0', '6.0', '12.0', '21.0'.",
-                'store'             => false,
+                'store'             => true,
                 'function'          => 'calcSubTotals'
             ],
 
             'subtotals_vat' => [
                 'type'              => 'computed',
-                'result_type'       => 'array',
+                'result_type'       => 'string',
+                'usage'             => 'text/json',
                 'description'       => "Sub totals, by vat rates, tax prices of the invoice.",
                 'help'              => "Must sum lines prices totals keeping 4 decimals and rounded to 2 decimals at the end. e.g. '0.0', '6.0', '12.0', '21.0'.",
-                'store'             => false,
+                'store'             => true,
                 'function'          => 'calcSubTotalsVat'
             ],
 
@@ -196,7 +198,7 @@ class Invoice extends Model {
                 'result_type'       => 'float',
                 'usage'             => 'amount/money:2',
                 'description'       => "Total tax price of the invoice.",
-                'store'             => false,
+                'store'             => true,
                 'function'          => 'calcTotalVat'
             ],
 
@@ -523,7 +525,7 @@ class Invoice extends Model {
             }
 
             // #memo - has to be rounded on 2 decimals here and not on each line
-            $result[$id] = array_map(fn($subtotal) => round($subtotal, 2), $subtotals);
+            $result[$id] = json_encode(array_map(fn($subtotal) => round($subtotal, 2), $subtotals));
         }
 
         return $result;
@@ -533,13 +535,15 @@ class Invoice extends Model {
         $result = [];
         $self->read(['subtotals']);
         foreach($self as $id => $invoice) {
+            $subtotals = json_decode($invoice['subtotals'], true);
+
             $subtotals_vat = [];
-            foreach($invoice['subtotals'] as $vat_rate_index => $subtotal) {
+            foreach($subtotals as $vat_rate_index => $subtotal) {
                 $vat_rate = ((float) $vat_rate_index) / 100;
                 $subtotals_vat[$vat_rate_index] = round($subtotal * $vat_rate, 2);
             }
 
-            $result[$id] = $subtotals_vat;
+            $result[$id] = json_encode($subtotals_vat);
         }
 
         return $result;
@@ -549,8 +553,10 @@ class Invoice extends Model {
         $result = [];
         $self->read(['subtotals_vat']);
         foreach($self as $id => $invoice) {
+            $subtotals_vat = json_decode($invoice['subtotals_vat'], true);
+
             $total_vat = 0.0;
-            foreach($invoice['subtotals_vat'] as $subtotal) {
+            foreach($subtotals_vat as $subtotal) {
                 $total_vat = round($total_vat + $subtotal, 2);
             }
 
@@ -696,8 +702,10 @@ class Invoice extends Model {
         $result = [];
         $self->read(['accounting_total', 'subtotals_vat']);
         foreach($self as $id => $invoice) {
+            $subtotals_vat = json_decode($invoice['subtotals_vat'], true);
+
             $total_vat = 0.0;
-            foreach($invoice['subtotals_vat'] as $subtotal_vat) {
+            foreach($subtotals_vat as $subtotal_vat) {
                 $total_vat = round($total_vat + $subtotal_vat, 2);
             }
 
