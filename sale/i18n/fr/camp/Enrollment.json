@@ -305,8 +305,13 @@
             "help": ""
         },
         "main_guardian_phone": {
-            "label": "Téléphone",
+            "label": "Téléphone tuteur",
             "description": "Numéro de téléphone du tuteur.",
+            "help": ""
+        },
+        "phone": {
+            "label": "Téléphone",
+            "description": "Numéro de téléphone inscription.",
             "help": ""
         },
         "is_foster": {
