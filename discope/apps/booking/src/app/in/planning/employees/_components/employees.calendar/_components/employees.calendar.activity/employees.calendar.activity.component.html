@@ -12,7 +12,11 @@
             <ng-container *ngIf="!activity?.is_partner_event">
                 <div class="activity-booking">
                     <!-- #memo - this part is discarded if available height is less than 28px -->
-                    <div style="flex: 0 1 20%;">{{activity.group_num ? activity.group_num + ' - ' : ''}}{{activity.name}}</div>
+                    <div style="flex: 0 1 20%;">
+                        <span *ngIf="activity.camp_id?.sojourn_number">{{ activity.camp_id?.sojourn_number + ' - ' }}</span>
+                        <span>{{ activity.group_num ? activity.group_num + ' - ' : '' }}</span>
+                        <span>{{ activity.name }}</span>
+                    </div>
                     <div style="margin-left: auto">
                         <span class="material-icons">{{getIcon()}}</span>
                     </div>
