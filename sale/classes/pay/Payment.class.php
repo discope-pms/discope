@@ -314,6 +314,10 @@ class Payment extends Model {
         if(count($values) == 1 && isset($values['funding_id'])) {
             return [];
         }
+        // setting is_exported is allowed at all time
+        if(count($values) == 1 && isset($values['is_exported'])) {
+            return [];
+        }
 
         $payments = $om->read(self::getType(), $ids, ['state', 'is_exported', 'is_manual', 'payment_origin', 'amount', 'statement_line_id.amount', 'statement_line_id.remaining_amount'], $lang);
         foreach($payments as $pid => $payment) {
@@ -356,7 +360,8 @@ class Payment extends Model {
                 }
             }
             elseif($payment['is_manual']) {
-                if(isset($payment['amount'])) {
+                // #memo - we prevent the modification of the amount if it's already set
+                if(isset($payment['amount'], $values['amount'])) {
                     return ['amount' => ['update_not_allowed' => 'A manual payment amount cannot be updated.']];
                 }
             }

@@ -745,7 +745,7 @@ Export::create([
 ]);
 
 
-// update journal index according to the number of payemnts
+// update journal index according to the number of payments
 AccountingJournal::id($journal['id'])->update(['index' => $journal['index']+$payments_count]);
 
 // mark processed payements as exported and
