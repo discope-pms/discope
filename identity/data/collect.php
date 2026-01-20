@@ -42,7 +42,7 @@ list($params, $providers) = announce([
 
     ],
     'response'      => [
-        //'content-type'  => 'application/json',
+        'content-type'  => 'application/json',
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
