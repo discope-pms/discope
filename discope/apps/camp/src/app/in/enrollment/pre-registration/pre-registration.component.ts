@@ -470,7 +470,7 @@ export class EnrollmentPreRegistrationComponent implements OnInit, AfterContentI
                 [
                     ['category_id', '=', this.selectedCenter.template_category_id],
                     ['type', '=', 'camp'],
-                    ['code', '=', ase ? 'preregistration' : 'preregistration_ase']
+                    ['code', '=', !ase ? 'preregistration' : 'preregistration_ase']
                 ],
                 Object.getOwnPropertyNames(new Template()),
                 'id', 'asc', 0, 1, this.selectedLanguage.code
