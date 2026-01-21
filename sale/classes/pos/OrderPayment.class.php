@@ -209,18 +209,52 @@ class OrderPayment extends Model {
         return $result;
     }
 
-    public static function calcTotalDue($om, $ids, $lang) {
+    public static function calcTotalDue($self) {
         $result = [];
-        $payments = $om->read(self::getType(), $ids, ['order_lines_ids.price'], $lang);
-        if($payments > 0) {
-            foreach($payments as $oid => $payment) {
-                $result[$oid] = 0.0;
-                foreach((array) $payment['order_lines_ids.price'] as $line) {
-                    $result[$oid] += $line['price'];
-                }
-                $result[$oid] = round($result[$oid], 2);
+        $self->read([
+            'order_lines_ids'   => ['price'],
+            'order_id'          => [
+                'price',
+                'order_lines_ids',
+                'order_payments_ids' => ['total_due', 'order_lines_ids']
+            ]
+        ]);
+        foreach($self as $id => $order_payment) {
+            $total_due = 0.0;
+            foreach($order_payment['order_lines_ids'] as $order_line) {
+                $total_due = round($total_due + $order_line['price'], 2);
             }
+
+            $is_last_payment = true;
+            foreach($order_payment['order_id']['order_lines_ids'] as $order_line_id) {
+                foreach($order_payment['order_id']['order_payments_ids'] as $od_payment) {
+                    foreach($od_payment['order_lines_ids'] as $od_ln_id) {
+                        if($order_line_id === $od_ln_id) {
+                            continue 3;
+                        }
+                    }
+                }
+
+                $is_last_payment = false;
+                break;
+            }
+
+            // If last payment we must set the total_due amount to the remaining amount (the sum of the order lines' prices might not match the remaining amount to pay because of how VAT is calculated)
+            if($is_last_payment) {
+                $already_paid_amount = 0.0;
+                foreach($order_payment['order_id']['order_payments_ids'] as $od_payment) {
+                    if($id === $od_payment['id']) {
+                        continue;
+                    }
+                    $already_paid_amount = round($already_paid_amount + $od_payment['total_due'], 2);
+                }
+
+                $total_due = round($order_payment['order_id']['price'] - $already_paid_amount, 2);
+            }
+
+            $result[$id] = $total_due;
         }
+
         return $result;
     }
 

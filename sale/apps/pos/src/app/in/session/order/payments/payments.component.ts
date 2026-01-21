@@ -209,13 +209,47 @@ export class SessionOrderPaymentsComponent extends TreeComponent<Order, OrderCom
             orderPayment = await this.api.create((new OrderPayment()).entity, { order_id: this.instance.id });
         }
 
+        let orderPaymentPartId = null;
         if(this.areAllExistingPaymentPartsPaid(orderPayment.id)) {
-            await this.createDefaultPaymentPart(orderPayment);
+            orderPaymentPartId = await this.createDefaultPaymentPart(orderPayment);
         }
 
         try {
             // add selected product to the current (latest) payment
             await this.api.update('sale\\pos\\OrderPayment', [orderPayment.id], {order_lines_ids: order_lines_ids});
+
+            if(orderPaymentPartId) {
+                const orders =  await this.api.read((new Order()).entity, [this.instance.id], ['order_lines_ids', 'order_payments_ids.order_lines_ids']);
+                if(orders.length > 0) {
+                    const order = orders[0];
+
+                    let isLastPaymentPart = true;
+                    for(let lineId of order.order_lines_ids) {
+                        let lineFound = false;
+                        for(let payment of order.order_payments_ids) {
+                            for(let liId of payment.order_lines_ids) {
+                                if(lineId === liId) {
+                                    lineFound = true;
+                                }
+                            }
+                        }
+
+                        if(!lineFound) {
+                            isLastPaymentPart = false;
+                            break;
+                        }
+                    }
+
+                    // if last payment part we must set its amount to the remaining amount (the sum of the order lines' prices might not match the remaining amount to pay because of how VAT is calculated)
+                    if(isLastPaymentPart) {
+                        const orderPayments = await this.api.read((new OrderPayment()).entity, [orderPayment.id], ['total_due', 'total_paid']);
+                        if(orderPayments.length > 0) {
+                            const orPay = orderPayments[0];
+                            await this.api.update((new OrderPaymentPart()).entity, [orderPaymentPartId], { amount: orPay.total_due - orPay.total_paid });
+                        }
+                    }
+                }
+            }
 
             // remove added items from product list
             const remainingOrderLines: any[] = this.dataSource.data.filter( (a:any) => (order_lines_ids.indexOf(a.id) < 0) );
@@ -229,7 +263,7 @@ export class SessionOrderPaymentsComponent extends TreeComponent<Order, OrderCom
         }
     }
 
-    private async createDefaultPaymentPart(orderPayment: OrderPayment) {
+    private async createDefaultPaymentPart(orderPayment: OrderPayment): Promise<number> {
         const amount: number = this.selection.selected.reduce(
             (ac: number, orderLine: OrderLine) => ac + orderLine.price,
             0.0
@@ -237,20 +271,27 @@ export class SessionOrderPaymentsComponent extends TreeComponent<Order, OrderCom
 
         const firstPaidPaymentPart = this.getFirstPaidPaymentPart();
 
+        let paymentPartId: number = null;
+
         try {
             if(firstPaidPaymentPart && firstPaidPaymentPart.payment_method === 'booking') {
+                paymentPartId = firstPaidPaymentPart.id;
                 await this.updatePaymentPartAmount(firstPaidPaymentPart, amount);
             }
             else {
-                await this.api.create(
+                const paymentPart: OrderPaymentPart = await this.api.create(
                     (new OrderPaymentPart()).entity,
                     { order_id: this.instance.id, order_payment_id: orderPayment.id, amount }
                 );
+
+                paymentPartId = paymentPart.id;
             }
         }
         catch (response) {
             console.log('unexpected error', response);
         }
+
+        return paymentPartId;
     }
 
     private getFirstPaidPaymentPart(): OrderPaymentPart {
