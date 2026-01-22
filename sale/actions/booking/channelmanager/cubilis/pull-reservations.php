@@ -665,7 +665,7 @@ try {
                                         ->read(['id', 'product_id' => ['id', 'sku']])
                                         ->first(true);
 
-                                    if ($booking_line['product_id']['sku'] == 'KA-CTaxSej-A'){
+                                    if($booking_line['product_id']['sku'] == 'KA-CTaxSej-A'){
                                         $city_tax_found = true;
                                     }
                                 }
@@ -674,6 +674,8 @@ try {
                                 }
                             }
                         }
+
+                        $city_tax_manually_added = false;
 
                         // if not present, manually add the city tax (must always be present)
                         if(!$city_tax_found) {
@@ -730,8 +732,7 @@ try {
                                         'booking_line_group_id' => $extra_booking_line_group['id'],
                                         'qty'                   => 1,
                                         'price_id'              => $price['id'],
-                                        'product_id'            => $price['product_id'],
-                                        'product_model_id'      => $service['product_model_id']
+                                        'product_id'            => $price['product_id']
                                     ])
                                     ->update([
                                         'unit_price'            => $city_tax_total,
@@ -739,15 +740,110 @@ try {
                                         'total'                 => $city_tax_total,
                                         'price'                 => $city_tax_price
                                     ]);
-                                    $booking_price = $reservation['total']['amount'] + $city_tax_price;
-                                    Booking::id($booking['id'])->update(['price' => $booking_price]);
+
+                                if($city_tax_price > 0) {
+                                    // set total and price to null
+                                    Booking::id($booking['id'])->update(['total' => null, 'price' => null]);
+
+                                    // recalc booking_price to new price
+                                    $book = Booking::id($booking['id'])->read(['total', 'price'])->first(true);
+                                    $booking_price = $book['price'];
+
+                                    $city_tax_manually_added = true;
+                                }
                             }
                             catch(Exception $e) {
                                 throw new Exception('extra_services_creation_failed:'.$e->getMessage(), QN_ERROR_UNKNOWN);
                             }
                         }
 
-                        // 4) add payments and fundings
+                        // 4) handle vat rounding
+
+                        $book = Booking::id($booking['id'])
+                            ->read(['total', 'center_id' => ['organisation_id' => ['has_vat']]])
+                            ->first(true);
+
+                        // add vat rounding product to match Cubilis reservation price, only if center has vat and no other products were manually added (e.g. : the city tax).
+                        if($book['center_id']['organisation_id']['has_vat'] && !$city_tax_manually_added) {
+                            // set price to null to force recalc
+                            Booking::id($booking['id'])->update(['price' => null]);
+
+                            // get new price
+                            $updated_book = Booking::id($booking['id'])->read(['price'])->first(true);
+
+                            // if vat calculation method gives a different price than Cubilis, then we add a rounding VAT product
+                            if($booking_price !== $updated_book['price']) {
+                                $rounding_vat_amount = round($booking_price - $updated_book['price'], 2);
+
+                                $sku_vat_rounding_product = Setting::get_value('sale', 'organization', 'sku.vat_rounding_product');
+                                if(is_null($sku_vat_rounding_product)) {
+                                    throw new Exception('missing_sku_vat_rounding_product');
+                                }
+
+                                $products_ids = Product::search(['sku', '=' , $sku_vat_rounding_product])->ids();
+                                if(empty($products_ids)) {
+                                    throw new Exception('missing_vat_rounding_product', QN_ERROR_INVALID_CONFIG);
+                                }
+
+                                $vat_rounding_product = Product::search(['sku', '=', $sku_vat_rounding_product])
+                                    ->read(['name', 'prices_ids' => ['price_list_id' => ['status', 'date_from', 'date_to']]])
+                                    ->first();
+
+                                if(is_null($vat_rounding_product)) {
+                                    throw new Exception('vat_rounding_product_not_found');
+                                }
+
+                                $vat_rounding_product_price = null;
+                                foreach($vat_rounding_product['prices_ids'] as $price) {
+                                    if(
+                                        in_array($price['price_list_id']['status'], ['pending', 'published'])
+                                        && $price['price_list_id']['date_from'] <= strtotime('midnight')
+                                        && $price['price_list_id']['date_to'] >= strtotime('midnight')
+                                    ) {
+                                        $vat_rounding_product_price = $price;
+                                        break;
+                                    }
+                                }
+
+                                if(is_null($vat_rounding_product_price)) {
+                                    throw new Exception('vat_rounding_product_price_not_found');
+                                }
+
+                                $extra_booking_line_group = BookingLineGroup::create([
+                                    'name'          => "Arrondi TVA",
+                                    'is_sojourn'    => false,
+                                    'is_event'      => false,
+                                    'has_pack'      => false,
+                                    'is_locked'     => false,
+                                    'nb_pers'       => 1,
+                                    'booking_id'    => $booking['id']
+                                ])
+                                    ->read(['id'])
+                                    ->first(true);
+
+                                BookingLine::create([
+                                    'booking_id'            => $booking['id'],
+                                    'booking_line_group_id' => $extra_booking_line_group['id'],
+                                    'qty'                   => 1,
+                                    'price_id'              => $vat_rounding_product_price['id'],
+                                    'product_id'            => $vat_rounding_product['id']
+                                ])
+                                    ->update([
+                                        'unit_price'            => $rounding_vat_amount,
+                                        'has_manual_unit_price' => true,
+                                        'total'                 => $rounding_vat_amount,
+                                        'price'                 => $rounding_vat_amount
+                                    ]);
+
+                                // set the booking price to previous value who is now correct because of the rounding vat product
+                                Booking::id($booking['id'])->update([
+                                    'total' => $book['total'] + $rounding_vat_amount,
+                                    'price' => $booking_price
+                                ]);
+                            }
+                        }
+
+                        // 5) add payments and fundings
 
                         if(isset($reservation['payments']) && count($reservation['payments'])) {
 
@@ -818,7 +914,7 @@ try {
                                 ->first(true);
                         }
 
-                        // 5) add contacts
+                        // 6) add contacts
 
                         // add main contact : use the customer as default contact (@see Booking class)
                         Booking::id($booking['id'])->do('import_contacts');

@@ -63,6 +63,7 @@ Setting::assert_value('sale', 'organization', 'sku.downpayment.1', 'ACPTE-A');
 Setting::assert_value('sale', 'organization', 'sku.bed_linens');
 Setting::assert_value('sale', 'organization', 'sku.make_beds');
 Setting::assert_value('sale', 'organization', 'sku.transport');
+Setting::assert_value('sale', 'organization', 'sku.vat_rounding_product');
 Setting::assert_value('sale', 'organization', 'age_range_default');
 Setting::assert_value('sale', 'organization', 'payment_terms_default');
 Setting::assert_value('sale', 'organization', 'quote.output_level_default');
