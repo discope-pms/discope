@@ -104,7 +104,8 @@ $orm->enableEvents();
 
 Booking::id($booking_id)
     // assign identity & sync with customer
-    ->update(['customer_identity_id'  => $params['fields']['customer_identity_id']])
+    ->update(['customer_identity_id'    => $params['fields']['customer_identity_id']])
+    ->update(['customer_rate_class_id'  => $params['fields']['customer_rate_class_id']])
     // re-create contacts
     ->do('import_contacts');
 
