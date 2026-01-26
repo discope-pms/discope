@@ -28,8 +28,13 @@
             "description": "",
             "help": ""
         },
-        "camp": {
-            "label": "Camp",
+        "code": {
+            "label": "N° séjour",
+            "description": "",
+            "help": ""
+        },
+        "dates": {
+            "label": "Dates",
             "description": "",
             "help": ""
         },

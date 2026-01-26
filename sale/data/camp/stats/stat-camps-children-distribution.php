@@ -45,9 +45,13 @@ use sale\camp\Enrollment;
             'type'              => 'string',
             'description'       => "Name of the center for the children quantities."
         ],
-        'camp' => [
+        'code' => [
             'type'              => 'string',
-            'description'       => "Name of the camp for the children quantities."
+            'description'       => "Code of the camp."
+        ],
+        'dates' => [
+            'type'              => 'string',
+            'description'       => "Start and end dates of the camp.",
         ],
         'location' => [
             'type'              => 'string',
@@ -132,8 +136,9 @@ $result = [];
 
 $camps = Camp::search($domain, ['sort' => ['date_from' => 'asc']])
     ->read([
-        'name',
+        'sojourn_number',
         'date_from',
+        'date_to',
         'location',
         'center_id' => [
             'name'
@@ -197,7 +202,8 @@ foreach($camps as $camp) {
         if(!isset($map_age_data[$enrollment['child_age']])) {
             $map_age_data[$enrollment['child_age']] = [
                 'center'        => $camp['center_id']['name'],
-                'camp'          => $camp['name'],
+                'code'          => str_pad($camp['sojourn_number'], 3, '0', STR_PAD_LEFT),
+                'dates'         => date('d/m/y', $camp['date_from']).' -> '.date('d/m/y', $camp['date_to']),
                 'location'      => $camp['location'],
                 'employees'     => implode(', ', $employees),
                 'age'           => $enrollment['child_age'],
@@ -245,7 +251,8 @@ foreach($camps as $camp) {
 
         $result[] = [
             'center'        => $camp['center_id']['name'],
-            'camp'          => $camp['name'],
+            'code'          => str_pad($camp['sojourn_number'], 3, '0', STR_PAD_LEFT),
+            'dates'         => date('d/m/y', $camp['date_from']).' -> '.date('d/m/y', $camp['date_to']),
             'location'      => $camp['location'],
             'employees'     => implode(', ', $employees),
             'age'           => implode(', ', $ages),
@@ -262,7 +269,7 @@ foreach($camps as $camp) {
 usort($result, function($a, $b) {
     $result = strcmp($a['center'], $b['center']);
     if($result === 0) {
-        $result = strcmp($a['camp'], $b['camp']);
+        $result = $a['code'] <=> $b['code'];
         if($result === 0) {
             return strcmp($a['age'], $b['age']);
         }
