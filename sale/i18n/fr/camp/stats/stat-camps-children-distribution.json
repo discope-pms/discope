@@ -41,12 +41,7 @@
         "location": {
             "label": "Site",
             "description": "",
-            "help": "",
-            "selection": {
-                "cricket": "Criquets",
-                "ladybug": "Coccinelles",
-                "dragonfly": "Libellules"
-            }
+            "help": ""
         },
         "employees": {
             "label": "Animateurs",

@@ -56,12 +56,7 @@ use sale\camp\Enrollment;
         'location' => [
             'type'              => 'string',
             'description'       => "The location of the accommodation of camp.",
-            'help'              => "Depends on the camp age range.",
-            'selection'         => [
-                'cricket',
-                'ladybug',
-                'dragonfly'
-            ]
+            'help'              => "Depends on the camp age range."
         ],
         'employees' => [
             'type'              => 'string',
@@ -185,6 +180,12 @@ foreach($children_enrollments as $enrollment) {
     $map_children_first_camp_date[$enrollment['child_id']] = $enrollment['camp_id']['date_from'];
 }
 
+$map_location = [
+    'cricket'   => 'Criquets',
+    'ladybug'   => 'Coccinelles',
+    'dragonfly' => 'Libellules'
+];
+
 foreach($camps as $camp) {
     $map_age_data = [];
 
@@ -204,7 +205,7 @@ foreach($camps as $camp) {
                 'center'        => $camp['center_id']['name'],
                 'code'          => str_pad($camp['sojourn_number'], 3, '0', STR_PAD_LEFT),
                 'dates'         => date('d/m/y', $camp['date_from']).' -> '.date('d/m/y', $camp['date_to']),
-                'location'      => $camp['location'],
+                'location'      => $map_location[$camp['location']],
                 'employees'     => implode(', ', $employees),
                 'age'           => $enrollment['child_age'],
                 'qty_male'      => 0,
@@ -253,7 +254,7 @@ foreach($camps as $camp) {
             'center'        => $camp['center_id']['name'],
             'code'          => str_pad($camp['sojourn_number'], 3, '0', STR_PAD_LEFT),
             'dates'         => date('d/m/y', $camp['date_from']).' -> '.date('d/m/y', $camp['date_to']),
-            'location'      => $camp['location'],
+            'location'      => $map_location[$camp['location']],
             'employees'     => implode(', ', $employees),
             'age'           => implode(', ', $ages),
             'qty_male'      => array_sum(array_column($map_age_data, 'qty_male')),
