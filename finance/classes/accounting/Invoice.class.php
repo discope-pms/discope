@@ -433,7 +433,10 @@ class Invoice extends Model {
                 throw new \Exception("unknown_journal_id", EQ_ERROR_INVALID_CONFIG);
             }
 
-            $format = Setting::get_value('sale', 'accounting', 'invoice.sequence_format', '%05d{sequence}');
+            $format = Setting::get_value('sale', 'accounting', 'invoice.sequence_format.'.$invoice['organisation_id']);
+            if(is_null($format)) {
+                $format = Setting::get_value('sale', 'accounting', 'invoice.sequence_format', '%05d{sequence}');
+            }
 
             $fiscal_year = Setting::get_value('finance', 'accounting', 'fiscal_year');
             $fiscal_date_from = Setting::get_value('finance', 'accounting', 'fiscal_year.date_from');
@@ -461,10 +464,20 @@ class Invoice extends Model {
                 throw new \Exception("APP::unable to retrieve sequence for invoice", EQ_ERROR_INVALID_CONFIG);
             }
 
+            $map_types = [
+                'sales'         => '0',
+                'sales_peppol'  => '1'
+            ];
+            if(!isset($map_types[$invoice['journal_id']['type']])) {
+                trigger_error("APP::accounting journal type not allowed", EQ_REPORT_ERROR);
+                throw new \Exception("wrong_accounting_journal_type");
+            }
+
             $result[$id] = Setting::parse_format($format, [
                 'year'      => $fiscal_year,
                 'office'    => $invoice['center_office_id']['code'],
                 'org'       => $invoice['organisation_id'],
+                'type'      => $map_types[$invoice['journal_id']['type']],
                 'sequence'  => $sequence
             ]);
         }
