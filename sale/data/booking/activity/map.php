@@ -108,6 +108,7 @@ $activities = $orm->read(BookingActivity::getType(), $activities_ids, [
         'product_model_id',
         'activity_booking_line_id',
         'camp_id',
+        'camp_group_id',
         'group_num',
         'counter',
         'counter_total'
@@ -290,7 +291,7 @@ if(!empty($params['partners_ids'])) {
 $activity_partner_activities_ids = $orm->search(PartnerEvent::getType(), $domain);
 
 if(!empty($activity_partner_activities_ids)) {
-    $partner_activities = $orm->read(PartnerEvent::getType(), $activity_partner_activities_ids, ['id', 'name', 'description', 'partner_id', 'event_date', 'time_slot_id', 'event_type', 'camp_group_id']);
+    $partner_activities = $orm->read(PartnerEvent::getType(), $activity_partner_activities_ids, ['id', 'name', 'description', 'partner_id', 'event_date', 'time_slot_id', 'event_type', 'camp_id', 'camp_group_id']);
 
     $map_camp_groups = [];
     // retrieve all foreign objects identifiers
@@ -335,7 +336,7 @@ if(!empty($activity_partner_activities_ids)) {
             'customer_id'               => null,
             'partner_identity_id'       => null,
             'age_range_assignments_ids' => [],
-            'partner_id'                => null,
+            'partner_id'                => $partner_activity['partner_id'],
         ]);
     }
 }
