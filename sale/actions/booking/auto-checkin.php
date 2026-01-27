@@ -19,6 +19,7 @@ use sale\booking\Booking;
         'charset'           => 'utf-8',
         'accept-origin'     => '*'
     ],
+    'constants'     => ['L10N_TIMEZONE'],
     'providers'     => ['context']
 ]);
 
@@ -27,9 +28,18 @@ use sale\booking\Booking;
  */
 ['context' => $context] = $provider;
 
+$now = new DateTime('now', new DateTimeZone(constant('L10N_TIMEZONE')));
+
 $bookings = Booking::search([
-    ['date_from', '<', strtotime('midnight')],
-    ['status', '=', 'validated']
+    [
+        ['date_from', '=', strtotime('midnight')],
+        ['time_from', '<=', $now->format('H:i:s')],
+        ['status', '=', 'validated']
+    ],
+    [
+        ['date_from', '<', strtotime('midnight')],
+        ['status', '=', 'validated']
+    ]
 ])
     ->read(['name'])
     ->get();

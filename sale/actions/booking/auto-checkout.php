@@ -9,7 +9,7 @@
 use sale\booking\Booking;
 
 [$params, $provider] = eQual::announce([
-    'description'   => "Auto checkin all bookings that are validated but have already started.",
+    'description'   => "Auto checkout all bookings that are checkedin but have already ended.",
     'params'        => [],
     'access'        => [
         'visibility'        => 'protected'
@@ -19,6 +19,7 @@ use sale\booking\Booking;
         'charset'           => 'utf-8',
         'accept-origin'     => '*'
     ],
+    'constants'     => ['L10N_TIMEZONE'],
     'providers'     => ['context']
 ]);
 
@@ -27,9 +28,18 @@ use sale\booking\Booking;
  */
 ['context' => $context] = $provider;
 
+$now = new DateTime('now', new DateTimeZone(constant('L10N_TIMEZONE')));
+
 $bookings = Booking::search([
-    ['date_from', '<', strtotime('midnight')],
-    ['status', '=', 'validated']
+    [
+        ['date_to', '=', strtotime('midnight')],
+        ['time_to', '<=', $now->format('H:i:s')],
+        ['status', '=', 'checkedin']
+    ],
+    [
+        ['date_to', '<', strtotime('midnight')],
+        ['status', '=', 'checkedin']
+    ]
 ])
     ->read(['name'])
     ->get();
@@ -39,14 +49,14 @@ $result = [
     'errors'    => []
 ];
 
-foreach($bookings as $id => $booking) {
+foreach($bookings as $id =>  $booking) {
     try {
-        eQual::run('do', 'sale_booking_do-checkin', ['id' => $id]);
+        eQual::run('do', 'sale_booking_do-checkout', ['id' => $id]);
 
-        $result['successes'][] = "Booking {$booking['name']} successfully checked in.";
+        $result['successes'][] = "Booking {$booking['name']} successfully checked out.";
     }
     catch(Exception $e) {
-        $result['errors'][] = "Unable to checkin booking {$booking['name']} : ".$e->getMessage();
+        $result['errors'][] = "Unable to checkout booking {$booking['name']} : ".$e->getMessage();
     }
 }
 
