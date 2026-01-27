@@ -696,7 +696,10 @@ if(!empty($data)) {
                     }
                     break;
                 case 'monetico':
-                    if(!empty($ext_enrollment['metaJson']['reglement']['montantCB'])) {
+                    if(
+                        !empty($ext_enrollment['metaJson']['reglement']['montantCB'])
+                        && $ext_enrollment['metaJson']['payment']['status'] !== 'failed'
+                    ) {
                         $funding = Funding::search(['enrollment_id', '=', $enrollment['id']])
                             ->read(['id'])
                             ->first();
