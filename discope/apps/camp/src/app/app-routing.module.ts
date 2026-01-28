@@ -19,6 +19,10 @@ const routes: Routes = [
         loadChildren: () => import(`./in/enrollment/enrollment.module`).then(m => m.AppInEnrollmentModule)
     },
     {
+        path: 'planning',
+        loadChildren: () => import(`./in/planning/planning.module`).then(m => m.AppInPlanningModule)
+    },
+    {
         /*
             default route, for bootstrapping the App
             1) load necessary info

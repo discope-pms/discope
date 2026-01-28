@@ -8,7 +8,16 @@ import { MatDialog } from '@angular/material/dialog';
 import * as screenfull from 'screenfull';
 import { PlanningEmployeesLegendDialogComponent } from './_components/legend.dialog/legend.component';
 import { PlanningEmployeesPreferencesDialogComponent } from './_components/preferences.dialog/preferences.component';
-import { TimeSlot } from '../../booking/activities-planning/_models/time-slot.model';
+
+class TimeSlot {
+    constructor(
+        public id: number = 0,
+        public name: string = '',
+        public code: 'AM'|'PM'|'EV' = 'AM',
+        public schedule_from: string = '',
+        public schedule_to: string = ''
+    ) {}
+}
 
 interface DateRange {
   from: Date,

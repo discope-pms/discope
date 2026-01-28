@@ -1,7 +1,19 @@
 {
     "name": "Camps menu",
+    "access": {
+        "groups": ["camp.default.user", "camp.default.administrator"]
+    },
     "layout": {
         "items": [
+            {
+                "id": "item.planning_employees",
+                "label": "Employees schedule",
+                "description": "",
+                "icon": "person_outline",
+                "type": "entry",
+                "route": "/planning/employees",
+                "visible": [true, "=", "env.sale.features.booking.employee_planning"]
+            }
         ]
     }
 }
