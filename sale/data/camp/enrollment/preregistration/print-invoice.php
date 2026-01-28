@@ -12,6 +12,7 @@ use Dompdf\Options as DompdfOptions;
 use identity\Center;
 use sale\camp\Child;
 use sale\camp\Guardian;
+use sale\camp\Institution;
 use Twig\Environment as TwigEnvironment;
 use Twig\Extension\ExtensionInterface;
 use Twig\Extra\Intl\IntlExtension;
@@ -100,9 +101,11 @@ $children = Child::ids($ids)
         'firstname',
         'lastname',
         'main_guardian_id',
+        'institution_id',
         'enrollments_ids' => [
             'status',
             'price',
+            'is_ase',
             'camp_id' => [
                 'short_name',
                 'sojourn_number',
@@ -143,9 +146,33 @@ if(empty($children)) {
     throw new Exception("no_enrollments", EQ_ERROR_INVALID_PARAM);
 }
 
-$main_guardian = Guardian::id($children[0]['main_guardian_id'])
-    ->read(['lastname', 'firstname', 'address_street', 'address_dispatch', 'address_zip', 'address_city'])
-    ->first();
+$recipient_address = [];
+if($children[0]['enrollments_ids'][0]['is_ase'] && !is_null($children[0]['institution_id'])) {
+    $institution = Institution::id($children[0]['institution_id'])
+        ->read(['name', 'address_street', 'address_dispatch', 'address_zip', 'address_city'])
+        ->first();
+
+    $recipient_address = [
+        'name'      => $institution['name'],
+        'street'    => $institution['address_street'],
+        'dispatch'  => $institution['address_dispatch'],
+        'zip'       => $institution['address_zip'],
+        'city'      => $institution['address_city']
+    ];
+}
+else {
+    $main_guardian = Guardian::id($children[0]['main_guardian_id'])
+        ->read(['lastname', 'firstname', 'address_street', 'address_dispatch', 'address_zip', 'address_city'])
+        ->first();
+
+    $recipient_address = [
+        'name'      => strtoupper($main_guardian['lastname']).' '.$main_guardian['firstname'],
+        'street'    => $main_guardian['address_street'],
+        'dispatch'  => $main_guardian['address_dispatch'],
+        'zip'       => $main_guardian['address_zip'],
+        'city'      => $main_guardian['address_city']
+    ];
+}
 
 /***************
  * Create HTML *
@@ -172,6 +199,13 @@ foreach($children as $child) {
 
 $enrollments = [];
 foreach($children as $child) {
+    foreach($child['enrollments_ids'] as &$enrollment) {
+        $enrollment['child_id'] = [
+            'firstname' => $child['firstname'],
+            'lastname'  => $child['lastname']
+        ];
+    }
+
     $enrollments = array_merge($enrollments, $child['enrollments_ids']);
 }
 
@@ -181,7 +215,7 @@ usort($enrollments, function($a, $b) {
 
 $values = [
     'center'                                => $center,
-    'main_guardian'                         => $main_guardian,
+    'recipient_address'                     => $recipient_address,
     'children'                              => $children,
     'enrollments'                           => $enrollments,
     'date'                                  => strtotime('now'),
