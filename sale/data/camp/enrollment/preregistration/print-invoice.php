@@ -170,10 +170,20 @@ foreach($children as $child) {
     }
 }
 
+$enrollments = [];
+foreach($children as $child) {
+    $enrollments = array_merge($enrollments, $child['enrollments_ids']);
+}
+
+usort($enrollments, function($a, $b) {
+    return $a['camp_id']['date_from'] <=> $b['camp_id']['date_from'];
+});
+
 $values = [
     'center'                                => $center,
     'main_guardian'                         => $main_guardian,
     'children'                              => $children,
+    'enrollments'                           => $enrollments,
     'date'                                  => strtotime('now'),
     'total_amount'                          => $total_amount,
     'remaining_amount'                      => $remaining_amount
