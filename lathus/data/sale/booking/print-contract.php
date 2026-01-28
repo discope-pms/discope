@@ -410,11 +410,6 @@ $cont = Contract::id($params['id'])
                 'type',
                 'due_amount'
             ],
-            'invoices_ids' => [
-                'is_deposit',
-                'is_paid',
-                'price'
-            ],
             'customer_id' => [
                 'partner_identity_id' => [
                     'flag_trusted'
@@ -426,36 +421,33 @@ $cont = Contract::id($params['id'])
 
 $booking_conf = [
     'security_deposit_check'    => 0,
-    'deposits'                  => []
+    'installments'              => []
 ];
 
 if(!$cont['booking_id']['customer_id']['partner_identity_id']['flag_trusted']) {
     $booking_conf['security_deposit_check'] = $formatMoney(305);
 }
 
+$total_amount_installment = 0.0;
 foreach($cont['booking_id']['fundings_ids'] as $funding) {
     if($funding['type'] === 'installment') {
-        $booking_conf['deposits'][] = [
+        $booking_conf['installments'][] = [
             'price' => $formatMoney($funding['due_amount'])
         ];
+
+        $total_amount_installment += $funding['due_amount'];
     }
 }
+
+$total_amount_installment = round($total_amount_installment, 2);
 
 /*
       3.11) handle cancellation
 */
 
 $cancellation_conf = [
-    'type'      => 'pay_amount',
-    'amount'    => $formatMoney(1500)
+    'amount'    => $formatMoney($total_amount_installment)
 ];
-
-foreach($cont['booking_id']['invoices_ids'] as $invoice) {
-    if($invoice['is_deposit'] && $invoice['is_paid']) {
-        $cancellation_conf['type'] = 'keep_deposit';
-        break;
-    }
-}
 
 /*
     3.12) handle lines

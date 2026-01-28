@@ -212,10 +212,10 @@ div.footer {
                 <div>(non encaissé et restitué après le règlement du séjour sauf cas de dégradation)</div>
             </li>
         {% endif %}
-        {% for deposit in booking_conf.deposits %}
-            <li>du paiement d'un acompte de {{ deposit.price }}</li>
+        {% for installment in booking_conf.installments %}
+            <li>du paiement d'un acompte de {{ installment.price }}</li>
         {% endfor %}
-        {% if booking_conf.deposits|length == 0 %}
+        {% if booking_conf.installments|length == 0 %}
             <li style="margin-top: 2px;">
                 <div>du bon de commande</div>
                 <div>(pour les collectivités locales et les collèges-lycées)</div>
@@ -227,12 +227,7 @@ div.footer {
 <div class="section">
     <div class="title">Article 7 / Conditions d'annulation ou de report de séjour</div>
     <div>
-        En cas d'annulation du séjour par le groupe
-        {% if cancellation_conf.type == 'keep_deposit' %}
-            l'acompte versé restera acquis au CPA Lathus, à titre de dédit.
-        {% else %}
-            le groupe devra au CPA Lathus la somme de {{ cancellation_conf.amount }}, à titre de dédit.
-        {% endif %}
+        En cas d'annulation du séjour par le groupe, le groupe devra au CPA Lathus la somme de {{ cancellation_conf.amount }}, à titre de dédit.
     </div>
 
     <div>
