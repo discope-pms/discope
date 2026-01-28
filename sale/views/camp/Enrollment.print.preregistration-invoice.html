@@ -223,15 +223,13 @@
                 {% endif %}
             {% endfor %}
             {% for price_adapter in enrollment.price_adapters_ids %}
-                {% if price_adapter.is_manual_discount %}
-                    <tr>
-                        <td><span style="margin-left: 30px">{{ price_adapter.name }}</span></td>
-                        <td>..............................................................................................</td>
-                        <td style="width: 60px; text-align: right;">
-                            <span>{{ price_adapter.value|format_money() }}</span>
-                        </td>
-                    </tr>
-                {% endif %}
+                <tr>
+                    <td><span style="margin-left: 30px">{{ price_adapter.name }}</span></td>
+                    <td>..............................................................................................</td>
+                    <td style="width: 60px; text-align: right;">
+                        <span>{{ price_adapter.value|format_money() }}</span>
+                    </td>
+                </tr>
             {% endfor %}
         {% endfor %}
     </table>

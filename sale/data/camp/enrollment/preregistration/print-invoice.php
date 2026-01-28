@@ -127,7 +127,6 @@ $children = Child::ids($ids)
             ],
             'price_adapters_ids' => [
                 'name',
-                'is_manual_discount',
                 'price_adapter_type',
                 'value'
             ]
@@ -236,8 +235,12 @@ foreach($enrollments as &$enrollment) {
 
     foreach($enrollment['price_adapters_ids'] as &$price_adapter) {
         if($price_adapter['price_adapter_type'] === 'percent') {
-            $price_adapter['value'] = -1 * round($camp_product_line['price'] * ($price_adapter['value'] / 100), 2);
+            $price_adapter['value'] = round($camp_product_line['price'] * ($price_adapter['value'] / 100), 2);
         }
+
+        $price_adapter['value'] = -1 * $price_adapter['value'];
+
+        $total_amount += $price_adapter['value'];
     }
 }
 
