@@ -206,19 +206,21 @@ div.footer {
     <div style="width: 95%;">La réservation sera considérée comme effective seulement lors du retour de la présente convention signée et accompagnée :</div>
 
     <ul>
-        {% for deposit in booking_conf.deposits %}
-            <li>du paiement d'un acompte de {{ deposit.price }}</li>
-        {% endfor %}
         {% if booking_conf.security_deposit_check > 0 %}
             <li style="margin-top: 2px;">
                 <div>d'un chèque de caution de {{ booking_conf.security_deposit_check }}</div>
                 <div>(non encaissé et restitué après le règlement du séjour sauf cas de dégradation)</div>
             </li>
         {% endif %}
-        <li style="margin-top: 2px;">
-            <div>du bon de commande</div>
-            <div>(pour les collectivités locales et les collèges-lycées)</div>
-        </li>
+        {% for deposit in booking_conf.deposits %}
+            <li>du paiement d'un acompte de {{ deposit.price }}</li>
+        {% endfor %}
+        {% if booking_conf.deposits|length == 0 %}
+            <li style="margin-top: 2px;">
+                <div>du bon de commande</div>
+                <div>(pour les collectivités locales et les collèges-lycées)</div>
+            </li>
+        {% endif %}
     </ul>
 </div>
 
