@@ -53,6 +53,14 @@ class TemplatePart extends Model {
                 'store'             => true
             ],
 
+            'variables' => [
+                'type'              => 'string',
+                'usage'             => 'text/json',
+                'description'       => "JSON array of possibly referenced variables.",
+                'multilang'         => true,
+                'readonly'          => true
+            ]
+
         ];
     }
 
