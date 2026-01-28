@@ -498,7 +498,10 @@ export class EnrollmentPreRegistrationReminderComponent implements OnInit, After
                     camp: camp.short_name,
                     child: this.child.name,
                     child_firstname: this.child.firstname,
-                    child_lastname: this.child.lastname
+                    child_lastname: this.child.lastname,
+                    main_guardian: this.mainGuardian.name,
+                    main_guardian_firstname: this.mainGuardian.firstname,
+                    main_guardian_lastname: this.mainGuardian.lastname
                 };
 
                 if(subjectPart) {
