@@ -495,25 +495,27 @@ export class EnrollmentPreRegistrationReminderComponent implements OnInit, After
                 const mapKeyValue: {[key: string]: string} = {
                     total: enrollment.total.toString(),
                     price: enrollment.price.toString(),
-                    camp: camp.short_name
+                    camp: camp.short_name,
+                    child: this.child.name,
+                    child_firstname: this.child.firstname,
+                    child_lastname: this.child.lastname
                 };
 
                 if(subjectPart) {
-                    let title = '';
+                    let title = 'Rappel : Pré-inscription de {child} au camp {camp}';
                     if(subjectPart.value && subjectPart.value.length > 0) {
                         // strip html nodes
                         title = subjectPart.value.replace(/<[^>]*>?/gm, '');
+                    }
+                    for(let key in mapKeyValue) {
+                        title = title.replace(`{${key}}`, mapKeyValue[key]);
                     }
 
                     this.vm.title.formControl.setValue(title);
                 }
 
                 if(bodyPart) {
-                    let body = '';
-                    for(let key in mapKeyValue) {
-                        body = bodyPart.value.replace(`{${key}}`, mapKeyValue[key]);
-                    }
-
+                    let body = bodyPart.value;
                     for(let key in mapKeyValue) {
                         body = body.replace(`{${key}}`, mapKeyValue[key]);
                     }
