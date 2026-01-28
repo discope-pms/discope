@@ -457,7 +457,10 @@ export class EnrollmentConfirmationComponent implements OnInit, AfterContentInit
                     date_to: strDateTo,
                     child: this.child.name,
                     firstname: this.child.firstname,
-                    lastname: this.child.lastname.toUpperCase()
+                    lastname: this.child.lastname.toUpperCase(),
+                    main_guardian: this.mainGuardian.name,
+                    main_guardian_firstname: this.mainGuardian.firstname,
+                    main_guardian_lastname: this.mainGuardian.lastname
                 };
 
                 if(subjectPart) {
