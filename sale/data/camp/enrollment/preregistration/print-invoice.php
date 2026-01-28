@@ -10,6 +10,7 @@ use core\setting\Setting;
 use Dompdf\Dompdf;
 use Dompdf\Options as DompdfOptions;
 use identity\Center;
+use sale\camp\catalog\Product;
 use sale\camp\Child;
 use sale\camp\Guardian;
 use sale\camp\Institution;
@@ -114,7 +115,8 @@ $children = Child::ids($ids)
                 'accounting_code',
                 'product_id',
                 'day_product_id',
-                'center_id'
+                'center_id',
+                'is_clsh'
             ],
             'enrollment_lines_ids' => [
                 'price',
@@ -122,6 +124,12 @@ $children = Child::ids($ids)
             ],
             'fundings_ids' => [
                 'paid_amount'
+            ],
+            'price_adapters_ids' => [
+                'name',
+                'is_manual_discount',
+                'price_adapter_type',
+                'value'
             ]
         ]
     ])
@@ -207,6 +215,30 @@ foreach($children as $child) {
     }
 
     $enrollments = array_merge($enrollments, $child['enrollments_ids']);
+}
+
+foreach($enrollments as &$enrollment) {
+    $camp_product_ids = null;
+    if($enrollment['camp_id']['is_clsh']) {
+        $camp_product_ids = Product::search(['camp_product_type', 'in', ['clsh-full-5-days', 'clsh-full-4-days', 'clsh-day']])->ids();
+    }
+    else {
+        $camp_product_ids = Product::search(['camp_product_type', '=', 'full'])->ids();
+    }
+
+    $camp_product_line = null;
+    foreach($enrollment['enrollment_lines_ids'] as &$line) {
+        $line['is_camp_product'] = in_array($line['product_id']['id'], $camp_product_ids);
+        if($line['is_camp_product']) {
+            $camp_product_line = $line;
+        }
+    }
+
+    foreach($enrollment['price_adapters_ids'] as &$price_adapter) {
+        if($price_adapter['price_adapter_type'] === 'percent') {
+            $price_adapter['value'] = -1 * round($camp_product_line['price'] * ($price_adapter['value'] / 100), 2);
+        }
+    }
 }
 
 usort($enrollments, function($a, $b) {
