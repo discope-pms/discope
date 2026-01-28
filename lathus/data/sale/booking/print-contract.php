@@ -406,6 +406,10 @@ if(!$has_activities) {
 $cont = Contract::id($params['id'])
     ->read([
         'booking_id' => [
+            'fundings_ids' => [
+                'type',
+                'due_amount'
+            ],
             'invoices_ids' => [
                 'is_deposit',
                 'is_paid',
@@ -429,10 +433,10 @@ if(!$cont['booking_id']['customer_id']['partner_identity_id']['flag_trusted']) {
     $booking_conf['security_deposit_check'] = $formatMoney(305);
 }
 
-foreach($cont['booking_id']['fundings_ids'] as $invoice) {
-    if($invoice['is_deposit']) {
+foreach($cont['booking_id']['fundings_ids'] as $funding) {
+    if($funding['type'] === 'installment') {
         $booking_conf['deposits'][] = [
-            'price' => $formatMoney($invoice['price'])
+            'price' => $formatMoney($funding['due_amount'])
         ];
     }
 }
