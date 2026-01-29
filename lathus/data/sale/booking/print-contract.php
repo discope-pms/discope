@@ -136,11 +136,26 @@ $data_to_inject = [
     'booking' => [
         'date_from', 'date_to', 'time_from', 'time_to', 'price'
     ],
+    'booking_extra_fields' => [
+        'date_from_long', 'date_to_long'
+    ],
     'organisation' => [
         'name', 'phone', 'address_street', 'address_dispatch', 'address_zip', 'address_city'
     ],
     'customer' => [
         'display_name', 'address_street', 'address_zip', 'address_dispatch', 'address_city'
+    ],
+    'booking_conf' => [
+        'security_deposit_check'
+    ],
+    'meals_conf' => [
+        'first_date', 'first_moment', 'last_date', 'last_moment'
+    ],
+    'cancellation_conf' => [
+        'amount'
+    ],
+    'extra_fields' => [
+        'today', 'today_long', 'sojourn_contact_name', 'nb_pers', 'nb_adults', 'nb_children'
     ]
 ];
 
@@ -347,11 +362,13 @@ if(!is_null($meals[count($meals) - 1])) {
 
 $meals_conf = [
     'has_meals'     => !empty($meals),
-    'first'         => $first,
-    'last'          => $last,
+    'first_date'    => $first['date'],
+    'first_moment'  => $first['moment'],
+    'last_date'     => $last['date'],
+    'last_moment'   => $last['moment'],
     'has_breakfast' => false,
     'has_lunch'     => false,
-    'has_dinner'     => false,
+    'has_dinner'    => false,
     'has_snack'     => false
 ];
 
@@ -591,19 +608,24 @@ $template_parts = [];
 foreach($template['parts_ids'] as $part) {
     $value = $part['value'];
     foreach($data_to_inject as $object => $fields) {
-        foreach($fields as $field) {
-            $value = str_replace('{'.$object.'.'.$field.'}', $values[$object][$field], $value);
+        if(str_ends_with($object, 'extra_fields')) {
+            if($object === 'extra_fields') {
+                foreach($fields as $field) {
+                    $value = str_replace('{'.$field.'}', $values[$field], $value);
+                }
+            }
+            else {
+                $object = explode('_', $object)[0];
+                foreach($fields as $field) {
+                    $value = str_replace('{'.$object.'.'.$field.'}', $values[$object][$field], $value);
+                }
+            }
         }
-    }
-
-    $extra_fields = ['today', 'today_long', 'sojourn_contact_name', 'nb_pers', 'nb_adults', 'nb_children'];
-    foreach($extra_fields as $field) {
-        $value = str_replace('{'.$field.'}', $values[$field], $value);
-    }
-
-    $booking_extra_fields = ['date_from_long', 'date_to_long'];
-    foreach($booking_extra_fields as $field) {
-        $value = str_replace('{booking.'.$field.'}', $values['booking'][$field], $value);
+        else {
+            foreach($fields as $field) {
+                $value = str_replace('{'.$object.'.'.$field.'}', $values[$object][$field], $value);
+            }
+        }
     }
 
     $template_parts[$part['name']] = $value;
