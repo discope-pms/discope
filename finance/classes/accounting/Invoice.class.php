@@ -434,7 +434,8 @@ class Invoice extends Model {
             }
 
             $format = Setting::get_value('sale', 'accounting', 'invoice.sequence_format.'.$invoice['organisation_id']);
-            if(is_null($format)) {
+            // #todo - remove check (intval(date('Y')) === 2026 && $invoice['journal_id']['type'] === 'sales') in 2027
+            if(is_null($format) || (intval(date('Y')) === 2026 && $invoice['journal_id']['type'] === 'sales')) {
                 $format = Setting::get_value('sale', 'accounting', 'invoice.sequence_format', '%05d{sequence}');
             }
 
