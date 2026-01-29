@@ -750,14 +750,23 @@ if(count($invoices_header_data)) {
     $auth->su();
 
     // create the export archive
-    Export::create([
+    $export = Export::create([
         'center_office_id'      => $params['center_office_id'],
         'export_type'           => $journal['type'] === 'sales' ? 'invoices' : 'invoices_peppol',
         'data'                  => $data
-    ]);
+    ])
+        ->read(['id'])
+        ->first();
 
-    // mark processed invoices as exported
-    Invoice::ids(array_keys($invoices_header_data))->update(['is_exported' => true]);
+    try {
+        // mark processed invoices as exported
+        Invoice::ids(array_keys($invoices_header_data))->update(['is_exported' => true]);
+    }
+    catch(Exception $e) {
+        // remove export if error triggered while flagging invoices as exported
+        Export::id($export['id'])->delete();
+        throw $e;
+    }
 }
 
 $context->httpResponse()

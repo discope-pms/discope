@@ -351,15 +351,23 @@ if(!empty($result)) {
     $auth->su();
 
     // create the export archive
-    Export::create([
+    $export = Export::create([
         'center_office_id'  => $params['center_office_id'],
         'export_type'       => 'invoices',
         'data'              => $data
-    ]);
+    ])
+        ->read(['id'])
+        ->first();
 
-    // mark processed invoices as exported
-    Invoice::ids(array_column($invoices, 'id'))
-        ->update(['is_exported' => true]);
+    try {
+        // mark processed invoices as exported
+        Invoice::ids(array_column($invoices, 'id'))->update(['is_exported' => true]);
+    }
+    catch(Exception $e) {
+        // remove export if error triggered while flagging invoices as exported
+        Export::id($export['id'])->delete();
+        throw $e;
+    }
 }
 
 $context->httpResponse()
