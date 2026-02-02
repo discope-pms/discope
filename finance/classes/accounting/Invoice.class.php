@@ -434,14 +434,27 @@ class Invoice extends Model {
             }
 
             $format = Setting::get_value('sale', 'accounting', 'invoice.sequence_format.'.$invoice['organisation_id']);
-            // #todo - remove check (intval(date('Y')) === 2026 && $invoice['journal_id']['type'] === 'sales') in 2027
-            if(is_null($format) || (intval(date('Y')) === 2026 && $invoice['journal_id']['type'] === 'sales')) {
+            $has_organisation_format = !is_null($format);
+            if(!$has_organisation_format) {
                 $format = Setting::get_value('sale', 'accounting', 'invoice.sequence_format', '%05d{sequence}');
             }
 
             $fiscal_year = Setting::get_value('finance', 'accounting', 'fiscal_year');
             $fiscal_date_from = Setting::get_value('finance', 'accounting', 'fiscal_year.date_from');
             $fiscal_date_to = Setting::get_value('finance', 'accounting', 'fiscal_year.date_to');
+
+            // #memo - forces LO, VSG and HVG (has_vat) format for fiscal year 2026
+            // #todo - to remove when fiscal year changed to 2027
+            if(intval($fiscal_year) === 2026 && $has_organisation_format) {
+                switch($invoice['journal_id']['type']) {
+                    case 'sales':
+                        $format = '%2d{year}-%02d{office}-%05d{sequence}';
+                        break;
+                    case 'sales_peppol':
+                        $format = '%2d{year}-9%02d{office}-%04d{sequence}';
+                        break;
+                }
+            }
 
             if(!$fiscal_year || !$fiscal_date_from || !$fiscal_date_to) {
                 trigger_error("APP::unable to retrieve sequence for invoice", EQ_REPORT_ERROR);
