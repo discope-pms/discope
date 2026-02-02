@@ -184,6 +184,20 @@
                 "label": "Status devrait être \"En cours\" ou \"Terminée\"",
                 "description": "Statut incohérent : la réservation, repassée en \"Devis\" pour modification, devrait être en \"En cours\" ou \"Terminée\".",
                 "type": "booking"
+            },
+            {
+                "id": 33,
+                "name": "sale.booking.followup.task.reminder",
+                "label": "Tâche réservation en attente",
+                "description": "La date limite de la tâche de réservation est dépassée.",
+                "type": "booking"
+            },
+            {
+                "id": 34,
+                "name": "sale.enrollment.followup.task.reminder",
+                "label": "Tâche inscription en attente",
+                "description": "La date limite de la tâche d'inscription est dépassée.",
+                "type": "camp"
             }
         ]
     }
