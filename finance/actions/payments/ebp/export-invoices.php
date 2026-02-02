@@ -108,7 +108,7 @@ if(is_null($journal)) {
     throw new Exception("unknown_accounting_journal", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
-$account_downpayment = Setting::get_value('sale', 'accounting', 'invoice.downpayment_account', '4460000');
+$account_downpayment = Setting::get_value('sale', 'accounting', 'invoice.downpayment_account');
 
 if(is_null($account_downpayment)) {
     throw new Exception("unknown_downpayment_account", EQ_ERROR_UNKNOWN_OBJECT);
