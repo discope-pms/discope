@@ -180,6 +180,7 @@ export class EnrollmentConfirmationComponent implements OnInit, AfterContentInit
     public loading = true;
     public isSent = false;
 
+    public printInvoiceUrl: string = null;
     public printConfirmationUrl: string = null;
 
     public vm: vModel;
@@ -510,10 +511,12 @@ export class EnrollmentConfirmationComponent implements OnInit, AfterContentInit
     public refreshPrintConfirmationUrl() {
         console.log('refreshPrintConfirmationUrl');
         if(this.selectedLanguage.id === 0 || this.enrollment.id === 0) {
+            this.printInvoiceUrl = null;
             this.printConfirmationUrl = null;
             return;
         }
 
+        this.printInvoiceUrl = '/?get=sale_camp_enrollment_confirmation_print-invoice&lang=' + this.selectedLanguage.code + '&id=' + this.enrollment.id;
         this.printConfirmationUrl = '/?get=sale_camp_enrollment_confirmation_print-confirmation&lang=' + this.selectedLanguage.code + '&id='+ this.enrollment.id;
     }
 
@@ -559,7 +562,7 @@ export class EnrollmentConfirmationComponent implements OnInit, AfterContentInit
             })
 
             this.isSent = true;
-            this.snack.open("Confirmation de pré-inscription envoyée avec succès.");
+            this.snack.open("Confirmation d'inscription envoyée avec succès.");
             this.loading = false;
         }
         catch(response: any) {
