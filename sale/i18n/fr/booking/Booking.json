@@ -263,6 +263,10 @@
                     "label": "Confirmer",
                     "description": "Les unités locatives seront réservées, un contrat sera créé et un échéancier de paiement sera généré."
                 },
+                "action.confirm-with-payment-plan": {
+                    "label": "Confirmer",
+                    "description": "Les unités locatives seront réservées, un contrat sera créé et un échéancier de paiement sera généré en fonction du plan de paiement sélectionné."
+                },
                 "action.checkin": {
                     "label": "Check in",
                     "description": "L'hôte occupe désormais l'hébergement: les unités locatives seront marquées comme occupées."
@@ -426,6 +430,10 @@
                 "action.confirm": {
                     "label": "Confirmer",
                     "description": "Les unités locatives seront réservées, un contrat sera créé et un échéancier de paiement sera généré."
+                },
+                "action.confirm-with-payment-plan": {
+                    "label": "Confirmer",
+                    "description": "Les unités locatives seront réservées, un contrat sera créé et un échéancier de paiement sera généré en fonction du plan de paiement sélectionné."
                 },
                 "action.checkin": {
                     "label": "Check in",
@@ -595,6 +603,10 @@
                     "label": "Confirmer",
                     "description": "Les unités locatives seront réservées, un contrat sera créé et un échéancier de paiement sera généré."
                 },
+                "action.confirm-with-payment-plan": {
+                    "label": "Confirmer",
+                    "description": "Les unités locatives seront réservées, un contrat sera créé et un échéancier de paiement sera généré en fonction du plan de paiement sélectionné."
+                },
                 "action.checkin": {
                     "label": "Check in",
                     "description": "L'hôte occupe désormais l'hébergement: les unités locatives seront marquées comme occupées."
@@ -744,6 +756,10 @@
                 "action.confirm": {
                     "label": "Confirmer",
                     "description": "Les unités locatives seront réservées, un contrat sera créé et un échéancier de paiement sera généré."
+                },
+                "action.confirm-with-payment-plan": {
+                    "label": "Confirmer",
+                    "description": "Les unités locatives seront réservées, un contrat sera créé et un échéancier de paiement sera généré en fonction du plan de paiement sélectionné."
                 },
                 "action.checkin": {
                     "label": "Check in",

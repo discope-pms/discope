@@ -1,0 +1,27 @@
+{
+    "name": "Confirmation de réservation",
+    "description": "Les unités locatives seront bloquées, un contrat sera créé et un échéancier de paiements sera généré en utilisant le plan de paiement sélectionné.",
+    "model": {
+        "id": {
+            "label": "Identifiant",
+            "description": "Identifiant de la réservation ciblée.",
+            "help": ""
+        },
+        "payment_plan_id": {
+            "label": "Plan de paiement",
+            "description": "Plan de paiement à utiliser pour créer les financements.",
+            "help": ""
+        }
+    },
+    "error": {
+        "errors": {
+            "unknown_booking": "Surbooking détecté",
+            "unknown_payment_plan": "Plan de paiement non trouvé",
+            "incompatible_status": "Action impossible pour ce statut de réservation.",
+            "unconfirmed_price": "Le contrat ne peut être généré avec un prix non-confirmé.",
+            "missing_price_assignment": "Un produit sélectionné n'a aucun Prix défini.",
+            "uncomplete_customer": "Les coordonnées du client sont incomplètes.",
+            "missing_contact_phone" : "Numéro de téléphone non valide dans les contacts."
+        }
+    }
+}
