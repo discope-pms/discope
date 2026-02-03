@@ -104,7 +104,12 @@ if(is_null($enrollment)) {
     throw new Exception("unknown_enrollment", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
-$attachment = eQual::run('get', 'sale_camp_enrollment_confirmation_print-confirmation', [
+$confirmation_attachment = eQual::run('get', 'sale_camp_enrollment_confirmation_print-confirmation', [
+    'id'    => $enrollment['id'],
+    'lang'  => $params['lang']
+]);
+
+$invoice_attachment = eQual::run('get', 'sale_camp_enrollment_confirmation_print-invoice', [
     'id'    => $enrollment['id'],
     'lang'  => $params['lang']
 ]);
@@ -127,7 +132,8 @@ $params['message'] .= $signature;
 /** @var EmailAttachment[] */
 $attachments = [];
 
-$attachments[] = new EmailAttachment('confirmation_inscription.pdf', (string) $attachment, 'application/pdf');
+$attachments[] = new EmailAttachment('confirmation_inscription.pdf', (string) $confirmation_attachment, 'application/pdf');
+$attachments[] = new EmailAttachment('facture_inscription.pdf', (string) $invoice_attachment, 'application/pdf');
 
 // add attachments whose ids have been received as param ($params['attachments_ids'])
 if(count($params['attachments_ids'])) {
