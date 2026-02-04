@@ -98,6 +98,10 @@
                 "action.add_bank_check": {
                     "label": "Ajouter chèque bancaire",
                     "description": "Ajouter un chèque bancaire à un financement."
+                },
+                "action.add_manual_payment": {
+                    "label": "Ajouter un paiement",
+                    "description": "Enregistrer manuellement un paiement."
                 }
             },
             "layout": {
@@ -131,6 +135,10 @@
                 "action.add_bank_check": {
                     "label": "Ajouter chèque bancaire",
                     "description": "Ajouter un chèque bancaire à un financement."
+                },
+                "action.add_manual_payment": {
+                    "label": "Ajouter un paiement",
+                    "description": "Enregistrer manuellement un paiement."
                 }
             },
             "layout": {

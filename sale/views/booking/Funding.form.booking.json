@@ -78,7 +78,6 @@
             },
             "visible": [[true, "=", "env.sale.features.payment.bank_check"], ["is_paid", "=", false]]
         },
-
         {
             "id": "action.pay_financial_help",
             "label": "Financial help payment",
