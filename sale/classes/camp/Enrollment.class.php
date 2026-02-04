@@ -1271,7 +1271,7 @@ class Enrollment extends Model {
                     ],
                     'cancel' => [
                         'status'        => 'cancelled',
-                        'description'   => "Cancel the pending enrollment.",
+                        'description'   => "Cancel the confirmed enrollment.",
                         'onafter'       => 'onafterCancel'
                     ]
                 ]
@@ -1282,7 +1282,7 @@ class Enrollment extends Model {
                 'transitions' => [
                     'cancel' => [
                         'status'        => 'cancelled',
-                        'description'   => "Cancel the enrollment.",
+                        'description'   => "Cancel the validated enrollment.",
                         'onafter'       => 'onafterCancel'
                     ]
                 ]
