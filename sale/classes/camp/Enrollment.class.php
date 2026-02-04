@@ -2151,17 +2151,17 @@ class Enrollment extends Model {
         $self->read([
             'price',
             'price_adapters_ids'    => ['name', 'value', 'origin_type'],
-            'fundings_ids'          => ['paid_amount'],
+            'fundings_ids'          => ['due_amount'],
             'camp_id'               => ['date_from', 'center_id' => ['center_office_id']]
         ]);
 
         foreach($self as $id => $enrollment) {
-            $remaining_amount = $enrollment['price'];
+            $remaining_due_amount = $enrollment['price'];
             foreach($enrollment['fundings_ids'] as $funding) {
-                $remaining_amount -= $funding['paid_amount'];
+                $remaining_due_amount -= $funding['due_amount'];
             }
 
-            if($remaining_amount <= 0) {
+            if($remaining_due_amount <= 0) {
                 continue;
             }
 
@@ -2173,7 +2173,7 @@ class Enrollment extends Model {
 
             $funding = Funding::create([
                 'enrollment_id'     => $id,
-                'due_amount'        => $remaining_amount,
+                'due_amount'        => $remaining_due_amount,
                 'due_date'          => $due_date,
                 'center_office_id'  => $enrollment['camp_id']['center_id']['center_office_id']
             ])
