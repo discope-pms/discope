@@ -1,0 +1,20 @@
+{
+    "name": "Supprimer paiement",
+    "description": "Supprime les paiements manuels du financement.",
+    "model": {
+        "id": {
+            "label": "Identifiant",
+            "description": "Identifiant unique du financement.",
+            "help": ""
+        }
+    },
+    "error": {
+        "errors": {
+            "unknown_funding": "Financement introuvable.",
+            "funding_not_paid": "Le financement n'est pas marqué comme payé.",
+            "not_enrollment_funding": "Le financement n'est pas lié à une inscription.",
+            "enrollment_validated": "L'inscription est déjà validée'.",
+            "enrollment_cancelled": "L'inscription est annulée'."
+        }
+    }
+}
