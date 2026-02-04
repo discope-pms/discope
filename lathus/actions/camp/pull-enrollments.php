@@ -655,9 +655,22 @@ if(!empty($data)) {
             $enrollment_warnings[] = "Prix calculé par Discope {$formatMoney($enrollment_price)}";
         }
 
-        //  2.3.9) Confirm enrollment to generate its funding
+        //  2.3.9) Cancel or confirm enrollment
 
-        if($enrollment_status === 'pending') {
+        if($ext_enrollment['status'] === 'cancelled') {
+            try {
+                //  If customer cancelled the enrollment
+                eQual::run('do', 'sale_camp_enrollment_cancel', [
+                    'id'        => $enrollment['id'],
+                    'reason'    => 'other',
+                    'fee'       => 0
+                ]);
+            }
+            catch(Exception $e) {
+                trigger_error("APP::sale_camp_enrollment_cancel unable to cancel the enrollment", E_USER_WARNING,);
+            }
+        }
+        elseif($enrollment_status === 'pending') {
             try {
                 //  If spot available confirm, else add to waiting list
                 eQual::run('do', 'sale_camp_enrollment_confirm', [
@@ -665,12 +678,7 @@ if(!empty($data)) {
                 ]);
             }
             catch(Exception $e) {
-                trigger_error("APP::sale_camp_enrollment_confirm unable to confirm/waitlist the enrollment", E_USER_WARNING,);
-            }
-            finally {
-                $en = Enrollment::id($enrollment['id'])
-                    ->read(['status'])
-                    ->first();
+                trigger_error("APP::sale_camp_enrollment_confirm unable to confirm the enrollment", E_USER_WARNING,);
             }
         }
 
@@ -698,7 +706,7 @@ if(!empty($data)) {
                 case 'monetico':
                     if(
                         !empty($ext_enrollment['metaJson']['reglement']['montantCB'])
-                        && $ext_enrollment['metaJson']['payment']['status'] !== 'failed'
+                        && !in_array($ext_enrollment['metaJson']['payment']['status'], ['failed', 'cancelled'])
                     ) {
                         $funding = Funding::search(['enrollment_id', '=', $enrollment['id']])
                             ->read(['id'])
