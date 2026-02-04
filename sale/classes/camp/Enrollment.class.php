@@ -1188,7 +1188,10 @@ class Enrollment extends Model {
         // unlock
         $self->update(['is_locked' => false]);
 
-        $self->do('remove_financial_help_payments');
+        $self->do('remove_financial_help_payments')
+            ->do('delete_unpaid_fundings')
+            ->do('update_fundings_due_to_paid')
+            ->update(['paid_amount' => null]);
 
         $self->do('remove_presences');
     }
@@ -2156,12 +2159,13 @@ class Enrollment extends Model {
         ]);
 
         foreach($self as $id => $enrollment) {
-            $remaining_due_amount = $enrollment['price'];
+            $remaining_amount = $enrollment['price'];
             foreach($enrollment['fundings_ids'] as $funding) {
-                $remaining_due_amount -= $funding['due_amount'];
+                $remaining_amount -= $funding['due_amount'];
             }
 
-            if($remaining_due_amount <= 0) {
+            if($remaining_amount <= 0) {
+                // # todo - handle too much is due compared to enrollment price
                 continue;
             }
 
@@ -2173,7 +2177,7 @@ class Enrollment extends Model {
 
             $funding = Funding::create([
                 'enrollment_id'     => $id,
-                'due_amount'        => $remaining_due_amount,
+                'due_amount'        => $remaining_amount,
                 'due_date'          => $due_date,
                 'center_office_id'  => $enrollment['camp_id']['center_id']['center_office_id']
             ])
@@ -2245,10 +2249,10 @@ class Enrollment extends Model {
     }
 
     protected static function doUpdateFundingsDueToPaid($self) {
-        $self->read(['fundings_ids' => ['due_amount', 'paid_amount']]);
+        $self->read(['fundings_ids' => ['is_paid', 'due_amount', 'paid_amount']]);
         foreach($self as $enrollment) {
             foreach($enrollment['fundings_ids'] as $funding_id => $funding) {
-                if($funding['due_amount'] <= 0) {
+                if($funding['is_paid'] || $funding['due_amount'] <= 0) {
                     continue;
                 }
 
