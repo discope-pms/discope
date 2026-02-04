@@ -668,6 +668,7 @@ if(!empty($data)) {
             }
             catch(Exception $e) {
                 trigger_error("APP::sale_camp_enrollment_cancel unable to cancel the enrollment", E_USER_WARNING,);
+                $dispatch->dispatch('lodging.camp.pull_enrollments.cancel_error', 'sale\camp\Enrollment', $enrollment['id'], 'important', null, [], [], null, 1);
             }
         }
         elseif($enrollment_status === 'pending') {
@@ -679,6 +680,7 @@ if(!empty($data)) {
             }
             catch(Exception $e) {
                 trigger_error("APP::sale_camp_enrollment_confirm unable to confirm the enrollment", E_USER_WARNING,);
+                $dispatch->dispatch('lodging.camp.pull_enrollments.confirm_error', 'sale\camp\Enrollment', $enrollment['id'], 'important', null, [], [], null, 1);
             }
         }
 
