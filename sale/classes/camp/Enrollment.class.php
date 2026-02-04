@@ -1188,12 +1188,6 @@ class Enrollment extends Model {
         // unlock
         $self->update(['is_locked' => false]);
 
-        // handle fundings and payments
-        $self->do('remove_financial_help_payments')
-            ->do('delete_unpaid_fundings')
-            ->do('update_fundings_due_to_paid')
-            ->update(['paid_amount' => null]);
-
         $self->do('remove_presences');
     }
 
