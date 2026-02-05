@@ -1196,6 +1196,18 @@ class Enrollment extends Model {
         $self->do('remove_presences');
     }
 
+    protected static function onafterUnvalidate($self) {
+        // unlock
+        $self->update(['is_locked' => false]);
+
+        $self->do('remove_financial_help_payments')
+            ->do('delete_unpaid_fundings')
+            ->do('update_fundings_due_to_paid')
+            ->update(['paid_amount' => null]);
+
+        $self->do('remove_presences');
+    }
+
     protected static function onafterCancel($self) {
         // unlock
         $self->update([
@@ -1279,6 +1291,12 @@ class Enrollment extends Model {
             'validated' => [
                 'description' => "The enrollment is validated, the required documents have been received.",
                 'transitions' => [
+                    'unvalidate' => [
+                        'status'        => 'pending',
+                        'description'   => "Set the enrollment status back to pending to allow its alteration.",
+                        'policies'      => [],
+                        'onafter'       => 'onafterUnvalidate'
+                    ],
                     'cancel' => [
                         'status'        => 'cancelled',
                         'description'   => "Cancel the validated enrollment.",
