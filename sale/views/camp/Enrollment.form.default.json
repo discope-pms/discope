@@ -246,7 +246,7 @@
                                             {
                                                 "type": "label",
                                                 "value": "",
-                                                "width": "50%",
+                                                "width": "75%",
                                                 "visible": ["state", "<>", "draft"]
                                             },
                                             {

@@ -1318,7 +1318,7 @@ class Enrollment extends Model {
             'presence_day_1', 'presence_day_2', 'presence_day_3', 'presence_day_4', 'presence_day_5'
         ]);
 
-        $allowed_keys = ['is_locked', 'status', 'is_handled', 'description', 'child_age', 'all_documents_received', 'doc_aquatic_skills_received', 'payment_status', 'paid_amount', 'cancellation_date', 'preregistration_sent', 'confirmation_sent', 'enrollment_mails_ids'];
+        $allowed_keys = ['is_locked', 'status', 'is_handled', 'description', 'child_age', 'all_documents_received', 'doc_aquatic_skills_received', 'payment_status', 'paid_amount', 'cancellation_date', 'cancellation_reason', 'preregistration_sent', 'confirmation_sent', 'enrollment_mails_ids'];
 
         // weekend_extra can be modified to alter presences, but it'll not affect lines for external enrollments, only presences
         $external_allowed_keys = ['weekend_extra'];
@@ -2172,50 +2172,72 @@ class Enrollment extends Model {
         $self->read([
             'price',
             'price_adapters_ids'    => ['name', 'value', 'origin_type'],
-            'fundings_ids'          => ['due_amount'],
+            'fundings_ids'          => ['center_office_id', 'due_amount'],
             'camp_id'               => ['date_from', 'center_id' => ['center_office_id']]
         ]);
 
         foreach($self as $id => $enrollment) {
+            $last_funding = null;
             $remaining_amount = $enrollment['price'];
             foreach($enrollment['fundings_ids'] as $funding) {
                 $remaining_amount -= $funding['due_amount'];
+                $last_funding = $funding;
             }
 
-            if($remaining_amount <= 0) {
-                // # todo - handle too much is due compared to enrollment price
-                continue;
-            }
-
-            $due_date = $enrollment['camp_id']['date_from'];
-            $one_month_before_camp = (new \DateTime())->setTimestamp($enrollment['camp_id']['date_from'])->modify('-30 days')->getTimestamp();
-            if(time() < $one_month_before_camp) {
-                $due_date = $one_month_before_camp;
-            }
-
-            $funding = Funding::create([
-                'enrollment_id'     => $id,
-                'due_amount'        => $remaining_amount,
-                'due_date'          => $due_date,
-                'center_office_id'  => $enrollment['camp_id']['center_id']['center_office_id']
-            ])
-                ->read(['center_office_id'])
-                ->first();
-
+            $payments_price_adapters = [];
             foreach($enrollment['price_adapters_ids'] as $price_adapter) {
-                // #memo - the other price-adapters are already removed from price
-                if(!in_array($price_adapter['origin_type'], ['commune', 'community-of-communes', 'department-caf', 'department-msa'])) {
-                    continue;
+                // #memo - the other price-adapters are already removed from enrollment price
+                if (in_array($price_adapter['origin_type'], ['commune', 'community-of-communes', 'department-caf', 'department-msa'])) {
+                    $payments_price_adapters[] = $price_adapter;
+                }
+            }
+
+            if($remaining_amount > 0 || (is_null($last_funding) && count($payments_price_adapters) > 0)) {
+                $due_date = $enrollment['camp_id']['date_from'];
+                $one_month_before_camp = (new \DateTime())->setTimestamp($enrollment['camp_id']['date_from'])->modify('-30 days')->getTimestamp();
+                if(time() < $one_month_before_camp) {
+                    $due_date = $one_month_before_camp;
                 }
 
+                $last_funding = Funding::create([
+                    'enrollment_id'     => $id,
+                    'due_amount'        => $remaining_amount,
+                    'due_date'          => $due_date,
+                    'center_office_id'  => $enrollment['camp_id']['center_id']['center_office_id']
+                ])
+                    ->read(['center_office_id'])
+                    ->first();
+            }
+
+            foreach($payments_price_adapters as $price_adapter) {
                 Payment::create([
                     'enrollment_id'     => $id,
                     'amount'            => $price_adapter['value'],
                     'payment_origin'    => 'cashdesk',
                     'payment_method'    => 'camp_financial_help',
-                    'funding_id'        => $funding['id'],
-                    'center_office_id'  => $funding['center_office_id'],
+                    'funding_id'        => $last_funding['id'],
+                    'center_office_id'  => $last_funding['center_office_id'],
                     'description'       => $price_adapter['name']
+                ]);
+            }
+
+            $fundings = Funding::search(['enrollment_id', '=', $id])
+                ->read(['due_amount', 'paid_amount'])
+                ->get();
+
+            $to_refund_amount = 0.0;
+            foreach($fundings as $funding) {
+                if($funding['paid_amount'] > $funding['due_amount']) {
+                    $to_refund_amount += $funding['paid_amount'] - $funding['due_amount'];
+                }
+            }
+
+            if($to_refund_amount > 0) {
+                Funding::create([
+                    'enrollment_id'     => $id,
+                    'due_amount'        => -1 * $to_refund_amount,
+                    'due_date'          => $enrollment['camp_id']['date_from'],
+                    'center_office_id'  => $enrollment['camp_id']['center_id']['center_office_id']
                 ]);
             }
 
@@ -2239,11 +2261,12 @@ class Enrollment extends Model {
 
             Payment::ids($external_payments_ids)->delete();
 
-            Funding::ids(array_keys($map_funding_to_reset_ids))->update([
-                'paid_amount'   => null,
-                'is_paid'       => null,
-                'status'        => 'pending'
-            ])
+            Funding::ids(array_keys($map_funding_to_reset_ids))
+                ->update([
+                    'paid_amount'   => null,
+                    'is_paid'       => null,
+                    'status'        => 'pending'
+                ])
                 ->read(['paid_amount', 'is_paid']);
         }
     }
@@ -2274,7 +2297,9 @@ class Enrollment extends Model {
                     continue;
                 }
 
-                Funding::id($funding_id)->update(['due_amount' => $funding['paid_amount']]);
+                Funding::id($funding_id)
+                    ->update(['due_amount' => $funding['paid_amount']])
+                    ->update(['is_paid' => true, 'status' => 'paid']);
             }
         }
     }
