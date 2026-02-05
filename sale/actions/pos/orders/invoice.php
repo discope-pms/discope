@@ -209,9 +209,11 @@ foreach($orders as $order) {
                 ->update([
                     'total'                     => $line['total']
                 ])
-                ->update([
+                // #todo - find why the price of an order line can be wrong
+                // #memo - commented because sometimes the price of an order line is not correctly calculated (price = unit_price instead of price = qty * unit_price)
+                /*->update([
                     'price'                     => $line['price']
-                ]);
+                ])*/;
         }
         // attach the invoice to the Order, and mark it as having an invoice
         Order::id($order['id'])->update(['invoice_id' => $invoice['id']]);
