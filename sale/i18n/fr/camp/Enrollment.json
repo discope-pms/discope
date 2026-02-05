@@ -349,6 +349,9 @@
                 "action.validate": {
                     "label": "Valider"
                 },
+                "action.unvalidate": {
+                    "label": "Repasser en brouillon"
+                },
                 "action.cancel": {
                     "label": "Annuler"
                 },
@@ -396,6 +399,9 @@
                 },
                 "action.validate": {
                     "label": "Valider"
+                },
+                "action.unvalidate": {
+                    "label": "Repasser en brouillon"
                 },
                 "action.cancel": {
                     "label": "Annuler"
@@ -445,6 +451,9 @@
                 "action.validate": {
                     "label": "Valider"
                 },
+                "action.unvalidate": {
+                    "label": "Repasser en brouillon"
+                },
                 "action.cancel": {
                     "label": "Annuler"
                 },
@@ -493,6 +502,9 @@
                 "action.validate": {
                     "label": "Valider"
                 },
+                "action.unvalidate": {
+                    "label": "Repasser en brouillon"
+                },
                 "action.cancel": {
                     "label": "Annuler"
                 },
@@ -538,6 +550,9 @@
                 },
                 "action.validate": {
                     "label": "Valider"
+                },
+                "action.unvalidate": {
+                    "label": "Repasser en brouillon"
                 },
                 "action.cancel": {
                     "label": "Annuler"

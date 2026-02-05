@@ -10,7 +10,7 @@
     "error": {
         "errors": {
             "unknown_enrollment": "Inscription non connue.",
-            "invalid_status": "L'inscription n'est pas confirmée.",
+            "invalid_status": "L'inscription n'est pas validée.",
             "camp_already_started": "Le camp a déjà commencé"
         }
     }

@@ -68,6 +68,16 @@
             ]
         },
         {
+            "id": "action.unvalidate",
+            "label": "Unvalidate",
+            "controller": "sale_camp_enrollment_unvalidate",
+            "confirm": true,
+            "visible": [
+                ["status", "=", "validated"],
+                ["state", "<>", "draft"]
+            ]
+        },
+        {
             "id": "action.cancel",
             "label": "Cancel",
             "controller": "sale_camp_enrollment_cancel",
