@@ -259,11 +259,15 @@
                     "label": "Confirmer",
                     "description": "Les unités locatives seront réservées, un contrat sera créé et une facture proforma sera éditée."
                 },
+                "action.option_confirm_with_payment_plan": {
+                    "label": "Confirmer",
+                    "description": "Les unités locatives seront réservées, un contrat sera créé et une facture proforma sera éditée."
+                },
                 "action.confirm": {
                     "label": "Confirmer",
                     "description": "Les unités locatives seront réservées, un contrat sera créé et un échéancier de paiement sera généré."
                 },
-                "action.confirm-with-payment-plan": {
+                "action.confirm_with_payment_plan": {
                     "label": "Confirmer",
                     "description": "Les unités locatives seront réservées, un contrat sera créé et un échéancier de paiement sera généré en fonction du plan de paiement sélectionné."
                 },
@@ -427,11 +431,15 @@
                     "label": "Confirmer",
                     "description": "Les unités locatives seront réservées, un contrat sera créé et une facture proforma sera éditée."
                 },
+                "action.option_confirm_with_payment_plan": {
+                    "label": "Confirmer",
+                    "description": "Les unités locatives seront réservées, un contrat sera créé et une facture proforma sera éditée."
+                },
                 "action.confirm": {
                     "label": "Confirmer",
                     "description": "Les unités locatives seront réservées, un contrat sera créé et un échéancier de paiement sera généré."
                 },
-                "action.confirm-with-payment-plan": {
+                "action.confirm_with_payment_plan": {
                     "label": "Confirmer",
                     "description": "Les unités locatives seront réservées, un contrat sera créé et un échéancier de paiement sera généré en fonction du plan de paiement sélectionné."
                 },
@@ -599,11 +607,15 @@
                     "label": "Confirmer",
                     "description": "Les unités locatives seront réservées, un contrat sera créé et une facture proforma sera éditée."
                 },
+                "action.option_confirm_with_payment_plan": {
+                    "label": "Confirmer",
+                    "description": "Les unités locatives seront réservées, un contrat sera créé et une facture proforma sera éditée."
+                },
                 "action.confirm": {
                     "label": "Confirmer",
                     "description": "Les unités locatives seront réservées, un contrat sera créé et un échéancier de paiement sera généré."
                 },
-                "action.confirm-with-payment-plan": {
+                "action.confirm_with_payment_plan": {
                     "label": "Confirmer",
                     "description": "Les unités locatives seront réservées, un contrat sera créé et un échéancier de paiement sera généré en fonction du plan de paiement sélectionné."
                 },
@@ -753,11 +765,15 @@
                     "label": "Confirmer",
                     "description": "Les unités locatives seront réservées, un contrat sera créé et une facture proforma sera éditée."
                 },
+                "action.option_confirm_with_payment_plan": {
+                    "label": "Confirmer",
+                    "description": "Les unités locatives seront réservées, un contrat sera créé et une facture proforma sera éditée."
+                },
                 "action.confirm": {
                     "label": "Confirmer",
                     "description": "Les unités locatives seront réservées, un contrat sera créé et un échéancier de paiement sera généré."
                 },
-                "action.confirm-with-payment-plan": {
+                "action.confirm_with_payment_plan": {
                     "label": "Confirmer",
                     "description": "Les unités locatives seront réservées, un contrat sera créé et un échéancier de paiement sera généré en fonction du plan de paiement sélectionné."
                 },

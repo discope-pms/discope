@@ -38,7 +38,15 @@
             "description": "Rental units will be reserved and the invoicing plan will be set up.",
             "controller": "sale_booking_do-option-confirm",
             "confirm": true,
-            "visible": [["status", "=", "quote"], ["is_price_tbc", "=", false], ["status_before_revert_to_quote", "is", null]]
+            "visible": [["status", "=", "quote"], ["is_price_tbc", "=", false], ["status_before_revert_to_quote", "is", null], [false, "=", "env.sale.features.booking.confirm_with_payment_plan"]]
+        },
+        {
+            "id": "action.option_confirm_with_payment_plan",
+            "label": "Confirm Booking",
+            "description": "Rental units will be reserved and the invoicing plan will be set up depending on selected plan.",
+            "controller": "sale_booking_do-option-confirm-with-payment-plan",
+            "confirm": true,
+            "visible": [["status", "=", "quote"], ["is_price_tbc", "=", false], ["status_before_revert_to_quote", "is", null], [true, "=", "env.sale.features.booking.confirm_with_payment_plan"]]
         },
         {
             "id": "action.confirm",
@@ -46,7 +54,15 @@
             "description": "Rental units will be reserved and the invoicing plan will be set up.",
             "controller": "sale_booking_do-confirm",
             "confirm": true,
-            "visible": [["status", "=", "option"], ["is_price_tbc", "=", false]]
+            "visible": [["status", "=", "option"], ["is_price_tbc", "=", false], [false, "=", "env.sale.features.booking.confirm_with_payment_plan"]]
+        },
+        {
+            "id": "action.confirm_with_payment_plan",
+            "label": "Confirm Booking",
+            "description": "Rental units will be reserved and the invoicing plan will be set up depending on selected plan.",
+            "controller": "sale_booking_do-confirm-with-payment-plan",
+            "confirm": true,
+            "visible": [["status", "=", "option"], ["is_price_tbc", "=", false], [true, "=", "env.sale.features.booking.confirm_with_payment_plan"]]
         },
         {
             "id": "action.checkin",
