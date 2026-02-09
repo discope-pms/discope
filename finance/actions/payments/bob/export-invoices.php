@@ -618,7 +618,7 @@ foreach($invoices as $invoice) {
         // #memo - if result of vat "calculation per line" is different from result of vat "calculation per vat_rate" (BE: 6%, 12% and 21%), then adapt it to match Invoices data
         foreach($subtotals_vat_lines as $vat_rate_index => $subtotal_vat) {
             $invoice_subtotals_vat = json_decode($invoice['subtotals_vat'], true);
-            $diff = $invoice_subtotals_vat[$vat_rate_index] - $subtotal_vat;
+            $diff = $invoice_subtotals_vat[$vat_rate_index] - abs($subtotal_vat);
             if(round(abs($diff), 2) == 0.0) {
                 continue;
             }
