@@ -42,7 +42,8 @@ class Booking extends Model {
                 'readonly'          => true,
                 // #memo - workaround for preventing setting name at creation when coming from filtered view
                 'onupdate'          => 'onupdateName',
-                'generation'        => 'generateName'
+                'generation'        => 'generateName',
+                'dependents'        => ['payment_reference']
             ],
 
             'display_name' => [
@@ -1096,7 +1097,7 @@ class Booking extends Model {
         $reference_type = Setting::get_value('sale', 'organization', 'booking.reference.type', 'VCS');
         foreach($bookings as $id => $booking) {
             $reference = $booking['payment_reference'];
-            if(in_array($reference, ['RN', 'RF', 'VCS'])) {
+            if(in_array($reference_type, ['RN', 'RF', 'VCS'])) {
                 DataFormatter::format($booking['payment_reference'], $reference_type);
             }
             $result[$id] = $reference;

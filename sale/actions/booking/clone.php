@@ -235,7 +235,7 @@ foreach($fields as $booking_field) {
 $event_mask = $orm->disableEvents();
 
 $cloned_booking = Booking::create($data)
-    ->read(['id'])
+    ->read(['id', 'name'])
     ->first();
 
 foreach($booking['contacts_ids'] as $contact) {
