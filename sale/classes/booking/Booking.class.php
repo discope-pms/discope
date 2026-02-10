@@ -1040,8 +1040,11 @@ class Booking extends Model {
      */
     public static function calcPaymentReference($self) {
         $result = [];
-        $self->read(['name', 'customer_identity_id' => ['name', 'id', 'accounting_account']]);
+        $self->read(['name', 'state', 'customer_identity_id' => ['name', 'id', 'accounting_account']]);
         foreach($self as $id => $booking) {
+            if($booking['state'] === 'draft') {
+                continue;
+            }
             // #memo - arbitrary value : used in the accounting software for identifying payments with a temporary account entry counterpart
             $code_ref =  Setting::get_value('sale', 'organization', 'booking.reference.code', 150);
             $reference_type =  Setting::get_value('sale', 'organization', 'booking.reference.type', 'VCS');
