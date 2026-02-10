@@ -1051,6 +1051,10 @@ class Booking extends Model {
 
             $booking_code = intval($booking['name']);
 
+            if($booking_code <= 0) {
+                continue;
+            }
+
             switch($reference_type) {
                 // use Customer accounting_account as reference (from Identity)
                 case 'accounting_account':
