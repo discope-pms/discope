@@ -89,7 +89,7 @@ if($booking['booking_lines_groups_ids']) {
 }
 
 $group = BookingLineGroup::create($values)
-    ->read(['id'])
+    ->read(['id', 'name', 'activity_group_num'])
     ->first();
 
 Booking::refreshNbPers($orm, $booking['id']);
