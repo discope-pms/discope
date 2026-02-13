@@ -7,6 +7,7 @@
 */
 
 use sale\booking\Booking;
+use sale\booking\BookingLineGroup;
 use sale\booking\SojournProductModelRentalUnitAssignement;
 
 // announce script and fetch parameters values
@@ -17,6 +18,11 @@ use sale\booking\SojournProductModelRentalUnitAssignement;
             'description'   => 'Identifier of the booking for which the tree is requested.',
             'type'          => 'integer',
             'required'      => true
+        ],
+        'booking_line_group_id' => [
+            'description'   => 'Identifier of the booking group for which the tree is requested.',
+            'help'          => 'If none given, then all are loaded.',
+            'type'          => 'integer'
         ]
     ],
     'access' => [
@@ -44,195 +50,219 @@ $tree = [
     'center_id' => [
         'id', 'name', 'sojourn_type_id', 'product_groups_ids'
     ],
-    'booking_lines_groups_ids' => [
-        'id',
-        'name',
-        'order',
-        'has_pack',
-        'total',
-        'price',
-        'fare_benefit',
-        'is_locked',
-        'is_autosale',
-        'is_extra',
-        'has_schedulable_services',
-        'has_consumptions',
-        'date_from',
-        'date_to',
-        'time_from',
-        'time_to',
-        'nb_pers',
-        'nb_nights',
-        'group_type',
-        'is_sojourn',
-        'is_event',
-        'has_locked_rental_units',
-        'booking_id',
-        'sojourn_type_id',
-        'activity_group_num',
-        'has_person_with_disability',
-        'person_disability_description',
-        'meal_prefs_description',
-        'pack_id' => [
-            'id',
-            'name'
-        ],
-        'rate_class_id' => [
-            'id',
-            'name',
-            'description'
-        ],
-        'age_range_assignments_ids' => [
-            'age_range_id', 'qty', 'free_qty', 'age_from', 'age_to', 'is_sporty'
-        ],
-        'sojourn_product_models_ids' => [
-            'id',
-            'qty',
-            'booking_line_group_id',
-            'product_model_id' => [
-                'id',
-                'name',
-                'capacity',
-                'is_accomodation',
-                'qty_accounting_method'
-            ],
-            'rental_unit_assignments_ids' => [
-                '@sort' => ['name' => 'asc'],
-                'id',
-                'name',
-                'qty',
-                'use_extra',
-                'extra_qty',
-                'booking_line_group_id',
-                'rental_unit_id' => [
-                    'id',
-                    'name',
-                    'description',
-                    'is_accomodation',
-                    'capacity',
-                    'extra'
-                ]
-            ]
-        ],
-        'meal_preferences_ids' => [
-            'type', 'pref', 'qty'
-        ],
-        'booking_lines_ids' => [
-            'id',
-            'name',
-            'description',
-            'order',
-            'qty',
-            'vat_rate',
-            'unit_price',
-            'total',
-            'price',
-            'free_qty',
-            'discount',
-            'fare_benefit',
-            'qty_vars',
-            'qty_accounting_method',
-            'is_rental_unit',
-            'is_accomodation',
-            'is_snack',
-            'is_meal',
-            'meal_location',
-            'is_activity',
-            'is_transport',
-            'is_supply',
-            'is_fullday',
-            'service_date',
-            'time_slot_id',
-            'booking_activity_id',
-            'price_id',
-            'product_id' => [
-                'name',
-                'sku',
-                'has_age_range',
-                'age_range_id',
-                'product_model_id' => [
-                    'schedule_offset',
-                    'has_duration',
-                    'duration',
-                    'capacity',
-                    'type',
-                    'service_type',
-                    'is_repeatable',
-                    'is_meal',
-                    'is_snack',
-                    'is_fullday',
-                    'has_provider',
-                    'has_rental_unit',
-                    'time_slot_id',
-                    'providers_ids'             => ['name'],
-                    'activity_rental_units_ids' => ['name'],
-                    'time_slots_ids'            => ['name', 'code']
-                ]
-            ],
-            'auto_discounts_ids' => [
-                'id', 'type', 'value',
-                'discount_id' => ['name'],
-                'discount_list_id' => [
-                    'name',
-                    'rate_min',
-                    'rate_max'
-                ]
-            ],
-            'manual_discounts_ids' => [
-                'id',
-                'type',
-                'value',
-                'discount_id' => ['name']
-            ]
-        ],
-        'booking_activities_ids' => [
-            'activity_booking_line_id',
-            'booking_line_group_id',
-            'supplies_booking_lines_ids',
-            'transports_booking_lines_ids',
-            'counter',
-            'total',
-            'price',
-            'qty',
-            'is_virtual',
-            'activity_date',
-            'time_slot_id',
-            'schedule_from',
-            'schedule_to',
-            'providers_ids',
-            'rental_unit_id',
-            'description',
-            'product_id' => [
-                'name',
-                'sku'
-            ],
-        ],
-        'booking_meals_ids' => [
-            'date',
-            'time_slot_id',
-            'is_self_provided',
-            'meal_type_id',
-            'meal_place_id',
-            'booking_lines_ids'
-        ],
-        'booking_line_group_attributes_ids' => [
-            'name',
-            'code'
-        ]
-    ]
+    'booking_lines_groups_ids'
 ];
 
-
-$bookings = Booking::id($params['id'])
+$booking = Booking::id($params['id'])
     ->read($tree)
     ->adapt('json')
-    ->get(true);
+    ->first(true);
 
-if(!$bookings || !count($bookings)) {
+if(!$booking) {
     throw new Exception('unknown_booking', QN_ERROR_UNKNOWN_OBJECT);
 }
 
-$booking = reset($bookings);
+$booking_lines_groups_ids = $booking['booking_lines_groups_ids'];
+if(isset($params['booking_line_group_id'])) {
+    $booking_lines_groups_ids = [$params['booking_line_group_id']];
+    if(!in_array($params['booking_line_group_id'], $booking['booking_lines_groups_ids'])) {
+        throw new Exception('unknown_booking_line_group', EQ_ERROR_UNKNOWN_OBJECT);
+    }
+}
+
+$booking_lines_groups_tree = [
+    'id',
+    'name',
+    'order',
+    'has_pack',
+    'total',
+    'price',
+    'fare_benefit',
+    'is_locked',
+    'is_autosale',
+    'is_extra',
+    'has_schedulable_services',
+    'has_consumptions',
+    'date_from',
+    'date_to',
+    'time_from',
+    'time_to',
+    'nb_pers',
+    'nb_nights',
+    'group_type',
+    'is_sojourn',
+    'is_event',
+    'has_locked_rental_units',
+    'booking_id',
+    'sojourn_type_id',
+    'activity_group_num',
+    'has_person_with_disability',
+    'person_disability_description',
+    'meal_prefs_description',
+    'pack_id' => [
+        'id',
+        'name'
+    ],
+    'rate_class_id' => [
+        'id',
+        'name',
+        'description'
+    ],
+    'age_range_assignments_ids' => [
+        'age_range_id', 'qty', 'free_qty', 'age_from', 'age_to', 'is_sporty'
+    ],
+    'sojourn_product_models_ids' => [
+        'id',
+        'qty',
+        'booking_line_group_id',
+        'product_model_id' => [
+            'id',
+            'name',
+            'capacity',
+            'is_accomodation',
+            'qty_accounting_method'
+        ],
+        'rental_unit_assignments_ids' => [
+            '@sort' => ['name' => 'asc'],
+            'id',
+            'name',
+            'qty',
+            'use_extra',
+            'extra_qty',
+            'booking_line_group_id',
+            'rental_unit_id' => [
+                'id',
+                'name',
+                'description',
+                'is_accomodation',
+                'capacity',
+                'extra'
+            ]
+        ]
+    ],
+    'meal_preferences_ids' => [
+        'type', 'pref', 'qty'
+    ],
+    'booking_lines_ids' => [
+        'id',
+        'name',
+        'description',
+        'order',
+        'qty',
+        'vat_rate',
+        'unit_price',
+        'total',
+        'price',
+        'free_qty',
+        'discount',
+        'fare_benefit',
+        'qty_vars',
+        'qty_accounting_method',
+        'is_rental_unit',
+        'is_accomodation',
+        'is_snack',
+        'is_meal',
+        'meal_location',
+        'is_activity',
+        'is_transport',
+        'is_supply',
+        'is_fullday',
+        'service_date',
+        'time_slot_id',
+        'booking_activity_id',
+        'price_id',
+        'product_id' => [
+            'name',
+            'sku',
+            'has_age_range',
+            'age_range_id',
+            'product_model_id' => [
+                'schedule_offset',
+                'has_duration',
+                'duration',
+                'capacity',
+                'type',
+                'service_type',
+                'is_repeatable',
+                'is_meal',
+                'is_snack',
+                'is_fullday',
+                'has_provider',
+                'has_rental_unit',
+                'time_slot_id',
+                'providers_ids'             => ['name'],
+                'activity_rental_units_ids' => ['name'],
+                'time_slots_ids'            => ['name', 'code']
+            ]
+        ],
+        'auto_discounts_ids' => [
+            'id', 'type', 'value',
+            'discount_id' => ['name'],
+            'discount_list_id' => [
+                'name',
+                'rate_min',
+                'rate_max'
+            ]
+        ],
+        'manual_discounts_ids' => [
+            'id',
+            'type',
+            'value',
+            'discount_id' => ['name']
+        ]
+    ],
+    'booking_activities_ids' => [
+        'activity_booking_line_id',
+        'booking_line_group_id',
+        'supplies_booking_lines_ids',
+        'transports_booking_lines_ids',
+        'counter',
+        'total',
+        'price',
+        'qty',
+        'is_virtual',
+        'activity_date',
+        'time_slot_id',
+        'schedule_from',
+        'schedule_to',
+        'providers_ids',
+        'rental_unit_id',
+        'description',
+        'product_id' => [
+            'name',
+            'sku'
+        ],
+    ],
+    'booking_meals_ids' => [
+        'date',
+        'time_slot_id',
+        'is_self_provided',
+        'meal_type_id',
+        'meal_place_id',
+        'booking_lines_ids'
+    ],
+    'booking_line_group_attributes_ids' => [
+        'name',
+        'code'
+    ]
+];
+
+if(!isset($params['booking_line_group_id'])) {
+    // we don't want to load all relationship fields if only the groups details are displayed (optimization)
+    $relationships_to_not_load = ['age_range_assignments_ids', 'sojourn_product_models_ids', 'meal_preferences_ids', 'booking_lines_ids', 'booking_activities_ids', 'booking_meals_ids', 'booking_line_group_attributes_ids'];
+    foreach($relationships_to_not_load as $relationship) {
+        $booking_lines_groups_tree[$relationship] = [
+            '@domain' => ['id', '=', 0]
+        ];
+    }
+}
+
+$booking_lines_groups = BookingLineGroup::ids($booking_lines_groups_ids)
+    ->read($booking_lines_groups_tree)
+    ->adapt('json')
+    ->get(true);
+
+$booking['booking_lines_groups_ids'] = $booking_lines_groups;
 
 // adjust capacity according to assignments made in other groups of the same booking, if any
 // #memo - this is necessary since a same UL can be assigned for distinct sojourns
