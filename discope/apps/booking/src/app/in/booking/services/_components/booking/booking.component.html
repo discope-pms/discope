@@ -43,7 +43,7 @@
                             [groupAttributes]="group_attributes"
                             [displaySettings]="display_settings"
                             [rentalUnitsSettings]="rental_units_settings"
-                            (updated)="onupdateGroup()"
+                            (updated)="onupdateGroup(group.id)"
                             (toggle)="ontoggleGroup(group.id, $event)"
                             (loadStart)="onLoadStartGroup()"
                             (loadEnd)="onLoadEndGroup()"
