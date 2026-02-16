@@ -17,6 +17,11 @@ export const translations: { [lang: string]: { [key: string]: string } } = {
         'SIGN_IN_FORM_CONNECTION_BTN': 'Sign in',
         'SIGN_IN_ERROR_MSG_INVALID_USERNAME_OR_PASSWORD': "Invalid username or password.",
 
+        /**
+         * User settings
+         */
+        'USER_SETTINGS_SIGN_OUT_BTN': "Sign out"
+
     },
     'fr': {
 
@@ -35,6 +40,11 @@ export const translations: { [lang: string]: { [key: string]: string } } = {
         'SIGN_IN_FORM_FIELD_LABEL_PASSWORD': 'Mot de passe',
         'SIGN_IN_FORM_CONNECTION_BTN': 'Connexion',
         'SIGN_IN_ERROR_MSG_INVALID_USERNAME_OR_PASSWORD': "Nom d'utilisateur ou mot de passe invalide.",
+
+        /**
+         * User settings
+         */
+        'USER_SETTINGS_SIGN_OUT_BTN': "Se déconnecter"
 
     }
 };

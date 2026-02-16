@@ -1,1 +1,11 @@
-<p>User settings</p>
+<div class="name">
+    {{ name }}
+</div>
+
+<div class="login">
+    {{ login }}
+</div>
+
+<button mat-raised-button color="secondary" (click)="signOut()">
+    {{ 'USER_SETTINGS_SIGN_OUT_BTN' | translate }}
+</button>
