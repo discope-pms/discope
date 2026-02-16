@@ -180,8 +180,12 @@ export class AppService implements OnDestroy {
             .pipe(takeUntil(this.destroy$))
             .subscribe({
                 next: ({ employees, providers }) => {
+                    // ignore employees that aren't configured
+                    employees = employees.filter(e => e.activity_product_models_ids.length > 0);
+
                     const combined = [...employees, ...providers]; // merge the two arrays
                     if(combined.length > 0) {
+                        console.log('EMPLOYEES', employees);
                         this.partnerListSubject.next(combined);
                         this.selectedPartnersIdsSubject.next(combined.map(partner => partner.id));
                     }
