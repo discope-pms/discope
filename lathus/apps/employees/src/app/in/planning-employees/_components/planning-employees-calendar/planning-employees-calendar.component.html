@@ -19,21 +19,21 @@
     <ng-container *ngFor="let dayIndex of daysIndexes">
         <div class="moment-col">
             <ng-container *ngIf="(activityMap?.[partner.id]?.[dayIndex]?.['AM']?.length || 0) > 0">
-                <div *ngFor="let activity of activityMap[partner.id][dayIndex]['AM']">
+                <div class="activity-card" *ngFor="let activity of activityMap[partner.id][dayIndex]['AM']" [style.background-color]="getActivityColor(activity)">
                     {{ activity.name }}
                 </div>
             </ng-container>
         </div>
         <div class="moment-col">
             <ng-container *ngIf="(activityMap?.[partner.id]?.[dayIndex]?.['PM']?.length || 0) > 0">
-                <div *ngFor="let activity of activityMap[partner.id][dayIndex]['PM']">
+                <div class="activity-card" *ngFor="let activity of activityMap[partner.id][dayIndex]['PM']" [style.background-color]="getActivityColor(activity)">
                     {{ activity.name }}
                 </div>
             </ng-container>
         </div>
         <div class="moment-col">
             <ng-container *ngIf="(activityMap?.[partner.id]?.[dayIndex]?.['EV']?.length || 0) > 0">
-                <div *ngFor="let activity of activityMap[partner.id][dayIndex]['EV']">
+                <div class="activity-card" *ngFor="let activity of activityMap[partner.id][dayIndex]['EV']" [style.background-color]="getActivityColor(activity)">
                     {{ activity.name }}
                 </div>
             </ng-container>

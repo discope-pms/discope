@@ -64,13 +64,27 @@
 
     .row {
         display: flex;
-        min-height: 60px;
 
         .employee-col,
         .moment-col {
-            padding: 6px 8px;
+            padding: 1px;
             border: 1px solid #f1f1f1;
             text-align: left;
+            min-height: 60px;
+        }
+
+        .moment-col {
+            display: flex;
+            flex-direction: column;
+            gap: 1px;
+
+            .activity-card {
+                width: 100%;
+                padding: 5px;
+                color: white;
+                border: 1px solid #f1f1f1;
+                border-radius: 5px;
+            }
         }
 
         &:nth-child(odd) {
