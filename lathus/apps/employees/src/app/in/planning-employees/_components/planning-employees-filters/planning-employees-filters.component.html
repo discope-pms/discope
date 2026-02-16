@@ -6,7 +6,11 @@
     <app-icon-button [icon]="'chevron_left'" (click)="onPreviousDate()" [fillInverse]="true"></app-icon-button>
 
     <div class="date">
-        {{ dateFormatted }}
+        <div>{{ dateFromFormatted }}</div>
+        <ng-container *ngIf="displayMultipleDays">
+            <div class="separator">-</div>
+            <div>{{ dateToFormatted }}</div>
+        </ng-container>
     </div>
 
     <app-icon-button [icon]="'chevron_right'" (click)="onNextDate()" [fillInverse]="true"></app-icon-button>

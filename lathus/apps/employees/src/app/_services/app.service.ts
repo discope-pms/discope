@@ -19,6 +19,9 @@ export class AppService implements OnDestroy {
     private dateFromSubject = new BehaviorSubject<Date>(new Date());
     public dateFrom$ = this.dateFromSubject.asObservable();
 
+    private dateToSubject = new BehaviorSubject<Date>(new Date());
+    public dateTo$ = this.dateToSubject.asObservable();
+
     private daysDisplayedQtySubject = new BehaviorSubject<number>(1);
     public daysDisplayedQty$ = this.daysDisplayedQtySubject.asObservable();
 
@@ -74,7 +77,9 @@ export class AppService implements OnDestroy {
                         return of({});
                     }
 
+                    // Update date to
                     const dateTo: Date = new Date(dateFrom.getTime() + (daysDisplayedQty - 1) * 24 * 60 * 60 * 1000);
+                    this.dateToSubject.next(dateTo);
 
                     // Call API to fetch activity map
                     return this.api.fetchActivityMap(dateFrom, dateTo, partnersIds, productModelsIds);

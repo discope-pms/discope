@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { AppService } from '../../../../_services/app.service';
 import { EnvService } from 'sb-shared-lib';
 import {formatDate} from "@angular/common";
+import {combineLatest} from "rxjs";
 
 @Component({
     selector: 'planning-employees-filters',
@@ -10,8 +11,13 @@ import {formatDate} from "@angular/common";
 })
 export class PlanningEmployeesFiltersComponent implements OnInit  {
 
-    private date: Date = new Date();
-    public dateFormatted = '';
+    private dateFrom: Date = new Date();
+    public dateFromFormatted = '';
+
+    private dateTo: Date = new Date();
+    public dateToFormatted = '';
+
+    public displayMultipleDays = false;
 
     private locale: string|null = null;
 
@@ -23,15 +29,26 @@ export class PlanningEmployeesFiltersComponent implements OnInit  {
 
     async ngOnInit() {
         this.app.dateFrom$.subscribe((dateFrom) => {
-            this.date = dateFrom;
+            this.dateFrom = dateFrom;
             if(this.locale) {
-                this.dateFormatted = this.formatDate(this.date, this.locale);
+                this.dateFromFormatted = this.formatDate(this.dateFrom, this.locale);
             }
+        });
+
+        this.app.dateTo$.subscribe((dateTo) => {
+            this.dateTo = dateTo;
+            if(this.locale) {
+                this.dateToFormatted = this.formatDate(this.dateTo, this.locale);
+            }
+        });
+
+        this.app.daysDisplayedQty$.subscribe((daysDisplayedQty) => {
+            this.displayMultipleDays = daysDisplayedQty > 1;
         });
 
         this.env.getEnv().then((env: any) => {
             this.locale = env.locale;
-            this.dateFormatted = this.formatDate(this.date, env.locale);
+            this.dateFromFormatted = this.formatDate(this.dateFrom, env.locale);
         });
     }
 
