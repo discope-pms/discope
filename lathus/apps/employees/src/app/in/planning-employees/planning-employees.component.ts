@@ -1,6 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, HostListener, OnInit} from '@angular/core';
 import { AppService } from '../../_services/app.service';
-import { TypeDisplay } from '../../../type';
 
 @Component({
     selector: 'planning-employees',
@@ -9,16 +8,28 @@ import { TypeDisplay } from '../../../type';
 })
 export class PlanningEmployeesComponent implements OnInit  {
 
-    public displayType: TypeDisplay = 'day';
-
     constructor(
         private app: AppService
     ) {
     }
 
     ngOnInit() {
-        this.app.displayType$.subscribe((displayType) => {
-            this.displayType = displayType;
-        });
+        this.handleScreenWidthChange(window.innerWidth);
+    }
+
+    @HostListener('window:resize', ['$event'])
+    onWindowResize() {
+        this.handleScreenWidthChange(window.innerWidth);
+    }
+
+    private handleScreenWidthChange(width: number) {
+        const widthWithoutEmployeeCol = width - 150;
+
+        let daysDisplayedQty = Math.floor(widthWithoutEmployeeCol / 250);
+        if(daysDisplayedQty < 1) {
+            daysDisplayedQty = 1;
+        }
+
+        this.app.setDaysDisplayedQty(daysDisplayedQty);
     }
 }

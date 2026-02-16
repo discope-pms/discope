@@ -1,0 +1,35 @@
+<div class="header">
+    <div class="employee-col">Anim.</div>
+    <ng-container *ngFor="let dayIndex of daysIndexes">
+        <div class="moment-col">Matin</div>
+        <div class="moment-col">Midi</div>
+        <div class="moment-col">Soir</div>
+    </ng-container>
+</div>
+
+<div class="row" *ngFor="let partner of partnerList">
+    <div class="employee-col">{{ partner.name }}</div>
+    <ng-container *ngFor="let dayIndex of daysIndexes">
+        <div class="moment-col">
+            <ng-container *ngIf="(activityMap?.[partner.id]?.[dayIndex]?.['AM']?.length || 0) > 0">
+                <div *ngFor="let activity of activityMap[partner.id][dayIndex]['AM']">
+                    {{ activity.name }}
+                </div>
+            </ng-container>
+        </div>
+        <div class="moment-col">
+            <ng-container *ngIf="(activityMap?.[partner.id]?.[dayIndex]?.['PM']?.length || 0) > 0">
+                <div *ngFor="let activity of activityMap[partner.id][dayIndex]['PM']">
+                    {{ activity.name }}
+                </div>
+            </ng-container>
+        </div>
+        <div class="moment-col">
+            <ng-container *ngIf="(activityMap?.[partner.id]?.[dayIndex]?.['EV']?.length || 0) > 0">
+                <div *ngFor="let activity of activityMap[partner.id][dayIndex]['EV']">
+                    {{ activity.name }}
+                </div>
+            </ng-container>
+        </div>
+    </ng-container>
+</div>

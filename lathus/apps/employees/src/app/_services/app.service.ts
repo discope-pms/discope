@@ -16,14 +16,11 @@ export class AppService implements OnDestroy {
     private centerSubject = new BehaviorSubject<Center|null>(null);
     public center$ = this.centerSubject.asObservable();
 
-    private displayTypeSubject = new BehaviorSubject<TypeDisplay>('day');
-    public displayType$ = this.displayTypeSubject.asObservable();
-
     private dateFromSubject = new BehaviorSubject<Date>(new Date());
     public dateFrom$ = this.dateFromSubject.asObservable();
 
-    private dateToSubject = new BehaviorSubject<Date>(new Date());
-    public dateTo$ = this.dateToSubject.asObservable();
+    private daysDisplayedQtySubject = new BehaviorSubject<number>(1);
+    public daysDisplayedQty$ = this.daysDisplayedQtySubject.asObservable();
 
     private timeSlotListSubject = new BehaviorSubject<TimeSlot[]>([]);
     public timeSlotList$ = this.timeSlotListSubject.asObservable();
@@ -65,17 +62,19 @@ export class AppService implements OnDestroy {
         // Listen to change of selected partners or product models to reload the activity map
         combineLatest([
             this.dateFrom$,
-            this.dateTo$,
+            this.daysDisplayedQty$,
             this.selectedPartnersIds$,
             this.selectedProductModelsIds$
         ])
             .pipe(
                 takeUntil(this.destroy$),
-                switchMap(([dateFrom, dateTo, partnersIds, productModelsIds]) => {
+                switchMap(([dateFrom, daysDisplayedQty, partnersIds, productModelsIds]) => {
                     // Only fetch if all data is available
                     if(!partnersIds.length || !productModelsIds.length) {
                         return of({});
                     }
+
+                    const dateTo: Date = new Date(dateFrom.getTime() + (daysDisplayedQty - 1) * 24 * 60 * 60 * 1000);
 
                     // Call API to fetch activity map
                     return this.api.fetchActivityMap(dateFrom, dateTo, partnersIds, productModelsIds);
@@ -90,11 +89,6 @@ export class AppService implements OnDestroy {
                     console.error('Error fetching activity map:', error);
                 }
             });
-
-        // Listen to change of "date from" to modify "date to", if necessary
-        this.dateFrom$
-            .pipe(takeUntil(this.destroy$))
-            .subscribe(dateFrom => this.handleChangeDateFrom(dateFrom));
 
         // Listen to change of selected category to update selected product models
         this.selectedCategoryId$
@@ -226,10 +220,6 @@ export class AppService implements OnDestroy {
         this.centerSubject.next(center);
     }
 
-    public setDisplayType(displayType: TypeDisplay) {
-        this.displayTypeSubject.next(displayType);
-    }
-
     public setPreviousDate() {
         const previousDateFrom = new Date(this.dateFromSubject.value.getTime());
         previousDateFrom.setDate(this.dateFromSubject.value.getDate() - 1);
@@ -242,6 +232,12 @@ export class AppService implements OnDestroy {
         nextDateFrom.setDate(this.dateFromSubject.value.getDate() + 1);
 
         this.dateFromSubject.next(nextDateFrom);
+    }
+
+    public setDaysDisplayedQty(daysDisplayedQty: number) {
+        if(daysDisplayedQty !== this.daysDisplayedQtySubject.value) {
+            this.daysDisplayedQtySubject.next(daysDisplayedQty);
+        }
     }
 
     public setCategory(categoryId: number) {
@@ -259,13 +255,6 @@ export class AppService implements OnDestroy {
     /**
      * CHANGE HANDLERS
      */
-
-    private handleChangeDateFrom(dateFrom: Date) {
-        const dateTo = this.dateToSubject.value;
-        if(this.displayTypeSubject.value === 'day' || dateTo.getTime() < dateFrom.getTime()) {
-            this.dateToSubject.next(new Date(dateFrom.getTime()));
-        }
-    }
 
     private handleChangeCategory(categoryId: number|null) {
         if(!categoryId) {

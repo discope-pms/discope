@@ -1,17 +1,18 @@
 import { Component, HostListener, OnInit } from '@angular/core';
 import { AppService } from '../../../../_services/app.service';
-import { Partner, ActivityMapDay, ActivityMap } from '../../../../../type';
+import { Partner, ActivityMap } from '../../../../../type';
+import { combineLatest } from 'rxjs';
 
 @Component({
-    selector: 'planning-employees-calendar-day',
-    templateUrl: 'planning-employees-calendar-day.component.html',
-    styleUrls: ['planning-employees-calendar-day.component.scss']
+    selector: 'planning-employees-calendar',
+    templateUrl: 'planning-employees-calendar.component.html',
+    styleUrls: ['planning-employees-calendar.component.scss']
 })
-export class PlanningEmployeesCalendarDayComponent implements OnInit {
+export class PlanningEmployeesCalendarComponent implements OnInit {
 
-    public dateIndex: string = (new Date()).toISOString().split('T')[0];
     public partnerList: Partner[] = [];
     public activityMap: ActivityMap = {};
+    public daysIndexes: string[] = [];
 
     private startX = 0;
     private currentX = 0;
@@ -50,9 +51,11 @@ export class PlanningEmployeesCalendarDayComponent implements OnInit {
     }
 
     ngOnInit() {
-        this.app.dateFrom$.subscribe((dateFrom) => {
-            this.dateIndex = dateFrom.toISOString().split('T')[0];
-        });
+        combineLatest([this.app.dateFrom$, this.app.daysDisplayedQty$]).subscribe(
+            ([dateFrom, daysDisplayedQty]) => {
+                this.refreshDaysIndexes(dateFrom, daysDisplayedQty);
+            }
+        );
 
         this.app.partnerList$.subscribe((partnerList) => {
             this.partnerList = partnerList;
@@ -61,6 +64,16 @@ export class PlanningEmployeesCalendarDayComponent implements OnInit {
         this.app.activityMap$.subscribe((activityMap) => {
             this.activityMap = activityMap;
         });
+    }
+
+    public refreshDaysIndexes(dateFrom: Date, days: number) {
+        const daysIndexes: string[] = [];
+        for(let i = 0; i < days; i++) {
+            const date = new Date(dateFrom.getTime() + i * 24 * 60 * 60 * 1000);
+            daysIndexes.push(date.toISOString().split('T')[0]);
+        }
+
+        this.daysIndexes = daysIndexes;
     }
 
     private onPreviousDate() {

@@ -17,7 +17,9 @@
         }
 
         .moment-col {
-            width: calc((100% - 120px) / 3);
+            flex-grow: 1;
+            flex-basis: 0;
+            min-width: 0;
         }
     }
 
