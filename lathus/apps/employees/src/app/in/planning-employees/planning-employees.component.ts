@@ -1,5 +1,5 @@
-import {Component, HostListener, OnInit} from '@angular/core';
-import { AppService } from '../../_services/app.service';
+import { Component, HostListener, OnInit } from '@angular/core';
+import { CalendarService } from '../../_services/calendar.service';
 
 @Component({
     selector: 'planning-employees',
@@ -9,7 +9,7 @@ import { AppService } from '../../_services/app.service';
 export class PlanningEmployeesComponent implements OnInit  {
 
     constructor(
-        private app: AppService
+        private calendar: CalendarService
     ) {
     }
 
@@ -30,6 +30,6 @@ export class PlanningEmployeesComponent implements OnInit  {
             daysDisplayedQty = 1;
         }
 
-        this.app.setDaysDisplayedQty(daysDisplayedQty);
+        this.calendar.setDaysDisplayedQty(daysDisplayedQty);
     }
 }

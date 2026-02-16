@@ -1,8 +1,8 @@
 import { Component, HostListener, OnInit } from '@angular/core';
-import { AppService } from '../../../../_services/app.service';
 import { Partner, ActivityMap } from '../../../../../type';
 import { EnvService } from 'sb-shared-lib';
 import { combineLatest } from 'rxjs';
+import { CalendarService } from '../../../../_services/calendar.service';
 
 @Component({
     selector: 'planning-employees-calendar',
@@ -49,23 +49,23 @@ export class PlanningEmployeesCalendarComponent implements OnInit {
     }
 
     constructor(
-        private app: AppService,
+        private calendar: CalendarService,
         private env: EnvService
     ) {
     }
 
     ngOnInit() {
-        combineLatest([this.app.dateFrom$, this.app.daysDisplayedQty$]).subscribe(
+        combineLatest([this.calendar.dateFrom$, this.calendar.daysDisplayedQty$]).subscribe(
             ([dateFrom, daysDisplayedQty]) => {
                 this.refreshDaysIndexes(dateFrom, daysDisplayedQty);
             }
         );
 
-        this.app.partnerList$.subscribe((partnerList) => {
+        this.calendar.partnerList$.subscribe((partnerList) => {
             this.partnerList = partnerList;
         });
 
-        this.app.activityMap$.subscribe((activityMap) => {
+        this.calendar.activityMap$.subscribe((activityMap) => {
             this.activityMap = activityMap;
         });
 
@@ -94,11 +94,11 @@ export class PlanningEmployeesCalendarComponent implements OnInit {
     }
 
     private onPreviousDate() {
-        this.app.setPreviousDate();
+        this.calendar.setPreviousDate();
     }
 
     private onNextDate() {
-        this.app.setNextDate();
+        this.calendar.setNextDate();
     }
 
     public getActivityColor(activity: any): string {

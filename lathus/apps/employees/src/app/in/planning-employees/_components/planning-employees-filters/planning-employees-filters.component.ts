@@ -1,8 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { AppService } from '../../../../_services/app.service';
 import { EnvService } from 'sb-shared-lib';
-import {formatDate} from "@angular/common";
-import {combineLatest} from "rxjs";
+import { CalendarService } from '../../../../_services/calendar.service';
 
 @Component({
     selector: 'planning-employees-filters',
@@ -22,27 +20,27 @@ export class PlanningEmployeesFiltersComponent implements OnInit  {
     private locale: string|null = null;
 
     constructor(
-        private app: AppService,
+        private calendar: CalendarService,
         private env: EnvService
     ) {
     }
 
     async ngOnInit() {
-        this.app.dateFrom$.subscribe((dateFrom) => {
+        this.calendar.dateFrom$.subscribe((dateFrom) => {
             this.dateFrom = dateFrom;
             if(this.locale) {
                 this.dateFromFormatted = this.formatDate(this.dateFrom, this.locale);
             }
         });
 
-        this.app.dateTo$.subscribe((dateTo) => {
+        this.calendar.dateTo$.subscribe((dateTo) => {
             this.dateTo = dateTo;
             if(this.locale) {
                 this.dateToFormatted = this.formatDate(this.dateTo, this.locale);
             }
         });
 
-        this.app.daysDisplayedQty$.subscribe((daysDisplayedQty) => {
+        this.calendar.daysDisplayedQty$.subscribe((daysDisplayedQty) => {
             this.displayMultipleDays = daysDisplayedQty > 1;
         });
 
@@ -63,10 +61,10 @@ export class PlanningEmployeesFiltersComponent implements OnInit  {
     }
 
     public onPreviousDate() {
-        this.app.setPreviousDate();
+        this.calendar.setPreviousDate();
     }
 
     public onNextDate() {
-        this.app.setNextDate();
+        this.calendar.setNextDate();
     }
 }
