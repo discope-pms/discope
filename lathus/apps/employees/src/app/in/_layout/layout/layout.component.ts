@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { AppService } from '../../../_services/app.service';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { filter } from 'rxjs/operators';
+import {Location} from "@angular/common";
 
 @Component({
     selector: 'app-layout',
@@ -15,7 +16,8 @@ export class LayoutComponent implements OnInit {
     constructor(
         private app: AppService,
         private router: Router,
-        private route: ActivatedRoute
+        private route: ActivatedRoute,
+        private location: Location
     ) {}
 
     ngOnInit() {
@@ -43,10 +45,10 @@ export class LayoutComponent implements OnInit {
     }
 
     public back() {
-        console.log('BACK');
+        this.location.back();
     }
 
-    public goTo(route: string) {
-        console.log('GO TO ' + route);
+    public goToUserSettings() {
+        this.router.navigate(['user-settings']);
     }
 }

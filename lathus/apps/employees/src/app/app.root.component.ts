@@ -42,7 +42,7 @@ export class AppRootComponent implements OnInit {
     private async authenticateUser() {
         try {
             await this.auth.authenticate();
-            await this.router.navigate(['/planning/employees']);
+            await this.router.navigate(['/planning-employees']);
         } catch (e: any) {
             await this.router.navigate(['/auth/sign-in']);
         }

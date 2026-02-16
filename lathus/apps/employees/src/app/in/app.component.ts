@@ -13,6 +13,6 @@ export class AppComponent implements OnInit  {
     ) {}
 
     async ngOnInit() {
-        await this.router.navigate(['/planning/employees']);
+        await this.router.navigate(['/planning-employees']);
     }
 }

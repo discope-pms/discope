@@ -4,6 +4,7 @@ export const translations: { [lang: string]: { [key: string]: string } } = {
         /**
          * Routes
          */
+        'TITLE_USER_SETTINGS': 'User settings',
         'TITLE_PLANNING_EMPLOYEES': 'Employees planning',
 
         /**
@@ -22,6 +23,7 @@ export const translations: { [lang: string]: { [key: string]: string } } = {
         /**
          * Routes
          */
+        'TITLE_USER_SETTINGS': 'Paramètres utilisateur',
         'TITLE_PLANNING_EMPLOYEES': 'Calendrier Animateurs',
 
         /**

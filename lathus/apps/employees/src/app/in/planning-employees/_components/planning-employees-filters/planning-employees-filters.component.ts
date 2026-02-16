@@ -52,7 +52,7 @@ export class PlanningEmployeesFiltersComponent implements OnInit  {
 
     private formatDate(date: Date, locale: string): string {
         date = new Date(date.getTime());
-        const formatter = new Intl.DateTimeFormat(locale, { weekday: 'short', day: '2-digit', month: '2-digit' });
+        const formatter = new Intl.DateTimeFormat(locale.replace('_', '-'), { weekday: 'short', day: '2-digit', month: '2-digit' });
         return formatter.format(date);
     }
 

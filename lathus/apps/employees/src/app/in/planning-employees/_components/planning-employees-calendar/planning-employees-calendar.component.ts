@@ -89,7 +89,7 @@ export class PlanningEmployeesCalendarComponent implements OnInit {
             return '';
         }
         const date = new Date(dateIndex);
-        const formatter = new Intl.DateTimeFormat(this.locale, { weekday: 'short', day: '2-digit', month: '2-digit' });
+        const formatter = new Intl.DateTimeFormat(this.locale.replace('_', '-'), { weekday: 'short', day: '2-digit', month: '2-digit' });
         return formatter.format(date);
     }
 

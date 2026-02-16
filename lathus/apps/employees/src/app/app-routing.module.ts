@@ -7,7 +7,7 @@ import { LayoutComponent } from './in/_layout/layout/layout.component';
 const routes: Routes = [
     /*
         Route for the default path '/', which will match AppComponent
-        Redirects to '/planning/employees'
+        Redirects to '/planning-employees'
     */
     {
         path: '',
@@ -32,31 +32,19 @@ const routes: Routes = [
         component: LayoutComponent,
         children: [
             {
-                path: 'planning',
+                path: 'planning-employees',
                 loadChildren: () => import('./in/planning-employees/planning-employees.module').then(m => m.AppPlanningEmployeesModule)
             },
-            /*{
+            {
                 path: 'user-settings',
-                component: UserSettingsComponent
-            },
-            {
-                path: 'center/:center_id',
-                loadChildren: () => import('./in/center/center.module').then(m => m.AppCenterModule)
-            },
-            {
-                path: 'bookings',
-                loadChildren: () => import('./in/bookings/bookings.module').then(m => m.AppBookingsModule)
-            },
-            {
-                path: 'booking-inspection/:booking_inspection_id',
-                loadChildren: () => import('./in/booking-inspection/booking-inspection.module').then(m => m.AppBookingInspectionModule)
-            }*/
+                loadChildren: () => import('./in/user-settings/user-settings.module').then(m => m.AppUserSettingsModule)
+            }
         ]
     },
 
     /*
         Wildcard route for any other paths
-        Redirects to '/planning/employees'
+        Redirects to '/planning-employees'
     */
     {
         path: '**',

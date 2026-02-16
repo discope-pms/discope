@@ -3,28 +3,24 @@ import { DateAdapter, MAT_DATE_LOCALE } from '@angular/material/core';
 import { Platform } from '@angular/cdk/platform';
 
 import { SharedLibModule, CustomDateAdapter } from 'sb-shared-lib';
-import { PlanningEmployeesRoutingModule } from './planning-employees-routing.module';
+import { UserSettingsRoutingModule } from './user-settings-routing.module';
 
-import { PlanningEmployeesComponent } from './planning-employees.component';
-import { PlanningEmployeesFiltersComponent } from './_components/planning-employees-filters/planning-employees-filters.component';
-import { PlanningEmployeesCalendarComponent } from './_components/planning-employees-calendar/planning-employees-calendar.component';
+import { UserSettingsComponent } from './user-settings.component';
 import { AppSharedPipesModule } from '../../_pipes/shared-pipes.module';
 import { AppSharedComponentsModule } from '../_components/shared-components.module';
 
 @NgModule({
     imports: [
         SharedLibModule,
-        PlanningEmployeesRoutingModule,
+        UserSettingsRoutingModule,
         AppSharedPipesModule,
         AppSharedComponentsModule
     ],
     declarations: [
-        PlanningEmployeesComponent,
-        PlanningEmployeesFiltersComponent,
-        PlanningEmployeesCalendarComponent
+        UserSettingsComponent
     ],
     providers: [
         { provide: DateAdapter, useClass: CustomDateAdapter, deps: [MAT_DATE_LOCALE, Platform] }
     ]
 })
-export class AppPlanningEmployeesModule { }
+export class AppUserSettingsModule { }
