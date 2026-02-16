@@ -48,7 +48,7 @@ const routes: Routes = [
     */
     {
         path: '**',
-        component: AppComponent
+        redirectTo: 'planning-employees'
     }
 ];
 

@@ -47,7 +47,7 @@ export class SignInComponent implements OnInit, OnDestroy  {
         if(this.form.valid) {
             try {
                 await this.auth.signIn(this.form.controls.username.value, this.form.controls.password.value);
-                await this.router.navigate(['/']);
+                await this.router.navigate(['/planning-employees']);
             } catch (e) {
                 this.showConnectionErrorMsg = true;
             }
