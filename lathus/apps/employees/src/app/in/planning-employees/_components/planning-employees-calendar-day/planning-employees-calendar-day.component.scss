@@ -23,7 +23,9 @@
 
     th {
         position: sticky;
-        top: -1px;
+        top: 0;
+        border-top: none;
+        box-shadow: inset 0 1px 0 #f1f1f1;
         height: 50px;
         background-color: #e8e8e8;
         font-weight: bold;
