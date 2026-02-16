@@ -1,12 +1,16 @@
 <div class="header">
     <div class="employee-col">Anim.</div>
     <ng-container *ngFor="let dayIndex of daysIndexes">
-        <div class="moment-col">
-            <div>Matin</div>
-            <div *ngIf="daysIndexes.length > 1"></div>
+        <div class="day-col">
+            <div *ngIf="daysIndexes.length > 1" class="date-info">
+                {{ formatDate(dayIndex) }}
+            </div>
+            <div class="moments">
+                <div class="moment-col">Matin</div>
+                <div class="moment-col">Midi</div>
+                <div class="moment-col">Soir</div>
+            </div>
         </div>
-        <div class="moment-col">Midi</div>
-        <div class="moment-col">Soir</div>
     </ng-container>
 </div>
 

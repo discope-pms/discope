@@ -17,6 +17,7 @@
         }
 
         .moment-col {
+            display: flex;
             flex-grow: 1;
             flex-basis: 0;
             min-width: 0;
@@ -34,9 +35,30 @@
         top: 0;
         z-index: 1;
 
-        .employee-col,
-        .moment-col {
+        .employee-col {
             text-align: center;
+        }
+
+        .day-col {
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            flex-basis: 0;
+            min-width: 0;
+
+            .date-info {
+                font-size: 0.8rem;
+                font-weight: 400;
+                text-align: center;
+            }
+
+            .moments {
+                display: flex;
+
+                .moment-col {
+                    justify-content: center;
+                }
+            }
         }
     }
 

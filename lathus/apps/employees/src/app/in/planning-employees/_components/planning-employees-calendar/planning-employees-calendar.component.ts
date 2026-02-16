@@ -1,6 +1,7 @@
 import { Component, HostListener, OnInit } from '@angular/core';
 import { AppService } from '../../../../_services/app.service';
 import { Partner, ActivityMap } from '../../../../../type';
+import { EnvService } from 'sb-shared-lib';
 import { combineLatest } from 'rxjs';
 
 @Component({
@@ -13,6 +14,8 @@ export class PlanningEmployeesCalendarComponent implements OnInit {
     public partnerList: Partner[] = [];
     public activityMap: ActivityMap = {};
     public daysIndexes: string[] = [];
+
+    private locale: string|null = null;
 
     private startX = 0;
     private currentX = 0;
@@ -46,7 +49,8 @@ export class PlanningEmployeesCalendarComponent implements OnInit {
     }
 
     constructor(
-        private app: AppService
+        private app: AppService,
+        private env: EnvService
     ) {
     }
 
@@ -64,6 +68,10 @@ export class PlanningEmployeesCalendarComponent implements OnInit {
         this.app.activityMap$.subscribe((activityMap) => {
             this.activityMap = activityMap;
         });
+
+        this.env.getEnv().then((env: any) => {
+            this.locale = env.locale;
+        });
     }
 
     public refreshDaysIndexes(dateFrom: Date, days: number) {
@@ -74,6 +82,15 @@ export class PlanningEmployeesCalendarComponent implements OnInit {
         }
 
         this.daysIndexes = daysIndexes;
+    }
+
+    public formatDate(dateIndex: string): string {
+        if(!this.locale) {
+            return '';
+        }
+        const date = new Date(dateIndex);
+        const formatter = new Intl.DateTimeFormat(this.locale, { weekday: 'short', day: '2-digit', month: '2-digit' });
+        return formatter.format(date);
     }
 
     private onPreviousDate() {
