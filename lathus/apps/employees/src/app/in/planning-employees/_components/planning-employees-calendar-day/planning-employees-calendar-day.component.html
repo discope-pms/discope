@@ -1,35 +1,31 @@
-<table>
-    <tr>
-        <th style="width: 120px;">Anim.</th>
-        <th style="width: calc((100% - 120px) / 3);">Matin</th>
-        <th style="width: calc((100% - 120px) / 3);">Midi</th>
-        <th style="width: calc((100% - 120px) / 3);">Soir</th>
-    </tr>
+<div class="header">
+    <div class="employee-col">Anim.</div>
+    <div class="moment-col">Matin</div>
+    <div class="moment-col">Midi</div>
+    <div class="moment-col">Soir</div>
+</div>
 
-    <tr *ngFor="let partner of partnerList">
-        <td>
-            {{ partner.name }}
-        </td>
-        <td>
-            <ng-container *ngIf="(activityMap?.[partner.id]?.[dateIndex]?.['AM']?.length || 0) > 0">
-                <div *ngFor="let activity of activityMap[partner.id][dateIndex]['AM']">
-                    {{ activity.name }}
-                </div>
-            </ng-container>
-        </td>
-        <td>
-            <ng-container *ngIf="(activityMap?.[partner.id]?.[dateIndex]?.['PM']?.length || 0) > 0">
-                <div *ngFor="let activity of activityMap[partner.id][dateIndex]['PM']">
-                    {{ activity.name }}
-                </div>
-            </ng-container>
-        </td>
-        <td>
-            <ng-container *ngIf="(activityMap?.[partner.id]?.[dateIndex]?.['EV']?.length || 0) > 0">
-                <div *ngFor="let activity of activityMap[partner.id][dateIndex]['EV']">
-                    {{ activity.name }}
-                </div>
-            </ng-container>
-        </td>
-    </tr>
-</table>
+<div class="row" *ngFor="let partner of partnerList">
+    <div class="employee-col">{{ partner.name }}</div>
+    <div class="moment-col">
+        <ng-container *ngIf="(activityMap?.[partner.id]?.[dateIndex]?.['AM']?.length || 0) > 0">
+            <div *ngFor="let activity of activityMap[partner.id][dateIndex]['AM']">
+                {{ activity.name }}
+            </div>
+        </ng-container>
+    </div>
+    <div class="moment-col">
+        <ng-container *ngIf="(activityMap?.[partner.id]?.[dateIndex]?.['PM']?.length || 0) > 0">
+            <div *ngFor="let activity of activityMap[partner.id][dateIndex]['PM']">
+                {{ activity.name }}
+            </div>
+        </ng-container>
+    </div>
+    <div class="moment-col">
+        <ng-container *ngIf="(activityMap?.[partner.id]?.[dateIndex]?.['EV']?.length || 0) > 0">
+            <div *ngFor="let activity of activityMap[partner.id][dateIndex]['EV']">
+                {{ activity.name }}
+            </div>
+        </ng-container>
+    </div>
+</div>
