@@ -28,20 +28,20 @@
             "description": "",
             "help": ""
         },
-        "camp": {
-            "label": "Camp",
+        "code": {
+            "label": "N° séjour",
+            "description": "",
+            "help": ""
+        },
+        "dates": {
+            "label": "Dates",
             "description": "",
             "help": ""
         },
         "location": {
             "label": "Site",
             "description": "",
-            "help": "",
-            "selection": {
-                "cricket": "Criquets",
-                "ladybug": "Coccinelles",
-                "dragonfly": "Libellules"
-            }
+            "help": ""
         },
         "employees": {
             "label": "Animateurs",

@@ -111,6 +111,7 @@ export class BookingServicesBookingGroupComponent
     @Input() sojournTypes: { id: number, name: 'GA'|'GG' }[] = [];
     @Input() mealTypes: { id: number, name: string, code: string }[] = [];
     @Input() mealPlaces: { id: number, name: string, code: string }[] = [];
+    @Input() groupAttributes: { id: number, name: string, code: string }[] = [];
     @Input() displaySettings: BookedServicesDisplaySettings;
     @Input() rentalUnitsSettings: RentalUnitsSettings;
 
@@ -923,30 +924,30 @@ export class BookingServicesBookingGroupComponent
             width: '33vw',
             data: {
                 has_person_with_disability: this.instance.has_person_with_disability,
-                person_disability_description: this.instance.person_disability_description
+                person_disability_description: this.instance.person_disability_description,
+                booking_line_group_attributes_ids: this.instance.booking_line_group_attributes_ids,
+                group_attributes: this.groupAttributes
             }
         });
 
         dialogRef.afterClosed().subscribe(async (result) => {
             if(result) {
-                if(this.instance.has_person_with_disability != result.has_person_with_disability || this.instance.person_disability_description != result.person_disability_description) {
+                try {
+                    this.loading = true;
+                    await this.api.update('sale\\booking\\BookingLineGroup', [this.instance.id], {
+                        has_person_with_disability: result.has_person_with_disability,
+                        person_disability_description: result.person_disability_description,
+                        booking_line_group_attributes_ids: result.attributes_ids
+                    });
 
-                    try {
-                        this.loading = true;
-                        await this.api.update('sale\\booking\\BookingLineGroup', [this.instance.id], {
-                            has_person_with_disability: result.has_person_with_disability,
-                            person_disability_description: result.person_disability_description
-                        });
-
-                        // relay change to parent component
-                        this.updated.emit();
-                    }
-                    catch(response) {
-                        this.api.errorFeedback(response);
-                    }
-                    finally {
-                        this.loading = false;
-                    }
+                    // relay change to parent component
+                    this.updated.emit();
+                }
+                catch(response) {
+                    this.api.errorFeedback(response);
+                }
+                finally {
+                    this.loading = false;
                 }
             }
         });

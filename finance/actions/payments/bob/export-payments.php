@@ -738,18 +738,36 @@ if($data === false) {
 }
 
 // create the export archive
-Export::create([
+$export = Export::create([
     'center_office_id'      => $params['center_office_id'],
     'export_type'           => 'payments',
     'data'                  => $data
-]);
+])
+    ->read(['id'])
+    ->first();
 
+$accounting_index_updated = false;
 
-// update journal index according to the number of payemnts
-AccountingJournal::id($journal['id'])->update(['index' => $journal['index']+$payments_count]);
+try {
+    // update journal index according to the number of payments
+    AccountingJournal::id($journal['id'])->update(['index' => $journal['index']+$payments_count]);
 
-// mark processed payements as exported and
-Payment::ids($payments_ids)->update(['is_exported' => true]);
+    $accounting_index_updated = true;
+
+    // mark processed payements as exported
+    Payment::ids($payments_ids)->update(['is_exported' => true]);
+}
+catch(Exception $e) {
+    // remove export if error triggered while updating journal index or flagging invoices as exported
+    Export::id($export['id'])->delete();
+
+    // set index of accounting journal back to previous value, if it was updated
+    if($accounting_index_updated) {
+        AccountingJournal::id($journal['id'])->update(['index' => $journal['index']]);
+    }
+
+    throw $e;
+}
 
 $context->httpResponse()
         ->status(201)

@@ -24,6 +24,11 @@
             "description": "",
             "help": ""
         },
+        "code": {
+            "label": "N° séjour",
+            "description": "",
+            "help": ""
+        },
         "camp": {
             "label": "Camp",
             "description": "",

@@ -6,10 +6,12 @@
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 
+use core\setting\Setting;
 use identity\Center;
 use finance\accounting\Invoice;
 use finance\accounting\InvoiceLine;
 use finance\accounting\InvoiceLineGroup;
+use sale\catalog\Product;
 use sale\pos\Order;
 
 list($params, $providers) = eQual::announce([
@@ -59,7 +61,13 @@ if($center_id <= 0) {
 }
 
 $center = Center::id($center_id)
-    ->read(['pos_default_customer_id', 'organisation_id', 'center_office_id'])
+    ->read([
+        'center_office_id',
+        'pos_default_customer_id',
+        'organisation_id' => [
+            'has_vat'
+        ]
+    ])
     ->first(true);
 
 if(!$center) {
@@ -68,6 +76,39 @@ if(!$center) {
 
 if(!$center['pos_default_customer_id']) {
     throw new Exception('unsupported_center', EQ_ERROR_INVALID_PARAM);
+}
+
+$vat_rounding_product = null;
+$vat_rounding_product_price = null;
+if($center['organisation_id']['has_vat']) {
+    $sku_vat_rounding_product = Setting::get_value('sale', 'organization', 'sku.vat_rounding_product');
+
+    if(is_null($sku_vat_rounding_product)) {
+        throw new Exception('missing_sku_vat_rounding_product');
+    }
+
+    $vat_rounding_product = Product::search(['sku', '=', $sku_vat_rounding_product])
+        ->read(['id', 'name', 'prices_ids' => ['price_list_id' => ['date_from', 'date_to', 'status']]])
+        ->first();
+
+    if(is_null($vat_rounding_product)) {
+        throw new Exception('vat_rounding_product_not_found');
+    }
+
+    foreach($vat_rounding_product['prices_ids'] as $price) {
+        if(
+            in_array($price['price_list_id']['status'], ['pending', 'published'])
+            && $price['price_list_id']['date_from'] <= strtotime('midnight')
+            && $price['price_list_id']['date_to'] >= strtotime('midnight')
+        ) {
+            $vat_rounding_product_price = $price;
+            break;
+        }
+    }
+
+    if(is_null($vat_rounding_product_price)) {
+        throw new Exception('vat_rounding_product_price_not_found');
+    }
 }
 
 if(!isset($params['params']['date'])) {
@@ -95,7 +136,11 @@ $orders = Order::search([
         ['created', '>=', $first_date]
     ])
     ->read([
-        'id', 'name', 'status', 'created',
+        'id',
+        'name',
+        'status',
+        'created',
+        'price',
         'customer_id',
         'order_lines_ids' => [
             'product_id' => ['id', 'name'],
@@ -117,7 +162,7 @@ $customer_id = $center['pos_default_customer_id'];
 // create invoice and invoice lines
 $invoice = Invoice::create([
         'date'              => time(),
-        'organisation_id'   => $center['organisation_id'],
+        'organisation_id'   => $center['organisation_id']['id'],
         'center_office_id'  => $center['center_office_id'],
         'status'            => 'proforma',
         'partner_id'        => $customer_id,
@@ -134,6 +179,8 @@ $invoice_line_group = InvoiceLineGroup::create([
     ->first(true);
 
 $orders_ids = [];
+
+$paid_amount = 0.0;
 
 foreach($orders as $order) {
     // check order consistency
@@ -162,15 +209,43 @@ foreach($orders as $order) {
                 ->update([
                     'total'                     => $line['total']
                 ])
-                ->update([
+                // #todo - find why the price of an order line can be wrong
+                // #memo - commented because sometimes the price of an order line is not correctly calculated (price = unit_price instead of price = qty * unit_price)
+                /*->update([
                     'price'                     => $line['price']
-                ]);
+                ])*/;
         }
         // attach the invoice to the Order, and mark it as having an invoice
         Order::id($order['id'])->update(['invoice_id' => $invoice['id']]);
+
+        $paid_amount = round($paid_amount + $order['price'], 2);
     }
     catch(Exception $e) {
         // ignore errors (must be resolved manually)
+    }
+}
+
+if($center['organisation_id']['has_vat']) {
+    $invoice = Invoice::id($invoice['id'])
+        ->read(['price'])
+        ->first();
+
+    if($invoice['price'] !== $paid_amount) {
+        $rounding_vat_amount = round($paid_amount - $invoice['price'], 2);
+
+        InvoiceLine::create([
+            'invoice_id'            => $invoice['id'],
+            'invoice_line_group_id' => $invoice_line_group['id'],
+            'product_id'            => $vat_rounding_product['id'],
+            'description'           => $vat_rounding_product['name'],
+            'price_id'              => $vat_rounding_product_price['id']
+        ])
+            ->update([
+                'unit_price'        => $rounding_vat_amount,
+                'qty'               => 1
+            ]);
+
+        Invoice::id($invoice['id'])->update(['price' => $paid_amount]);
     }
 }
 

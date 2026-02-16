@@ -67,6 +67,7 @@ export class BookingServicesBookingComponent
     public sojourn_types: { id: number, name: 'GA'|'GG' }[] = [];
     public meal_types: { id: number, name: string, code: string }[] = [];
     public meal_places: { id: number, name: string, code: string }[] = [];
+    public group_attributes: { id: number, name: string, code: string }[] = [];
 
     private mapGroupsIdsHasActivity: {[key: number]: boolean};
 
@@ -108,17 +109,19 @@ export class BookingServicesBookingComponent
 
     public async ngOnInit() {
         console.debug('BookingServicesBookingComponent::ngOnInit');
-        const [timeSlots, sojournTypes, mealTypes, mealPlaces] = await Promise.all([
+        const [timeSlots, sojournTypes, mealTypes, mealPlaces, groupAttributes] = await Promise.all([
             this.api.collect('sale\\booking\\TimeSlot', [], ['id','name','code']),
             this.api.collect('sale\\booking\\SojournType', [], ['id','name']),
             this.api.collect('sale\\booking\\MealType', [], ['id','name','code']),
-            this.api.collect('sale\\booking\\MealPlace', [], ['id','name','code'])
+            this.api.collect('sale\\booking\\MealPlace', [], ['id','name','code']),
+            this.api.collect('sale\\booking\\BookingLineGroupAttribute', [], ['id','name','code'])
         ]);
 
         this.time_slots = timeSlots;
         this.sojourn_types = sojournTypes;
         this.meal_types = mealTypes;
         this.meal_places = mealPlaces;
+        this.group_attributes = groupAttributes;
 
         this.load$.pipe(debounceTime(500)).subscribe(() => {
             this.load(this.instance.id);
@@ -127,17 +130,21 @@ export class BookingServicesBookingComponent
 
 
     /**
-     * Load an Booking object using the sale_pos_order_tree controller
-     * @param booking_id
+     * Load a Booking object using the sale_pos_order_tree controller
      */
-    public async load(booking_id: number) {
+    public async load(booking_id: number, group_id: number = null) {
         if(booking_id <= 0){
             return;
         }
 
+        const data: any = { id: booking_id };
+        if(group_id) {
+            data.booking_line_group_id = group_id;
+        }
+
         try {
             // #memo - do not set loading to true here (to allow silent update)
-            const result: any = await this.api.fetch('?get=sale_booking_tree', { id: booking_id });
+            const result: any = await this.api.fetch('?get=sale_booking_tree', data);
             if (result) {
                 this.update(result);
                 this.initMapGroupsIdsHasActivity(result);
@@ -241,9 +248,9 @@ export class BookingServicesBookingComponent
      * By convention, updating a group does not trigger the display of the loader.
      * To do so, groups must explicitly relay a request through `loadStart`.
      */
-    public onupdateGroup() {
+    public onupdateGroup(group_id:number) {
         // reload booking tree
-        this.load(this.instance.id);
+        this.load(this.instance.id, group_id);
     }
 
     public ondropGroup(event:CdkDragDrop<any>) {
@@ -261,13 +268,19 @@ export class BookingServicesBookingComponent
         }
     }
 
-    public ontoggleGroup(group_id:number, folded: boolean) {
+    public async ontoggleGroup(group_id:number, folded: boolean) {
+        this.loading = true;
+
         if(!folded) {
             this.maximized_group_id = group_id;
+            await this.load(this.instance.id, group_id);
         }
         else {
             this.maximized_group_id = 0;
+            await this.load(this.instance.id);
         }
+
+        this.loading = false;
     }
 
     /**

@@ -45,10 +45,6 @@ use sale\camp\Camp;
             'description'       => "Total quantity of sojourns."
         ]
     ],
-    'access'        => [
-        'visibility'    => 'protected',
-        'groups'        => ['camp.default.user'],
-    ],
     'response'      => [
         'content-type'  => 'application/json',
         'charset'       => 'utf-8',

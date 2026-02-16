@@ -2,7 +2,7 @@
     "name": "Task Model",
     "description": "The model of tasks generated for an enrollment when it is created.",
     "access": {
-        "groups": ["camp.default.user"]
+        "groups": ["camp.default.administrator", "camp.default.user"]
     },
     "layout": {
         "groups": [

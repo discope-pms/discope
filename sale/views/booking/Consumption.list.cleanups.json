@@ -43,6 +43,13 @@
             ["is_accomodation", "=", true],
             ["bed_linens", "=", true],
             ["type", "=", "book"]
+        ],
+        [
+            ["center_id", "in", "user.centers_ids"],
+            ["is_accomodation", "=", true],
+            ["description", "is not", null],
+            ["description", "<>", ""],
+            ["type", "=", "book"]
         ]
     ],
     "operations": {
@@ -96,6 +103,11 @@
             {
                 "type": "field",
                 "value": "bed_linens",
+                "width": "20%"
+            },
+            {
+                "type": "field",
+                "value": "description",
                 "width": "20%"
             }
         ]

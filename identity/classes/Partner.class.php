@@ -200,14 +200,14 @@ class Partner extends Model {
             // Set default value depending on partner relationship
             switch($partner['relationship']) {
                 case 'employee':
-                    $employee = Employee::id($id)->read(['center_id']);
+                    $employee = Employee::id($id)->read(['center_id'])->first();
 
                     if(is_null($employee['center_id'])) {
                         Employee::id($id)->update(['center_id' => 1]);
                     }
                     break;
                 case 'contact':
-                    $contact = Contact::id($id)->read(['origin', 'is_direct_contact']);
+                    $contact = Contact::id($id)->read(['origin', 'is_direct_contact'])->first();
 
                     $contact_data = [];
                     if(is_null($contact['origin'])) {
@@ -222,7 +222,7 @@ class Partner extends Model {
                     }
                     break;
                 case 'customer':
-                    $customer = Customer::id($id)->read(['is_tour_operator']);
+                    $customer = Customer::id($id)->read(['is_tour_operator'])->first();
 
                     if(is_null($customer['is_tour_operator'])) {
                         Customer::id($id)->update(['is_tour_operator' => false]);

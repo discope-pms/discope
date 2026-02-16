@@ -108,6 +108,7 @@ $activities = $orm->read(BookingActivity::getType(), $activities_ids, [
         'product_model_id',
         'activity_booking_line_id',
         'camp_id',
+        'camp_group_id',
         'group_num',
         'counter',
         'counter_total'
@@ -136,7 +137,7 @@ foreach($activities as $id => $activity) {
 // load all foreign objects at once
 $bookings = $orm->read(Booking::getType(), array_keys($map_bookings), ['id', 'name', 'description', 'status', 'payment_status', 'customer_id', 'date_from', 'date_to', 'nb_pers']);
 $booking_groups = $orm->read(BookingLineGroup::getType(), array_keys($map_groups), ['id', 'nb_pers', 'age_range_assignments_ids', 'has_person_with_disability', 'person_disability_description']);
-$camps = $orm->read(Camp::getType(), array_keys($map_camps), ['id', 'status', 'name', 'short_name', 'date_from', 'date_to', 'min_age', 'max_age', 'enrollments_qty', 'employee_ratio']);
+$camps = $orm->read(Camp::getType(), array_keys($map_camps), ['id', 'status', 'name', 'sojourn_number', 'short_name', 'date_from', 'date_to', 'min_age', 'max_age', 'enrollments_qty', 'employee_ratio']);
 $employees = $orm->read(Employee::getType(), array_keys($map_employees), ['id', 'name', 'relationship']);
 $providers = $orm->read(Provider::getType(), array_keys($map_providers), ['id', 'name', 'relationship']);
 $product_models = $orm->read(ProductModel::getType(), array_keys($map_product_models), ['id', 'name', 'activity_color', 'providers_ids']);
@@ -290,7 +291,7 @@ if(!empty($params['partners_ids'])) {
 $activity_partner_activities_ids = $orm->search(PartnerEvent::getType(), $domain);
 
 if(!empty($activity_partner_activities_ids)) {
-    $partner_activities = $orm->read(PartnerEvent::getType(), $activity_partner_activities_ids, ['id', 'name', 'description', 'partner_id', 'event_date', 'time_slot_id', 'event_type', 'camp_group_id']);
+    $partner_activities = $orm->read(PartnerEvent::getType(), $activity_partner_activities_ids, ['id', 'name', 'description', 'partner_id', 'event_date', 'time_slot_id', 'event_type', 'camp_id', 'camp_group_id']);
 
     $map_camp_groups = [];
     // retrieve all foreign objects identifiers
@@ -335,7 +336,7 @@ if(!empty($activity_partner_activities_ids)) {
             'customer_id'               => null,
             'partner_identity_id'       => null,
             'age_range_assignments_ids' => [],
-            'partner_id'                => null,
+            'partner_id'                => $partner_activity['partner_id'],
         ]);
     }
 }

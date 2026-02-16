@@ -1,0 +1,19 @@
+{
+    "name": "Ajout paiement",
+    "description": "Ajoute un paiement manuel au financement pour compléter son paiement.",
+    "model": {
+        "id": {
+            "label": "Identifiant",
+            "description": "Identifiant unique du financement.",
+            "help": ""
+        }
+    },
+    "error": {
+        "errors": {
+            "unknown_funding": "Financement introuvable.",
+            "funding_already_paid": "Le financement est marqué comme payé.",
+            "not_enrollment_funding": "Le financement n'est pas lié à une inscription.",
+            "nothing_to_pay": "Le financement est déjà entièrement réglé."
+        }
+    }
+}

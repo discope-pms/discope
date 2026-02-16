@@ -68,6 +68,16 @@
             ]
         },
         {
+            "id": "action.unvalidate",
+            "label": "Unvalidate",
+            "controller": "sale_camp_enrollment_unvalidate",
+            "confirm": true,
+            "visible": [
+                ["status", "=", "validated"],
+                ["state", "<>", "draft"]
+            ]
+        },
+        {
             "id": "action.cancel",
             "label": "Cancel",
             "controller": "sale_camp_enrollment_cancel",
@@ -172,6 +182,12 @@
                                                 "width": "33%",
                                                 "readonly":  true,
                                                 "visible": ["state", "<>", "draft"]
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "external_ref",
+                                                "width": "33%",
+                                                "visible": ["external_ref", "is not", null]
                                             }
                                         ]
                                     },
@@ -230,7 +246,7 @@
                                             {
                                                 "type": "label",
                                                 "value": "",
-                                                "width": "50%",
+                                                "width": "75%",
                                                 "visible": ["state", "<>", "draft"]
                                             },
                                             {
@@ -348,13 +364,18 @@
                                         "items": [
                                             {
                                                 "type": "field",
+                                                "value": "is_handled",
+                                                "width": "33%"
+                                            },
+                                            {
+                                                "type": "field",
                                                 "value": "preregistration_sent",
-                                                "width": "50%"
+                                                "width": "33%"
                                             },
                                             {
                                                 "type": "field",
                                                 "value": "confirmation_sent",
-                                                "width": "50%"
+                                                "width": "33%"
                                             }
                                         ]
                                     }

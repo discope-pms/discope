@@ -2,7 +2,7 @@
     "name": "Tasks",
     "description": "List of follow up tasks related to enrollments.",
     "access": {
-        "groups": ["camp.default.user"]
+        "groups": ["camp.default.administrator", "camp.default.user"]
     },
     "layout": {
         "items": [

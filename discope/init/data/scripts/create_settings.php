@@ -16,6 +16,7 @@ Setting::assert_value('sale', 'features', 'booking.tasks_table', false);
 Setting::assert_value('sale', 'features', 'booking.age_range.freebies', false);
 Setting::assert_value('sale', 'features', 'booking.age_range.sporty', false);
 Setting::assert_value('sale', 'features', 'booking.room_plans', false);
+Setting::assert_value('sale', 'features', 'booking.confirm_with_payment_plan', false);
 Setting::assert_value('sale', 'features', 'employee.activity_filter', false);
 Setting::assert_value('sale', 'features', 'quote.validity_delay', 10);
 Setting::assert_value('sale', 'features', 'quote.remind_auto', false);
@@ -63,6 +64,7 @@ Setting::assert_value('sale', 'organization', 'sku.downpayment.1', 'ACPTE-A');
 Setting::assert_value('sale', 'organization', 'sku.bed_linens');
 Setting::assert_value('sale', 'organization', 'sku.make_beds');
 Setting::assert_value('sale', 'organization', 'sku.transport');
+Setting::assert_value('sale', 'organization', 'sku.vat_rounding_product');
 Setting::assert_value('sale', 'organization', 'age_range_default');
 Setting::assert_value('sale', 'organization', 'payment_terms_default');
 Setting::assert_value('sale', 'organization', 'quote.output_level_default');
@@ -90,6 +92,7 @@ Setting::assert_value('sale', 'accounting', 'invoice.sequence_format', '%2d{year
 Setting::assert_value('sale', 'accounting', 'invoice.sequence', 1);
 // for compatibility when there are more than one center office
 Setting::assert_value('sale', 'accounting', 'invoice.sequence.1', 1);
+Setting::assert_sequence('sale', 'accounting', 'invoice.sequence.1', 1);
 // === identity.accounting ===
 Setting::assert_value('identity', 'accounting', 'customer_account.prefix', '411');
 Setting::assert_value('identity', 'accounting', 'customer_account.sequence', 1);

@@ -261,9 +261,9 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
         }
 
         let date_index = this.calcDateIndex(day);
-        const allActivities = this.activities[partner.id]?.[date_index]?.[time_slot] ?? [];
+        const allItems = this.activities[partner.id]?.[date_index]?.[time_slot] ?? [];
 
-        return allActivities
+        return allItems
             .filter((a: any) => !a.is_partner_event)
             .sort((a: any, b: any) => {
                 if(a.schedule_from < b.schedule_from) {
@@ -293,9 +293,31 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
         }
 
         let date_index = this.calcDateIndex(day);
-        const allActivities = this.activities[partner.id]?.[date_index]?.[time_slot] ?? [];
+        const allItems = this.activities[partner.id]?.[date_index]?.[time_slot] ?? [];
 
-        return allActivities.filter((a: any) => a.is_partner_event);
+        const allActivities = allItems.filter((a: any) => !a.is_partner_event);
+        const allPartnerEvents = allItems.filter((a: any) => a.is_partner_event);
+
+        const filteredPartnerEvents = [];
+        for(let partnerEvent of allPartnerEvents) {
+            if(partnerEvent.event_type !== 'camp_activity') {
+                filteredPartnerEvents.push(partnerEvent);
+                continue;
+            }
+
+            let partnerHasActivity = false;
+            for(let activity of allActivities) {
+                if(activity.partner_id.id === partnerEvent.partner_id && activity.camp_group_id === partnerEvent.camp_group_id) {
+                    partnerHasActivity = true;
+                }
+            }
+            // Add camp activity partner event only if the partner does not handle the activity
+            if(!partnerHasActivity) {
+                filteredPartnerEvents.push(partnerEvent);
+            }
+        }
+
+        return filteredPartnerEvents;
     }
 
     public getActivityDescription(activity: any): string {

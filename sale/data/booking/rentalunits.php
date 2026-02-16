@@ -167,33 +167,33 @@ if($sojourn) {
     // #memo - we need to do this in 2 steps : first, remove all ancestors, second, remove all descendants
     $map_rental_units_ids_to_remove = [];
 
-	$children_ids = $booking_assigned_rental_units_ids;
+    $children_ids = $booking_assigned_rental_units_ids;
     for($i = 0; $i < 2; ++$i) {
         $units = RentalUnit::ids($children_ids)->read(['parent_id', 'can_partial_rent'])->get();
         if($units > 0) {
             foreach($units as $uid => $unit) {
                 if($unit['parent_id'] > 0) {
-					$map_rental_units_ids_to_remove[(int)$unit['parent_id']] = true;
+                    $map_rental_units_ids_to_remove[(int)$unit['parent_id']] = true;
                 }
             }
         }
     }
 
-	$parents_ids = $booking_assigned_rental_units_ids;
-	for($i = 0; $i < 2; ++$i) {
+    $parents_ids = $booking_assigned_rental_units_ids;
+    for($i = 0; $i < 2; ++$i) {
         $units = RentalUnit::ids($parents_ids)->read(['children_ids'])->get();
         if($units > 0) {
             foreach($units as $uid => $unit) {
                 if(count($unit['children_ids'])) {
                     foreach($unit['children_ids'] as $uid) {
-						$map_rental_units_ids_to_remove[(int)$uid] = true;
+                        $map_rental_units_ids_to_remove[(int)$uid] = true;
                     }
                 }
             }
         }
     }
 
-	$booking_assigned_rental_units_ids = array_merge($booking_assigned_rental_units_ids, array_keys($map_rental_units_ids_to_remove));
+    $booking_assigned_rental_units_ids = array_merge($booking_assigned_rental_units_ids, array_keys($map_rental_units_ids_to_remove));
 
     // retrieve available rental units based on schedule and product_id
     $rental_units_ids = Consumption::getAvailableRentalUnits($orm, $sojourn['booking_id']['center_id'], $params['product_model_id'], $date_from, $date_to);

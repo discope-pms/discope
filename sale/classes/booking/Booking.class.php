@@ -42,7 +42,8 @@ class Booking extends Model {
                 'readonly'          => true,
                 // #memo - workaround for preventing setting name at creation when coming from filtered view
                 'onupdate'          => 'onupdateName',
-                'generation'        => 'generateName'
+                'generation'        => 'generateName',
+                'dependents'        => ['payment_reference']
             ],
 
             'display_name' => [
@@ -1039,13 +1040,20 @@ class Booking extends Model {
      */
     public static function calcPaymentReference($self) {
         $result = [];
-        $self->read(['name', 'customer_identity_id' => ['name', 'id', 'accounting_account']]);
+        $self->read(['name', 'state', 'customer_identity_id' => ['name', 'id', 'accounting_account']]);
         foreach($self as $id => $booking) {
+            if($booking['state'] === 'draft') {
+                continue;
+            }
             // #memo - arbitrary value : used in the accounting software for identifying payments with a temporary account entry counterpart
             $code_ref =  Setting::get_value('sale', 'organization', 'booking.reference.code', 150);
             $reference_type =  Setting::get_value('sale', 'organization', 'booking.reference.type', 'VCS');
 
             $booking_code = intval($booking['name']);
+
+            if($booking_code <= 0) {
+                continue;
+            }
 
             switch($reference_type) {
                 // use Customer accounting_account as reference (from Identity)
@@ -1096,7 +1104,7 @@ class Booking extends Model {
         $reference_type = Setting::get_value('sale', 'organization', 'booking.reference.type', 'VCS');
         foreach($bookings as $id => $booking) {
             $reference = $booking['payment_reference'];
-            if(in_array($reference, ['RN', 'RF', 'VCS'])) {
+            if(in_array($reference_type, ['RN', 'RF', 'VCS'])) {
                 DataFormatter::format($booking['payment_reference'], $reference_type);
             }
             $result[$id] = $reference;

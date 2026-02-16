@@ -24,7 +24,8 @@ class Enrollment {
         public child_id: number = 0,
         public camp_id: number = 0,
         public total: number = 0,
-        public price: number = 0
+        public price: number = 0,
+        public date_created: Date = new Date()
     ) {
     }
 }
@@ -492,28 +493,80 @@ export class EnrollmentPreRegistrationReminderComponent implements OnInit, After
                 const camp = this.camps[0];
                 const enrollment = this.enrollments[0];
 
+                const dateFrom = new Date(camp.date_from);
+                const dateTo = new Date(camp.date_to);
+
+                let strDateFrom = dateFrom.getDate().toString().padStart(2, '0') + '/' + (dateFrom.getMonth()+1).toString().padStart(2, '0') + '/' + dateFrom.getFullYear();
+                let strDateTo = dateTo.getDate().toString().padStart(2, '0') + '/' + (dateTo.getMonth()+1).toString().padStart(2, '0') + '/' + dateTo.getFullYear();
+
+                const deadline_days = 10;
+
+                const deadline = new Date(enrollment.date_created);
+                deadline.setDate(deadline.getDate() + deadline_days);
+
+                let strDeadline = deadline.getDate().toString().padStart(2, '0') + '/' + (deadline.getMonth()+1).toString().padStart(2, '0') + '/' + deadline.getFullYear();
+
+                let enrollments_list = [];
+                for(let enrollment of this.enrollments) {
+                    let enrollmentCamp = camp;
+                    if(enrollmentCamp.id !== enrollment.camp_id) {
+                        for(let c of this.camps) {
+                            if(c.id === enrollment.camp_id) {
+                                enrollmentCamp = c;
+                            }
+                        }
+                    }
+
+                    const enrollmentCampDateFrom = new Date(enrollmentCamp.date_from);
+                    const enrollmentCampDateTo = new Date(enrollmentCamp.date_to);
+
+                    let enrollmentCampStrDateFrom = enrollmentCampDateFrom.getDate().toString().padStart(2, '0') + '/' + (enrollmentCampDateFrom.getMonth()+1).toString().padStart(2, '0') + '/' + enrollmentCampDateFrom.getFullYear();
+                    let enrollmentCampStrDateTo = enrollmentCampDateTo.getDate().toString().padStart(2, '0') + '/' + (enrollmentCampDateTo.getMonth()+1).toString().padStart(2, '0') + '/' + enrollmentCampDateTo.getFullYear();
+
+                    let enrollmentChild = this.child;
+                    if(enrollmentChild.id !== enrollment.child_id) {
+                        for(let c of this.mainGuardianChildren) {
+                            if(c.id === enrollment.child_id) {
+                                enrollmentChild = c;
+                            }
+                        }
+                    }
+
+                    enrollments_list.push(`<li>${enrollmentChild.name} au camp ${enrollmentCamp.short_name} du ${enrollmentCampStrDateFrom} au ${enrollmentCampStrDateTo}</li>`);
+                }
+
                 const mapKeyValue: {[key: string]: string} = {
                     total: enrollment.total.toString(),
                     price: enrollment.price.toString(),
-                    camp: camp.short_name
+                    camp: camp.short_name,
+                    date_from: strDateFrom,
+                    date_to: strDateTo,
+                    child: this.child.name,
+                    child_firstname: this.child.firstname,
+                    child_lastname: this.child.lastname,
+                    main_guardian: this.mainGuardian.name,
+                    main_guardian_firstname: this.mainGuardian.firstname,
+                    main_guardian_lastname: this.mainGuardian.lastname,
+                    deadline: strDeadline,
+                    deadline_days: deadline_days.toString(),
+                    enrollments_list: '<ul>' + enrollments_list.join('') + '</ul>'
                 };
 
                 if(subjectPart) {
-                    let title = '';
+                    let title = 'Rappel : Pré-inscription de {child} au camp {camp}';
                     if(subjectPart.value && subjectPart.value.length > 0) {
                         // strip html nodes
                         title = subjectPart.value.replace(/<[^>]*>?/gm, '');
+                    }
+                    for(let key in mapKeyValue) {
+                        title = title.replace(`{${key}}`, mapKeyValue[key]);
                     }
 
                     this.vm.title.formControl.setValue(title);
                 }
 
                 if(bodyPart) {
-                    let body = '';
-                    for(let key in mapKeyValue) {
-                        body = bodyPart.value.replace(`{${key}}`, mapKeyValue[key]);
-                    }
-
+                    let body = bodyPart.value;
                     for(let key in mapKeyValue) {
                         body = body.replace(`{${key}}`, mapKeyValue[key]);
                     }

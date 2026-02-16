@@ -108,6 +108,22 @@
                         }
                     },
                     {
+                        "id": "item.enrollments_fundings.reimburse",
+                        "type": "entry",
+                        "label": "Fundings to reimburse",
+                        "description": "",
+                        "route": "/",
+                        "context": {
+                            "entity": "sale\\pay\\Funding",
+                            "view": "list.default",
+                            "domain": [
+                                ["enrollment_id", "is not", null],
+                                ["due_amount", "<", 0]
+                            ]
+                        },
+                        "visible": ["lathus", "=", "env.discope.features.custom_package"]
+                    },
+                    {
                         "id": "item.bank_statement_lines.reimburse",
                         "type": "entry",
                         "label": "Bank payments to reimburse",

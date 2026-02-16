@@ -10,8 +10,10 @@ use core\setting\Setting;
 use Dompdf\Dompdf;
 use Dompdf\Options as DompdfOptions;
 use identity\Center;
+use sale\camp\catalog\Product;
 use sale\camp\Child;
 use sale\camp\Guardian;
+use sale\camp\Institution;
 use Twig\Environment as TwigEnvironment;
 use Twig\Extension\ExtensionInterface;
 use Twig\Extra\Intl\IntlExtension;
@@ -55,10 +57,6 @@ use Twig\TwigFilter;
 
     ],
     'constants'             => ['DEFAULT_LANG', 'L10N_LOCALE'],
-    'access'        => [
-        'visibility'        => 'protected',
-        'groups'            => ['camp.default.user'],
-    ],
     'response'      => [
         'content-type'      => 'application/pdf',
         'accept-origin'     => '*'
@@ -104,9 +102,11 @@ $children = Child::ids($ids)
         'firstname',
         'lastname',
         'main_guardian_id',
+        'institution_id',
         'enrollments_ids' => [
             'status',
             'price',
+            'is_ase',
             'camp_id' => [
                 'short_name',
                 'sojourn_number',
@@ -115,7 +115,8 @@ $children = Child::ids($ids)
                 'accounting_code',
                 'product_id',
                 'day_product_id',
-                'center_id'
+                'center_id',
+                'is_clsh'
             ],
             'enrollment_lines_ids' => [
                 'price',
@@ -123,6 +124,11 @@ $children = Child::ids($ids)
             ],
             'fundings_ids' => [
                 'paid_amount'
+            ],
+            'price_adapters_ids' => [
+                'name',
+                'price_adapter_type',
+                'value'
             ]
         ]
     ])
@@ -147,9 +153,33 @@ if(empty($children)) {
     throw new Exception("no_enrollments", EQ_ERROR_INVALID_PARAM);
 }
 
-$main_guardian = Guardian::id($children[0]['main_guardian_id'])
-    ->read(['lastname', 'firstname', 'address_street', 'address_dispatch', 'address_zip', 'address_city'])
-    ->first();
+$recipient_address = [];
+if($children[0]['enrollments_ids'][0]['is_ase'] && !is_null($children[0]['institution_id'])) {
+    $institution = Institution::id($children[0]['institution_id'])
+        ->read(['name', 'address_street', 'address_dispatch', 'address_zip', 'address_city'])
+        ->first();
+
+    $recipient_address = [
+        'name'      => $institution['name'],
+        'street'    => $institution['address_street'],
+        'dispatch'  => $institution['address_dispatch'],
+        'zip'       => $institution['address_zip'],
+        'city'      => $institution['address_city']
+    ];
+}
+else {
+    $main_guardian = Guardian::id($children[0]['main_guardian_id'])
+        ->read(['lastname', 'firstname', 'address_street', 'address_dispatch', 'address_zip', 'address_city'])
+        ->first();
+
+    $recipient_address = [
+        'name'      => strtoupper($main_guardian['lastname']).' '.$main_guardian['firstname'],
+        'street'    => $main_guardian['address_street'],
+        'dispatch'  => $main_guardian['address_dispatch'],
+        'zip'       => $main_guardian['address_zip'],
+        'city'      => $main_guardian['address_city']
+    ];
+}
 
 /***************
  * Create HTML *
@@ -174,10 +204,55 @@ foreach($children as $child) {
     }
 }
 
+$enrollments = [];
+foreach($children as $child) {
+    foreach($child['enrollments_ids'] as &$enrollment) {
+        $enrollment['child_id'] = [
+            'firstname' => $child['firstname'],
+            'lastname'  => $child['lastname']
+        ];
+    }
+
+    $enrollments = array_merge($enrollments, $child['enrollments_ids']);
+}
+
+foreach($enrollments as &$enrollment) {
+    $camp_product_ids = null;
+    if($enrollment['camp_id']['is_clsh']) {
+        $camp_product_ids = Product::search(['camp_product_type', 'in', ['clsh-full-5-days', 'clsh-full-4-days', 'clsh-day']])->ids();
+    }
+    else {
+        $camp_product_ids = Product::search(['camp_product_type', '=', 'full'])->ids();
+    }
+
+    $camp_product_line = null;
+    foreach($enrollment['enrollment_lines_ids'] as &$line) {
+        $line['is_camp_product'] = in_array($line['product_id']['id'], $camp_product_ids);
+        if($line['is_camp_product']) {
+            $camp_product_line = $line;
+        }
+    }
+
+    foreach($enrollment['price_adapters_ids'] as &$price_adapter) {
+        if($price_adapter['price_adapter_type'] === 'percent') {
+            $price_adapter['value'] = round($camp_product_line['price'] * ($price_adapter['value'] / 100), 2);
+        }
+
+        $price_adapter['value'] = -1 * $price_adapter['value'];
+
+        $total_amount += $price_adapter['value'];
+    }
+}
+
+usort($enrollments, function($a, $b) {
+    return $a['camp_id']['date_from'] <=> $b['camp_id']['date_from'];
+});
+
 $values = [
     'center'                                => $center,
-    'main_guardian'                         => $main_guardian,
+    'recipient_address'                     => $recipient_address,
     'children'                              => $children,
+    'enrollments'                           => $enrollments,
     'date'                                  => strtotime('now'),
     'total_amount'                          => $total_amount,
     'remaining_amount'                      => $remaining_amount

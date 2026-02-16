@@ -55,7 +55,7 @@ if(is_null($funding['enrollment_id'])) {
 }
 
 if($funding['enrollment_id']['status'] === 'validate') {
-    throw new Exception("booking_validated", EQ_ERROR_INVALID_PARAM);
+    throw new Exception("enrollment_validated", EQ_ERROR_INVALID_PARAM);
 }
 
 if($funding['enrollment_id']['status'] === 'cancelled') {

@@ -23,6 +23,9 @@
             <div class="actions-std">
             </div>
             <div class="actions-view">
+                <a target="_blank" [attr.href]="printInvoiceUrl">
+                    <button mat-stroked-button [disabled]="printInvoiceUrl === null">Voir facture</button>
+                </a>
                 <a target="_blank" [attr.href]="printConfirmationUrl">
                     <button mat-stroked-button [disabled]="printConfirmationUrl === null">Voir confirmation</button>
                 </a>

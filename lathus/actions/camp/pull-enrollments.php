@@ -7,9 +7,9 @@
 */
 
 use core\setting\Setting;
+use lathus\sale\camp\Enrollment as LathusEnrollment;
 use lathus\sale\camp\Guardian as LathusGuardian;
 use lathus\sale\camp\Institution as LathusInstitution;
-use sale\booking\Payment;
 use sale\camp\Camp;
 use sale\camp\Child;
 use sale\camp\Enrollment;
@@ -20,6 +20,7 @@ use sale\camp\price\PriceAdapter;
 use sale\camp\Sponsor;
 use sale\camp\WorksCouncil;
 use sale\pay\Funding;
+use sale\pay\Payment;
 
 [$params, $providers] = eQual::announce([
     'description'   => "Pull enrollments from CPA Lathus API.",
@@ -61,38 +62,62 @@ $normalizeName = function($city) {
 $findOrCreateGuardian = function($ext_guardian, $ext_child, $child_id) use($sanitizePhoneNumber) {
     $guardian = null;
 
+    $ext_guardian_firstname = trim($ext_guardian['prenom']);
+    $ext_guardian_lastname = trim($ext_guardian['nom']);
+
+    $ext_guardian_phones = [
+        'mobile'        => '',
+        'phone'         => '',
+        'work_phone'    => ''
+    ];
+    if(isset($ext_guardian['telephonePortable'])) {
+        $ext_guardian_phones['mobile'] = trim($ext_guardian['telephonePortable']);
+    }
+    if(isset($ext_guardian['telephoneDomicile'])) {
+        $ext_guardian_phones['phone'] = trim($ext_guardian['telephoneDomicile']);
+    }
+    if(isset($ext_guardian['telephoneTravail'])) {
+        $ext_guardian_phones['work_phone'] = trim($ext_guardian['telephoneTravail']);
+    }
+
     $child = Child::id($child_id)
         ->read(['guardians_ids'])
         ->first();
 
     if(!empty($child['guardians_ids'])) {
         $guardian = Guardian::search([
-            ['firstname', 'ilike', trim($ext_guardian['prenom'])],
-            ['lastname', 'ilike', trim($ext_guardian['nom'])],
+            ['firstname', 'ilike', $ext_guardian_firstname],
+            ['lastname', 'ilike', $ext_guardian_lastname],
             ['id', 'in', $child['guardians_ids']]
         ])
             ->read(['id'])
             ->first();
     }
-    elseif(isset($ext_guardian['telephonePortable']) || isset($ext_guardian['telephoneDomicile']) || isset($ext_guardian['telephoneTravail'])) {
-        $domain = [
-            ['firstname', 'ilike', trim($ext_guardian['prenom'])],
-            ['lastname', 'ilike', trim($ext_guardian['nom'])]
-        ];
-        if(!empty($ext_guardian['telephonePortable'])) {
-            $domain[] = ['mobile', '=', trim($ext_guardian['telephonePortable'])];
+    elseif(!empty($ext_guardian_phones['mobile']) || !empty($ext_guardian_phones['phone']) || !empty($ext_guardian_phones['work_phone'])) {
+        $domain = [];
+        if(!empty($ext_guardian_phones['mobile'])) {
+            $domain[] = [
+                ['firstname', 'ilike', $ext_guardian_firstname],
+                ['lastname', 'ilike', $ext_guardian_lastname],
+                ['mobile', '=', $ext_guardian_phones['mobile']]
+            ];
         }
-        elseif(!empty($ext_guardian['telephoneDomicile'])) {
-            $domain[] = ['phone', '=', trim($ext_guardian['telephoneDomicile'])];
+        elseif(!empty($ext_guardian_phones['phone'])) {
+            $domain[] = [
+                ['firstname', 'ilike', $ext_guardian_firstname],
+                ['lastname', 'ilike', $ext_guardian_lastname],
+                ['phone', '=', $ext_guardian_phones['phone']]
+            ];
         }
-        elseif(!empty($ext_guardian['telephoneTravail'])) {
-            $domain[] = ['work_phone', '=', trim($ext_guardian['telephoneTravail'])];
+        elseif(!empty($ext_guardian_phones['work_phone'])) {
+            $domain[] = [
+                ['firstname', 'ilike', $ext_guardian_firstname],
+                ['lastname', 'ilike', $ext_guardian_lastname],
+                ['work_phone', '=', $ext_guardian_phones['work_phone']]
+            ];
         }
 
-        $guardian = Guardian::search([
-            ['firstname', 'ilike', trim($ext_guardian['prenom'])],
-            ['lastname', 'ilike', trim($ext_guardian['nom'])]
-        ])
+        $guardian = Guardian::search($domain)
             ->read(['id'])
             ->first();
 
@@ -115,24 +140,40 @@ $findOrCreateGuardian = function($ext_guardian, $ext_child, $child_id) use($sani
             'children_ids'      => [$child['id']]
         ];
 
-        if(!empty($ext_guardian['telephonePortable'])) {
-            $guardian_data['mobile'] = $sanitizePhoneNumber($ext_guardian['telephonePortable']);
+        if(!empty($ext_guardian_phones['mobile'])) {
+            $guardian_data['mobile'] = $sanitizePhoneNumber($ext_guardian_phones['mobile']);
         }
 
-        if(!empty($ext_guardian['telephoneDomicile'])) {
-            $guardian_data['phone'] = $sanitizePhoneNumber($ext_guardian['telephoneDomicile']);
-        }
-        elseif(!empty($ext_child['telephone'])) {
-            $guardian_data['phone'] = $sanitizePhoneNumber($ext_child['telephone']);
+        if(!empty($ext_guardian_phones['phone'])) {
+            $guardian_data['phone'] = $sanitizePhoneNumber($ext_guardian_phones['phone']);
         }
 
-        if(!empty($ext_guardian['telephoneTravail'])) {
-            $guardian_data['work_phone'] = $sanitizePhoneNumber($ext_guardian['telephoneTravail']);
+        if(!empty($ext_guardian_phones['work_phone'])) {
+            $guardian_data['work_phone'] = $sanitizePhoneNumber($ext_guardian_phones['work_phone']);
         }
 
         $guardian = LathusGuardian::create($guardian_data)
             ->read(['id'])
             ->first();
+    }
+    elseif(!empty($ext_guardian_phones['mobile']) || !empty($ext_guardian_phones['phone']) || !empty($ext_guardian_phones['work_phone'])) {
+        $guardian_data = [];
+
+        if(!empty($ext_guardian_phones['mobile'])) {
+            $guardian_data['mobile'] = $sanitizePhoneNumber($ext_guardian_phones['mobile']);
+        }
+
+        if(!empty($ext_guardian_phones['phone'])) {
+            $guardian_data['phone'] = $sanitizePhoneNumber($ext_guardian_phones['phone']);
+        }
+
+        if(!empty($ext_guardian_phones['work_phone'])) {
+            $guardian_data['work_phone'] = $sanitizePhoneNumber($ext_guardian_phones['work_phone']);
+        }
+
+        if(!empty($guardian_data)) {
+            LathusGuardian::id($guardian['id'])->update($guardian_data);
+        }
     }
 
     return $guardian;
@@ -301,7 +342,7 @@ if(!empty($data)) {
                 'cpa_club'          => $ext_enrollment['metaJson']['aides']['clubCpa'] ?? null,
                 'has_license_ffe'   => !is_null($ext_child_horseriding),
                 'license_ffe'       => $ext_child_horseriding ? $ext_child_horseriding['dernierGalopValide'] : null,
-                'year_license_ffe'  => $ext_child_horseriding ? $ext_child_horseriding['anneeLicence'] : null,
+                'year_license_ffe'  => !empty($ext_child_horseriding['anneeLicence']) && is_numeric($ext_child_horseriding['anneeLicence']) ? $ext_child_horseriding['anneeLicence'] : null,
                 'external_ref'      => $ext_enrollment['wpOrderId']
             ])
                 ->read(['id'])
@@ -348,7 +389,15 @@ if(!empty($data)) {
             $enrollment_status = 'waitlisted';
         }
 
-        $enrollment = Enrollment::create([
+        $enrollment_phone = null;
+        if(!empty($ext_child['telephone'])) {
+            $enrollment_phone = $sanitizePhoneNumber($ext_child['telephone']);
+            if(empty($enrollment_phone)) {
+                $enrollment_phone = null;
+            }
+        }
+
+        $enrollment = LathusEnrollment::create([
             'date_created'      => $ext_enrollment_created,
             'camp_id'           => $camp['id'],
             'child_id'          => $child['id'],
@@ -356,7 +405,8 @@ if(!empty($data)) {
             'is_external'       => true,
             'external_ref'      => $ext_enrollment['wpOrderId'],
             'external_data'     => json_encode($ext_enrollment),
-            'status'            => $enrollment_status
+            'status'            => $enrollment_status,
+            'phone'             => $enrollment_phone
         ])
             ->read(['center_office_id', 'camp_id' => ['date_from']])
             ->first();
@@ -605,9 +655,23 @@ if(!empty($data)) {
             $enrollment_warnings[] = "Prix calculé par Discope {$formatMoney($enrollment_price)}";
         }
 
-        //  2.3.9) Confirm enrollment to generate its funding
+        //  2.3.9) Cancel or confirm enrollment
 
-        if($enrollment_status === 'pending') {
+        if($ext_enrollment['status'] === 'cancelled') {
+            try {
+                //  If customer cancelled the enrollment
+                eQual::run('do', 'sale_camp_enrollment_cancel', [
+                    'id'        => $enrollment['id'],
+                    'reason'    => 'other',
+                    'fee'       => 0
+                ]);
+            }
+            catch(Exception $e) {
+                trigger_error("APP::sale_camp_enrollment_cancel unable to cancel the enrollment", E_USER_WARNING,);
+                $dispatch->dispatch('lodging.camp.pull_enrollments.cancel_error', 'sale\camp\Enrollment', $enrollment['id'], 'important', null, [], [], null, 1);
+            }
+        }
+        elseif($enrollment_status === 'pending') {
             try {
                 //  If spot available confirm, else add to waiting list
                 eQual::run('do', 'sale_camp_enrollment_confirm', [
@@ -615,12 +679,8 @@ if(!empty($data)) {
                 ]);
             }
             catch(Exception $e) {
-                trigger_error("APP::sale_camp_enrollment_confirm unable to confirm/waitlist the enrollment", E_USER_WARNING,);
-            }
-            finally {
-                $en = Enrollment::id($enrollment['id'])
-                    ->read(['status'])
-                    ->first();
+                trigger_error("APP::sale_camp_enrollment_confirm unable to confirm the enrollment", E_USER_WARNING,);
+                $dispatch->dispatch('lodging.camp.pull_enrollments.confirm_error', 'sale\camp\Enrollment', $enrollment['id'], 'important', null, [], [], null, 1);
             }
         }
 
@@ -646,7 +706,10 @@ if(!empty($data)) {
                     }
                     break;
                 case 'monetico':
-                    if(!empty($ext_enrollment['metaJson']['reglement']['montantCB'])) {
+                    if(
+                        !empty($ext_enrollment['metaJson']['reglement']['montantCB'])
+                        && !in_array($ext_enrollment['metaJson']['payment']['status'], ['failed', 'cancelled'])
+                    ) {
                         $funding = Funding::search(['enrollment_id', '=', $enrollment['id']])
                             ->read(['id'])
                             ->first();
@@ -666,7 +729,8 @@ if(!empty($data)) {
                             'is_manual'         => false,
                             'amount'            => floatval($ext_enrollment['metaJson']['reglement']['montantCB']),
                             'payment_origin'    => 'online',
-                            'payment_method'    => 'bank_card'
+                            'payment_method'    => 'bank_card',
+                            'external_ref'      => $ext_enrollment['metaJson']['payment']['transactionId']
                         ])
                             ->update(['funding_id' => $funding['id']]);
                     }

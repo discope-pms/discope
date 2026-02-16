@@ -90,7 +90,7 @@ use sale\camp\EnrollmentMail;
     'constants'             => ['DEFAULT_LANG'],
     'access'        => [
         'visibility'        => 'protected',
-        'groups'            => ['camp.default.user'],
+        'groups'            => ['camp.default.administrator', 'camp.default.user'],
     ],
     'response' => [
         'content-type'      => 'application/json',

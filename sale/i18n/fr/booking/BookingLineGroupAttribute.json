@@ -1,0 +1,30 @@
+{
+	"name": "Attribut de groupe",
+	"plural": "Attributs de groupe",
+	"description": "Les attributs permettant de détailler les groupes de réservation.",
+	"model": {
+		"name": {
+			"label": "Nom",
+			"description": "Nom court de l'attribut.",
+			"help": ""
+		},
+		"code": {
+			"label": "Code",
+			"description": "Memo pour l'attribut.",
+			"help": ""
+		}
+	},
+	"view": {
+		"form.default": {
+			"name": "Attribut de groupe",
+			"description": "Les attributs permettant de détailler les groupes de réservation.",
+			"layout": {}
+		},
+		"list.default": {
+			"name": "Attributs de groupe",
+			"description": "Liste des attributs de groupe de réservation.",
+			"layout": {}
+		}
+	},
+	"error": {}
+}

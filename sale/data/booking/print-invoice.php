@@ -683,10 +683,12 @@ if(empty($output)) {
 
     $values['lines'] = $lines;
 
+    $subtotals_vat = json_decode($invoice['subtotals_vat'], true);
+
     /*
         retrieve final VAT and group by rate
     */
-    foreach($invoice['subtotals_vat'] as $vat_rate_index => $subtotal_vat) {
+    foreach($subtotals_vat as $vat_rate_index => $subtotal_vat) {
         $vat_rate = ((float) $vat_rate_index) / 100;
         $tax_label = 'TVA '.intval($vat_rate * 100).'%';
         $values['tax_lines'][$tax_label] = $subtotal_vat;

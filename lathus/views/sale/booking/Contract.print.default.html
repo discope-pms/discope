@@ -130,7 +130,7 @@ div.footer {
     </div>
 
     <div style="margin-top: 30px; margin-bottom: 30px;">
-        Il a été convenu ce qui suit :
+        {{ parts.first_info|raw }}
     </div>
 </div>
 
@@ -139,7 +139,7 @@ div.footer {
 </div>
 
 <div class="section">
-    <div class="title">Article 1 / Accueil</div>
+    <div class="title">{{ parts.article_1_title|raw }}</div>
 
     <div class="no-margin">
         {{ parts.article_1|raw }}
@@ -147,15 +147,15 @@ div.footer {
 </div>
 
 <div class="section">
-    <div class="title">Article 2 / Hébergement / Ménage / Linge de toilette </div>
+    <div class="title">{{ parts.article_2_title|raw }}</div>
 
     {% if hosting_conf.hosted %}
-        <div>Le groupe sera hébergé :</div>
+        <div>{{ parts.article_2_hosting_title|striptags }}</div>
         <ul style="margin-top: 5px; padding-left: 20px;">
-            {% if hosting_conf.CH %}<li>en chambres de 2 à 5 lits, avec sanitaires privatifs</li>{% endif %}
-            {% if hosting_conf.CC %}<li>en chambres collectives de 3 à 4 lits, avec sanitaires dans le couloir</li>{% endif %}
-            {% if hosting_conf.MB %}<li>en marabout et le groupe devra apporter matelas et duvets</li>{% endif %}
-            {% if hosting_conf.CP %}<li>en camping et le groupe devra apporter tentes, matelas et duvets</li>{% endif %}
+            {% if hosting_conf.CH %}<li>{{ parts.article_2_hosting_ch|striptags }}</li>{% endif %}
+            {% if hosting_conf.CC %}<li>{{ parts.article_2_hosting_cc|striptags }}</li>{% endif %}
+            {% if hosting_conf.MB %}<li>{{ parts.article_2_hosting_mb|striptags }}</li>{% endif %}
+            {% if hosting_conf.CP %}<li>{{ parts.article_2_hosting_cp|striptags }}</li>{% endif %}
         </ul>
 
         <div class="no-margin">
@@ -167,23 +167,27 @@ div.footer {
 </div>
 
 <div class="section">
-    <div class="title">Article 3 / Restauration</div>
+    <div class="title">{{ parts.article_3_title|raw }}</div>
 
     {% if meals_conf.has_meals %}
-        <div>Le groupe a réservé, à partir du {{ meals_conf.first.date }} ({{ meals_conf.first.moment }}) au {{ meals_conf.last.date }} ({{ meals_conf.last.moment }}), les repas suivants :</div>
+        <div>{{ parts.article_3_has_meal_title|striptags }}</div>
         <ul style="margin-top: 5px; padding-left: 20px;">
-            {% if meals_conf.has_breakfast %}<li>petits-déjeuners</li>{% endif %}
-            {% if meals_conf.has_lunch %}<li>repas de midi</li>{% endif %}
-            {% if meals_conf.has_snack %}<li>goûters</li>{% endif %}
-            {% if meals_conf.has_dinner %}<li>repas du soir</li>{% endif %}
+            {% if meals_conf.has_breakfast %}<li>{{ parts.article_3_has_breakfast|striptags }}</li>{% endif %}
+            {% if meals_conf.has_lunch %}<li>{{ parts.article_3_has_lunch|striptags }}</li>{% endif %}
+            {% if meals_conf.has_snack %}<li>{{ parts.article_3_has_snack|striptags }}</li>{% endif %}
+            {% if meals_conf.has_dinner %}<li>{{ parts.article_3_has_dinner|striptags }}</li>{% endif %}
         </ul>
+
+        <div class="no-margin">
+            {{ parts.article_3_meal|raw }}
+        </div>
     {% else %}
-        <div>Le groupe n'a pas réservé de repas</div>
+        <div>{{ parts.article_3_no_meal|raw }}</div>
     {% endif %}
 </div>
 
 <div class="section">
-    <div class="title">Article 4 / Activités</div>
+    <div class="title">{{ parts.article_4_title|raw }}</div>
 
     {% if has_activities %}
         <div>{{ parts.article_4_activities|raw }}</div>
@@ -193,65 +197,50 @@ div.footer {
 </div>
 
 <div class="section">
-    <div class="title">Article 5 / Accompagnement</div>
+    <div class="title">{{ parts.article_5_title|raw }}</div>
 
-    <div>Si le groupe est composé d'enfants, ils devront être accompagnés d'au moins un adulte.</div>
-    <div style="margin-top: 10px;">Cet adulte devra être présent lors des activités.</div>
-    <div style="margin-top: 10px;">En dehors des activités, les enfants seront sous la responsabilité de cet adulte.</div>
+    <div>{{ parts.article_5|raw }}</div>
 </div>
 
 <div class="section">
-    <div class="title">Article 6 / Réservation</div>
+    <div class="title">{{ parts.article_6_title|raw }}</div>
 
-    <div style="width: 95%;">La réservation sera considérée comme effective seulement lors du retour de la présente convention signée et accompagnée :</div>
+    <div style="width: 95%;">{{ parts.article_6_booking_title|striptags }}</div>
 
     <ul>
-        {% for deposit in booking_conf.deposits %}
-            <li>du paiement d'un acompte de {{ deposit.price }}</li>
-        {% endfor %}
         {% if booking_conf.security_deposit_check > 0 %}
-            <li style="margin-top: 2px;">
-                <div>d'un chèque de caution de {{ booking_conf.security_deposit_check }}</div>
-                <div>(non encaissé et restitué après le règlement du séjour sauf cas de dégradation)</div>
-            </li>
+            <li>{{ parts.article_6_security_deposit_check|replace({'<p>': '<div>'})|replace({'</p>': '</div>'})|raw }}</li>
         {% endif %}
-        <li style="margin-top: 2px;">
-            <div>du bon de commande</div>
-            <div>(pour les collectivités locales et les collèges-lycées)</div>
-        </li>
+        {% for installment in booking_conf.installments %}
+            <li>{{ parts.article_6_installment|replace({'{installment.price}': installment.price})|striptags }}</li>
+        {% endfor %}
+        {% if booking_conf.installments|length == 0 %}
+            <li>{{ parts.article_6_purchase_order|replace({'<p>': '<div>'})|replace({'</p>': '</div>'})|raw }}</li>
+        {% endif %}
     </ul>
 </div>
 
 <div class="section">
-    <div class="title">Article 7 / Conditions d'annulation ou de report de séjour</div>
-    <div>
-        En cas d'annulation du séjour par le groupe
-        {% if cancellation_conf.type == 'keep_deposit' %}
-            l'acompte versé restera acquis au CPA Lathus, à titre de dédit.
-        {% else %}
-            le groupe devra au CPA Lathus la somme de {{ cancellation_conf.amount }}, à titre de dédit.
-        {% endif %}
-    </div>
-
+    <div class="title">{{ parts.article_7_title|raw }}</div>
     <div>
         {{ parts.article_7|raw }}
     </div>
 </div>
 
 <div class="section">
-    <div class="title">Article 8 / Facturation</div>
+    <div class="title">{{ parts.article_8_title|raw }}</div>
 
     <div>{{ parts.article_8|raw }}</div>
 </div>
 
 <div class="section">
-    <div class="title">Article 9 / Règlement</div>
+    <div class="title">{{ parts.article_9_title|raw }}</div>
 
     <div>{{ parts.article_9|raw }}</div>
 </div>
 
 <div class="section">
-    <div class="title">Article 10 / Divers</div>
+    <div class="title">{{ parts.article_10_title|raw }}</div>
 
     <div style="padding-left: 10px;">
         <div class="no-margin">{{ parts.article_10|raw }}</div>

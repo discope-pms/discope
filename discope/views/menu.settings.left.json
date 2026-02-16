@@ -237,6 +237,16 @@
                                     "entity": "sale\\booking\\BookingType",
                                     "view": "list.default"
                                 }
+                            },
+                            {
+                                "id": "sales.booking.booking_group_attributes",
+                                "type": "entry",
+                                "label": "Group attributes",
+                                "description": "",
+                                "context": {
+                                    "entity": "sale\\booking\\BookingLineGroupAttribute",
+                                    "view": "list.default"
+                                }
                             }
                         ]
                     },

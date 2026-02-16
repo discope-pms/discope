@@ -9,6 +9,7 @@
 use core\setting\Setting;
 use Dompdf\Dompdf;
 use Dompdf\Options as DompdfOptions;
+use sale\camp\Enrollment;
 use sale\camp\price\PriceAdapter;
 use Twig\Environment as TwigEnvironment;
 use Twig\Extension\ExtensionInterface;
@@ -40,10 +41,6 @@ use Twig\TwigFilter;
 
     ],
     'constants'     => ['L10N_LOCALE', 'L10N_TIMEZONE'],
-    'access'        => [
-        'visibility'        => 'protected',
-        'groups'            => ['camp.default.user'],
-    ],
     'response'      => [
         'content-type'      => 'application/pdf',
         'accept-origin'     => '*'
@@ -89,7 +86,15 @@ if(!file_exists($file)) {
     Prepare values for template
 */
 
+$enrollments_ids = Enrollment::search([
+    ['date_from', '>=', $params['date_from']],
+    ['date_from', '<=', $params['date_to']],
+    ['status', 'in', ['confirmed', 'validated']]
+])
+    ->ids();
+
 $price_adapters = PriceAdapter::search([
+    ['enrollment_id', 'in', $enrollments_ids],
     ['sponsor_id', '<>', null],
     ['origin_type', 'in', ['commune', 'community-of-communes']]
 ])

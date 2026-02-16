@@ -666,6 +666,7 @@ class BookingActivity extends Model {
         $booking_fields = ['booking_id', 'booking_line_group_id'];
         $camp_fields = ['camp_id', 'camp_group_id'];
 
+        $self->read(['activity_booking_line_id', 'booking_line_group_id', 'camp_group_id']);
         foreach($self as $booking_activity) {
             if(isset($booking_activity['activity_booking_line_id'])) {
                 // booking line checks

@@ -56,6 +56,10 @@ if($funding['is_paid']) {
     throw new Exception("funding_already_paid", EQ_ERROR_INVALID_PARAM);
 }
 
+if(is_null($funding['enrollment_id'])) {
+    throw new Exception("not_enrollment_funding", EQ_ERROR_INVALID_PARAM);
+}
+
 $sign = ($funding['due_amount'] >= 0) ? 1 : -1;
 $remaining_amount = abs($funding['due_amount']) - abs($funding['paid_amount']);
 

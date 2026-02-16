@@ -1,0 +1,21 @@
+nav:
+  - 'Accueil': 'index.md'
+  - 'Planning':
+      - 'Calendrier Animateurs': 'planning/employee_calendar.md'
+      - 'Planning activités condensé': 'planning/activities_planning.md'
+      - 'Programme de la semaine': 'planning/weekly_program.md'
+  - 'Camps':
+      - 'Vue d''ensemble': 'camps/index.md'
+      - 'Modèles': 'camps/models.md'
+      - 'Camp': 'camps/camps.md'
+      - 'Groupes': 'camps/groups.md'
+      - 'Inscriptions': 'camps/enrollments.md'
+      - 'Présences & repas': 'camps/presences_meals.md'
+      - 'Tarification & produits': 'camps/pricing_products.md'
+      - 'Réductions & aides': 'camps/price_adapters.md'
+      - 'Paiements & financements': 'camps/payments.md'
+      - 'Documents & emails': 'camps/docs_emails.md'
+      - 'Participants': 'camps/participants.md'
+      - 'Suivi opérationnel': 'camps/followup.md'
+      - 'Statistiques': 'camps/stats.md'
+

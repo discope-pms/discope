@@ -2,7 +2,10 @@
     "name": "Confirmed enrollments",
     "order": "date_created",
     "sort": "asc",
-    "domain": ["status", "=", "confirmed"],
+    "domain": [
+        ["status", "=", "confirmed"],
+        ["is_handled", "=", true]
+    ],
     "header": {
         "actions": {
             "ACTION.CREATE": false,

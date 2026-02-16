@@ -30,11 +30,19 @@
             "help": ""
         },
         "item.fundings": {
-            "label": "Paiements",
+            "label": "À rembourser",
             "help": ""
         },
         "item.fundings.reimburse": {
-            "label": "Paiements à rembourser",
+            "label": "Réservations",
+            "help": ""
+        },
+        "item.enrollments_fundings.reimburse": {
+            "label": "Inscriptions",
+            "help": ""
+        },
+        "item.bank_statement_lines.reimburse": {
+            "label": "Relevés bancaires",
             "help": ""
         },
         "item.settings": {

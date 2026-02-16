@@ -60,6 +60,16 @@
                             "entity": "valrance\\booking\\stats\\stat-contracts",
                             "view": "list.default"
                         }
+                    },
+                    {
+                        "id": "stats.booking.summary-sheets",
+                        "type": "entry",
+                        "label": "Fiches récap.",
+                        "description": "",
+                        "context": {
+                            "entity": "valrance\\booking\\stats\\summary-sheets",
+                            "view": "list.default"
+                        }
                     }
                 ]
             }

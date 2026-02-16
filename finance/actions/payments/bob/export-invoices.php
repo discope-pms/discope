@@ -118,12 +118,14 @@ $invoices = Invoice::search($domain, ['limit' => 100, 'sort' => ['number' => 'as
         'due_date',
         'type',
         'status',
-        // 'price',
         // #memo - accounting price is the amount to be recorded in accountancy (does not include installment payments)
         'accounting_price',
         'is_deposit',
         'organisation_id',
         'subtotals_vat',
+        'total',
+        'total_vat',
+        'price',
         'partner_id' => [
             'id',
             'name',
@@ -501,6 +503,8 @@ foreach($invoices as $invoice) {
         }
     }
 
+    $subtotals_vat_lines = [];
+
     // pass-1 : group all lines by account_id
     foreach($invoice['invoice_lines_ids'] as $lid => $line) {
         $vat = round($line['price'] - round($line['total'], 2), 2);
@@ -594,6 +598,13 @@ foreach($invoices as $invoice) {
             $invoice_lines_accounts[$rline['account_id']['code']]['vat'] += $line_vat;
             $invoice_lines_accounts[$rline['account_id']['code']]['amount'] += $line_amount;
 
+            // update vat subtotals map that will be used to adapt the vats amount later (to match Peppol style calculation of vat)
+            $vat_rate_index = number_format($vat_rate * 100, 2, '.', '');
+            if(!isset($subtotals_vat_lines[$vat_rate_index])) {
+                $subtotals_vat_lines[$vat_rate_index] = 0.0;
+            }
+            $subtotals_vat_lines[$vat_rate_index] = round($subtotals_vat_lines[$vat_rate_index] + $line_vat, 2);
+
             $amount_remaining -= $line_amount;
             $vat_remaining -= $line_vat;
 
@@ -601,35 +612,27 @@ foreach($invoices as $invoice) {
         }
     }
 
-    // #memo - if result of vat "calculation per line" is different from result of vat "calculation per vat_rate" (BE: 6%, 12% and 21%), then adapt it to match Invoices data
-    $subtotals_vat_lines = [];
-    foreach($invoice_lines_accounts as $account_values) {
-        $vat_rate_index = number_format($account_values['vat_rate'] * 100, 2, '.', '');
-        if(!isset($subtotals_vat_lines[$vat_rate_index])) {
-            $subtotals_vat_lines[$vat_rate_index] = 0.0;
-        }
-
-        $subtotals_vat_lines[$vat_rate_index] += $account_values['vat'];
-    }
-    foreach($subtotals_vat_lines as $vat_rate_index => $subtotal_vat) {
-        if(abs($subtotal_vat - $invoice['subtotals_vat'][$vat_rate_index]) < 0.01) {
-            continue;
-        }
-
-        $diff = $invoice['subtotals_vat'][$vat_rate_index] - $subtotal_vat;
-        if(round($diff, 2) == 0.0) {
-            continue;
-        }
-        foreach($invoice_lines_accounts as &$account_values) {
-            $vat_rate = ((float) $vat_rate_index) / 100;
-            if($account_values['vat_rate'] === $vat_rate) {
-                // adapt here
-                $account_values['vat'] = round($account_values['vat'] + $diff, 2);
-                unset($account_values);
-                continue 2;
+    // the check $invoice['price'] === $new_calculation_price can be removed when the new vat calculation price (peppol compatible) is the only used (no more old invoice to export)
+    $new_calculation_price = round($invoice['total_vat'] + $invoice['total'], 2);
+    if($invoice['price'] === $new_calculation_price) {
+        // #memo - if result of vat "calculation per line" is different from result of vat "calculation per vat_rate" (BE: 6%, 12% and 21%), then adapt it to match Invoices data
+        foreach($subtotals_vat_lines as $vat_rate_index => $subtotal_vat) {
+            $invoice_subtotals_vat = json_decode($invoice['subtotals_vat'], true);
+            $diff = $invoice_subtotals_vat[$vat_rate_index] - abs($subtotal_vat);
+            if(round(abs($diff), 2) == 0.0) {
+                continue;
             }
+            foreach($invoice_lines_accounts as &$account_values) {
+                $vat_rate = ((float) $vat_rate_index) / 100;
+                if($account_values['vat_rate'] === $vat_rate) {
+                    // adapt here
+                    $account_values['vat'] = round($account_values['vat'] + $diff, 2);
+                    unset($account_values);
+                    continue 2;
+                }
+            }
+            unset($account_values);
         }
-        unset($account_values);
     }
 
     // pass-2 : generate lines based on account entries
@@ -747,14 +750,23 @@ if(count($invoices_header_data)) {
     $auth->su();
 
     // create the export archive
-    Export::create([
+    $export = Export::create([
         'center_office_id'      => $params['center_office_id'],
         'export_type'           => $journal['type'] === 'sales' ? 'invoices' : 'invoices_peppol',
         'data'                  => $data
-    ]);
+    ])
+        ->read(['id'])
+        ->first();
 
-    // mark processed invoices as exported
-    Invoice::ids(array_keys($invoices_header_data))->update(['is_exported' => true]);
+    try {
+        // mark processed invoices as exported
+        Invoice::ids(array_keys($invoices_header_data))->update(['is_exported' => true]);
+    }
+    catch(Exception $e) {
+        // remove export if error triggered while flagging invoices as exported
+        Export::id($export['id'])->delete();
+        throw $e;
+    }
 }
 
 $context->httpResponse()

@@ -1,0 +1,9 @@
+{
+    "description": "",
+    "view": {
+        "item.planning_employees": {
+            "label": "Calendrier Animateurs",
+            "help": ""
+        }
+    }
+}

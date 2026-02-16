@@ -92,10 +92,6 @@ use sale\camp\Camp;
             'description'       => "Quantity of children without age attending the camp."
         ]
     ],
-    'access'        => [
-        'visibility'    => 'protected',
-        'groups'        => ['camp.default.user'],
-    ],
     'response'      => [
         'content-type'  => 'application/json',
         'charset'       => 'utf-8',

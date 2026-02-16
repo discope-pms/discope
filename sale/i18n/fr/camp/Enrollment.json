@@ -217,6 +217,11 @@
                 "cancelled": "Annulée"
             }
         },
+        "is_handled": {
+            "label": "Est traitée",
+            "description": "Est-ce que l'inscription est considérée comme traitée?",
+            "help": ""
+        },
         "preregistration_sent": {
             "label": "Pré-inscription envoyée",
             "description": "Est-ce que le mail de pré-inscription a été envoyé?",
@@ -299,13 +304,18 @@
             "description": "Le tuteur principal responsable de l'enfant.",
             "help": "Utilisé pour savoir quelle adresse utiliser pour la facturation."
         },
+        "phone": {
+            "label": "Téléphone inscription",
+            "description": "Numéro de téléphone inscription.",
+            "help": ""
+        },
         "main_guardian_mobile": {
-            "label": "Mobile",
+            "label": "Mobile tuteur",
             "description": "Numéro de téléphone mobile du tuteur.",
             "help": ""
         },
         "main_guardian_phone": {
-            "label": "Téléphone",
+            "label": "Téléphone tuteur",
             "description": "Numéro de téléphone du tuteur.",
             "help": ""
         },
@@ -317,6 +327,11 @@
         "institution_id": {
             "label": "Institution",
             "description": "L'institution qui prend en charge l'enfant.",
+            "help": ""
+        },
+        "external_ref": {
+            "label": "Référence externe",
+            "description": "Référence externe de l'inscription permettant son identification.",
             "help": ""
         }
     },
@@ -333,6 +348,9 @@
                 },
                 "action.validate": {
                     "label": "Valider"
+                },
+                "action.unvalidate": {
+                    "label": "Repasser en brouillon"
                 },
                 "action.cancel": {
                     "label": "Annuler"
@@ -382,6 +400,9 @@
                 "action.validate": {
                     "label": "Valider"
                 },
+                "action.unvalidate": {
+                    "label": "Repasser en brouillon"
+                },
                 "action.cancel": {
                     "label": "Annuler"
                 },
@@ -429,6 +450,9 @@
                 },
                 "action.validate": {
                     "label": "Valider"
+                },
+                "action.unvalidate": {
+                    "label": "Repasser en brouillon"
                 },
                 "action.cancel": {
                     "label": "Annuler"
@@ -478,6 +502,9 @@
                 "action.validate": {
                     "label": "Valider"
                 },
+                "action.unvalidate": {
+                    "label": "Repasser en brouillon"
+                },
                 "action.cancel": {
                     "label": "Annuler"
                 },
@@ -524,6 +551,9 @@
                 "action.validate": {
                     "label": "Valider"
                 },
+                "action.unvalidate": {
+                    "label": "Repasser en brouillon"
+                },
                 "action.cancel": {
                     "label": "Annuler"
                 },
@@ -547,7 +577,18 @@
             "layout": {}
         },
         "list.pending": {
-            "name": "Inscriptions à confirmer",
+            "name": "Inscriptions brouillons",
+            "description": "",
+            "header": {
+                "action.validate": {
+                    "label": "Valider"
+                }
+            },
+            "layout": {
+            }
+        },
+        "list.confirmed-not-handled": {
+            "name": "Inscriptions à traiter",
             "description": "",
             "header": {
                 "action.validate": {

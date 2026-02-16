@@ -1,5 +1,5 @@
 {
-    "description": "Repasser l'inscription en cours pour la modifier.",
+    "description": "Repasser l'inscription en brouillon pour la modifier.",
     "model": {
         "id": {
             "label": "Inscription",

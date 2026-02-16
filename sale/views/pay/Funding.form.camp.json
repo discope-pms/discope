@@ -46,6 +46,20 @@
                 [true, "=", "env.sale.features.payment.bank_check"],
                 ["is_paid", "=", false]
             ]
+        },
+        {
+            "id": "action.add_manual_payment",
+            "label": "Add manual payment",
+            "description": "This will add a manual payment to the funding.",
+            "controller": "sale_camp_enrollment_funding_add-manual-payment",
+            "confirm": true,
+            "access": {
+                "groups": ["booking.default.user", "finance.default.administrator", "finance.default.user"]
+            },
+            "visible": [
+                ["is_paid", "=", false],
+                ["enrollment_id", "<>", null]
+            ]
         }
     ],
     "layout": {
