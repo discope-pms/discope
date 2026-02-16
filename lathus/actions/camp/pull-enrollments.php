@@ -288,10 +288,10 @@ if(!empty($data)) {
     }
 
     $camps = Camp::search([
-        ['sojourn_number', 'in', array_keys($map_soj_nums)],
-        ['date_from', '>=', strtotime('first day of january this year')],
-        ['date_from', '<', strtotime('last day of december this year')]
-    ])
+            ['sojourn_number', 'in', array_keys($map_soj_nums)],
+            ['date_from', '>=', strtotime('first day of january this year')],
+            ['date_from', '<', strtotime('last day of december this year')]
+        ])
         ->read(['sojourn_number', 'saturday_morning_product_id'])
         ->get();
 
@@ -322,11 +322,11 @@ if(!empty($data)) {
         $ext_child_gender = $ext_child['sexe'] === 'Fille' ? 'F' : 'M';
 
         $child = Child::search([
-            ['firstname', 'ilike', trim($ext_child['prenom'])],
-            ['lastname', 'ilike', trim($ext_child['nom'])],
-            ['birthdate', '=', $ext_child_birthdate],
-            ['gender', '=', $ext_child_gender]
-        ])
+                ['firstname', 'ilike', trim($ext_child['prenom'])],
+                ['lastname', 'ilike', trim($ext_child['nom'])],
+                ['birthdate', '=', $ext_child_birthdate],
+                ['gender', '=', $ext_child_gender]
+            ])
             ->read(['id'])
             ->first();
 
@@ -334,17 +334,17 @@ if(!empty($data)) {
             $ext_child_horseriding = $ext_enrollment['metaJson']['equitation'] ?? null;
 
             $child = Child::create([
-                'firstname'         => ucwords(strtolower($ext_child['prenom'])),
-                'lastname'          => $ext_child['nom'],
-                'birthdate'         => $ext_child_birthdate,
-                'gender'            => $ext_child_gender,
-                'is_cpa_member'     => $ext_enrollment['metaJson']['aides']['hasClubCpa'] ?? false,
-                'cpa_club'          => $ext_enrollment['metaJson']['aides']['clubCpa'] ?? null,
-                'has_license_ffe'   => !is_null($ext_child_horseriding),
-                'license_ffe'       => $ext_child_horseriding ? $ext_child_horseriding['dernierGalopValide'] : null,
-                'year_license_ffe'  => !empty($ext_child_horseriding['anneeLicence']) && is_numeric($ext_child_horseriding['anneeLicence']) ? $ext_child_horseriding['anneeLicence'] : null,
-                'external_ref'      => $ext_enrollment['wpOrderId']
-            ])
+                    'firstname'         => ucwords(strtolower($ext_child['prenom'])),
+                    'lastname'          => $ext_child['nom'],
+                    'birthdate'         => $ext_child_birthdate,
+                    'gender'            => $ext_child_gender,
+                    'is_cpa_member'     => $ext_enrollment['metaJson']['aides']['hasClubCpa'] ?? false,
+                    'cpa_club'          => $ext_enrollment['metaJson']['aides']['clubCpa'] ?? null,
+                    'has_license_ffe'   => !is_null($ext_child_horseriding),
+                    'license_ffe'       => $ext_child_horseriding ? $ext_child_horseriding['dernierGalopValide'] : null,
+                    'year_license_ffe'  => !empty($ext_child_horseriding['anneeLicence']) && is_numeric($ext_child_horseriding['anneeLicence']) ? $ext_child_horseriding['anneeLicence'] : null,
+                    'external_ref'      => $ext_enrollment['wpOrderId']
+                ])
                 ->read(['id'])
                 ->first();
         }
@@ -398,16 +398,16 @@ if(!empty($data)) {
         }
 
         $enrollment = LathusEnrollment::create([
-            'date_created'      => $ext_enrollment_created,
-            'camp_id'           => $camp['id'],
-            'child_id'          => $child['id'],
-            'main_guardian_id'  => $main_guardian['id'],
-            'is_external'       => true,
-            'external_ref'      => $ext_enrollment['wpOrderId'],
-            'external_data'     => json_encode($ext_enrollment),
-            'status'            => $enrollment_status,
-            'phone'             => $enrollment_phone
-        ])
+                'date_created'      => $ext_enrollment_created,
+                'camp_id'           => $camp['id'],
+                'child_id'          => $child['id'],
+                'main_guardian_id'  => $main_guardian['id'],
+                'is_external'       => true,
+                'external_ref'      => $ext_enrollment['wpOrderId'],
+                'external_data'     => json_encode($ext_enrollment),
+                'status'            => $enrollment_status,
+                'phone'             => $enrollment_phone
+            ])
             ->read(['center_office_id', 'camp_id' => ['date_from']])
             ->first();
 
@@ -489,9 +489,9 @@ if(!empty($data)) {
                 $sponsor_name = preg_replace("/\s*\([^)]*\)/", "", $sponsorings['montantPriseEnChargePourCalcul']);
 
                 $sponsor = Sponsor::search([
-                    ['name', 'ilike', $sponsor_name],
-                    ['sponsor_type', '=', 'community-of-communes']
-                ])
+                        ['name', 'ilike', $sponsor_name],
+                        ['sponsor_type', '=', 'community-of-communes']
+                    ])
                     ->read(['name', 'amount', 'sponsor_type'])
                     ->first();
 
@@ -724,14 +724,14 @@ if(!empty($data)) {
                         }
 
                         Payment::create([
-                            'enrollment_id'     => $enrollment['id'],
-                            'center_office_id'  => $enrollment['center_office_id'],
-                            'is_manual'         => false,
-                            'amount'            => floatval($ext_enrollment['metaJson']['reglement']['montantCB']),
-                            'payment_origin'    => 'online',
-                            'payment_method'    => 'bank_card',
-                            'external_ref'      => $ext_enrollment['metaJson']['payment']['transactionId']
-                        ])
+                                'enrollment_id'     => $enrollment['id'],
+                                'center_office_id'  => $enrollment['center_office_id'],
+                                'is_manual'         => false,
+                                'amount'            => floatval($ext_enrollment['metaJson']['reglement']['montantCB']),
+                                'payment_origin'    => 'online',
+                                'payment_method'    => 'bank_card',
+                                'external_ref'      => $ext_enrollment['metaJson']['payment']['transactionId']
+                            ])
                             ->update(['funding_id' => $funding['id']]);
                     }
                     break;
