@@ -1,12 +1,10 @@
 import { Injectable, OnDestroy } from '@angular/core';
 import { BehaviorSubject, combineLatest, forkJoin, of, Subject } from 'rxjs';
 import { ActivityMap, Category, Partner, ProductModel, TimeSlot } from '../../type';
-import { takeUntil, switchMap } from 'rxjs/operators';
+import { takeUntil, switchMap, debounceTime } from 'rxjs/operators';
 import { ApiService } from './api.service';
 
-@Injectable({
-    providedIn: 'root'
-})
+@Injectable()
 export class CalendarService implements OnDestroy {
 
     private dateFromSubject = new BehaviorSubject<Date>(new Date());
@@ -56,6 +54,7 @@ export class CalendarService implements OnDestroy {
         ])
             .pipe(
                 takeUntil(this.destroy$),
+                debounceTime(300),
                 switchMap(([dateFrom, daysDisplayedQty, partnersIds, productModelsIds]) => {
                     // Only fetch if all data is available
                     if(!partnersIds.length || !productModelsIds.length) {

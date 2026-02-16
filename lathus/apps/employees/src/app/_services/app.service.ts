@@ -26,7 +26,9 @@ export class AppService implements OnDestroy {
         this.auth.getObservable()
             .pipe(takeUntil(this.destroy$))
             .subscribe(user => {
-                this.loadCenterList(user.centers_ids);
+                if(user) {
+                    this.loadCenterList(user.centers_ids);
+                }
             });
     }
 
