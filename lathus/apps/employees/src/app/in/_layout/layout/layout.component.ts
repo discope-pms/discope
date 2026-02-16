@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { Center } from '../../../../type';
 import { AppService } from '../../../_services/app.service';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { filter } from 'rxjs/operators';

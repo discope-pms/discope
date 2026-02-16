@@ -1,14 +1,10 @@
 <div class="header">
-    <div class="back">
-        <app-icon-button [icon]="'arrow_back'" (click)="back()"></app-icon-button>
-    </div>
-
     <div class="title">
         {{ title | translate }}
     </div>
 
-    <div class="settings">
-        <app-icon-button [icon]="'settings'" (click)="goTo('settings')"></app-icon-button>
+    <div class="user-profile">
+        <app-icon-button [icon]="'account_circle'" (click)="goTo('user-profile')"></app-icon-button>
     </div>
 </div>
 

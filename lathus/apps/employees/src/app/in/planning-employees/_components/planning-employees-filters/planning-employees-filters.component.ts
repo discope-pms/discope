@@ -58,8 +58,8 @@ export class PlanningEmployeesFiltersComponent implements OnInit  {
         return formatter.format(date);
     }
 
-    public onAdd() {
-        console.log('on add');
+    public onFilter() {
+        console.log('on open filters');
     }
 
     public onPreviousDate() {

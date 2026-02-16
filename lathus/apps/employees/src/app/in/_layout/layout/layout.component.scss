@@ -11,17 +11,13 @@
         color: white;
         background-color: #1769aa;
 
-        .back {
-            width: 60px;
-            text-align: center;
-        }
-
         .title {
             flex-grow: 1;
+            padding-left: 25px;
             font-size: 1.25rem;
         }
 
-        .settings {
+        .user-profile {
             width: 60px;
             text-align: center;
         }
