@@ -2,10 +2,9 @@ import { Component, HostListener, OnInit } from '@angular/core';
 import { CalendarService } from './_services/calendar.service';
 
 @Component({
-    selector: 'planning-employees',
+    selector: 'app-planning-employees',
     templateUrl: 'planning-employees.component.html',
-    styleUrls: ['planning-employees.component.scss'],
-    providers: [CalendarService]
+    styleUrls: ['planning-employees.component.scss']
 })
 export class PlanningEmployeesComponent implements OnInit  {
 

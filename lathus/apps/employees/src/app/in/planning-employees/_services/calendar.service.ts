@@ -55,6 +55,9 @@ export class CalendarService implements OnDestroy {
     private selectedProductModelsIdsSubject = new BehaviorSubject<number[]>([]);
     public selectedProductModelsIds$ = this.selectedProductModelsIdsSubject.asObservable();
 
+    private selectedEmployeeRoleCodeSubject = new BehaviorSubject<'ALL'|'EQUI'|'ENV'|'SP'>('ALL');
+    public selectedEmployeeRoleCode$ = this.selectedEmployeeRoleCodeSubject.asObservable();
+
     /**
      * Result activity map + loading
      */
@@ -106,6 +109,7 @@ export class CalendarService implements OnDestroy {
         // Listen to change of selected partners or product models to reload the activity map
         forkJoin([
             this.loadTimeSlotList(),
+            this.loadEmployeeRoleList(),
             this.loadCategoryList(),
             this.loadEmployeeList()
         ])
@@ -146,31 +150,41 @@ export class CalendarService implements OnDestroy {
         combineLatest([
             this.userGroup$,
             this.employeeRole$,
+            this.selectedEmployeeRoleCode$,
             this.employeeList$,
             this.categoryList$
         ])
             .pipe(
                 takeUntil(this.destroy$),
-                switchMap(([userGroup, employeeRole, employeeList, categoryList]) => {
+                switchMap(([userGroup, employeeRole, selectedEmployeeRoleCode, employeeList, categoryList]) => {
                     if(!userGroup || !employeeRole || !employeeList.length || !categoryList.length) {
                         return EMPTY;
                     }
 
                     if(userGroup === 'organizer') {
+                        // filter product models
                         let allProductModelsIds: number[] = [];
                         for(let category of categoryList) {
-                            allProductModelsIds = [...allProductModelsIds, ...category.product_models_ids];
+                            if(selectedEmployeeRoleCode === 'ALL' || selectedEmployeeRoleCode === category.code) {
+                                allProductModelsIds = [...allProductModelsIds, ...category.product_models_ids];
+                            }
                         }
                         this.selectedProductModelsIdsSubject.next(allProductModelsIds);
 
+                        // filter employees
+                        if(selectedEmployeeRoleCode !== 'ALL') {
+                            employeeList = employeeList.filter(e => e.role_id.code === selectedEmployeeRoleCode);
+                        }
                         this.selectedEmployeesIdsSubject.next(employeeList.map(e => e.id));
                     }
                     else {
+                        // filter product models
                         const category = categoryList.find(c => c.code === employeeRole);
                         if(category) {
                             this.selectedProductModelsIdsSubject.next(category.product_models_ids);
                         }
 
+                        // filter employees
                         this.selectedEmployeesIdsSubject.next(employeeList.filter(e => e.role_id.code === employeeRole).map(e => e.id));
                     }
 
@@ -196,6 +210,25 @@ export class CalendarService implements OnDestroy {
                 }),
                 catchError(error => {
                     console.error('Error fetching time slots:', error);
+                    return EMPTY;
+                })
+            );
+    }
+
+    private loadEmployeeRoleList(): Observable<any> {
+        return this.api.fetchEmployeeRoles()
+            .pipe(
+                takeUntil(this.destroy$),
+                tap(employeeRoles => {
+                    if(employeeRoles.length > 0) {
+                        this.employeeRoleListSubject.next(employeeRoles);
+                    }
+                    else {
+                        console.error('No employee roles defined!');
+                    }
+                }),
+                catchError(error => {
+                    console.error('Error fetching employee roles:', error);
                     return EMPTY;
                 })
             );
@@ -310,5 +343,9 @@ export class CalendarService implements OnDestroy {
             this.loadingSubject.next(true);
             this.daysDisplayedQtySubject.next(daysDisplayedQty);
         }
+    }
+
+    public selectSelectedEmployeeRole(employeeRoleCode: 'ALL'|'EQUI'|'ENV'|'SP') {
+        this.selectedEmployeeRoleCodeSubject.next(employeeRoleCode);
     }
 }

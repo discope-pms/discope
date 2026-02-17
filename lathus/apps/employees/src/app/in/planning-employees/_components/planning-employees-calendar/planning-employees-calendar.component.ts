@@ -5,7 +5,7 @@ import { combineLatest } from 'rxjs';
 import { CalendarService } from '../../_services/calendar.service';
 
 @Component({
-    selector: 'planning-employees-calendar',
+    selector: 'app-planning-employees-calendar',
     templateUrl: 'planning-employees-calendar.component.html',
     styleUrls: ['planning-employees-calendar.component.scss']
 })
@@ -114,7 +114,7 @@ export class PlanningEmployeesCalendarComponent implements OnInit, AfterViewInit
 
         this.calendar.loading$.subscribe((loading) => {
             this.loading = loading;
-        })
+        });
 
         this.env.getEnv().then((env: any) => {
             this.locale = env.locale;

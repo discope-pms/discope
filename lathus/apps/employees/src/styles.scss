@@ -66,3 +66,10 @@ ngx-material-timepicker-toggle {
 .mat-progress-spinner circle, .mat-spinner circle {
     stroke: $secondary-color !important;
 }
+
+.full-screen-dialog {
+    .mat-dialog-container {
+        border-radius: 0;
+        outline: none;
+    }
+}

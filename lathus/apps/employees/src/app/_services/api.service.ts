@@ -8,7 +8,7 @@ import {
     Employee,
     Provider,
     ProductModel,
-    ActivityMap
+    ActivityMap, EmployeeRole
 } from '../../type';
 import { EnvService } from 'sb-shared-lib';
 import { from, Observable } from 'rxjs';
@@ -24,6 +24,7 @@ type EntityNamespace = 'identity\\Center'
     | 'sale\\booking\\TimeSlot'
     | 'sale\\catalog\\Category'
     | 'hr\\employee\\Employee'
+    | 'hr\\employee\\Role'
     | 'sale\\provider\\Provider'
     | 'sale\\catalog\\ProductModel';
 
@@ -94,6 +95,15 @@ export class ApiService {
             'sale\\booking\\TimeSlot',
             ['id', 'name', 'code', 'schedule_from', 'schedule_to'],
             ['code', 'in', ['AM', 'PM', 'EV']]
+        );
+    }
+
+    public fetchEmployeeRoles(): Observable<EmployeeRole[]> {
+        return this.modelCollect<EmployeeRole>(
+            'hr\\employee\\Role',
+            ['id', 'name', 'code'],
+            ['code', 'in', ['EQUI', 'ENV', 'SP']],
+            { order: 'name', sort: 'asc' }
         );
     }
 

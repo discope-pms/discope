@@ -3,7 +3,7 @@ import { AuthService } from 'sb-shared-lib';
 import { Router } from '@angular/router';
 
 @Component({
-    selector: 'user-settings',
+    selector: 'app-user-settings',
     templateUrl: 'user-settings.component.html',
     styleUrls: ['user-settings.component.scss']
 })

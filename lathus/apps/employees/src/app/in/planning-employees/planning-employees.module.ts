@@ -10,6 +10,8 @@ import { PlanningEmployeesFiltersComponent } from './_components/planning-employ
 import { PlanningEmployeesCalendarComponent } from './_components/planning-employees-calendar/planning-employees-calendar.component';
 import { AppSharedPipesModule } from '../../_pipes/shared-pipes.module';
 import { AppSharedComponentsModule } from '../_components/shared-components.module';
+import { PlanningEmployeesFiltersDialogComponent } from './_components/planning-employees-filters/_components/planning-employees-filters-dialog/planning-employees-filters-dialog.component';
+import { CalendarService } from "./_services/calendar.service";
 
 @NgModule({
     imports: [
@@ -21,10 +23,12 @@ import { AppSharedComponentsModule } from '../_components/shared-components.modu
     declarations: [
         PlanningEmployeesComponent,
         PlanningEmployeesFiltersComponent,
-        PlanningEmployeesCalendarComponent
+        PlanningEmployeesCalendarComponent,
+        PlanningEmployeesFiltersDialogComponent
     ],
     providers: [
-        { provide: DateAdapter, useClass: CustomDateAdapter, deps: [MAT_DATE_LOCALE, Platform] }
+        { provide: DateAdapter, useClass: CustomDateAdapter, deps: [MAT_DATE_LOCALE, Platform] },
+        CalendarService
     ]
 })
 export class AppPlanningEmployeesModule { }

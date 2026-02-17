@@ -20,7 +20,13 @@ export const translations: { [lang: string]: { [key: string]: string } } = {
         /**
          * User settings
          */
-        'USER_SETTINGS_SIGN_OUT_BTN': "Sign out"
+        'USER_SETTINGS_SIGN_OUT_BTN': "Sign out",
+
+        /**
+         * Planning employees
+         */
+        'FILTERS_DIALOG_TITLE': 'Filters',
+        'FILTERS_EMPLOYEE_ROLE_LABEL': 'Sector'
 
     },
     'fr': {
@@ -44,7 +50,13 @@ export const translations: { [lang: string]: { [key: string]: string } } = {
         /**
          * User settings
          */
-        'USER_SETTINGS_SIGN_OUT_BTN': "Se déconnecter"
+        'USER_SETTINGS_SIGN_OUT_BTN': "Se déconnecter",
+
+        /**
+         * Planning employees
+         */
+        'FILTERS_DIALOG_TITLE': 'Filtres',
+        'FILTERS_EMPLOYEE_ROLE_LABEL': 'Secteur'
 
     }
 };

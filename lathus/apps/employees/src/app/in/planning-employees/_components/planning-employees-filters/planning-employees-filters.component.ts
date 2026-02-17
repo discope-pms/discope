@@ -1,9 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { EnvService } from 'sb-shared-lib';
 import { CalendarService } from '../../_services/calendar.service';
+import { PlanningEmployeesFiltersDialogComponent } from './_components/planning-employees-filters-dialog/planning-employees-filters-dialog.component';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
-    selector: 'planning-employees-filters',
+    selector: 'app-planning-employees-filters',
     templateUrl: 'planning-employees-filters.component.html',
     styleUrls: ['planning-employees-filters.component.scss']
 })
@@ -21,7 +23,8 @@ export class PlanningEmployeesFiltersComponent implements OnInit  {
 
     constructor(
         private calendar: CalendarService,
-        private env: EnvService
+        private env: EnvService,
+        private dialog: MatDialog
     ) {
     }
 
@@ -57,7 +60,13 @@ export class PlanningEmployeesFiltersComponent implements OnInit  {
     }
 
     public onFilter() {
-        console.log('on open filters');
+        const dialogRef = this.dialog.open(PlanningEmployeesFiltersDialogComponent, {
+            width: '100vw',
+            height: '100vh',
+            maxWidth: '100vw',
+            maxHeight: '100vh',
+            panelClass: 'full-screen-dialog'
+        });
     }
 
     public onPreviousDate() {
