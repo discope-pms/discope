@@ -2,7 +2,7 @@ import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit } from '@angula
 import { Partner, ActivityMap } from '../../../../../type';
 import { EnvService } from 'sb-shared-lib';
 import { combineLatest } from 'rxjs';
-import { CalendarService } from '../../../../_services/calendar.service';
+import { CalendarService } from '../../_services/calendar.service';
 
 @Component({
     selector: 'planning-employees-calendar',

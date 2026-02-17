@@ -1,5 +1,5 @@
 import { Component, HostListener, OnInit } from '@angular/core';
-import { CalendarService } from '../../_services/calendar.service';
+import { CalendarService } from './_services/calendar.service';
 
 @Component({
     selector: 'planning-employees',

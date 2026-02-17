@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { EnvService } from 'sb-shared-lib';
-import { CalendarService } from '../../../../_services/calendar.service';
+import { CalendarService } from '../../_services/calendar.service';
 
 @Component({
     selector: 'planning-employees-filters',

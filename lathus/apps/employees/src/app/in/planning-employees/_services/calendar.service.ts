@@ -1,8 +1,8 @@
 import { Injectable, OnDestroy } from '@angular/core';
 import { BehaviorSubject, combineLatest, EMPTY, forkJoin, Observable, Subject } from 'rxjs';
-import { ActivityMap, Category, Partner, ProductModel, TimeSlot } from '../../type';
+import { ActivityMap, Category, Partner, ProductModel, TimeSlot } from '../../../../type';
 import { takeUntil, switchMap, debounceTime, tap, catchError } from 'rxjs/operators';
-import { ApiService } from './api.service';
+import { ApiService } from '../../../_services/api.service';
 
 @Injectable()
 export class CalendarService implements OnDestroy {
