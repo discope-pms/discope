@@ -22,29 +22,56 @@ export class PlanningEmployeesCalendarComponent implements OnInit, AfterViewInit
     private startX = 0;
     private currentX = 0;
     private isSwiping = false;
-    private swipeThreshold = 100;
+    private swipeThresholdX = 100;
+
+    private startY = 0;
+    private currentY = 0;
+    private startOnTop = false;
 
     private onTouchStart = (event: TouchEvent) => {
         this.startX = event.touches[0].clientX;
         this.currentX = event.touches[0].clientX;
+
+        this.startY = event.touches[0].clientY;
+        this.currentY = event.touches[0].clientY;
+        this.startOnTop = this.el.nativeElement.scrollTop === 0;
+
         this.isSwiping = true;
     }
 
     private onTouchMove = (event: TouchEvent) => {
-        if (!this.isSwiping) return;
+        if(!this.isSwiping) return;
         this.currentX = event.touches[0].clientX;
+        this.currentY = event.touches[0].clientY;
     }
 
     private onTouchEnd = (event: TouchEvent) => {
-        if (!this.isSwiping) return;
+        if(!this.isSwiping) return;
         this.isSwiping = false;
 
         const deltaX = this.currentX - this.startX;
-        if (deltaX < -this.swipeThreshold) {
+        if(deltaX < -this.swipeThresholdX) {
             this.onNextDate();
-        } else if (deltaX > this.swipeThreshold) {
+        }
+        else if (deltaX > this.swipeThresholdX) {
             this.onPreviousDate();
         }
+
+        if(this.startOnTop) {
+            const changeY = this.startY - this.currentY;
+            const changeX = this.startX - this.currentX;
+            if(this.startOnTop && this.isPullDown(changeY, changeX)) {
+                this.calendar.refresh();
+            }
+        }
+    }
+
+    private isPullDown(dY: number, dX: number) {
+        return (
+            dY < 0 &&
+            ((Math.abs(dX) <= 100 && Math.abs(dY) >= 100) ||
+                (Math.abs(dX) / Math.abs(dY) <= 0.3 && dY >= 60))
+        );
     }
 
     constructor(

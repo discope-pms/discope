@@ -95,6 +95,43 @@ export class CalendarService implements OnDestroy {
             .subscribe(categoryId => this.handleChangeCategory(categoryId));
     }
 
+    /**
+     * Refresh with minimum delay for the loading spinner to show correctly
+     */
+    public refresh() {
+        const DELAY = 300;
+        const startTime = Date.now();
+
+        this.loadingSubject.next(true);
+
+        this.api.fetchActivityMap(
+            this.dateFromSubject.value,
+            this.dateToSubject.value,
+            this.selectedPartnersIdsSubject.value,
+            this.selectedProductModelsIdsSubject.value
+        )
+            .subscribe({
+                next: (activityMap) => {
+                    const elapsed = Date.now() - startTime;
+                    const remaining = Math.max(0, DELAY - elapsed);
+
+                    setTimeout(() => {
+                        this.loadingSubject.next(false);
+                        this.activityMapSubject.next({...activityMap});
+                    }, remaining);
+                },
+                error: (error) => {
+                    const elapsed = Date.now() - startTime;
+                    const remaining = Math.max(0, DELAY - elapsed);
+
+                    setTimeout(() => {
+                        this.loadingSubject.next(false);
+                        console.error('Error fetching activity map:', error);
+                    }, remaining);
+                }
+            });
+    }
+
     ngOnDestroy() {
         this.destroy$.next();
         this.destroy$.complete();
