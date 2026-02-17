@@ -46,7 +46,7 @@ use sale\provider\Provider;
         ]
     ],
     'access'        => [
-        'groups'        => ['booking.default.user', 'booking.infra.user']
+        'groups'        => ['booking.default.user', 'booking.infra.user', 'planning.employees.organizer', 'planning.employees.manager', 'planning.employees.animator']
     ],
     'response'      => [
         'content-type'  => 'application/json',

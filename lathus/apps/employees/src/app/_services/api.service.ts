@@ -98,37 +98,20 @@ export class ApiService {
     }
 
     public fetchActivityCategories(): Observable<Category[]> {
-        const options = {
-            headers: this.headers,
-            params: {
-                fields: JSON.stringify(['id', 'name', 'code']),
-                order: 'name',
-                sort: 'asc',
-                start: 0,
-                limit: 500
-            }
-        };
-
-        return this.getBackendUrl().pipe(
-            switchMap((backend_url: string) => this.http.get<Category[]>(`${backend_url}?get=sale_booking_activity_collect-categories`, options))
+        return this.modelCollect<Category>(
+            'sale\\catalog\\Category',
+            ['id', 'name', 'code', 'product_models_ids'],
+            ['code', 'in', ['EQUI', 'ENV', 'SP']],
+            { order: 'name', sort: 'asc' }
         );
     }
 
     public fetchEmployees(): Observable<Employee[]> {
         return this.modelCollect<Employee>(
             'hr\\employee\\Employee',
-            ['id', 'name', 'relationship', 'is_active', 'activity_product_models_ids'],
+            ['id', 'name', 'relationship', 'is_active', 'activity_product_models_ids', 'role_id.code', 'role_id.name', 'partner_identity_id'],
             [['relationship', '=', 'employee'], ['is_active', '=', true]],
-            { order: 'name', sort: "asc" }
-        );
-    }
-
-    public fetchProviders(): Observable<Provider[]> {
-        return this.modelCollect<Provider>(
-            'sale\\provider\\Provider',
-            ['id', 'name', 'relationship', 'is_active'],
-            ['relationship', '=', 'provider'],
-            { order: 'name', sort: "asc" }
+            { order: 'name', sort: 'asc' }
         );
     }
 
@@ -140,7 +123,7 @@ export class ApiService {
         );
     }
 
-    public fetchActivityMap(dateFrom: Date, dateTo: Date, partnersIds: number[], productModelsIds: number[]): Observable<ActivityMap> {
+    public fetchActivityMap(dateFrom: Date, dateTo: Date, employeesIds: number[], productModelsIds: number[]): Observable<ActivityMap> {
         // date_to isn't included
         dateTo = new Date(dateTo.getTime());
         dateTo.setDate(dateTo.getDate() + 1);
@@ -150,7 +133,7 @@ export class ApiService {
             params: {
                 date_from: dateFrom.toISOString().split('T')[0],
                 date_to: dateTo.toISOString().split('T')[0],
-                partners_ids: JSON.stringify(partnersIds),
+                partners_ids: JSON.stringify(employeesIds),
                 product_model_ids: JSON.stringify(productModelsIds)
             }
         };

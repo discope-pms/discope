@@ -1,5 +1,5 @@
 import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit } from '@angular/core';
-import { Partner, ActivityMap } from '../../../../../type';
+import { ActivityMap, Employee } from '../../../../../type';
 import { EnvService } from 'sb-shared-lib';
 import { combineLatest } from 'rxjs';
 import { CalendarService } from '../../_services/calendar.service';
@@ -11,7 +11,7 @@ import { CalendarService } from '../../_services/calendar.service';
 })
 export class PlanningEmployeesCalendarComponent implements OnInit, AfterViewInit, OnDestroy {
 
-    public partnerList: Partner[] = [];
+    public employeeList: Employee[] = [];
     public activityMap: ActivityMap = {};
     public daysIndexes: string[] = [];
 
@@ -102,9 +102,11 @@ export class PlanningEmployeesCalendarComponent implements OnInit, AfterViewInit
             }
         );
 
-        this.calendar.partnerList$.subscribe((partnerList) => {
-            this.partnerList = partnerList;
-        });
+        combineLatest([this.calendar.employeeList$, this.calendar.selectedEmployeesIds$]).subscribe(
+            ([employeeList, selectedEmployeesIds]) => {
+                this.employeeList = employeeList.filter(e => selectedEmployeesIds.includes(e.id));
+            }
+        );
 
         this.calendar.activityMap$.subscribe((activityMap) => {
             this.activityMap = activityMap;

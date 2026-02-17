@@ -15,7 +15,12 @@ export interface TimeSlot extends Model {
 }
 
 export interface Category extends Model {
-    code: string
+    code: 'EQUI'|'ENV'|'SP',
+    product_models_ids: number[]
+}
+
+export interface EmployeeRole extends Model {
+    code: 'EQUI'|'ENV'|'SP'
 }
 
 export interface Partner extends Model {
@@ -25,7 +30,13 @@ export interface Partner extends Model {
 
 export interface Employee extends Partner {
     relationship: 'employee',
-    activity_product_models_ids: number[]
+    activity_product_models_ids: number[],
+    role_id: {
+        id: number,
+        name: string,
+        code: 'EQUI'|'ENV'|'SP'
+    },
+    partner_identity_id: number
 }
 
 export interface Provider extends Partner {
