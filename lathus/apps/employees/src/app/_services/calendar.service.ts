@@ -49,6 +49,11 @@ export class CalendarService implements OnDestroy {
         private api: ApiService
     ) {}
 
+    ngOnDestroy() {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
+
     public init() {
         // Listen to change of selected partners or product models to reload the activity map
         forkJoin([
@@ -93,48 +98,6 @@ export class CalendarService implements OnDestroy {
         this.selectedCategoryId$
             .pipe(takeUntil(this.destroy$))
             .subscribe(categoryId => this.handleChangeCategory(categoryId));
-    }
-
-    /**
-     * Refresh with minimum delay for the loading spinner to show correctly
-     */
-    public refresh() {
-        const DELAY = 300;
-        const startTime = Date.now();
-
-        this.loadingSubject.next(true);
-
-        this.api.fetchActivityMap(
-            this.dateFromSubject.value,
-            this.dateToSubject.value,
-            this.selectedPartnersIdsSubject.value,
-            this.selectedProductModelsIdsSubject.value
-        )
-            .subscribe({
-                next: (activityMap) => {
-                    const elapsed = Date.now() - startTime;
-                    const remaining = Math.max(0, DELAY - elapsed);
-
-                    setTimeout(() => {
-                        this.loadingSubject.next(false);
-                        this.activityMapSubject.next({...activityMap});
-                    }, remaining);
-                },
-                error: (error) => {
-                    const elapsed = Date.now() - startTime;
-                    const remaining = Math.max(0, DELAY - elapsed);
-
-                    setTimeout(() => {
-                        this.loadingSubject.next(false);
-                        console.error('Error fetching activity map:', error);
-                    }, remaining);
-                }
-            });
-    }
-
-    ngOnDestroy() {
-        this.destroy$.next();
-        this.destroy$.complete();
     }
 
     private loadTimeSlotList(): Observable<any> {
@@ -218,6 +181,43 @@ export class CalendarService implements OnDestroy {
                     return EMPTY;
                 })
             );
+    }
+
+    /**
+     * Refresh with minimum delay for the loading spinner to show correctly
+     */
+    public refresh() {
+        const DELAY = 300;
+        const startTime = Date.now();
+
+        this.loadingSubject.next(true);
+
+        this.api.fetchActivityMap(
+            this.dateFromSubject.value,
+            this.dateToSubject.value,
+            this.selectedPartnersIdsSubject.value,
+            this.selectedProductModelsIdsSubject.value
+        )
+            .subscribe({
+                next: (activityMap) => {
+                    const elapsed = Date.now() - startTime;
+                    const remaining = Math.max(0, DELAY - elapsed);
+
+                    setTimeout(() => {
+                        this.loadingSubject.next(false);
+                        this.activityMapSubject.next({...activityMap});
+                    }, remaining);
+                },
+                error: (error) => {
+                    const elapsed = Date.now() - startTime;
+                    const remaining = Math.max(0, DELAY - elapsed);
+
+                    setTimeout(() => {
+                        this.loadingSubject.next(false);
+                        console.error('Error fetching activity map:', error);
+                    }, remaining);
+                }
+            });
     }
 
     /**
