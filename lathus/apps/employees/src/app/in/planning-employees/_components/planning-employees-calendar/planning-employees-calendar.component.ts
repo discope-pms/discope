@@ -1,4 +1,4 @@
-import { Component, HostListener, OnInit } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit } from '@angular/core';
 import { Partner, ActivityMap } from '../../../../../type';
 import { EnvService } from 'sb-shared-lib';
 import { combineLatest } from 'rxjs';
@@ -9,7 +9,7 @@ import { CalendarService } from '../../../../_services/calendar.service';
     templateUrl: 'planning-employees-calendar.component.html',
     styleUrls: ['planning-employees-calendar.component.scss']
 })
-export class PlanningEmployeesCalendarComponent implements OnInit {
+export class PlanningEmployeesCalendarComponent implements OnInit, AfterViewInit, OnDestroy {
 
     public partnerList: Partner[] = [];
     public activityMap: ActivityMap = {};
@@ -22,36 +22,48 @@ export class PlanningEmployeesCalendarComponent implements OnInit {
     private isSwiping = false;
     private swipeThreshold = 100;
 
-    @HostListener('touchstart', ['$event'])
-    onTouchStart(event: TouchEvent) {
+    private onTouchStart = (event: TouchEvent) => {
         this.startX = event.touches[0].clientX;
+        this.currentX = event.touches[0].clientX;
         this.isSwiping = true;
     }
 
-    @HostListener('touchmove', ['$event'])
-    onTouchMove(event: TouchEvent) {
+    private onTouchMove = (event: TouchEvent) => {
         if (!this.isSwiping) return;
         this.currentX = event.touches[0].clientX;
     }
 
-    @HostListener('touchend', ['$event'])
-    onTouchEnd(event: TouchEvent) {
+    private onTouchEnd = (event: TouchEvent) => {
         if (!this.isSwiping) return;
         this.isSwiping = false;
 
         const deltaX = this.currentX - this.startX;
         if (deltaX < -this.swipeThreshold) {
             this.onNextDate();
-        }
-        else if (deltaX > this.swipeThreshold) {
+        } else if (deltaX > this.swipeThreshold) {
             this.onPreviousDate();
         }
     }
 
     constructor(
         private calendar: CalendarService,
-        private env: EnvService
+        private env: EnvService,
+        private el: ElementRef
     ) {
+    }
+
+    ngAfterViewInit() {
+        const el = this.el.nativeElement;
+        el.addEventListener('touchstart', this.onTouchStart, { passive: true });
+        el.addEventListener('touchmove', this.onTouchMove, { passive: true });
+        el.addEventListener('touchend',  this.onTouchEnd,  { passive: true });
+    }
+
+    ngOnDestroy() {
+        const el = this.el.nativeElement;
+        el.removeEventListener('touchstart', this.onTouchStart);
+        el.removeEventListener('touchmove',  this.onTouchMove);
+        el.removeEventListener('touchend',   this.onTouchEnd);
     }
 
     ngOnInit() {
