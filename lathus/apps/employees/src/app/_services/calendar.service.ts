@@ -1,7 +1,7 @@
 import { Injectable, OnDestroy } from '@angular/core';
-import { BehaviorSubject, combineLatest, forkJoin, of, Subject } from 'rxjs';
+import { BehaviorSubject, combineLatest, EMPTY, forkJoin, Observable, Subject } from 'rxjs';
 import { ActivityMap, Category, Partner, ProductModel, TimeSlot } from '../../type';
-import { takeUntil, switchMap, debounceTime } from 'rxjs/operators';
+import { takeUntil, switchMap, debounceTime, tap, catchError } from 'rxjs/operators';
 import { ApiService } from './api.service';
 
 @Injectable()
@@ -15,6 +15,9 @@ export class CalendarService implements OnDestroy {
 
     private daysDisplayedQtySubject = new BehaviorSubject<number>(1);
     public daysDisplayedQty$ = this.daysDisplayedQtySubject.asObservable();
+
+    private loadingSubject = new BehaviorSubject<boolean>(true);
+    public loading$ = this.loadingSubject.asObservable();
 
     private timeSlotListSubject = new BehaviorSubject<TimeSlot[]>([]);
     public timeSlotList$ = this.timeSlotListSubject.asObservable();
@@ -44,37 +47,44 @@ export class CalendarService implements OnDestroy {
 
     constructor(
         private api: ApiService
-    ) {
+    ) {}
+
+    public init() {
         // Listen to change of selected partners or product models to reload the activity map
-        combineLatest([
-            this.dateFrom$,
-            this.daysDisplayedQty$,
-            this.selectedPartnersIds$,
-            this.selectedProductModelsIds$
+        forkJoin([
+            this.loadTimeSlotList(),
+            this.loadCategoryList(),
+            this.loadPartnerList(),
+            this.loadProductModelList()
         ])
             .pipe(
                 takeUntil(this.destroy$),
+                switchMap(() => combineLatest([
+                    this.dateFrom$,
+                    this.daysDisplayedQty$,
+                    this.selectedPartnersIds$,
+                    this.selectedProductModelsIds$
+                ])),
                 debounceTime(300),
+                tap(() => this.loadingSubject.next(true)),
                 switchMap(([dateFrom, daysDisplayedQty, partnersIds, productModelsIds]) => {
-                    // Only fetch if all data is available
                     if(!partnersIds.length || !productModelsIds.length) {
-                        return of({});
+                        return EMPTY;
                     }
 
-                    // Update date to
                     const dateTo: Date = new Date(dateFrom.getTime() + (daysDisplayedQty - 1) * 24 * 60 * 60 * 1000);
                     this.dateToSubject.next(dateTo);
 
-                    // Call API to fetch activity map
                     return this.api.fetchActivityMap(dateFrom, dateTo, partnersIds, productModelsIds);
                 })
             )
             .subscribe({
                 next: (activityMap) => {
-                    console.log('Activity map loaded:', activityMap);
+                    this.loadingSubject.next(false);
                     this.activityMapSubject.next({...activityMap});
                 },
                 error: (error) => {
+                    this.loadingSubject.next(false);
                     console.error('Error fetching activity map:', error);
                 }
             });
@@ -83,12 +93,6 @@ export class CalendarService implements OnDestroy {
         this.selectedCategoryId$
             .pipe(takeUntil(this.destroy$))
             .subscribe(categoryId => this.handleChangeCategory(categoryId));
-
-        // Load needed data
-        this.loadTimeSlotList();
-        this.loadCategoryList();
-        this.loadPartnerList();
-        this.loadProductModelList();
     }
 
     ngOnDestroy() {
@@ -96,54 +100,54 @@ export class CalendarService implements OnDestroy {
         this.destroy$.complete();
     }
 
-    private loadTimeSlotList() {
-        this.api.fetchTimeSlots()
-            .pipe(takeUntil(this.destroy$))
-            .subscribe({
-                next: (timeSlots) => {
+    private loadTimeSlotList(): Observable<any> {
+        return this.api.fetchTimeSlots()
+            .pipe(
+                takeUntil(this.destroy$),
+                tap(timeSlots => {
                     if(timeSlots.length > 0) {
                         this.timeSlotListSubject.next(timeSlots);
                     }
                     else {
                         console.error('No time slots AM, PM and EV defined!');
                     }
-                },
-                error: (error) => {
+                }),
+                catchError(error => {
                     console.error('Error fetching time slots:', error);
-                }
-            });
+                    return EMPTY;
+                })
+            );
     }
 
-    private loadCategoryList() {
-        this.api.fetchActivityCategories()
-            .pipe(takeUntil(this.destroy$))
-            .subscribe({
-                next: (categories) => {
+    private loadCategoryList(): Observable<any> {
+        return this.api.fetchActivityCategories()
+            .pipe(
+                takeUntil(this.destroy$),
+                tap(categories => {
                     if(categories.length > 0) {
                         this.categoryListSubject.next(categories);
                     }
                     else {
                         console.error('No categories defined!');
                     }
-                },
-                error: (error) => {
+                }),
+                catchError(error => {
                     console.error('Error fetching categories:', error);
-                }
-            });
+                    return EMPTY;
+                })
+            );
     }
 
-    private loadPartnerList() {
-        forkJoin({
+    private loadPartnerList(): Observable<any> {
+        return forkJoin({
             employees: this.api.fetchEmployees(),
             providers: this.api.fetchProviders()
         })
-            .pipe(takeUntil(this.destroy$))
-            .subscribe({
-                next: ({ employees, providers }) => {
-                    // ignore employees that aren't configured
-                    employees = employees.filter(e => e.activity_product_models_ids.length > 0);
-
-                    const combined = [...employees, ...providers]; // merge the two arrays
+            .pipe(
+                takeUntil(this.destroy$),
+                tap(({ employees, providers }) => {
+                    const filtered = employees.filter(e => e.activity_product_models_ids.length > 0);
+                    const combined = [...filtered, ...providers];
                     if(combined.length > 0) {
                         this.partnerListSubject.next(combined);
                         this.selectedPartnersIdsSubject.next(combined.map(partner => partner.id));
@@ -151,30 +155,32 @@ export class CalendarService implements OnDestroy {
                     else {
                         console.error('No partners defined!');
                     }
-                },
-                error: (error) => {
+                }),
+                catchError(error => {
                     console.error('Error fetching partners:', error);
-                }
-            });
+                    return EMPTY;
+                })
+            );
     }
 
-    private loadProductModelList() {
-        this.api.fetchProductModels()
-            .pipe(takeUntil(this.destroy$))
-            .subscribe({
-                next: (productModels) => {
+    private loadProductModelList(): Observable<any> {
+        return this.api.fetchProductModels()
+            .pipe(
+                takeUntil(this.destroy$),
+                tap(productModels => {
                     if(productModels.length > 0) {
                         this.productModelListSubject.next(productModels);
-                        this.selectedProductModelsIdsSubject.next(productModels.map(productModel => productModel.id));
+                        this.selectedProductModelsIdsSubject.next(productModels.map(p => p.id));
                     }
                     else {
                         console.error('No product models defined!');
                     }
-                },
-                error: (error) => {
+                }),
+                catchError(error => {
                     console.error('Error fetching product models:', error);
-                }
-            });
+                    return EMPTY;
+                })
+            );
     }
 
     /**
@@ -182,6 +188,8 @@ export class CalendarService implements OnDestroy {
      */
 
     public setPreviousDate() {
+        this.loadingSubject.next(true);
+
         const previousDateFrom = new Date(this.dateFromSubject.value.getTime());
         previousDateFrom.setDate(this.dateFromSubject.value.getDate() - 1);
 
@@ -189,6 +197,8 @@ export class CalendarService implements OnDestroy {
     }
 
     public setNextDate() {
+        this.loadingSubject.next(true);
+
         const nextDateFrom = new Date(this.dateFromSubject.value.getTime());
         nextDateFrom.setDate(this.dateFromSubject.value.getDate() + 1);
 
@@ -197,6 +207,7 @@ export class CalendarService implements OnDestroy {
 
     public setDaysDisplayedQty(daysDisplayedQty: number) {
         if(daysDisplayedQty !== this.daysDisplayedQtySubject.value) {
+            this.loadingSubject.next(true);
             this.daysDisplayedQtySubject.next(daysDisplayedQty);
         }
     }

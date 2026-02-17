@@ -1,4 +1,4 @@
-import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
+import { Component, HostListener, OnInit } from '@angular/core';
 import { CalendarService } from '../../_services/calendar.service';
 
 @Component({
@@ -7,7 +7,7 @@ import { CalendarService } from '../../_services/calendar.service';
     styleUrls: ['planning-employees.component.scss'],
     providers: [CalendarService]
 })
-export class PlanningEmployeesComponent implements OnInit, OnDestroy  {
+export class PlanningEmployeesComponent implements OnInit  {
 
     constructor(
         private calendar: CalendarService
@@ -15,10 +15,9 @@ export class PlanningEmployeesComponent implements OnInit, OnDestroy  {
     }
 
     ngOnInit() {
-        this.handleScreenWidthChange(window.innerWidth);
-    }
+        this.calendar.init();
 
-    ngOnDestroy() {
+        this.handleScreenWidthChange(window.innerWidth);
     }
 
     @HostListener('window:resize', ['$event'])

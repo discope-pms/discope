@@ -15,6 +15,8 @@ export class PlanningEmployeesCalendarComponent implements OnInit, AfterViewInit
     public activityMap: ActivityMap = {};
     public daysIndexes: string[] = [];
 
+    public loading = true;
+
     private locale: string|null = null;
 
     private startX = 0;
@@ -80,6 +82,10 @@ export class PlanningEmployeesCalendarComponent implements OnInit, AfterViewInit
         this.calendar.activityMap$.subscribe((activityMap) => {
             this.activityMap = activityMap;
         });
+
+        this.calendar.loading$.subscribe((loading) => {
+            this.loading = loading;
+        })
 
         this.env.getEnv().then((env: any) => {
             this.locale = env.locale;
