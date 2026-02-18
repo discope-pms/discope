@@ -6,6 +6,12 @@
 
         .activity {
             position: relative;
+            width: 100%;
+
+            > div {
+                white-space: nowrap;
+                overflow: hidden;
+            }
 
             .disability-icon {
                 position: absolute;
