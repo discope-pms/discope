@@ -44,6 +44,7 @@
             flex-grow: 1;
             flex-basis: 0;
             min-width: 0;
+            overflow: hidden;
         }
     }
 
@@ -87,13 +88,15 @@
 
     .row {
         display: flex;
+        height: 70px;
+        min-height: 70px;
+        max-height: 70px;
 
         .employee-col,
         .moment-col {
             padding: 1px;
             border: 1px solid #f1f1f1;
             text-align: left;
-            min-height: 60px;
         }
 
         .employee-col {
