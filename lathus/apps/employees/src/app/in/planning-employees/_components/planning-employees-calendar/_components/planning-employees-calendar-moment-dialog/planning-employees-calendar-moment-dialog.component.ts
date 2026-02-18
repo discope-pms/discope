@@ -25,8 +25,6 @@ export class PlanningEmployeesCalendarMomentDialogComponent implements OnInit, O
 
     public timeDetailsText = '';
 
-    public dateFromFormatted = '';
-
     private destroy$ = new Subject<void>();
 
     constructor(

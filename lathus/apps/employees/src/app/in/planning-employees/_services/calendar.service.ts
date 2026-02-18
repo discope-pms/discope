@@ -1,7 +1,7 @@
 import { Injectable, OnDestroy } from '@angular/core';
 import { BehaviorSubject, combineLatest, EMPTY, forkJoin, Observable, Subject } from 'rxjs';
 import {ActivityMap, Category, Employee, EmployeeRole, ProductModel, TimeSlot} from '../../../../type';
-import { takeUntil, switchMap, debounceTime, tap, catchError } from 'rxjs/operators';
+import {takeUntil, switchMap, debounceTime, tap, catchError, filter} from 'rxjs/operators';
 import { ApiService } from '../../../_services/api.service';
 import { AuthService } from 'sb-shared-lib';
 
@@ -225,25 +225,18 @@ export class CalendarService implements OnDestroy {
             .pipe(
                 takeUntil(this.destroy$),
                 debounceTime(300),
-                switchMap(([userGroup, employeeRole, categoryList]) => {
-                    if(!userGroup || !employeeRole || !categoryList.length) {
-                        return EMPTY;
-                    }
-
-                    if(userGroup === 'organizer') {
-                        this.loadProductModelList().subscribe();
-                    }
-                    else {
-                        const category = categoryList.find(c => c.code === employeeRole);
-                        if(category) {
-                            this.loadProductModelList({ ids: category.product_models_ids }).subscribe();
-                        }
-                    }
-
-                    return EMPTY;
-                })
+                filter(([userGroup, employeeRole, categoryList]) => !!userGroup && !!employeeRole && !!categoryList.length)
             )
-            .subscribe();
+            .subscribe(([userGroup, employeeRole, categoryList]) => {
+                if(userGroup === 'organizer') {
+                    this.loadProductModelList().subscribe();
+                } else {
+                    const category = categoryList.find(c => c.code === employeeRole);
+                    if(category) {
+                        this.loadProductModelList({ ids: category.product_models_ids }).subscribe();
+                    }
+                }
+            });
     }
 
     private loadTimeSlotList(): Observable<any> {
