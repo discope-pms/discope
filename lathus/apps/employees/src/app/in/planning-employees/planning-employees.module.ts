@@ -14,8 +14,6 @@ import { PlanningEmployeesCalendarComponent } from './_components/planning-emplo
 import { PlanningEmployeesFiltersDialogComponent } from './_components/planning-employees-filters/_components/planning-employees-filters-dialog/planning-employees-filters-dialog.component';
 import { PlanningEmployeesCalendarMomentDialogComponent } from './_components/planning-employees-calendar/_components/planning-employees-calendar-moment-dialog/planning-employees-calendar-moment-dialog.component';
 
-import { CalendarService } from "./_services/calendar.service";
-
 @NgModule({
     imports: [
         SharedLibModule,
@@ -31,8 +29,7 @@ import { CalendarService } from "./_services/calendar.service";
         PlanningEmployeesCalendarMomentDialogComponent
     ],
     providers: [
-        { provide: DateAdapter, useClass: CustomDateAdapter, deps: [MAT_DATE_LOCALE, Platform] },
-        CalendarService
+        { provide: DateAdapter, useClass: CustomDateAdapter, deps: [MAT_DATE_LOCALE, Platform] }
     ]
 })
 export class AppPlanningEmployeesModule { }

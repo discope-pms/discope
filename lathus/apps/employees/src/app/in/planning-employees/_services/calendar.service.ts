@@ -1,7 +1,7 @@
-import { Injectable, OnDestroy } from '@angular/core';
+import {Injectable, OnDestroy } from '@angular/core';
 import { BehaviorSubject, combineLatest, EMPTY, forkJoin, Observable, Subject } from 'rxjs';
-import {ActivityMap, Category, Employee, EmployeeRole, ProductModel, TimeSlot} from '../../../../type';
-import {takeUntil, switchMap, debounceTime, tap, catchError, filter} from 'rxjs/operators';
+import { ActivityMap, Category, Employee, EmployeeRole, ProductModel, TimeSlot } from '../../../../type';
+import { takeUntil, switchMap, debounceTime, tap, catchError, filter } from 'rxjs/operators';
 import { ApiService } from '../../../_services/api.service';
 import { AuthService } from 'sb-shared-lib';
 

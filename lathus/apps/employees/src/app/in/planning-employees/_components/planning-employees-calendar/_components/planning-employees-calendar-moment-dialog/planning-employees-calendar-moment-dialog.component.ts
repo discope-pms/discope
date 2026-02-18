@@ -1,12 +1,13 @@
-import {Component, Inject, OnDestroy, OnInit} from '@angular/core';
+import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { CalendarService } from '../../../../_services/calendar.service';
 import { Employee, TimeSlot } from '../../../../../../../type';
 import { EnvService } from 'sb-shared-lib';
-import { combineLatest, from, Subject } from "rxjs";
-import { takeUntil } from "rxjs/operators";
+import { combineLatest, from, Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 export interface MomentDialogOpenData {
+    calendar: CalendarService,
     employee: Employee,
     dayIndex: string,
     timeSlotCode: 'AM'|'PM'|'EV'
@@ -19,6 +20,8 @@ export interface MomentDialogOpenData {
 })
 export class PlanningEmployeesCalendarMomentDialogComponent implements OnInit, OnDestroy {
 
+    private calendar: CalendarService;
+
     public employee: Employee;
     private dayIndex: string;
     private timeSlotCode: string;
@@ -29,10 +32,10 @@ export class PlanningEmployeesCalendarMomentDialogComponent implements OnInit, O
 
     constructor(
         private env: EnvService,
-        private calendar: CalendarService,
         private dialogRef: MatDialogRef<PlanningEmployeesCalendarMomentDialogComponent>,
         @Inject(MAT_DIALOG_DATA) public data: MomentDialogOpenData
     ) {
+        this.calendar = data.calendar;
         this.employee = data.employee;
         this.dayIndex = data.dayIndex;
         this.timeSlotCode = data.timeSlotCode;

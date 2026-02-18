@@ -1,25 +1,27 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import { EnvService } from 'sb-shared-lib';
 import { CalendarService } from '../../_services/calendar.service';
-import { PlanningEmployeesFiltersDialogComponent } from './_components/planning-employees-filters-dialog/planning-employees-filters-dialog.component';
+import {
+    FilterDialogOpenData,
+    PlanningEmployeesFiltersDialogComponent
+} from './_components/planning-employees-filters-dialog/planning-employees-filters-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
+import {combineLatest, from, Subject} from "rxjs";
+import {takeUntil} from "rxjs/operators";
 
 @Component({
     selector: 'app-planning-employees-filters',
     templateUrl: 'planning-employees-filters.component.html',
     styleUrls: ['planning-employees-filters.component.scss']
 })
-export class PlanningEmployeesFiltersComponent implements OnInit  {
+export class PlanningEmployeesFiltersComponent implements OnInit, OnDestroy  {
 
-    private dateFrom: Date = new Date();
     public dateFromFormatted = '';
-
-    private dateTo: Date = new Date();
     public dateToFormatted = '';
 
     public displayMultipleDays = false;
 
-    private locale: string|null = null;
+    private destroy$ = new Subject<void>();
 
     constructor(
         private calendar: CalendarService,
@@ -29,28 +31,38 @@ export class PlanningEmployeesFiltersComponent implements OnInit  {
     }
 
     async ngOnInit() {
-        this.calendar.dateFrom$.subscribe((dateFrom) => {
-            this.dateFrom = dateFrom;
-            if(this.locale) {
-                this.dateFromFormatted = this.formatDate(this.dateFrom, this.locale);
-            }
-        });
+        combineLatest([
+            from(this.env.getEnv()),
+            this.calendar.dateFrom$
+        ])
+            .pipe(takeUntil(this.destroy$))
+            .subscribe(([env, dateFrom]: any) => {
+                if (!env) return;
 
-        this.calendar.dateTo$.subscribe((dateTo) => {
-            this.dateTo = dateTo;
-            if(this.locale) {
-                this.dateToFormatted = this.formatDate(this.dateTo, this.locale);
-            }
-        });
+                this.dateFromFormatted = this.formatDate(dateFrom, env.locale);
+            });
 
-        this.calendar.daysDisplayedQty$.subscribe((daysDisplayedQty) => {
-            this.displayMultipleDays = daysDisplayedQty > 1;
-        });
+        combineLatest([
+            from(this.env.getEnv()),
+            this.calendar.dateTo$
+        ])
+            .pipe(takeUntil(this.destroy$))
+            .subscribe(([env, dateTo]: any) => {
+                if (!env) return;
 
-        this.env.getEnv().then((env: any) => {
-            this.locale = env.locale;
-            this.dateFromFormatted = this.formatDate(this.dateFrom, env.locale);
-        });
+                this.dateToFormatted = this.formatDate(dateTo, env.locale);
+            });
+
+        this.calendar.daysDisplayedQty$
+            .pipe(takeUntil(this.destroy$))
+            .subscribe((daysDisplayedQty) => {
+                this.displayMultipleDays = daysDisplayedQty > 1;
+            });
+    }
+
+    ngOnDestroy() {
+        this.destroy$.next();
+        this.destroy$.complete();
     }
 
     private formatDate(date: Date, locale: string): string {
@@ -60,12 +72,15 @@ export class PlanningEmployeesFiltersComponent implements OnInit  {
     }
 
     public onFilter() {
+        const data: FilterDialogOpenData = { calendar: this.calendar };
+
         this.dialog.open(PlanningEmployeesFiltersDialogComponent, {
             width: '100vw',
             height: '100vh',
             maxWidth: '100vw',
             maxHeight: '100vh',
-            panelClass: 'full-screen-dialog'
+            panelClass: 'full-screen-dialog',
+            data: data
         });
     }
 

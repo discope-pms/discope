@@ -148,9 +148,11 @@ export class PlanningEmployeesCalendarComponent implements OnInit, AfterViewInit
             }
         );
 
-        this.calendar.loading$.subscribe((loading) => {
-            this.loading = loading;
-        });
+        this.calendar.loading$
+            .pipe(takeUntil(this.destroy$))
+            .subscribe((loading) => {
+                this.loading = loading;
+            });
 
         this.env.getEnv().then((env: any) => {
             this.locale = env.locale;
@@ -211,7 +213,7 @@ export class PlanningEmployeesCalendarComponent implements OnInit, AfterViewInit
             return;
         }
 
-        const data: MomentDialogOpenData = { employee, dayIndex, timeSlotCode };
+        const data: MomentDialogOpenData = { calendar: this.calendar, employee, dayIndex, timeSlotCode };
 
         this.dialog.open(PlanningEmployeesCalendarMomentDialogComponent, {
             width: '100vw',

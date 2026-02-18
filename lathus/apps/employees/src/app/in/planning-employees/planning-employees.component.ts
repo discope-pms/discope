@@ -4,7 +4,8 @@ import { CalendarService } from './_services/calendar.service';
 @Component({
     selector: 'app-planning-employees',
     templateUrl: 'planning-employees.component.html',
-    styleUrls: ['planning-employees.component.scss']
+    styleUrls: ['planning-employees.component.scss'],
+    providers: [CalendarService]
 })
 export class PlanningEmployeesComponent implements OnInit  {
 
