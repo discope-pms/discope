@@ -130,14 +130,32 @@ export class PlanningEmployeesCalendarComponent implements OnInit, AfterViewInit
                         const dateActivityMap = userActivityMap[dateIndex];
                         for(let timeSlotCode of timeSlotCodes) {
                             if(dateActivityMap[timeSlotCode] !== undefined) {
+                                const allItems = dateActivityMap[timeSlotCode];
+                                const allActivities = allItems.filter((a: any) => !a.is_partner_event);
+                                const allPartnerEvents = allItems.filter((a: any) => a.is_partner_event);
+
                                 const activitiesToDisplay: ActivityMapActivity[] = [];
-                                const activities = dateActivityMap[timeSlotCode];
-                                for(let i = 0; i < activities.length; i++) {
-                                    const activity = activities[i];
-                                    if(!activity.product_model_id?.id || productModelsIdsToDisplay.includes(activity.product_model_id.id)) {
+                                for(let activity of allActivities) {
+                                    // don't show activity if the product model is not selected
+                                    if(productModelsIdsToDisplay.includes(activity.product_model_id.id)) {
                                         activitiesToDisplay.push(activity);
                                     }
                                 }
+
+                                for(let partnerEvent of allPartnerEvents) {
+                                    let partnerHasActivity = false;
+                                    for(let activity of allActivities) {
+                                        if(partnerEvent.camp_group_id && activity.camp_group_id === partnerEvent.camp_group_id) {
+                                            partnerHasActivity = true;
+                                        }
+                                    }
+
+                                    // don't show camp partner event if employee handles the activity
+                                    if(!partnerHasActivity) {
+                                        activitiesToDisplay.push(partnerEvent);
+                                    }
+                                }
+
                                 activityMapToDisplay[userId][dateIndex][timeSlotCode] = activitiesToDisplay;
                             }
                         }

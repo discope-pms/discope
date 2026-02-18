@@ -307,7 +307,7 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
 
             let partnerHasActivity = false;
             for(let activity of allActivities) {
-                if(activity.partner_id.id === partnerEvent.partner_id && activity.camp_group_id === partnerEvent.camp_group_id) {
+                if(partnerEvent.camp_group_id && activity.camp_group_id === partnerEvent.camp_group_id) {
                     partnerHasActivity = true;
                 }
             }

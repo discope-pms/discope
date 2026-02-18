@@ -80,13 +80,14 @@ export interface ActivityMapActivity {
     product_model_id: ActivityMapProductModel;
     activity_booking_line_id: number | null;
     camp_id: ActivityMapCamp | null;
+    camp_group_id: number | null;
     group_num: number | null;
     is_partner_event: boolean;
     time_slot: "AM" | "PM" | "EV";
     customer_id: ActivityMapCustomer | null;
     partner_identity_id: ActivityMapPartnerIdentity | null;
     age_range_assignments_ids: ActivityMapAgeRangeAssignment[];
-    partner_id: ActivityMapPartner | null;
+    partner_id: ActivityMapPartner | number | null;
 }
 
 interface ActivityMapBooking {
