@@ -209,7 +209,10 @@ export class CalendarService implements OnDestroy {
                     }
 
                     this.selectedProductModelsIdsSubject.next(productModelsIds);
+                    this.productModelsIdsToDisplaySubject.next(productModelsIds);
+
                     this.selectedEmployeesIdsSubject.next(employeesIds);
+                    this.employeesIdsToDisplaySubject.next(employeesIds);
 
                     return EMPTY;
                 })
@@ -305,7 +308,6 @@ export class CalendarService implements OnDestroy {
                         employees = employees.filter(e => e.role_id);
 
                         this.employeeListSubject.next(employees);
-                        this.employeesIdsToDisplaySubject.next(employees.map(e => e.id));
 
                         const employee = employees.find(e => e.partner_identity_id === this.user.identity_id.id);
                         if(employee) {
@@ -330,7 +332,6 @@ export class CalendarService implements OnDestroy {
                 tap(productModels => {
                     if(productModels.length > 0) {
                         this.productModelListSubject.next(productModels);
-                        this.productModelsIdsToDisplaySubject.next(productModels.map(pm => pm.id));
                     }
                     else {
                         console.error('No product models defined!');
