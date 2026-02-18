@@ -21,7 +21,7 @@
             </div>
         </div>
     </div>
-    <div *ngIf="activity?.is_partner_event">
+    <div *ngIf="activity?.is_partner_event" class="partner-event">
         <!-- Always -->
         <div>
             {{ activity.group_num ? activity.group_num + ' - ' : '' }}{{ activity.name }}
