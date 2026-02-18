@@ -4,41 +4,7 @@
     <div class="time-details">{{ timeDetailsText }}</div>
 
     <div *ngIf="activities.length > 0" class="activities">
-        <div *ngFor="let activity of activities" class="activity-card" [style.background-color]="getActivityColor(activity)">
-            <div *ngIf="!activity?.is_partner_event" style="position: relative;">
-                <mat-icon *ngIf="activity.booking_line_group_id?.has_person_with_disability" style="position: absolute; right: -10px; top: -10px;" aria-hidden="true">accessible</mat-icon>
-                <div>
-                    <!-- Camp -->
-                    <span *ngIf="activity.camp_id?.sojourn_number">{{ activity.camp_id?.sojourn_number + ' - ' }}</span>
-
-                    <!-- Always -->
-                    <span *ngIf="activity.group_num">{{ activity.group_num + ' - ' }}</span>
-                    <span>{{ activity.name }}</span>
-                </div>
-                <div *ngIf="activity.customer_id?.name || activity.camp_id?.short_name">
-                    <!-- Booking -->
-                    <div *ngIf="activity.customer_id?.name" style="position: relative">
-                        <span>{{ activity.customer_id.name }}</span>
-                    </div>
-
-                    <!-- Camp -->
-                    <div *ngIf="activity.camp_id?.short_name">
-                        {{ activity.camp_id.short_name }}
-                    </div>
-                </div>
-            </div>
-            <div *ngIf="activity?.is_partner_event">
-                <!-- Always -->
-                <div>
-                    {{ activity.group_num ? activity.group_num + ' - ' : '' }}{{ activity.name }}
-                </div>
-
-                <!-- Camp -->
-                <div *ngIf="activity?.camp_id?.short_name">
-                    {{ activity.camp_id.short_name }}
-                </div>
-            </div>
-        </div>
+        <app-planning-employees-calendar-activity-card *ngFor="let activity of activities" [activity]="activity" class="activity-card" [padding]="'15px'"></app-planning-employees-calendar-activity-card>
     </div>
 
     <div *ngIf="activities.length === 0" class="no-activities">

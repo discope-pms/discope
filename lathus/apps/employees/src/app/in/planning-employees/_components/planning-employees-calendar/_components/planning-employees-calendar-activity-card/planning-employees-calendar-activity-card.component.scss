@@ -1,0 +1,20 @@
+:host {
+    .card {
+        color: white;
+        border: 1px solid #f1f1f1;
+        border-radius: 5px;
+
+        .activity {
+            position: relative;
+
+            .disability-icon {
+                position: absolute;
+                right: -10px;
+                top: -10px;
+            }
+        }
+
+        .partner-event {
+        }
+    }
+}

@@ -11,6 +11,7 @@ import { AppSharedComponentsModule } from '../_components/shared-components.modu
 import { PlanningEmployeesComponent } from './planning-employees.component';
 import { PlanningEmployeesFiltersComponent } from './_components/planning-employees-filters/planning-employees-filters.component';
 import { PlanningEmployeesCalendarComponent } from './_components/planning-employees-calendar/planning-employees-calendar.component';
+import { PlanningEmployeesCalendarActivityCardComponent } from './_components/planning-employees-calendar/_components/planning-employees-calendar-activity-card/planning-employees-calendar-activity-card.component';
 import { PlanningEmployeesFiltersDialogComponent } from './_components/planning-employees-filters/_components/planning-employees-filters-dialog/planning-employees-filters-dialog.component';
 import { PlanningEmployeesCalendarMomentDialogComponent } from './_components/planning-employees-calendar/_components/planning-employees-calendar-moment-dialog/planning-employees-calendar-moment-dialog.component';
 
@@ -25,6 +26,7 @@ import { PlanningEmployeesCalendarMomentDialogComponent } from './_components/pl
         PlanningEmployeesComponent,
         PlanningEmployeesFiltersComponent,
         PlanningEmployeesCalendarComponent,
+        PlanningEmployeesCalendarActivityCardComponent,
         PlanningEmployeesFiltersDialogComponent,
         PlanningEmployeesCalendarMomentDialogComponent
     ],
