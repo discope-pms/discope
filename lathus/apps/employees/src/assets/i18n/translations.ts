@@ -26,7 +26,11 @@ export const translations: { [lang: string]: { [key: string]: string } } = {
          * Planning employees
          */
         'FILTERS_DIALOG_TITLE': 'Filters',
-        'FILTERS_EMPLOYEE_ROLE_LABEL': 'Sector'
+        'FILTERS_EMPLOYEE_ROLE_LABEL': 'Sector',
+        'FILTERS_EMPLOYEE_LABEL': 'Animator',
+        'FILTERS_PRODUCT_MODEL_LABEL': 'Activity',
+        'FILTERS_CANCEL_BTN': 'Cancel',
+        'FILTERS_APPLY_BTN': 'Apply'
 
     },
     'fr': {
@@ -56,7 +60,11 @@ export const translations: { [lang: string]: { [key: string]: string } } = {
          * Planning employees
          */
         'FILTERS_DIALOG_TITLE': 'Filtres',
-        'FILTERS_EMPLOYEE_ROLE_LABEL': 'Secteur'
+        'FILTERS_EMPLOYEE_ROLE_LABEL': 'Secteur',
+        'FILTERS_EMPLOYEE_LABEL': 'Animateur',
+        'FILTERS_PRODUCT_MODEL_LABEL': 'Activité',
+        'FILTERS_CANCEL_BTN': 'Annuler',
+        'FILTERS_APPLY_BTN': 'Appliquer'
 
     }
 };

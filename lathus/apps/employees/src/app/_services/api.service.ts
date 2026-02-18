@@ -125,11 +125,17 @@ export class ApiService {
         );
     }
 
-    public fetchProductModels(): Observable<ProductModel[]> {
+    public fetchProductModels(filters: { ids?: number[] }  = {}): Observable<ProductModel[]> {
+        const domain: any = [['can_sell', '=', true], ['is_activity', '=', true]];
+        if(filters.ids !== undefined) {
+            domain.push(['id', 'in', filters.ids]);
+        }
+
         return this.modelCollect<ProductModel>(
             'sale\\catalog\\ProductModel',
             ['id', 'name'],
-            [['can_sell', '=', true], ['is_activity', '=', true]]
+            domain,
+            { limit: 1000 }
         );
     }
 

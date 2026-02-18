@@ -1,6 +1,6 @@
 import { Injectable, OnDestroy } from '@angular/core';
 import { BehaviorSubject, combineLatest, EMPTY, forkJoin, Observable, Subject } from 'rxjs';
-import { ActivityMap, Category, Employee, EmployeeRole, TimeSlot } from '../../../../type';
+import {ActivityMap, Category, Employee, EmployeeRole, ProductModel, TimeSlot} from '../../../../type';
 import { takeUntil, switchMap, debounceTime, tap, catchError } from 'rxjs/operators';
 import { ApiService } from '../../../_services/api.service';
 import { AuthService } from 'sb-shared-lib';
@@ -21,7 +21,7 @@ export class CalendarService implements OnDestroy {
     public employeeRole$ = this.employeeRoleSubject.asObservable();
 
     /**
-     * Interface
+     * Interface data
      */
 
     private timeSlotListSubject = new BehaviorSubject<TimeSlot[]>([]);
@@ -36,6 +36,9 @@ export class CalendarService implements OnDestroy {
     private employeeListSubject = new BehaviorSubject<Employee[]>([]);
     public employeeList$ = this.employeeListSubject.asObservable();
 
+    private productModelListSubject = new BehaviorSubject<ProductModel[]>([]);
+    public productModelList$ = this.productModelListSubject.asObservable();
+
     /**
      * Filters
      */
@@ -49,17 +52,29 @@ export class CalendarService implements OnDestroy {
     private daysDisplayedQtySubject = new BehaviorSubject<number>(1);
     public daysDisplayedQty$ = this.daysDisplayedQtySubject.asObservable();
 
-    private selectedEmployeesIdsSubject = new BehaviorSubject<number[]>([]);
-    public selectedEmployeesIds$ = this.selectedEmployeesIdsSubject.asObservable();
-
-    private selectedProductModelsIdsSubject = new BehaviorSubject<number[]>([]);
-    public selectedProductModelsIds$ = this.selectedProductModelsIdsSubject.asObservable();
-
     private selectedEmployeeRoleCodeSubject = new BehaviorSubject<'ALL'|'EQUI'|'ENV'|'SP'>('ALL');
     public selectedEmployeeRoleCode$ = this.selectedEmployeeRoleCodeSubject.asObservable();
 
+    // Should only depend on the employee role
+    private selectedEmployeesIdsSubject = new BehaviorSubject<number[]>([]);
+    public selectedEmployeesIds$ = this.selectedEmployeesIdsSubject.asObservable();
+
+    // Should only depend on the employee role
+    private selectedProductModelsIdsSubject = new BehaviorSubject<number[]>([]);
+    public selectedProductModelsIds$ = this.selectedProductModelsIdsSubject.asObservable();
+
     /**
-     * Result activity map + loading
+     * Display filters
+     */
+
+    private employeesIdsToDisplaySubject = new BehaviorSubject<number[]>([]);
+    public employeesIdsToDisplay$ = this.employeesIdsToDisplaySubject.asObservable();
+
+    private productModelsIdsToDisplaySubject = new BehaviorSubject<number[]>([]);
+    public productModelsIdsToDisplay$ = this.productModelsIdsToDisplaySubject.asObservable();
+
+    /**
+     * Result activity map + its loading flag
      */
 
     private activityMapSubject = new BehaviorSubject<ActivityMap>({});
@@ -85,6 +100,7 @@ export class CalendarService implements OnDestroy {
     }
 
     public init() {
+        // Listen to auth user to set user related data
         this.auth.getObservable()
             .pipe(takeUntil(this.destroy$))
             .subscribe((user) => {
@@ -92,21 +108,21 @@ export class CalendarService implements OnDestroy {
 
                 let role: 'animator'|'manager'|'organizer'|null = null;
                 if(user) {
-                    if(user.groups.includes('planning.employees.animator')) {
-                        role = 'animator';
+                    if(user.groups.includes('planning.employees.organizer')) {
+                        role = 'organizer';
                     }
                     else if(user.groups.includes('planning.employees.manager')) {
                         role = 'manager';
                     }
-                    else if(user.groups.includes('planning.employees.organizer')) {
-                        role = 'organizer';
+                    else if(user.groups.includes('planning.employees.animator')) {
+                        role = 'animator';
                     }
                 }
 
                 this.userGroupSubject.next(role);
             });
 
-        // Listen to change of selected partners or product models to reload the activity map
+        // Load base data then listen to changes to reload the activity map
         forkJoin([
             this.loadTimeSlotList(),
             this.loadEmployeeRoleList(),
@@ -147,6 +163,7 @@ export class CalendarService implements OnDestroy {
                 }
             });
 
+        // Listen to filter changes to modify the product models and employees to display
         combineLatest([
             this.userGroup$,
             this.employeeRole$,
@@ -161,6 +178,9 @@ export class CalendarService implements OnDestroy {
                         return EMPTY;
                     }
 
+                    let productModelsIds: number[] = [];
+                    let employeesIds: number[] = [];
+
                     if(userGroup === 'organizer') {
                         // filter product models
                         let allProductModelsIds: number[] = [];
@@ -169,31 +189,61 @@ export class CalendarService implements OnDestroy {
                                 allProductModelsIds = [...allProductModelsIds, ...category.product_models_ids];
                             }
                         }
-                        this.selectedProductModelsIdsSubject.next(allProductModelsIds);
+                        productModelsIds = allProductModelsIds;
 
                         // filter employees
                         if(selectedEmployeeRoleCode !== 'ALL') {
                             employeeList = employeeList.filter(e => e.role_id.code === selectedEmployeeRoleCode);
                         }
-                        this.selectedEmployeesIdsSubject.next(employeeList.map(e => e.id));
+                        employeesIds = employeeList.map(e => e.id);
                     }
                     else {
                         // filter product models
                         const category = categoryList.find(c => c.code === employeeRole);
                         if(category) {
-                            this.selectedProductModelsIdsSubject.next(category.product_models_ids);
+                            productModelsIds = category.product_models_ids;
                         }
 
                         // filter employees
-                        this.selectedEmployeesIdsSubject.next(employeeList.filter(e => e.role_id.code === employeeRole).map(e => e.id));
+                        employeesIds = employeeList.filter(e => e.role_id.code === employeeRole).map(e => e.id);
                     }
+
+                    this.selectedProductModelsIdsSubject.next(productModelsIds);
+                    this.selectedEmployeesIdsSubject.next(employeesIds);
 
                     return EMPTY;
                 })
             )
             .subscribe();
 
-        // When role and group loaded
+        // Wait for user and product categories data to be loaded, then load the product models accordingly
+        combineLatest([
+            this.userGroup$,
+            this.employeeRole$,
+            this.categoryList$
+        ])
+            .pipe(
+                takeUntil(this.destroy$),
+                debounceTime(300),
+                switchMap(([userGroup, employeeRole, categoryList]) => {
+                    if(!userGroup || !employeeRole || !categoryList.length) {
+                        return EMPTY;
+                    }
+
+                    if(userGroup === 'organizer') {
+                        this.loadProductModelList().subscribe();
+                    }
+                    else {
+                        const category = categoryList.find(c => c.code === employeeRole);
+                        if(category) {
+                            this.loadProductModelList({ ids: category.product_models_ids }).subscribe();
+                        }
+                    }
+
+                    return EMPTY;
+                })
+            )
+            .subscribe();
     }
 
     private loadTimeSlotList(): Observable<any> {
@@ -262,6 +312,7 @@ export class CalendarService implements OnDestroy {
                         employees = employees.filter(e => e.role_id);
 
                         this.employeeListSubject.next(employees);
+                        this.employeesIdsToDisplaySubject.next(employees.map(e => e.id));
 
                         const employee = employees.find(e => e.partner_identity_id === this.user.identity_id.id);
                         if(employee) {
@@ -274,6 +325,26 @@ export class CalendarService implements OnDestroy {
                 }),
                 catchError(error => {
                     console.error('Error fetching employees:', error);
+                    return EMPTY;
+                })
+            );
+    }
+
+    private loadProductModelList(filters: { ids?: number[] }  = {}): Observable<any> {
+        return this.api.fetchProductModels(filters)
+            .pipe(
+                takeUntil(this.destroy$),
+                tap(productModels => {
+                    if(productModels.length > 0) {
+                        this.productModelListSubject.next(productModels);
+                        this.productModelsIdsToDisplaySubject.next(productModels.map(pm => pm.id));
+                    }
+                    else {
+                        console.error('No product models defined!');
+                    }
+                }),
+                catchError(error => {
+                    console.error('Error fetching product models:', error);
                     return EMPTY;
                 })
             );
@@ -347,5 +418,21 @@ export class CalendarService implements OnDestroy {
 
     public selectSelectedEmployeeRole(employeeRoleCode: 'ALL'|'EQUI'|'ENV'|'SP') {
         this.selectedEmployeeRoleCodeSubject.next(employeeRoleCode);
+    }
+
+    public setEmployeesIdsToDisplay(employeesIds: number[]) {
+        this.employeesIdsToDisplaySubject.next(employeesIds);
+    }
+
+    public resetEmployeesIdsToDisplay() {
+        this.employeesIdsToDisplaySubject.next(this.selectedEmployeesIdsSubject.value);
+    }
+
+    public setProductModelsIdsToDisplay(productModelsIds: number[]) {
+        this.productModelsIdsToDisplaySubject.next(productModelsIds);
+    }
+
+    public resetProductModelsIdsToDisplay() {
+        this.productModelsIdsToDisplaySubject.next(this.selectedProductModelsIdsSubject.value);
     }
 }

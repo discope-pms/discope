@@ -60,7 +60,7 @@ export interface ActivityMapDay {
     EV: ActivityMapActivity[];
 }
 
-interface ActivityMapActivity {
+export interface ActivityMapActivity {
     counter: number;
     counter_total: number;
     id: number;

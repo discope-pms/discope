@@ -60,7 +60,7 @@ export class PlanningEmployeesFiltersComponent implements OnInit  {
     }
 
     public onFilter() {
-        const dialogRef = this.dialog.open(PlanningEmployeesFiltersDialogComponent, {
+        this.dialog.open(PlanningEmployeesFiltersDialogComponent, {
             width: '100vw',
             height: '100vh',
             maxWidth: '100vw',

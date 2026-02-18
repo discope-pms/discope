@@ -1,5 +1,5 @@
 import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit } from '@angular/core';
-import { ActivityMap, Employee } from '../../../../../type';
+import { ActivityMap, ActivityMapActivity, Employee } from '../../../../../type';
 import { EnvService } from 'sb-shared-lib';
 import { combineLatest } from 'rxjs';
 import { CalendarService } from '../../_services/calendar.service';
@@ -102,15 +102,40 @@ export class PlanningEmployeesCalendarComponent implements OnInit, AfterViewInit
             }
         );
 
-        combineLatest([this.calendar.employeeList$, this.calendar.selectedEmployeesIds$]).subscribe(
-            ([employeeList, selectedEmployeesIds]) => {
-                this.employeeList = employeeList.filter(e => selectedEmployeesIds.includes(e.id));
+        combineLatest([this.calendar.employeeList$, this.calendar.employeesIdsToDisplay$]).subscribe(
+            ([employeeList, employeesIdsToDisplay]) => {
+                this.employeeList = employeeList.filter(e => employeesIdsToDisplay.includes(e.id));
             }
         );
 
-        this.calendar.activityMap$.subscribe((activityMap) => {
-            this.activityMap = activityMap;
-        });
+        const timeSlotCodes: ('AM'|'PM'|'EV')[] = ['AM', 'PM', 'EV'];
+        combineLatest([this.calendar.activityMap$, this.calendar.productModelsIdsToDisplay$]).subscribe(
+            ([activityMap, productModelsIdsToDisplay]) => {
+                const activityMapToDisplay: ActivityMap = JSON.parse(JSON.stringify(activityMap));
+
+                for(let userId in activityMapToDisplay) {
+                    const userActivityMap = activityMap[userId];
+                    for(let dateIndex in userActivityMap) {
+                        const dateActivityMap = userActivityMap[dateIndex];
+                        for(let timeSlotCode of timeSlotCodes) {
+                            if(dateActivityMap[timeSlotCode] !== undefined) {
+                                const activitiesToDisplay: ActivityMapActivity[] = [];
+                                const activities = dateActivityMap[timeSlotCode];
+                                for(let i = 0; i < activities.length; i++) {
+                                    const activity = activities[i];
+                                    if(!activity.product_model_id?.id || productModelsIdsToDisplay.includes(activity.product_model_id.id)) {
+                                        activitiesToDisplay.push(activity);
+                                    }
+                                }
+                                activityMapToDisplay[userId][dateIndex][timeSlotCode] = activitiesToDisplay;
+                            }
+                        }
+                    }
+                }
+
+                this.activityMap = activityMapToDisplay;
+            }
+        );
 
         this.calendar.loading$.subscribe((loading) => {
             this.loading = loading;
