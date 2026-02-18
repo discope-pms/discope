@@ -1,0 +1,9 @@
+<h2 mat-dialog-title>{{ 'MOMENT_DIALOG_TITLE' | translate }} : {{ employee.name }}</h2>
+
+<mat-dialog-content>
+    <div class="time-details">{{ timeDetailsText }}</div>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+    <button mat-button (click)="close()">{{ 'MOMENT_CLOSE_BTN' | translate }}</button>
+</mat-dialog-actions>

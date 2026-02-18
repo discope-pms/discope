@@ -23,14 +23,20 @@ export const translations: { [lang: string]: { [key: string]: string } } = {
         'USER_SETTINGS_SIGN_OUT_BTN': "Sign out",
 
         /**
-         * Planning employees
+         * Filters
          */
         'FILTERS_DIALOG_TITLE': 'Filters',
         'FILTERS_EMPLOYEE_ROLE_LABEL': 'Sector',
         'FILTERS_EMPLOYEE_LABEL': 'Animator',
         'FILTERS_PRODUCT_MODEL_LABEL': 'Activity',
         'FILTERS_CANCEL_BTN': 'Cancel',
-        'FILTERS_APPLY_BTN': 'Apply'
+        'FILTERS_APPLY_BTN': 'Apply',
+
+        /**
+         * Moment details
+         */
+        'MOMENT_DIALOG_TITLE': 'Details',
+        'MOMENT_CLOSE_BTN': 'Close'
 
     },
     'fr': {
@@ -57,14 +63,20 @@ export const translations: { [lang: string]: { [key: string]: string } } = {
         'USER_SETTINGS_SIGN_OUT_BTN': "Se déconnecter",
 
         /**
-         * Planning employees
+         * Filters
          */
         'FILTERS_DIALOG_TITLE': 'Filtres',
         'FILTERS_EMPLOYEE_ROLE_LABEL': 'Secteur',
         'FILTERS_EMPLOYEE_LABEL': 'Animateur',
         'FILTERS_PRODUCT_MODEL_LABEL': 'Activité',
         'FILTERS_CANCEL_BTN': 'Annuler',
-        'FILTERS_APPLY_BTN': 'Appliquer'
+        'FILTERS_APPLY_BTN': 'Appliquer',
+
+        /**
+         * Moment details
+         */
+        'MOMENT_DIALOG_TITLE': 'Détails',
+        'MOMENT_CLOSE_BTN': 'Fermer'
 
     }
 };

@@ -18,26 +18,26 @@
     </ng-container>
 </div>
 
-<div class="row" *ngFor="let partner of employeeList">
-    <div class="employee-col">{{ partner.name }}</div>
+<div class="row" *ngFor="let employee of employeeList">
+    <div class="employee-col">{{ employee.name }}</div>
     <ng-container *ngFor="let dayIndex of daysIndexes">
-        <div class="moment-col">
-            <ng-container *ngIf="(activityMap?.[partner.id]?.[dayIndex]?.['AM']?.length || 0) > 0">
-                <div class="activity-card" *ngFor="let activity of activityMap[partner.id][dayIndex]['AM']" [style.background-color]="getActivityColor(activity)">
+        <div class="moment-col" (click)="openMoment(employee.id, dayIndex, 'AM')">
+            <ng-container *ngIf="(activityMap?.[employee.id]?.[dayIndex]?.['AM']?.length || 0) > 0">
+                <div class="activity-card" *ngFor="let activity of activityMap[employee.id][dayIndex]['AM']" [style.background-color]="getActivityColor(activity)">
                     {{ activity.name }}
                 </div>
             </ng-container>
         </div>
-        <div class="moment-col">
-            <ng-container *ngIf="(activityMap?.[partner.id]?.[dayIndex]?.['PM']?.length || 0) > 0">
-                <div class="activity-card" *ngFor="let activity of activityMap[partner.id][dayIndex]['PM']" [style.background-color]="getActivityColor(activity)">
+        <div class="moment-col" (click)="openMoment(employee.id, dayIndex, 'PM')">
+            <ng-container *ngIf="(activityMap?.[employee.id]?.[dayIndex]?.['PM']?.length || 0) > 0">
+                <div class="activity-card" *ngFor="let activity of activityMap[employee.id][dayIndex]['PM']" [style.background-color]="getActivityColor(activity)">
                     {{ activity.name }}
                 </div>
             </ng-container>
         </div>
-        <div class="moment-col">
-            <ng-container *ngIf="(activityMap?.[partner.id]?.[dayIndex]?.['EV']?.length || 0) > 0">
-                <div class="activity-card" *ngFor="let activity of activityMap[partner.id][dayIndex]['EV']" [style.background-color]="getActivityColor(activity)">
+        <div class="moment-col" (click)="openMoment(employee.id, dayIndex, 'EV')">
+            <ng-container *ngIf="(activityMap?.[employee.id]?.[dayIndex]?.['EV']?.length || 0) > 0">
+                <div class="activity-card" *ngFor="let activity of activityMap[employee.id][dayIndex]['EV']" [style.background-color]="getActivityColor(activity)">
                     {{ activity.name }}
                 </div>
             </ng-container>

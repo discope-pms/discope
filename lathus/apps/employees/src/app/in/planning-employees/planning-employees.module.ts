@@ -5,12 +5,15 @@ import { Platform } from '@angular/cdk/platform';
 import { SharedLibModule, CustomDateAdapter } from 'sb-shared-lib';
 import { PlanningEmployeesRoutingModule } from './planning-employees-routing.module';
 
+import { AppSharedPipesModule } from '../../_pipes/shared-pipes.module';
+import { AppSharedComponentsModule } from '../_components/shared-components.module';
+
 import { PlanningEmployeesComponent } from './planning-employees.component';
 import { PlanningEmployeesFiltersComponent } from './_components/planning-employees-filters/planning-employees-filters.component';
 import { PlanningEmployeesCalendarComponent } from './_components/planning-employees-calendar/planning-employees-calendar.component';
-import { AppSharedPipesModule } from '../../_pipes/shared-pipes.module';
-import { AppSharedComponentsModule } from '../_components/shared-components.module';
 import { PlanningEmployeesFiltersDialogComponent } from './_components/planning-employees-filters/_components/planning-employees-filters-dialog/planning-employees-filters-dialog.component';
+import { PlanningEmployeesCalendarMomentDialogComponent } from './_components/planning-employees-calendar/_components/planning-employees-calendar-moment-dialog/planning-employees-calendar-moment-dialog.component';
+
 import { CalendarService } from "./_services/calendar.service";
 
 @NgModule({
@@ -24,7 +27,8 @@ import { CalendarService } from "./_services/calendar.service";
         PlanningEmployeesComponent,
         PlanningEmployeesFiltersComponent,
         PlanningEmployeesCalendarComponent,
-        PlanningEmployeesFiltersDialogComponent
+        PlanningEmployeesFiltersDialogComponent,
+        PlanningEmployeesCalendarMomentDialogComponent
     ],
     providers: [
         { provide: DateAdapter, useClass: CustomDateAdapter, deps: [MAT_DATE_LOCALE, Platform] },

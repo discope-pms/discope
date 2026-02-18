@@ -1,8 +1,11 @@
 import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit } from '@angular/core';
 import { ActivityMap, ActivityMapActivity, Employee } from '../../../../../type';
 import { EnvService } from 'sb-shared-lib';
-import { combineLatest } from 'rxjs';
+import {combineLatest, Subject} from 'rxjs';
 import { CalendarService } from '../../_services/calendar.service';
+import { MomentDialogOpenData, PlanningEmployeesCalendarMomentDialogComponent } from './_components/planning-employees-calendar-moment-dialog/planning-employees-calendar-moment-dialog.component';
+import {MatDialog} from "@angular/material/dialog";
+import {takeUntil} from "rxjs/operators";
 
 @Component({
     selector: 'app-planning-employees-calendar',
@@ -27,6 +30,8 @@ export class PlanningEmployeesCalendarComponent implements OnInit, AfterViewInit
     private startY = 0;
     private currentY = 0;
     private startOnTop = false;
+
+    private destroy$ = new Subject<void>();
 
     private onTouchStart = (event: TouchEvent) => {
         this.startX = event.touches[0].clientX;
@@ -77,7 +82,8 @@ export class PlanningEmployeesCalendarComponent implements OnInit, AfterViewInit
     constructor(
         private calendar: CalendarService,
         private env: EnvService,
-        private el: ElementRef
+        private el: ElementRef,
+        private dialog: MatDialog
     ) {
     }
 
@@ -93,24 +99,29 @@ export class PlanningEmployeesCalendarComponent implements OnInit, AfterViewInit
         el.removeEventListener('touchstart', this.onTouchStart);
         el.removeEventListener('touchmove',  this.onTouchMove);
         el.removeEventListener('touchend',   this.onTouchEnd);
+
+        this.destroy$.next();
+        this.destroy$.complete();
     }
 
     ngOnInit() {
-        combineLatest([this.calendar.dateFrom$, this.calendar.daysDisplayedQty$]).subscribe(
-            ([dateFrom, daysDisplayedQty]) => {
+        combineLatest([this.calendar.dateFrom$, this.calendar.daysDisplayedQty$])
+            .pipe(takeUntil(this.destroy$))
+            .subscribe(([dateFrom, daysDisplayedQty]) => {
                 this.refreshDaysIndexes(dateFrom, daysDisplayedQty);
-            }
-        );
+            });
 
-        combineLatest([this.calendar.employeeList$, this.calendar.employeesIdsToDisplay$]).subscribe(
-            ([employeeList, employeesIdsToDisplay]) => {
+        combineLatest([this.calendar.employeeList$, this.calendar.employeesIdsToDisplay$])
+            .pipe(takeUntil(this.destroy$))
+            .subscribe(([employeeList, employeesIdsToDisplay]) => {
                 this.employeeList = employeeList.filter(e => employeesIdsToDisplay.includes(e.id));
             }
         );
 
         const timeSlotCodes: ('AM'|'PM'|'EV')[] = ['AM', 'PM', 'EV'];
-        combineLatest([this.calendar.activityMap$, this.calendar.productModelsIdsToDisplay$]).subscribe(
-            ([activityMap, productModelsIdsToDisplay]) => {
+        combineLatest([this.calendar.activityMap$, this.calendar.productModelsIdsToDisplay$])
+            .pipe(takeUntil(this.destroy$))
+            .subscribe(([activityMap, productModelsIdsToDisplay]) => {
                 const activityMapToDisplay: ActivityMap = JSON.parse(JSON.stringify(activityMap));
 
                 for(let userId in activityMapToDisplay) {
@@ -192,5 +203,23 @@ export class PlanningEmployeesCalendarComponent implements OnInit, AfterViewInit
         }
 
         return '#BAA9A2';
+    }
+
+    public openMoment(employeeId: number, dayIndex: string, timeSlotCode: 'AM'|'PM'|'EV') {
+        const employee = this.employeeList.find(e => e.id === employeeId);
+        if(!employee) {
+            return;
+        }
+
+        const data: MomentDialogOpenData = { employee, dayIndex, timeSlotCode };
+
+        this.dialog.open(PlanningEmployeesCalendarMomentDialogComponent, {
+            width: '100vw',
+            height: '100vh',
+            maxWidth: '100vw',
+            maxHeight: '100vh',
+            panelClass: 'full-screen-dialog',
+            data: data
+        });
     }
 }
