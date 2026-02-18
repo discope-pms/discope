@@ -5,6 +5,7 @@ import { Employee, TimeSlot } from '../../../../../../../type';
 import { EnvService } from 'sb-shared-lib';
 import { combineLatest, from, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import { ApiService } from '../../../../../../_services/api.service';
 
 export interface MomentDialogOpenData {
     calendar: CalendarService,
@@ -20,24 +21,29 @@ export interface MomentDialogOpenData {
 })
 export class PlanningEmployeesCalendarMomentDialogComponent implements OnInit, OnDestroy {
 
-    private calendar: CalendarService;
+    private readonly calendar: CalendarService;
 
-    public employee: Employee;
-    private dayIndex: string;
-    private timeSlotCode: string;
+    public readonly employee: Employee;
+    public dayIndex: string;
+    public date: Date;
+    private readonly timeSlotCode: 'AM'|'PM'|'EV';
 
     public timeDetailsText = '';
+
+    public activities: any[] = [];
 
     private destroy$ = new Subject<void>();
 
     constructor(
         private env: EnvService,
+        private api: ApiService,
         private dialogRef: MatDialogRef<PlanningEmployeesCalendarMomentDialogComponent>,
         @Inject(MAT_DIALOG_DATA) public data: MomentDialogOpenData
     ) {
         this.calendar = data.calendar;
         this.employee = data.employee;
         this.dayIndex = data.dayIndex;
+        this.date = new Date(data.dayIndex);
         this.timeSlotCode = data.timeSlotCode;
     }
 
@@ -52,11 +58,17 @@ export class PlanningEmployeesCalendarMomentDialogComponent implements OnInit, O
 
                 const timeSlot: TimeSlot = timeSlotList.find((ts: TimeSlot) => ts.code === this.timeSlotCode);
                 if(timeSlot) {
-                    this.timeDetailsText = this.formatDate(new Date(this.dayIndex), env.locale) + ' - ' + timeSlot.name.toLowerCase();
+                    this.timeDetailsText = this.formatDate(this.date, env.locale) + ' - ' + timeSlot.name.toLowerCase();
                 }
             });
 
-        // TODO: Display info employee, day and moment
+        this.calendar.activityMap$.subscribe(activityMap => {
+            let activities: any[] = [];
+            if(activityMap?.[this.employee.id]?.[this.dayIndex]?.[this.timeSlotCode]?.length) {
+                activities = activityMap?.[this.employee.id]?.[this.dayIndex]?.[this.timeSlotCode];
+            }
+            this.activities = activities;
+        });
 
         // TODO: List activities
 
@@ -76,6 +88,27 @@ export class PlanningEmployeesCalendarMomentDialogComponent implements OnInit, O
         date = new Date(date.getTime());
         const formatter = new Intl.DateTimeFormat(locale.replace('_', '-'), { weekday: 'long', day: '2-digit', month: '2-digit' });
         return formatter.format(date);
+    }
+
+    public getActivityColor(activity: any): string {
+        if(activity.is_partner_event) {
+            const mapPartnerEventColors: any = {
+                camp_activity: '#7A8F78',
+                leave: '#BFA58A',
+                time_off: '#8C6E5E',
+                other: '#6C7A91',
+                rest: '#6F5B4D',
+                trainer: '#C27A5A',
+                training: '#8F4E3A'
+            };
+
+            return mapPartnerEventColors[activity.event_type];
+        }
+        else if(activity.product_model_id.activity_color) {
+            return activity.product_model_id.activity_color;
+        }
+
+        return '#BAA9A2';
     }
 
     public close() {

@@ -21,6 +21,8 @@ interface CollectOptions {
 }
 
 type EntityNamespace = 'identity\\Center'
+    | 'sale\\booking\\BookingActivity'
+    | 'sale\\booking\\PartnerEvent'
     | 'sale\\booking\\TimeSlot'
     | 'sale\\catalog\\Category'
     | 'hr\\employee\\Employee'

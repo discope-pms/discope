@@ -35,7 +35,7 @@ export const translations: { [lang: string]: { [key: string]: string } } = {
         /**
          * Moment details
          */
-        'MOMENT_DIALOG_TITLE': 'Details',
+        'MOMENT_DIALOG_NO_ACTIVITIES_ASSIGNED': 'No activities assigned',
         'MOMENT_CLOSE_BTN': 'Close'
 
     },
@@ -75,7 +75,7 @@ export const translations: { [lang: string]: { [key: string]: string } } = {
         /**
          * Moment details
          */
-        'MOMENT_DIALOG_TITLE': 'Détails',
+        'MOMENT_DIALOG_NO_ACTIVITIES_ASSIGNED': 'Aucune activité assignée',
         'MOMENT_CLOSE_BTN': 'Fermer'
 
     }

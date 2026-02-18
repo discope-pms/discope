@@ -16,7 +16,7 @@ export interface FilterDialogOpenData {
 })
 export class PlanningEmployeesFiltersDialogComponent implements OnInit, OnDestroy {
 
-    private calendar: CalendarService;
+    private readonly calendar: CalendarService;
 
     public userGroup: 'organizer'|'manager'|'animator'|null = null;
     public initialSelectedEmployeeRole: 'ALL'|'EQUI'|'ENV'|'SP' =  'ALL';

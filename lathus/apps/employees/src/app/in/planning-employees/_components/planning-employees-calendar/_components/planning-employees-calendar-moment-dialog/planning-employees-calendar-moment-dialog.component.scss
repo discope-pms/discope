@@ -9,8 +9,33 @@
 
         .time-details {
             margin-left: 5px;
+            margin-bottom: 10px;
             font-size: 0.9rem;
             font-weight: 500;
+        }
+
+        .activities {
+            display: flex;
+            width: 100%;
+            flex-direction: column;
+            padding: 20px 0;
+            gap: 10px;
+
+            .activity-card {
+                width: 100%;
+                padding: 20px;
+                color: white;
+                border: 1px solid #f1f1f1;
+                border-radius: 5px;
+            }
+        }
+
+        .no-activities {
+            display: flex;
+            height: 80px;
+            justify-content: center;
+            align-items: center;
+            font-weight: 700;
         }
     }
 
