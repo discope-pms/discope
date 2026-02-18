@@ -215,13 +215,17 @@ export class PlanningEmployeesCalendarComponent implements OnInit, AfterViewInit
 
         const data: MomentDialogOpenData = { calendar: this.calendar, employee, dayIndex, timeSlotCode };
 
-        this.dialog.open(PlanningEmployeesCalendarMomentDialogComponent, {
+        const dialog = this.dialog.open(PlanningEmployeesCalendarMomentDialogComponent, {
             width: '100vw',
             height: '100vh',
             maxWidth: '100vw',
             maxHeight: '100vh',
             panelClass: 'full-screen-dialog',
             data: data
+        });
+
+        dialog.afterClosed().subscribe(() => {
+            this.calendar.refresh();
         });
     }
 }
