@@ -1,0 +1,22 @@
+<div class="employee-col" (click)="toggleOpen()">
+    <app-icon-button *ngIf="!opened" [icon]="'unfold_more'" [fillInverse]="true"></app-icon-button>
+    <app-icon-button *ngIf="opened" [icon]="'unfold_less'" [fillInverse]="true"></app-icon-button>
+</div>
+
+<ng-container *ngFor="let dayIndex of daysIndexes">
+    <div class="moment-col">
+        <ng-container *ngIf="(unassignedActivityMap?.['0']?.[dayIndex]?.['AM']?.length || 0) > 0">
+            <app-planning-employees-calendar-activity-card *ngFor="let activity of unassignedActivityMap['0'][dayIndex]['AM']" [activity]="activity"></app-planning-employees-calendar-activity-card>
+        </ng-container>
+    </div>
+    <div class="moment-col">
+        <ng-container *ngIf="(unassignedActivityMap?.['0']?.[dayIndex]?.['PM']?.length || 0) > 0">
+            <app-planning-employees-calendar-activity-card *ngFor="let activity of unassignedActivityMap['0'][dayIndex]['PM']" [activity]="activity"></app-planning-employees-calendar-activity-card>
+        </ng-container>
+    </div>
+    <div class="moment-col">
+        <ng-container *ngIf="(unassignedActivityMap?.['0']?.[dayIndex]?.['EV']?.length || 0) > 0">
+            <app-planning-employees-calendar-activity-card *ngFor="let activity of unassignedActivityMap['0'][dayIndex]['EV']" [activity]="activity"></app-planning-employees-calendar-activity-card>
+        </ng-container>
+    </div>
+</ng-container>

@@ -9,6 +9,8 @@ import { CalendarService } from './_services/calendar.service';
 })
 export class PlanningEmployeesComponent implements OnInit  {
 
+    public unassignedOpened = false;
+
     constructor(
         private calendar: CalendarService
     ) {

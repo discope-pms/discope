@@ -2,6 +2,16 @@
     display: flex;
     height: 100%;
     flex-direction: column;
-    gap: 25px;
+    gap: 15px;
     padding: 10px;
+
+    .unassigned-activities {
+        min-height: 70px;
+        max-height: 70px;
+
+        &.opened {
+            min-height: 200px;
+            max-height: 200px;
+        }
+    }
 }

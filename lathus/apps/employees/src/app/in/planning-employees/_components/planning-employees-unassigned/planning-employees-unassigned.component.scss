@@ -1,0 +1,40 @@
+:host {
+    display: flex;
+    width: 100%;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px #0000000a, 0 1px 2px #0000000a;
+    overflow: auto;
+    font-family: Arial, sans-serif;
+
+    .employee-col,
+    .moment-col {
+        padding: 1px;
+        border: 1px solid #f1f1f1;
+    }
+
+    .employee-col{
+        display: flex;
+        width: 120px;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .moment-col {
+        display: flex;
+        flex-grow: 1;
+        flex-basis: 0;
+        flex-direction: column;
+        gap: 1px;
+        min-width: 0;
+        overflow: hidden;
+
+        .activity-card {
+            width: 100%;
+            padding: 5px;
+            color: white;
+            border: 1px solid #f1f1f1;
+            border-radius: 5px;
+        }
+    }
+}
