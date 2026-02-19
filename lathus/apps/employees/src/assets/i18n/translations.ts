@@ -15,28 +15,47 @@ export const translations: { [lang: string]: { [key: string]: string } } = {
         'SIGN_IN_FORM_FIELD_LABEL_USERNAME': 'Username',
         'SIGN_IN_FORM_FIELD_LABEL_PASSWORD': 'Password',
         'SIGN_IN_FORM_CONNECTION_BTN': 'Sign in',
-        'SIGN_IN_ERROR_MSG_INVALID_USERNAME_OR_PASSWORD': "Invalid username or password.",
+        'SIGN_IN_ERROR_MSG_INVALID_USERNAME_OR_PASSWORD': 'Invalid username or password.',
 
         /**
          * User settings
          */
-        'USER_SETTINGS_SIGN_OUT_BTN': "Sign out",
+        'USER_SETTINGS_SIGN_OUT_BTN': 'Sign out',
 
         /**
          * Filters
          */
         'FILTERS_DIALOG_TITLE': 'Filters',
-        'FILTERS_EMPLOYEE_ROLE_LABEL': 'Sector',
-        'FILTERS_EMPLOYEE_LABEL': 'Animator',
-        'FILTERS_PRODUCT_MODEL_LABEL': 'Activity',
-        'FILTERS_CANCEL_BTN': 'Cancel',
-        'FILTERS_APPLY_BTN': 'Apply',
+        'FILTERS_DIALOG_EMPLOYEE_ROLE_LABEL': 'Sector',
+        'FILTERS_DIALOG_EMPLOYEE_LABEL': 'Animator',
+        'FILTERS_DIALOG_PRODUCT_MODEL_LABEL': 'Activity',
+        'FILTERS_DIALOG_CANCEL_BTN': 'Cancel',
+        'FILTERS_DIALOG_APPLY_BTN': 'Apply',
 
         /**
          * Moment details
          */
         'MOMENT_DIALOG_NO_ACTIVITIES_ASSIGNED': 'No activities assigned',
-        'MOMENT_CLOSE_BTN': 'Close'
+        'MOMENT_DIALOG_CLOSE_BTN': 'Close',
+
+        /**
+         * Activity details
+         */
+        'ACTIVITY_DIALOG_TITLE': 'Activity',
+        'ACTIVITY_DIALOG_ACTIVITY_LABEL': 'Activity',
+        'ACTIVITY_DIALOG_DATE_LABEL': 'Date',
+        'ACTIVITY_DIALOG_GROUP_LABEL': 'Group',
+        'ACTIVITY_DIALOG_PEOPLE': 'people',
+        'ACTIVITY_DIALOG_DISABILITY': 'Disability',
+        'ACTIVITY_DIALOG_DISABILITY_YES': 'yes',
+        'ACTIVITY_DIALOG_DISABILITY_NO': 'no',
+        'ACTIVITY_DIALOG_FROM': 'From',
+        'ACTIVITY_DIALOG_TO': 'to',
+        'ACTIVITY_DIALOG_BOOKING_LABEL': 'Booking',
+        'ACTIVITY_DIALOG_CAMP_LABEL': 'Camp',
+        'ACTIVITY_DIALOG_EMPLOYEE_LABEL': 'Animator',
+        'ACTIVITY_DIALOG_CLOSE_BTN': 'Close',
+        'ACTIVITY_DIALOG_SAVE_BTN': 'Save'
 
     },
     'fr': {
@@ -55,28 +74,47 @@ export const translations: { [lang: string]: { [key: string]: string } } = {
         'SIGN_IN_FORM_FIELD_LABEL_USERNAME': "Nom d'utilisateur",
         'SIGN_IN_FORM_FIELD_LABEL_PASSWORD': 'Mot de passe',
         'SIGN_IN_FORM_CONNECTION_BTN': 'Connexion',
-        'SIGN_IN_ERROR_MSG_INVALID_USERNAME_OR_PASSWORD': "Nom d'utilisateur ou mot de passe invalide.",
+        'SIGN_IN_ERROR_MSG_INVALID_USERNAME_OR_PASSWORD': 'Nom d\'utilisateur ou mot de passe invalide.',
 
         /**
          * User settings
          */
-        'USER_SETTINGS_SIGN_OUT_BTN': "Se déconnecter",
+        'USER_SETTINGS_SIGN_OUT_BTN': 'Se déconnecter',
 
         /**
          * Filters
          */
         'FILTERS_DIALOG_TITLE': 'Filtres',
-        'FILTERS_EMPLOYEE_ROLE_LABEL': 'Secteur',
-        'FILTERS_EMPLOYEE_LABEL': 'Animateur',
-        'FILTERS_PRODUCT_MODEL_LABEL': 'Activité',
-        'FILTERS_CANCEL_BTN': 'Annuler',
-        'FILTERS_APPLY_BTN': 'Appliquer',
+        'FILTERS_DIALOG_EMPLOYEE_ROLE_LABEL': 'Secteur',
+        'FILTERS_DIALOG_EMPLOYEE_LABEL': 'Animateur',
+        'FILTERS_DIALOG_PRODUCT_MODEL_LABEL': 'Activité',
+        'FILTERS_DIALOG_CANCEL_BTN': 'Annuler',
+        'FILTERS_DIALOG_APPLY_BTN': 'Appliquer',
 
         /**
          * Moment details
          */
         'MOMENT_DIALOG_NO_ACTIVITIES_ASSIGNED': 'Aucune activité assignée',
-        'MOMENT_CLOSE_BTN': 'Fermer'
+        'MOMENT_DIALOG_CLOSE_BTN': 'Fermer',
+
+        /**
+         * Activity details
+         */
+        'ACTIVITY_DIALOG_TITLE': 'Activité',
+        'ACTIVITY_DIALOG_ACTIVITY_LABEL': 'Activité',
+        'ACTIVITY_DIALOG_DATE_LABEL': 'Date',
+        'ACTIVITY_DIALOG_GROUP_LABEL': 'Groupe',
+        'ACTIVITY_DIALOG_PEOPLE': 'personnes',
+        'ACTIVITY_DIALOG_DISABILITY': 'Handicap',
+        'ACTIVITY_DIALOG_DISABILITY_YES': 'oui',
+        'ACTIVITY_DIALOG_DISABILITY_NO': 'non',
+        'ACTIVITY_DIALOG_FROM': 'Du',
+        'ACTIVITY_DIALOG_TO': 'au',
+        'ACTIVITY_DIALOG_BOOKING_LABEL': 'Réservation',
+        'ACTIVITY_DIALOG_CAMP_LABEL': 'Camp',
+        'ACTIVITY_DIALOG_EMPLOYEE_LABEL': 'Animateur',
+        'ACTIVITY_DIALOG_CLOSE_BTN': 'Fermer',
+        'ACTIVITY_DIALOG_SAVE_BTN': 'Enregistrer'
 
     }
 };

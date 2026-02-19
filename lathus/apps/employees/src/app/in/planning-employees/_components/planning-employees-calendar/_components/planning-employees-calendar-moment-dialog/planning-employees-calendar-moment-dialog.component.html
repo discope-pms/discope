@@ -4,7 +4,12 @@
     <div class="time-details">{{ timeDetailsText }}</div>
 
     <div *ngIf="activities.length > 0" class="activities">
-        <app-planning-employees-calendar-activity-card *ngFor="let activity of activities" [activity]="activity" class="activity-card" [padding]="'15px'"></app-planning-employees-calendar-activity-card>
+        <app-planning-employees-calendar-activity-card
+            *ngFor="let activity of activities"
+            [activity]="activity" class="activity-card"
+            [padding]="'15px'"
+            (click)="openActivity(activity)"
+        ></app-planning-employees-calendar-activity-card>
     </div>
 
     <div *ngIf="activities.length === 0" class="no-activities">
@@ -13,5 +18,5 @@
 </mat-dialog-content>
 
 <mat-dialog-actions align="end">
-    <button mat-button (click)="close()">{{ 'MOMENT_CLOSE_BTN' | translate }}</button>
+    <button mat-button (click)="close()">{{ 'MOMENT_DIALOG_CLOSE_BTN' | translate }}</button>
 </mat-dialog-actions>

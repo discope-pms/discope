@@ -3,6 +3,8 @@ import { combineLatest, Subject } from 'rxjs';
 import { CalendarService } from '../../_services/calendar.service';
 import { takeUntil } from 'rxjs/operators';
 import { ActivityMap, ActivityMapActivity } from '../../../../../type';
+import { ActivityDialogData,  PlanningEmployeesActivityDialogComponent } from '../planning-employees-activity-dialog/planning-employees-activity-dialog.component';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
     selector: 'app-planning-employees-unassigned',
@@ -23,7 +25,8 @@ export class PlanningEmployeesUnassignedComponent implements OnInit, OnDestroy  
     private destroy$ = new Subject<void>();
 
     constructor(
-        private calendar: CalendarService
+        private calendar: CalendarService,
+        private dialog: MatDialog
     ) {
     }
 
@@ -89,5 +92,18 @@ export class PlanningEmployeesUnassignedComponent implements OnInit, OnDestroy  
         else {
             this.open.emit();
         }
+    }
+
+    public openActivity(activity: ActivityMapActivity) {
+        const data: ActivityDialogData = { calendar: this.calendar, activity };
+
+        this.dialog.open(PlanningEmployeesActivityDialogComponent, {
+            width: '100vw',
+            height: '100vh',
+            maxWidth: '100vw',
+            maxHeight: '100vh',
+            panelClass: 'full-screen-dialog',
+            data: data
+        });
     }
 }

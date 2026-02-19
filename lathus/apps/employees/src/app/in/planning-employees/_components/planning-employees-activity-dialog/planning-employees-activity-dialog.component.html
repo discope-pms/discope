@@ -1,0 +1,85 @@
+<h2 mat-dialog-title>{{ 'ACTIVITY_DIALOG_TITLE' | translate }}</h2>
+
+<mat-dialog-content>
+    <div class="activity-details">
+        <div class="activity-detail">
+            <div class="label">{{ 'ACTIVITY_DIALOG_ACTIVITY_LABEL' | translate }}</div>
+            <div class="value">
+                <div>{{ activity.name }}</div>
+                <div *ngIf="activity.booking_id || activity.camp_id" style="font-size: 0.75rem;">
+                    ({{ activity.counter }}/{{ activity.counter_total }})
+                </div>
+            </div>
+        </div>
+        <div class="activity-detail">
+            <div class="label">{{ 'ACTIVITY_DIALOG_DATE_LABEL' | translate }}</div>
+            <div class="value">
+                <div>{{ dateFormated }}</div>
+                <div *ngIf="activity.schedule_from">{{ activity.schedule_from }} - {{ activity.schedule_to }}</div>
+            </div>
+        </div>
+
+        <ng-container *ngIf="activity.booking_id">
+            <div class="activity-detail">
+                <div class="label">{{ 'ACTIVITY_DIALOG_GROUP_LABEL' | translate }}</div>
+                <div class="value">
+                    <div>N° {{ activity.group_num }}</div>
+                    <div *ngFor="let age_range_assign of activity.age_range_assignments_ids">
+                        {{ age_range_assign.qty }} {{ 'ACTIVITY_DIALOG_PEOPLE' | translate }} ({{ age_range_assign.age_from }} - {{ age_range_assign.age_to }})
+                    </div>
+                    <div>
+                        <div>
+                            <span>{{ 'ACTIVITY_DIALOG_DISABILITY' | translate }} : </span>
+                            <span *ngIf="activity.booking_line_group_id?.has_person_with_disability">{{ 'ACTIVITY_DIALOG_DISABILITY_YES' | translate }}</span>
+                            <span *ngIf="!activity.booking_line_group_id?.has_person_with_disability">{{ 'ACTIVITY_DIALOG_DISABILITY_NO' | translate }}</span>
+                        </div>
+                        <div *ngIf="activity.booking_line_group_id?.has_person_with_disability && activity.booking_line_group_id?.person_disability_description">
+                            {{ activity.booking_line_group_id?.person_disability_description }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="activity-detail">
+                <div class="label">{{ 'ACTIVITY_DIALOG_BOOKING_LABEL' | translate }}</div>
+                <div class="value">
+                    <div *ngIf="activity?.customer_id?.name">{{ activity?.customer_id?.name }}</div>
+                    <div>{{ 'ACTIVITY_DIALOG_FROM' | translate }} {{ activity.booking_id.date_from }} {{ 'ACTIVITY_DIALOG_TO' | translate }} {{ activity.booking_id.date_to }}</div>
+                    <div>{{ activity.booking_id.nb_pers }} {{ 'ACTIVITY_DIALOG_PEOPLE' | translate }}</div>
+                </div>
+            </div>
+        </ng-container>
+
+        <ng-container *ngIf="activity.camp_id">
+            <div class="activity-detail">
+                <div class="label">{{ 'ACTIVITY_DIALOG_GROUP_LABEL' | translate }}</div>
+                <div class="value">
+                    <div>N° {{ activity.group_num }}</div>
+                    <div>{{ activity.camp_id.enrollments_qty }} {{ 'ACTIVITY_DIALOG_PEOPLE' | translate }} ({{ activity.camp_id.min_age }} - {{ activity.camp_id.max_age }})</div>
+                </div>
+            </div>
+            <div class="activity-detail">
+                <div class="label">{{ 'ACTIVITY_DIALOG_CAMP_LABEL' | translate }}</div>
+                <div class="value">
+                    <div>{{ activity.camp_id.short_name }}</div>
+                    <div>Du {{ activity.camp_id.date_from }} au {{ activity.camp_id.date_to }}</div>
+                </div>
+            </div>
+        </ng-container>
+    </div>
+
+    <div [formGroup]="form" class="form">
+        <mat-form-field *ngIf="!activity?.is_partner_event" class="field" appearance="fill">
+            <mat-label>{{ 'ACTIVITY_DIALOG_EMPLOYEE_LABEL' | translate }}</mat-label>
+            <mat-select formControlName="employee">
+                <mat-option *ngFor="let employee of employees" [value]="employee.id">
+                    {{ employee.name }}
+                </mat-option>
+            </mat-select>
+        </mat-form-field>
+    </div>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+    <button mat-button (click)="close()">{{ 'ACTIVITY_DIALOG_CLOSE_BTN' | translate }}</button>
+    <button *ngIf="!activity?.is_partner_event" mat-button color="primary" (click)="closeAndSave()">{{ 'ACTIVITY_DIALOG_SAVE_BTN' | translate }}</button>
+</mat-dialog-actions>

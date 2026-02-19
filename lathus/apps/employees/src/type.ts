@@ -71,6 +71,7 @@ export interface ActivityMapActivity {
     qty: number;
     providers_ids: number[];
     activity_date: string; // ISO date string
+    event_date: string; // ISO date string
     time_slot_id: number;
     is_exclusive: boolean;
     schedule_from: string; // HH:mm:ss

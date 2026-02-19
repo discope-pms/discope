@@ -1,11 +1,14 @@
 import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { CalendarService } from '../../../../_services/calendar.service';
-import { Employee, TimeSlot } from '../../../../../../../type';
+import { ActivityMapActivity, Employee, TimeSlot } from '../../../../../../../type';
 import { EnvService } from 'sb-shared-lib';
 import { combineLatest, from, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { ApiService } from '../../../../../../_services/api.service';
+import {
+    ActivityDialogData,
+    PlanningEmployeesActivityDialogComponent
+} from '../../../planning-employees-activity-dialog/planning-employees-activity-dialog.component';
 
 export interface MomentDialogOpenData {
     calendar: CalendarService,
@@ -36,7 +39,7 @@ export class PlanningEmployeesCalendarMomentDialogComponent implements OnInit, O
 
     constructor(
         private env: EnvService,
-        private api: ApiService,
+        private dialog: MatDialog,
         private dialogRef: MatDialogRef<PlanningEmployeesCalendarMomentDialogComponent>,
         @Inject(MAT_DIALOG_DATA) public data: MomentDialogOpenData
     ) {
@@ -69,14 +72,6 @@ export class PlanningEmployeesCalendarMomentDialogComponent implements OnInit, O
             }
             this.activities = activities;
         });
-
-        // TODO: List activities
-
-        // TODO: List partner event
-
-        // Open :
-        // TODO: Open modification dialog for activities
-        // TODO: Open modification dialog for partner events
     }
 
     ngOnDestroy() {
@@ -92,5 +87,18 @@ export class PlanningEmployeesCalendarMomentDialogComponent implements OnInit, O
 
     public close() {
         this.dialogRef.close();
+    }
+
+    public openActivity(activity: ActivityMapActivity) {
+        const data: ActivityDialogData = { calendar: this.calendar, activity };
+
+        this.dialog.open(PlanningEmployeesActivityDialogComponent, {
+            width: '100vw',
+            height: '100vh',
+            maxWidth: '100vw',
+            maxHeight: '100vh',
+            panelClass: 'full-screen-dialog',
+            data: data
+        });
     }
 }

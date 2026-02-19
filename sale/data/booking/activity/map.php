@@ -326,6 +326,8 @@ if(!empty($activity_partner_activities_ids)) {
             }
         }
 
+        $event_date = $adapter->adaptOut($partner_activity['event_date'], Field::MAP_TYPE_USAGE['date']);
+
         $result[$partner_activity['partner_id']][$date_index][$time_slot][] = array_merge($partner_activity->toArray(), [
             'is_partner_event'          => true,
             'booking_id'                => null,
@@ -337,6 +339,7 @@ if(!empty($activity_partner_activities_ids)) {
             'partner_identity_id'       => null,
             'age_range_assignments_ids' => [],
             'partner_id'                => $partner_activity['partner_id'],
+            'event_date'                => $event_date
         ]);
     }
 }
