@@ -33,13 +33,13 @@ export class PlanningEmployeesActivityDialogComponent implements OnInit {
     public form: FormGroup;
 
     public eventTypeMap = {
-        camp_activity: this.translateService.translate('ACTIVITY_DIALOG_EVENT_TYPE_CAMP_ACTIVITY'),
-        leave: this.translateService.translate('ACTIVITY_DIALOG_EVENT_TYPE_LEAVE'),
-        other: this.translateService.translate('ACTIVITY_DIALOG_EVENT_TYPE_OTHER'),
-        rest: this.translateService.translate('ACTIVITY_DIALOG_EVENT_TYPE_REST'),
-        time_off: this.translateService.translate('ACTIVITY_DIALOG_EVENT_TYPE_TIME_OFF'),
-        trainer: this.translateService.translate('ACTIVITY_DIALOG_EVENT_TYPE_TRAINER'),
-        training: this.translateService.translate('ACTIVITY_DIALOG_EVENT_TYPE_TRAINING'),
+        camp_activity: this.translateService.translate('PARTNER_EVENT_TYPE_CAMP_ACTIVITY'),
+        leave: this.translateService.translate('PARTNER_EVENT_TYPE_LEAVE'),
+        other: this.translateService.translate('PARTNER_EVENT_TYPE_OTHER'),
+        rest: this.translateService.translate('PARTNER_EVENT_TYPE_REST'),
+        time_off: this.translateService.translate('PARTNER_EVENT_TYPE_TIME_OFF'),
+        trainer: this.translateService.translate('PARTNER_EVENT_TYPE_TRAINER'),
+        training: this.translateService.translate('PARTNER_EVENT_TYPE_TRAINING'),
     };
 
     constructor(
@@ -79,7 +79,7 @@ export class PlanningEmployeesActivityDialogComponent implements OnInit {
         this.calendar.employeeList$.subscribe(employeeList => {
             if(!this.activity?.is_partner_event) {
                 this.employees = [
-                    { id: 0, name: 'Non assigné' },
+                    { id: 0, name: this.translateService.translate('ACTIVITY_DIALOG_NOT_ASSIGNED') },
                     ...employeeList.filter(e => e.activity_product_models_ids.includes(this.activity.product_model_id.id))
                         .map(e => { return { id: e.id, name: e.name }; })
                 ];

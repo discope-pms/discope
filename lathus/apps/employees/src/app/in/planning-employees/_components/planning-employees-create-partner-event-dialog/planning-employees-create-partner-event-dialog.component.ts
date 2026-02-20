@@ -27,13 +27,13 @@ export class PlanningEmployeesCreatePartnerEventDialogComponent implements OnIni
     public form: FormGroup;
 
     public eventTypeMap = {
-        camp_activity: this.translateService.translate('ACTIVITY_DIALOG_EVENT_TYPE_CAMP_ACTIVITY'),
-        leave: this.translateService.translate('ACTIVITY_DIALOG_EVENT_TYPE_LEAVE'),
-        other: this.translateService.translate('ACTIVITY_DIALOG_EVENT_TYPE_OTHER'),
-        rest: this.translateService.translate('ACTIVITY_DIALOG_EVENT_TYPE_REST'),
-        time_off: this.translateService.translate('ACTIVITY_DIALOG_EVENT_TYPE_TIME_OFF'),
-        trainer: this.translateService.translate('ACTIVITY_DIALOG_EVENT_TYPE_TRAINER'),
-        training: this.translateService.translate('ACTIVITY_DIALOG_EVENT_TYPE_TRAINING'),
+        camp_activity: this.translateService.translate('PARTNER_EVENT_TYPE_CAMP_ACTIVITY'),
+        leave: this.translateService.translate('PARTNER_EVENT_TYPE_LEAVE'),
+        other: this.translateService.translate('PARTNER_EVENT_TYPE_OTHER'),
+        rest: this.translateService.translate('PARTNER_EVENT_TYPE_REST'),
+        time_off: this.translateService.translate('PARTNER_EVENT_TYPE_TIME_OFF'),
+        trainer: this.translateService.translate('PARTNER_EVENT_TYPE_TRAINER'),
+        training: this.translateService.translate('PARTNER_EVENT_TYPE_TRAINING'),
     };
 
     constructor(

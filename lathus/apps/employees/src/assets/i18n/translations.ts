@@ -18,9 +18,28 @@ export const translations: { [lang: string]: { [key: string]: string } } = {
         'SIGN_IN_ERROR_MSG_INVALID_USERNAME_OR_PASSWORD': 'Invalid username or password.',
 
         /**
+         * Data
+         */
+        'PARTNER_EVENT_TYPE_LEAVE': 'Leave',
+        'PARTNER_EVENT_TYPE_OTHER': 'Other',
+        'PARTNER_EVENT_TYPE_REST': 'Rest',
+        'PARTNER_EVENT_TYPE_TIME_OFF': 'Time off',
+        'PARTNER_EVENT_TYPE_TRAINER': 'Trainer',
+        'PARTNER_EVENT_TYPE_TRAINING': 'Training',
+
+        'TIME_SLOT_AM': 'Morning',
+        'TIME_SLOT_PM': 'Afternoon',
+        'TIME_SLOT_EV': 'Evening',
+
+        /**
          * User settings
          */
         'USER_SETTINGS_SIGN_OUT_BTN': 'Sign out',
+
+        /**
+         * Planning employees
+         */
+        'PLANNING_EMPLOYEES_ANIMATORS': 'Animators',
 
         /**
          * Filters
@@ -55,14 +74,9 @@ export const translations: { [lang: string]: { [key: string]: string } } = {
         'ACTIVITY_DIALOG_BOOKING_LABEL': 'Booking',
         'ACTIVITY_DIALOG_CAMP_LABEL': 'Camp',
         'ACTIVITY_DIALOG_EMPLOYEE_LABEL': 'Animator',
-        'ACTIVITY_DIALOG_EVENT_TYPE_LABEL': 'Type',
-        'ACTIVITY_DIALOG_EVENT_TYPE_CAMP_ACTIVITY': 'Camp activity',
-        'ACTIVITY_DIALOG_EVENT_TYPE_LEAVE': 'Leave',
-        'ACTIVITY_DIALOG_EVENT_TYPE_OTHER': 'Other',
-        'ACTIVITY_DIALOG_EVENT_TYPE_REST': 'Rest',
-        'ACTIVITY_DIALOG_EVENT_TYPE_TIME_OFF': 'Time off',
-        'ACTIVITY_DIALOG_EVENT_TYPE_TRAINER': 'Trainer',
-        'ACTIVITY_DIALOG_EVENT_TYPE_TRAINING': 'Training',
+        'ACTIVITY_DIALOG_NOT_ASSIGNED': 'Not assigned',
+        'PARTNER_EVENT_TYPE_LABEL': 'Type',
+        'PARTNER_EVENT_TYPE_CAMP_ACTIVITY': 'Camp activity',
         'ACTIVITY_DIALOG_DESCRIPTION_LABEL': 'Description',
         'ACTIVITY_DIALOG_MODIFY_PARTNER_EVENT': 'Modify',
         'ACTIVITY_DIALOG_DELETE_PARTNER_EVENT': 'Delete',
@@ -99,9 +113,29 @@ export const translations: { [lang: string]: { [key: string]: string } } = {
         'SIGN_IN_ERROR_MSG_INVALID_USERNAME_OR_PASSWORD': 'Nom d\'utilisateur ou mot de passe invalide.',
 
         /**
+         * Data
+         */
+        'PARTNER_EVENT_TYPE_CAMP_ACTIVITY': 'Activité camp',
+        'PARTNER_EVENT_TYPE_LEAVE': 'Congé',
+        'PARTNER_EVENT_TYPE_OTHER': 'Autre',
+        'PARTNER_EVENT_TYPE_REST': 'Repos',
+        'PARTNER_EVENT_TYPE_TIME_OFF': 'Temps libre',
+        'PARTNER_EVENT_TYPE_TRAINER': 'Formateur',
+        'PARTNER_EVENT_TYPE_TRAINING': 'Formation',
+
+        'TIME_SLOT_AM': 'Matin',
+        'TIME_SLOT_PM': 'Midi',
+        'TIME_SLOT_EV': 'Soir',
+
+        /**
          * User settings
          */
         'USER_SETTINGS_SIGN_OUT_BTN': 'Se déconnecter',
+
+        /**
+         * Planning employees
+         */
+        'PLANNING_EMPLOYEES_ANIMATORS': 'Animateurs',
 
         /**
          * Filters
@@ -136,14 +170,8 @@ export const translations: { [lang: string]: { [key: string]: string } } = {
         'ACTIVITY_DIALOG_BOOKING_LABEL': 'Réservation',
         'ACTIVITY_DIALOG_CAMP_LABEL': 'Camp',
         'ACTIVITY_DIALOG_EMPLOYEE_LABEL': 'Animateur',
-        'ACTIVITY_DIALOG_EVENT_TYPE_LABEL': 'Type',
-        'ACTIVITY_DIALOG_EVENT_TYPE_CAMP_ACTIVITY': 'Activité camp',
-        'ACTIVITY_DIALOG_EVENT_TYPE_LEAVE': 'Congé',
-        'ACTIVITY_DIALOG_EVENT_TYPE_OTHER': 'Autre',
-        'ACTIVITY_DIALOG_EVENT_TYPE_REST': 'Repos',
-        'ACTIVITY_DIALOG_EVENT_TYPE_TIME_OFF': 'Temps libre',
-        'ACTIVITY_DIALOG_EVENT_TYPE_TRAINER': 'Formateur',
-        'ACTIVITY_DIALOG_EVENT_TYPE_TRAINING': 'Formation',
+        'ACTIVITY_DIALOG_NOT_ASSIGNED': 'Non assignée',
+        'PARTNER_EVENT_TYPE_LABEL': 'Type',
         'ACTIVITY_DIALOG_DESCRIPTION_LABEL': 'Description',
         'ACTIVITY_DIALOG_MODIFY_PARTNER_EVENT': 'Modifier',
         'ACTIVITY_DIALOG_DELETE_PARTNER_EVENT': 'Supprimer',
