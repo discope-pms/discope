@@ -17,7 +17,7 @@ export class CalendarService implements OnDestroy {
     private userGroupSubject = new BehaviorSubject<'animator'|'manager'|'organizer'|null>(null);
     public userGroup$ = this.userGroupSubject.asObservable();
 
-    private employeeRoleSubject = new BehaviorSubject<'EQUI'|'ENV'|'SP'|null>(null);
+    private employeeRoleSubject = new BehaviorSubject<'EQUI'|'ENV'|'SP'>('EQUI');
     public employeeRole$ = this.employeeRoleSubject.asObservable();
 
     /**
