@@ -63,6 +63,12 @@ export class PlanningEmployeesActivityDialogComponent implements OnInit {
             this.form = this.formBuilder.group({
                 employee: [this.activity.employee_id ?? 0]
             });
+
+            this.calendar.userGroup$.subscribe(userGroup => {
+                if(userGroup === 'animator') {
+                    this.form.get('employee')?.disable();
+                }
+            });
         }
         else {
             this.form = this.formBuilder.group({});

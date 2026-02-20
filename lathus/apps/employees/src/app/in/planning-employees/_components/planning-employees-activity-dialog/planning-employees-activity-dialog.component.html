@@ -67,8 +67,8 @@
         </ng-container>
     </div>
 
-    <div [formGroup]="form" class="form">
-        <mat-form-field *ngIf="!activity?.is_partner_event" class="field" appearance="fill">
+    <div *ngIf="!activity?.is_partner_event" [formGroup]="form" class="form">
+        <mat-form-field class="field" appearance="fill">
             <mat-label>{{ 'ACTIVITY_DIALOG_EMPLOYEE_LABEL' | translate }}</mat-label>
             <mat-select formControlName="employee">
                 <mat-option *ngFor="let employee of employees" [value]="employee.id">

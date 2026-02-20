@@ -20,7 +20,7 @@ export class PlanningEmployeesUnassignedComponent implements OnInit, OnDestroy  
 
     public daysIndexes: string[] = [];
 
-    public unassignedActivityMap: ActivityMap
+    public unassignedActivityMap: ActivityMap;
 
     private destroy$ = new Subject<void>();
 

@@ -5,10 +5,7 @@ import { ActivityMapActivity, Employee, TimeSlot } from '../../../../../../../ty
 import { EnvService } from 'sb-shared-lib';
 import { combineLatest, from, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import {
-    ActivityDialogData,
-    PlanningEmployeesActivityDialogComponent
-} from '../../../planning-employees-activity-dialog/planning-employees-activity-dialog.component';
+import { ActivityDialogData,  PlanningEmployeesActivityDialogComponent } from '../../../planning-employees-activity-dialog/planning-employees-activity-dialog.component';
 
 export interface MomentDialogOpenData {
     calendar: CalendarService,
