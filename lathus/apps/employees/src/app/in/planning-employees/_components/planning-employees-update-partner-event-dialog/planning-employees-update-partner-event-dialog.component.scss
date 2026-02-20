@@ -1,0 +1,17 @@
+:host {
+    h2 {
+        margin: 0;
+    }
+
+    mat-dialog-content {
+        padding: 16px 20px;
+
+        .field {
+            width: 100%;
+        }
+    }
+
+    mat-dialog-actions {
+        padding: 8px 0 0;
+    }
+}

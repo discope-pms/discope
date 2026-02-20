@@ -1,0 +1,35 @@
+<div [style.background-color]="getActivityColor(activity)" class="card" [style.padding]="padding">
+    <div *ngIf="!activity?.is_partner_event" class="activity">
+        <mat-icon *ngIf="activity.booking_line_group_id?.has_person_with_disability" class="disability-icon" aria-hidden="true">accessible</mat-icon>
+        <div>
+            <!-- Camp -->
+            <span *ngIf="activity.camp_id?.sojourn_number">{{ activity.camp_id?.sojourn_number + ' - ' }}</span>
+
+            <!-- Always -->
+            <span *ngIf="activity.group_num">{{ activity.group_num + ' - ' }}</span>
+            <span>{{ activity.name }}</span>
+        </div>
+        <div *ngIf="activity.customer_id?.name || activity.camp_id?.short_name">
+            <!-- Booking -->
+            <div *ngIf="activity.customer_id?.name">
+                <span>{{ activity.customer_id.name }}</span>
+            </div>
+
+            <!-- Camp -->
+            <div *ngIf="activity.camp_id?.short_name">
+                {{ activity.camp_id.short_name }}
+            </div>
+        </div>
+    </div>
+    <div *ngIf="activity?.is_partner_event" class="partner-event">
+        <!-- Always -->
+        <div>
+            {{ activity.group_num ? activity.group_num + ' - ' : '' }}{{ activity.name }}
+        </div>
+
+        <!-- Camp -->
+        <div *ngIf="activity?.camp_id?.short_name">
+            {{ activity.camp_id.short_name }}
+        </div>
+    </div>
+</div>

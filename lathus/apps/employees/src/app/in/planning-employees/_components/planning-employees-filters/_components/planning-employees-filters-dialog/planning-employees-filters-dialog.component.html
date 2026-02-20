@@ -1,0 +1,35 @@
+<h2 mat-dialog-title>{{ 'FILTERS_DIALOG_TITLE' | translate }}</h2>
+
+<mat-dialog-content [formGroup]="form">
+    <mat-form-field *ngIf="userGroup === 'organizer'" class="field" appearance="fill">
+        <mat-label>{{ 'FILTERS_DIALOG_EMPLOYEE_ROLE_LABEL' | translate }}</mat-label>
+        <mat-select formControlName="employeeRole">
+            <mat-option *ngFor="let employeeRole of employeeRoles" [value]="employeeRole.code">
+                {{ employeeRole.name }}
+            </mat-option>
+        </mat-select>
+    </mat-form-field>
+
+    <mat-form-field class="field" appearance="fill">
+        <mat-label>{{ 'FILTERS_DIALOG_EMPLOYEE_LABEL' | translate }}</mat-label>
+        <mat-select formControlName="employee">
+            <mat-option *ngFor="let employee of employees" [value]="employee.id">
+                {{ employee.name }}
+            </mat-option>
+        </mat-select>
+    </mat-form-field>
+
+    <mat-form-field class="field" appearance="fill">
+        <mat-label>{{ 'FILTERS_DIALOG_PRODUCT_MODEL_LABEL' | translate }}</mat-label>
+        <mat-select formControlName="productModel">
+            <mat-option *ngFor="let productModel of productModels" [value]="productModel.id">
+                {{ productModel.name }}
+            </mat-option>
+        </mat-select>
+    </mat-form-field>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+    <button mat-button (click)="close()">{{ 'FILTERS_DIALOG_CANCEL_BTN' | translate }}</button>
+    <button mat-button color="primary" (click)="closeAndSave()">{{ 'FILTERS_DIALOG_APPLY_BTN' | translate }}</button>
+</mat-dialog-actions>

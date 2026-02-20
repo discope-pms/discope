@@ -1,0 +1,40 @@
+<div class="loading-overlay" *ngIf="loading">
+    <div class="spinner"></div>
+</div>
+
+<div class="header">
+    <div class="employee-col">{{ 'PLANNING_EMPLOYEES_ANIMATORS' | translate }}</div>
+    <ng-container *ngFor="let dayIndex of daysIndexes">
+        <div class="day-col">
+            <div *ngIf="daysIndexes.length > 1" class="date-info">
+                {{ formatDate(dayIndex) }}
+            </div>
+            <div class="moments">
+                <div class="moment-col">{{ 'TIME_SLOT_AM' | translate }}</div>
+                <div class="moment-col">{{ 'TIME_SLOT_PM' | translate }}</div>
+                <div class="moment-col">{{ 'TIME_SLOT_EV' | translate }}</div>
+            </div>
+        </div>
+    </ng-container>
+</div>
+
+<div class="row" *ngFor="let employee of employeeList">
+    <div class="employee-col">{{ employee.name }}</div>
+    <ng-container *ngFor="let dayIndex of daysIndexes">
+        <div class="moment-col" (click)="openMoment(employee.id, dayIndex, 'AM')">
+            <ng-container *ngIf="(activityMap?.[employee.id]?.[dayIndex]?.['AM']?.length || 0) > 0">
+                <app-planning-employees-calendar-activity-card *ngFor="let activity of activityMap[employee.id][dayIndex]['AM']" [activity]="activity"></app-planning-employees-calendar-activity-card>
+            </ng-container>
+        </div>
+        <div class="moment-col" (click)="openMoment(employee.id, dayIndex, 'PM')">
+            <ng-container *ngIf="(activityMap?.[employee.id]?.[dayIndex]?.['PM']?.length || 0) > 0">
+                <app-planning-employees-calendar-activity-card *ngFor="let activity of activityMap[employee.id][dayIndex]['PM']" [activity]="activity"></app-planning-employees-calendar-activity-card>
+            </ng-container>
+        </div>
+        <div class="moment-col" (click)="openMoment(employee.id, dayIndex, 'EV')">
+            <ng-container *ngIf="(activityMap?.[employee.id]?.[dayIndex]?.['EV']?.length || 0) > 0">
+                <app-planning-employees-calendar-activity-card *ngFor="let activity of activityMap[employee.id][dayIndex]['EV']" [activity]="activity"></app-planning-employees-calendar-activity-card>
+            </ng-container>
+        </div>
+    </ng-container>
+</div>

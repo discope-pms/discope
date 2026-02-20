@@ -1,0 +1,162 @@
+export interface Model {
+    id: number,
+    state: 'instance'|'draft'|'archive'
+    modified: string,
+    name: string
+}
+
+export interface Center extends Model {
+}
+
+export interface TimeSlot extends Model {
+    code: 'B'|'AM'|'L'|'PM'|'D'|'EV',
+    schedule_from: string,
+    schedule_to: string
+}
+
+export interface Category extends Model {
+    code: 'EQUI'|'ENV'|'SP',
+    product_models_ids: number[]
+}
+
+export interface EmployeeRole extends Model {
+    code: 'EQUI'|'ENV'|'SP'
+}
+
+export interface Partner extends Model {
+    relationship: 'employee'|'provider',
+    is_active: boolean
+}
+
+export interface Employee extends Partner {
+    relationship: 'employee',
+    activity_product_models_ids: number[],
+    role_id: {
+        id: number,
+        name: string,
+        code: 'EQUI'|'ENV'|'SP'
+    },
+    partner_identity_id: number
+}
+
+export interface Provider extends Partner {
+    relationship: 'provider'
+}
+
+export interface ProductModel extends Model {
+    categories_ids: number[],
+    has_transport_required: boolean
+}
+
+export interface ActivityMap {
+    [index: number]: { // partner_id or 0 if not assigned
+        [date: string]: ActivityMapDay;
+    };
+}
+
+export interface ActivityMapDay {
+    AM: ActivityMapActivity[];
+    PM: ActivityMapActivity[];
+    EV: ActivityMapActivity[];
+}
+
+export interface ActivityMapActivity {
+    counter: number;
+    counter_total: number;
+    id: number;
+    name: string;
+    has_staff_required: boolean;
+    employee_id: number | null;
+    has_provider: boolean;
+    qty: number;
+    providers_ids: number[];
+    activity_date: string; // ISO date string
+    event_date: string; // ISO date string
+    time_slot_id: number;
+    is_exclusive: boolean;
+    schedule_from: string; // HH:mm:ss
+    schedule_to: string;   // HH:mm:ss
+    booking_id: ActivityMapBooking | null;
+    booking_line_group_id: ActivityMapBookingLineGroup | null;
+    product_model_id: ActivityMapProductModel;
+    activity_booking_line_id: number | null;
+    camp_id: ActivityMapCamp | null;
+    camp_group_id: number | null;
+    group_num: number | null;
+    is_partner_event: boolean;
+    description: string | undefined;
+    event_type: 'camp_activity' | 'leave' | 'other' | 'rest' | 'time_off' |'trainer' | 'training' | undefined;
+    time_slot: "AM" | "PM" | "EV";
+    customer_id: ActivityMapCustomer | null;
+    partner_identity_id: ActivityMapPartnerIdentity | null;
+    age_range_assignments_ids: ActivityMapAgeRangeAssignment[];
+    partner_id: ActivityMapPartner | number | null;
+}
+
+interface ActivityMapBooking {
+    id: number;
+    name: string;
+    description: string;
+    status: "quote" | "option" | "confirmed" | "validated" | "checkedin" | "checkedout" | "proforma" | "invoiced" | "debit_balance" | "credit_balance" | "balanced" | "cancelled";
+    date_from: string; // DD/MM/YYYY
+    date_to: string;   // DD/MM/YYYY
+    payment_status: "due" | "paid";
+    customer_id: number;
+    nb_pers: number;
+}
+
+interface ActivityMapBookingLineGroup {
+    id: number;
+    nb_pers: number;
+    has_person_with_disability: boolean;
+    person_disability_description: string | null;
+    age_range_assignments_ids: number[];
+}
+
+interface ActivityMapCamp {
+    id: number,
+    status: "draft" | "published" | "cancelled",
+    name: string,
+    short_name: string,
+    date_from: string, // ISO date string
+    date_to: string, // ISO date string
+    min_age: number,
+    max_age: number,
+    enrollments_qty: number,
+    employee_ratio: number
+}
+
+interface ActivityMapProductModel {
+    id: number;
+    name: string;
+    activity_color: string | null;
+    providers_ids: number[];
+}
+
+interface ActivityMapCustomer {
+    id: number;
+    name: string;
+    partner_identity_id: number;
+}
+
+interface ActivityMapPartnerIdentity {
+    id: number;
+    name: string;
+    address_city: string;
+}
+
+interface ActivityMapPartner {
+    id: number,
+    name: string,
+    relationship: 'employee' | 'provider'
+}
+
+interface ActivityMapAgeRangeAssignment {
+    id: number;
+    booking_line_group_id: number;
+    qty: number;
+    age_from: number;
+    age_to: number;
+}
+
+export type TypeDisplay = 'day' | 'week';

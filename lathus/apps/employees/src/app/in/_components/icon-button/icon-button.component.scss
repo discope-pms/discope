@@ -1,0 +1,26 @@
+@import '../../../../variables';
+
+:host {
+    color: #FFFFFF;
+
+    .filled {
+        background-color: $secondary-color;
+    }
+
+    .outlined {
+        border: solid 1px $secondary-color;
+    }
+
+    .filled-inverse {
+        background-color: #FFFFFF;
+        color: $secondary-color;
+    }
+
+    .outlined-inverse {
+        border: solid 1px #FFFFFF;
+    }
+
+    .disabled {
+        opacity: 0.5;
+    }
+}

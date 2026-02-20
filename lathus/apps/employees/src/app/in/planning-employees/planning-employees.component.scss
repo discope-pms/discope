@@ -1,0 +1,18 @@
+:host {
+    display: flex;
+    height: 100%;
+    flex-direction: column;
+    gap: 15px;
+    padding: 10px;
+
+    .unassigned-activities {
+        min-height: 70px;
+        max-height: 70px;
+        transition: max-height 0.15s ease, min-height 0.15s ease;
+
+        &.opened {
+            min-height: 200px;
+            max-height: 200px;
+        }
+    }
+}

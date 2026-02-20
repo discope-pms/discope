@@ -28,29 +28,32 @@ import { LayoutModule } from '@angular/cdk/layout';
 import { OverlayModule } from '@angular/cdk/overlay';
 
 @NgModule({
-  imports: [
-    SharedLibModule,
-    PlanningRoutingModule,
-    LayoutModule,
-    OverlayModule
-  ],
-  declarations: [
-    PlanningComponent,
-    PlanningCalendarComponent,
-    PlanningCalendarBookingComponent,
-    PlanningCalendarNavbarComponent,
-    ConsumptionCreationDialog,
-    PlanningLegendDialogComponent,
-    PlanningPreferencesDialogComponent,
-    PlanningEmployeesComponent,
-    PlanningEmployeesLegendDialogComponent,
-    PlanningEmployeesPreferencesDialogComponent,
-    PlanningEmployeesCalendarComponent,
-    PlanningEmployeesCalendarNavbarComponent,
-    PlanningEmployeesCalendarActivityComponent
-  ],
-  providers: [
-    { provide: DateAdapter, useClass: CustomDateAdapter, deps: [MAT_DATE_LOCALE, Platform] }
-  ]
+    imports: [
+        SharedLibModule,
+        PlanningRoutingModule,
+        LayoutModule,
+        OverlayModule
+    ],
+    declarations: [
+        PlanningComponent,
+        PlanningCalendarComponent,
+        PlanningCalendarBookingComponent,
+        PlanningCalendarNavbarComponent,
+        ConsumptionCreationDialog,
+        PlanningLegendDialogComponent,
+        PlanningPreferencesDialogComponent,
+        PlanningEmployeesComponent,
+        PlanningEmployeesLegendDialogComponent,
+        PlanningEmployeesPreferencesDialogComponent,
+        PlanningEmployeesCalendarComponent,
+        PlanningEmployeesCalendarNavbarComponent,
+        PlanningEmployeesCalendarActivityComponent
+    ],
+    exports: [
+        PlanningEmployeesCalendarComponent
+    ],
+    providers: [
+        {provide: DateAdapter, useClass: CustomDateAdapter, deps: [MAT_DATE_LOCALE, Platform]}
+    ]
 })
 export class AppInPlanningModule { }

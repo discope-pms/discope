@@ -1,0 +1,21 @@
+<div class="add-wrapper">
+    <app-icon-button [icon]="'filter_list'" (click)="onFilter()" [fill]="true"></app-icon-button>
+</div>
+
+<div class="dates-wrapper">
+    <div class="space"></div>
+
+    <app-icon-button [icon]="'chevron_left'" (click)="onPreviousDate()" [fillInverse]="true"></app-icon-button>
+
+    <div class="date">
+        <div>{{ dateFromFormatted }}</div>
+        <ng-container *ngIf="displayMultipleDays">
+            <div class="separator">-</div>
+            <div>{{ dateToFormatted }}</div>
+        </ng-container>
+    </div>
+
+    <app-icon-button [icon]="'chevron_right'" (click)="onNextDate()" [fillInverse]="true"></app-icon-button>
+
+    <div class="space"></div>
+</div>

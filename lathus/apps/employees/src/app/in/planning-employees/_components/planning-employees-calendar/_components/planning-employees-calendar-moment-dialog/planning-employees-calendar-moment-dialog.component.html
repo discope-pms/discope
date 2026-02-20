@@ -1,0 +1,31 @@
+<h2 mat-dialog-title>{{ employee.name }}</h2>
+
+<mat-dialog-content>
+    <div class="time-details">{{ timeDetailsText }}</div>
+
+    <div *ngIf="activities.length > 0" class="activities">
+        <app-planning-employees-calendar-activity-card
+            *ngFor="let activity of activities"
+            [activity]="activity" class="activity-card"
+            [padding]="'15px'"
+            (click)="openActivity(activity)"
+        ></app-planning-employees-calendar-activity-card>
+    </div>
+
+    <div *ngIf="activities.length === 0" class="no-activities">
+        {{ 'MOMENT_DIALOG_NO_ACTIVITIES_ASSIGNED' | translate }}
+    </div>
+
+    <div *ngIf="userGroup !== 'animator'" class="actions">
+        <button mat-stroked-button (click)="onCreatePartnerEvent()" color="primary">
+            {{ 'MOMENT_DIALOG_CREATE_PARTNER_EVENT' | translate }}
+        </button>
+        <button mat-stroked-button (click)="onCreatePartnerEventSerie()" color="primary">
+            {{ 'MOMENT_DIALOG_CREATE_PARTNER_EVENT_SERIE' | translate }}
+        </button>
+    </div>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+    <button mat-button (click)="close()">{{ 'MOMENT_DIALOG_CLOSE_BTN' | translate }}</button>
+</mat-dialog-actions>

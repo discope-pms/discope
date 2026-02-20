@@ -1,0 +1,11 @@
+<app-planning-employees-filters></app-planning-employees-filters>
+
+<app-planning-employees-calendar></app-planning-employees-calendar>
+
+<app-planning-employees-unassigned
+    [class.opened]="unassignedOpened"
+    [opened]="unassignedOpened"
+    (open)="unassignedOpened = true"
+    (close)="unassignedOpened = false"
+    class="unassigned-activities"
+></app-planning-employees-unassigned>

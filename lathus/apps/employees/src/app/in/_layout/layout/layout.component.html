@@ -1,0 +1,17 @@
+<div class="header">
+    <div class="back">
+        <app-icon-button [icon]="'arrow_back'" (click)="back()"></app-icon-button>
+    </div>
+
+    <div class="title">
+        {{ title | translate }}
+    </div>
+
+    <div class="user-profile">
+        <app-icon-button [icon]="'account_circle'" (click)="goToUserSettings()"></app-icon-button>
+    </div>
+</div>
+
+<div class="content">
+    <router-outlet></router-outlet>
+</div>

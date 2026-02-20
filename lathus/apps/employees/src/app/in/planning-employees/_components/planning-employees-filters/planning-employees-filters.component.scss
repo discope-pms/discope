@@ -1,0 +1,37 @@
+:host {
+    display: flex;
+    min-height: 60px;
+    align-items: center;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px #0000000a, 0 1px 2px #0000000a;
+
+    .add-wrapper {
+        width: 70px;
+        text-align: center;
+        border-right: 1px solid #0000000a;
+    }
+
+    .dates-wrapper {
+        display: flex;
+        align-items: center;
+        flex-grow: 1;
+        padding: 0 10px;
+
+        .space {
+            flex-grow: 1;
+        }
+
+        .date {
+            display: flex;
+            justify-content: center;
+            padding: 0 15px;
+            font-size: 1rem;
+
+            .separator {
+                width: 20px;
+                text-align: center;
+            }
+        }
+    }
+}
