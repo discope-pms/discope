@@ -1,0 +1,35 @@
+<h2 mat-dialog-title>{{ 'CREATE_PARTNER_EVENT_SET_DIALOG_TITLE' | translate }}</h2>
+
+<mat-dialog-content [formGroup]="form">
+    <mat-form-field class="field" appearance="fill">
+        <mat-label>{{ 'CREATE_PARTNER_EVENT_SET_DIALOG_NAME_LABEL' | translate }}</mat-label>
+        <input type="text" matInput formControlName="name"/>
+    </mat-form-field>
+
+    <mat-form-field class="field" appearance="fill">
+        <mat-select formControlName="event_type">
+            <mat-option *ngFor="let item of eventTypeMap | keyvalue" [value]="item.key">
+                {{ item.value }}
+            </mat-option>
+        </mat-select>
+    </mat-form-field>
+
+    <mat-form-field class="field" appearance="fill">
+        <mat-label>{{ 'CREATE_PARTNER_EVENT_SET_DIALOG_DESCRIPTION_LABEL' | translate }}</mat-label>
+        <textarea matInput formControlName="description" rows="3"></textarea>
+    </mat-form-field>
+
+    <mat-form-field class="field">
+        <mat-date-range-input [rangePicker]="sojournDateRangePicker">
+            <input matStartDate formControlName="date_from">
+            <input matEndDate formControlName="date_to">
+        </mat-date-range-input>
+        <mat-datepicker-toggle matSuffix [for]="sojournDateRangePicker"></mat-datepicker-toggle>
+        <mat-date-range-picker #sojournDateRangePicker></mat-date-range-picker>
+    </mat-form-field>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+    <button mat-button (click)="close()">{{ 'CREATE_PARTNER_EVENT_SET_DIALOG_CLOSE_BTN' | translate }}</button>
+    <button mat-button (click)="closeAndSave()">{{ 'CREATE_PARTNER_EVENT_SET_DIALOG_SAVE_BTN' | translate }}</button>
+</mat-dialog-actions>

@@ -7,6 +7,9 @@ import { combineLatest, from, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { ActivityDialogData,  PlanningEmployeesActivityDialogComponent } from '../../../planning-employees-activity-dialog/planning-employees-activity-dialog.component';
 import { CreatePartnerEventDialogData, PlanningEmployeesCreatePartnerEventDialogComponent } from '../../../planning-employees-create-partner-event-dialog/planning-employees-create-partner-event-dialog.component';
+import {
+    CreatePartnerEventSetDialogData, PlanningEmployeesCreatePartnerEventSetDialogComponent
+} from "../../../planning-employees-create-partner-event-serie-dialog/planning-employees-create-partner-event-set-dialog.component";
 
 export interface MomentDialogOpenData {
     calendar: CalendarService,
@@ -119,6 +122,23 @@ export class PlanningEmployeesCalendarMomentDialogComponent implements OnInit, O
         };
 
         this.dialog.open(PlanningEmployeesCreatePartnerEventDialogComponent, {
+            width: '100vw',
+            height: '100vh',
+            maxWidth: '100vw',
+            maxHeight: '100vh',
+            panelClass: 'full-screen-dialog',
+            data: data
+        });
+    }
+
+    public onCreatePartnerEventSerie() {
+        const data: CreatePartnerEventSetDialogData = {
+            calendar: this.calendar,
+            eventDate: new Date(this.dayIndex),
+            partnerId: this.employee.id
+        };
+
+        this.dialog.open(PlanningEmployeesCreatePartnerEventSetDialogComponent, {
             width: '100vw',
             height: '100vh',
             maxWidth: '100vw',
