@@ -50,10 +50,13 @@ export class PlanningEmployeesActivityDialogComponent implements OnInit {
         });
 
         this.calendar.employeeList$.subscribe(employeeList => {
-            this.employees = [
-                { id: 0, name: 'Non assigné' },
-                ...employeeList.map(e => { return { id: e.id, name: e.name }; })
-            ];
+            if(!this.activity?.is_partner_event) {
+                this.employees = [
+                    { id: 0, name: 'Non assigné' },
+                    ...employeeList.filter(e => e.activity_product_models_ids.includes(this.activity.product_model_id.id))
+                        .map(e => { return { id: e.id, name: e.name }; })
+                ];
+            }
         });
 
         if(!this.activity.is_partner_event) {
