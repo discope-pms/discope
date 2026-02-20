@@ -143,6 +143,7 @@
     "APPS_APP_SETTINGS": "Configuration",
     "APPS_APP_DOCUMENTS": "Documents",
     "APPS_APP_STATS": "Statistics",
+    "APPS_APP_EMPLOYEES": "Calendrier animateur",
 
     "SETTINGS_LIST_SETTING": "Settings",
     "SETTINGS_LIST_CORE": "General",

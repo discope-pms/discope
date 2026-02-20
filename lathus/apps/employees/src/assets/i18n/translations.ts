@@ -1,5 +1,17 @@
 export const translations: { [lang: string]: { [key: string]: string } } = {
     'en': {
+        /**
+         * Apps
+         */
+        "APPS_APP_BOOKING": "Booking",
+        "APPS_APP_CAMP": "Camps",
+        "APPS_APP_POS": "Point of sale",
+        "APPS_APP_ACCOUNTING": "Accounting",
+        "APPS_APP_SALES": "Sales",
+        "APPS_APP_SETTINGS": "Configuration",
+        "APPS_APP_DOCUMENTS": "Documents",
+        "APPS_APP_STATS": "Statistics",
+        "APPS_APP_EMPLOYEES": "Animators planning",
 
         /**
          * Routes
@@ -106,6 +118,18 @@ export const translations: { [lang: string]: { [key: string]: string } } = {
 
     },
     'fr': {
+        /**
+         * Apps
+         */
+        "APPS_APP_BOOKING": "Réservations",
+        "APPS_APP_CAMP": "Camps",
+        "APPS_APP_POS": "Point de vente",
+        "APPS_APP_ACCOUNTING": "Compta",
+        "APPS_APP_SALES": "Ventes",
+        "APPS_APP_SETTINGS": "Configuration",
+        "APPS_APP_DOCUMENTS": "Documents",
+        "APPS_APP_STATS": "Statistiques",
+        "APPS_APP_EMPLOYEES": "Calendrier animateur",
 
         /**
          * Routes

@@ -45,7 +45,12 @@ export class LayoutComponent implements OnInit {
     }
 
     public back() {
-        this.location.back();
+        if(this.router.url === '/planning-employees') {
+            window.location.href = '/apps';
+        }
+        else {
+            this.location.back();
+        }
     }
 
     public goToUserSettings() {
