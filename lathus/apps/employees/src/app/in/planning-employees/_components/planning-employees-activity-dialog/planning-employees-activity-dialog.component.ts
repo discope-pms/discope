@@ -56,6 +56,17 @@ export class PlanningEmployeesActivityDialogComponent implements OnInit {
     }
 
     ngOnInit() {
+        if(!this.activity.is_partner_event) {
+            this.form = this.formBuilder.group({
+                employee: [this.activity.employee_id ?? 0]
+            });
+        }
+        else {
+            this.form = this.formBuilder.group({});
+        }
+
+        this.form.get('employee')?.disable();
+
         from(this.env.getEnv()).subscribe((env: any) => {
             if(!this.activity?.is_partner_event) {
                 this.dateFormated = this.formatDate(new Date(this.activity.activity_date.split('T')[0]), env.locale);
@@ -79,19 +90,10 @@ export class PlanningEmployeesActivityDialogComponent implements OnInit {
             if(userGroup) {
                 this.userGroup = userGroup;
             }
-            if(userGroup === 'animator') {
-                this.form.get('employee')?.disable();
+            if(userGroup !== 'animator') {
+                this.form.get('employee')?.enable();
             }
         });
-
-        if(!this.activity.is_partner_event) {
-            this.form = this.formBuilder.group({
-                employee: [this.activity.employee_id ?? 0]
-            });
-        }
-        else {
-            this.form = this.formBuilder.group({});
-        }
     }
 
     private formatDate(date: Date, locale: string): string {

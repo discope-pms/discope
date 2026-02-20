@@ -96,7 +96,7 @@
         </mat-form-field>
     </div>
 
-    <div class="actions">
+    <div *ngIf="userGroup !== 'animator'" class="actions">
         <button *ngIf="activity?.is_partner_event" mat-stroked-button (click)="onModifyPartnerEvent()" color="primary">
             {{ 'ACTIVITY_DIALOG_MODIFY_PARTNER_EVENT' | translate }}
         </button>

@@ -16,7 +16,7 @@
         {{ 'MOMENT_DIALOG_NO_ACTIVITIES_ASSIGNED' | translate }}
     </div>
 
-    <div class="actions">
+    <div *ngIf="userGroup !== 'animator'" class="actions">
         <button mat-stroked-button (click)="onCreatePartnerEvent()" color="primary">
             {{ 'MOMENT_DIALOG_CREATE_PARTNER_EVENT' | translate }}
         </button>
