@@ -163,7 +163,7 @@ export const translations: { [lang: string]: { [key: string]: string } } = {
          */
         'MOMENT_DIALOG_NO_ACTIVITIES_ASSIGNED': 'Aucune activité assignée',
         'MOMENT_DIALOG_CREATE_PARTNER_EVENT': 'Créer un événement',
-        'MOMENT_DIALOG_CREATE_PARTNER_EVENT_SERIE': 'Créer une série d\'événement',
+        'MOMENT_DIALOG_CREATE_PARTNER_EVENT_SERIE': 'Créer une série d\'événements',
         'MOMENT_DIALOG_CLOSE_BTN': 'Fermer',
 
         /**
