@@ -18,10 +18,14 @@
         flex-grow: 1;
         padding: 0 10px;
 
+        .space {
+            flex-grow: 1;
+        }
+
         .date {
             display: flex;
             justify-content: center;
-            flex-grow: 1;
+            padding: 0 15px;
             font-size: 1rem;
 
             .separator {
