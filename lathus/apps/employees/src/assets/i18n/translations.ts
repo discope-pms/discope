@@ -36,6 +36,7 @@ export const translations: { [lang: string]: { [key: string]: string } } = {
          * Moment details
          */
         'MOMENT_DIALOG_NO_ACTIVITIES_ASSIGNED': 'No activities assigned',
+        'MOMENT_DIALOG_CREATE_PARTNER_EVENT': 'Create partner event',
         'MOMENT_DIALOG_CLOSE_BTN': 'Close',
 
         /**
@@ -63,8 +64,19 @@ export const translations: { [lang: string]: { [key: string]: string } } = {
         'ACTIVITY_DIALOG_EVENT_TYPE_TRAINER': 'Trainer',
         'ACTIVITY_DIALOG_EVENT_TYPE_TRAINING': 'Training',
         'ACTIVITY_DIALOG_DESCRIPTION_LABEL': 'Description',
+        'ACTIVITY_DIALOG_DELETE_PARTNER_EVENT': 'Delete',
         'ACTIVITY_DIALOG_CLOSE_BTN': 'Close',
-        'ACTIVITY_DIALOG_SAVE_BTN': 'Save'
+        'ACTIVITY_DIALOG_SAVE_BTN': 'Save',
+
+        /**
+         * Create partner event
+         */
+        'CREATE_PARTNER_EVENT_DIALOG_TITLE': 'Create event',
+        'CREATE_PARTNER_EVENT_DIALOG_NAME_LABEL': 'Name',
+        'CREATE_PARTNER_EVENT_DIALOG_TYPE_LABEL': 'Type',
+        'CREATE_PARTNER_EVENT_DIALOG_DESCRIPTION_LABEL': 'Description',
+        'CREATE_PARTNER_EVENT_DIALOG_CLOSE_BTN': 'Close',
+        'CREATE_PARTNER_EVENT_DIALOG_SAVE_BTN': 'Save'
 
     },
     'fr': {
@@ -104,6 +116,7 @@ export const translations: { [lang: string]: { [key: string]: string } } = {
          * Moment details
          */
         'MOMENT_DIALOG_NO_ACTIVITIES_ASSIGNED': 'Aucune activité assignée',
+        'MOMENT_DIALOG_CREATE_PARTNER_EVENT': 'Créer un événement',
         'MOMENT_DIALOG_CLOSE_BTN': 'Fermer',
 
         /**
@@ -131,8 +144,18 @@ export const translations: { [lang: string]: { [key: string]: string } } = {
         'ACTIVITY_DIALOG_EVENT_TYPE_TRAINER': 'Formateur',
         'ACTIVITY_DIALOG_EVENT_TYPE_TRAINING': 'Formation',
         'ACTIVITY_DIALOG_DESCRIPTION_LABEL': 'Description',
+        'ACTIVITY_DIALOG_DELETE_PARTNER_EVENT': 'Supprimer',
         'ACTIVITY_DIALOG_CLOSE_BTN': 'Fermer',
-        'ACTIVITY_DIALOG_SAVE_BTN': 'Enregistrer'
+        'ACTIVITY_DIALOG_SAVE_BTN': 'Enregistrer',
 
+        /**
+         * Create partner event
+         */
+        'CREATE_PARTNER_EVENT_DIALOG_TITLE': 'Créer événement',
+        'CREATE_PARTNER_EVENT_DIALOG_NAME_LABEL': 'Nom',
+        'CREATE_PARTNER_EVENT_DIALOG_TYPE_LABEL': 'Type',
+        'CREATE_PARTNER_EVENT_DIALOG_DESCRIPTION_LABEL': 'Description',
+        'CREATE_PARTNER_EVENT_DIALOG_CLOSE_BTN': 'Fermer',
+        'CREATE_PARTNER_EVENT_DIALOG_SAVE_BTN': 'Enregistrer'
     }
 };

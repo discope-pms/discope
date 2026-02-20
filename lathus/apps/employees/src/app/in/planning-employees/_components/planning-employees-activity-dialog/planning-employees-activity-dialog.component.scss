@@ -39,6 +39,15 @@
                 width: 100%;
             }
         }
+
+        .actions {
+            margin-top: 20px;
+
+            > button {
+                width: 100%;
+                height: 50px;
+            }
+        }
     }
 
     mat-dialog-actions {

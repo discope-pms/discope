@@ -6,6 +6,10 @@ import { EnvService } from 'sb-shared-lib';
 import { combineLatest, from, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { ActivityDialogData,  PlanningEmployeesActivityDialogComponent } from '../../../planning-employees-activity-dialog/planning-employees-activity-dialog.component';
+import {
+    CreatePartnerEventDialogData,
+    PlanningEmployeesCreatePartnerEventDialogComponent
+} from "../../../planning-employees-create-partner-event-dialog/planning-employees-create-partner-event-dialog.component";
 
 export interface MomentDialogOpenData {
     calendar: CalendarService,
@@ -27,6 +31,9 @@ export class PlanningEmployeesCalendarMomentDialogComponent implements OnInit, O
     public dayIndex: string;
     public date: Date;
     private readonly timeSlotCode: 'AM'|'PM'|'EV';
+    private timeSlotId = 0;
+
+    public userGroup: 'animator' | 'manager' | 'organizer' = 'animator';
 
     public timeDetailsText = '';
 
@@ -58,6 +65,7 @@ export class PlanningEmployeesCalendarMomentDialogComponent implements OnInit, O
 
                 const timeSlot: TimeSlot = timeSlotList.find((ts: TimeSlot) => ts.code === this.timeSlotCode);
                 if(timeSlot) {
+                    this.timeSlotId = timeSlot.id;
                     this.timeDetailsText = this.formatDate(this.date, env.locale) + ' - ' + timeSlot.name.toLowerCase();
                 }
             });
@@ -68,6 +76,12 @@ export class PlanningEmployeesCalendarMomentDialogComponent implements OnInit, O
                 activities = activityMap?.[this.employee.id]?.[this.dayIndex]?.[this.timeSlotCode];
             }
             this.activities = activities;
+        });
+
+        this.calendar.userGroup$.subscribe(userGroup => {
+            if(userGroup) {
+                this.userGroup = userGroup;
+            }
         });
     }
 
@@ -90,6 +104,23 @@ export class PlanningEmployeesCalendarMomentDialogComponent implements OnInit, O
         const data: ActivityDialogData = { calendar: this.calendar, activity };
 
         this.dialog.open(PlanningEmployeesActivityDialogComponent, {
+            width: '100vw',
+            height: '100vh',
+            maxWidth: '100vw',
+            maxHeight: '100vh',
+            panelClass: 'full-screen-dialog',
+            data: data
+        });
+    }
+
+    public onCreatePartnerEvent() {
+        const data: CreatePartnerEventDialogData = {
+            eventDate: new Date(this.dayIndex),
+            timeSlotId: this.timeSlotId,
+            partnerId: this.employee.id
+        };
+
+        this.dialog.open(PlanningEmployeesCreatePartnerEventDialogComponent, {
             width: '100vw',
             height: '100vh',
             maxWidth: '100vw',

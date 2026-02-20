@@ -73,18 +73,18 @@ export class PlanningEmployeesActivityDialogComponent implements OnInit {
             }
         });
 
+        this.calendar.userGroup$.subscribe(userGroup => {
+            if(userGroup) {
+                this.userGroup = userGroup;
+            }
+            if(userGroup === 'animator') {
+                this.form.get('employee')?.disable();
+            }
+        });
+
         if(!this.activity.is_partner_event) {
             this.form = this.formBuilder.group({
                 employee: [this.activity.employee_id ?? 0]
-            });
-
-            this.calendar.userGroup$.subscribe(userGroup => {
-                if(userGroup) {
-                    this.userGroup = userGroup;
-                }
-                if(userGroup === 'animator') {
-                    this.form.get('employee')?.disable();
-                }
             });
         }
         else {
@@ -96,6 +96,19 @@ export class PlanningEmployeesActivityDialogComponent implements OnInit {
         date = new Date(date.getTime());
         const formatter = new Intl.DateTimeFormat(locale.replace('_', '-'), { weekday: 'long', day: '2-digit', month: '2-digit' });
         return formatter.format(date);
+    }
+
+    public onDeletePartnerEvent() {
+        this.api.modelDelete('sale\\booking\\PartnerEvent', this.activity.id)
+            .subscribe({
+                next: () => {
+                    this.calendar.refresh();
+                    this.dialogRef.close();
+                },
+                error: (error) => {
+                    console.error('Error updating activity:', error);
+                }
+            });
     }
 
     public close() {
