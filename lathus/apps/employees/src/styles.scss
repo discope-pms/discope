@@ -68,6 +68,11 @@ ngx-material-timepicker-toggle {
 }
 
 .full-screen-dialog {
+    mat-dialog-content {
+        min-height: 83vh;
+        max-height: 83vh;
+    }
+
     .mat-dialog-container {
         border-radius: 0;
         outline: none;

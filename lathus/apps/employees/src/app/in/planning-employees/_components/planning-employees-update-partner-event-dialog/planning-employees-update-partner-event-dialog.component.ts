@@ -5,8 +5,12 @@ import { TranslationService } from '../../../../_services/translation.service';
 import { ApiService } from '../../../../_services/api.service';
 import { CalendarService } from '../../_services/calendar.service';
 
-export interface CreatePartnerEventDialogData {
+export interface UpdatePartnerEventDialogData {
     calendar: CalendarService,
+    id: number,
+    name: string,
+    eventType: 'camp_activity' | 'leave' | 'other' | 'rest' | 'time_off' | 'trainer' | 'training',
+    description: string,
     eventDate: Date,
     timeSlotId: number,
     partnerId: number
@@ -14,12 +18,16 @@ export interface CreatePartnerEventDialogData {
 
 @Component({
     selector: 'app-planning-employees-create-partner-event-dialog',
-    templateUrl: 'planning-employees-create-partner-event-dialog.component.html',
-    styleUrls: ['planning-employees-create-partner-event-dialog.component.scss']
+    templateUrl: 'planning-employees-update-partner-event-dialog.component.html',
+    styleUrls: ['planning-employees-update-partner-event-dialog.component.scss']
 })
-export class PlanningEmployeesCreatePartnerEventDialogComponent implements OnInit {
+export class PlanningEmployeesUpdatePartnerEventDialogComponent implements OnInit {
 
     private readonly calendar: CalendarService;
+    private readonly id: number;
+    private readonly name: string;
+    private readonly eventType: 'camp_activity' | 'leave' | 'other' | 'rest' | 'time_off' | 'trainer' | 'training';
+    private readonly description: string;
     private readonly eventDate: Date;
     private readonly timeSlotId: number;
     private readonly partnerId: number;
@@ -40,10 +48,14 @@ export class PlanningEmployeesCreatePartnerEventDialogComponent implements OnIni
         private api: ApiService,
         private translateService: TranslationService,
         private formBuilder: FormBuilder,
-        private dialogRef: MatDialogRef<PlanningEmployeesCreatePartnerEventDialogComponent>,
-        @Inject(MAT_DIALOG_DATA) public data: CreatePartnerEventDialogData
+        private dialogRef: MatDialogRef<PlanningEmployeesUpdatePartnerEventDialogComponent>,
+        @Inject(MAT_DIALOG_DATA) public data: UpdatePartnerEventDialogData
     ) {
         this.calendar = data.calendar;
+        this.id = data.id;
+        this.name = data.name;
+        this.eventType = data.eventType;
+        this.description = data.description;
         this.eventDate = data.eventDate;
         this.timeSlotId = data.timeSlotId;
         this.partnerId = data.partnerId;
@@ -51,9 +63,9 @@ export class PlanningEmployeesCreatePartnerEventDialogComponent implements OnIni
 
     ngOnInit() {
         this.form = this.formBuilder.group({
-            'name': ['', Validators.required],
-            'event_type': ['other'],
-            'description': [''],
+            'name': [this.name, Validators.required],
+            'event_type': [this.eventType],
+            'description': [this.description],
         });
     }
 
@@ -66,7 +78,7 @@ export class PlanningEmployeesCreatePartnerEventDialogComponent implements OnIni
         const eventType: number = this.form.get('event_type')?.value;
         const description: number = this.form.get('description')?.value;
 
-        this.api.modelCreate('sale\\booking\\PartnerEvent', {
+        this.api.modelUpdate('sale\\booking\\PartnerEvent', this.id, {
             name: name,
             event_type: eventType,
             description: description,
@@ -76,7 +88,6 @@ export class PlanningEmployeesCreatePartnerEventDialogComponent implements OnIni
         })
             .subscribe({
                 next: () => {
-                    this.calendar.refresh();
                     this.dialogRef.close();
                 },
                 error: (error) => {

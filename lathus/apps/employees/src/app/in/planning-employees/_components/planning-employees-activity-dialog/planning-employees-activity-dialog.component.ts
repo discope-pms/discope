@@ -1,5 +1,5 @@
 import { Component, Inject, OnInit } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { ActivityMapActivity } from '../../../../../type';
 import { from } from 'rxjs';
 import { EnvService } from 'sb-shared-lib';
@@ -7,6 +7,7 @@ import { FormBuilder, FormGroup } from '@angular/forms';
 import { CalendarService } from '../../_services/calendar.service';
 import { ApiService } from '../../../../_services/api.service';
 import { TranslationService } from "../../../../_services/translation.service";
+import { PlanningEmployeesUpdatePartnerEventDialogComponent, UpdatePartnerEventDialogData } from '../planning-employees-update-partner-event-dialog/planning-employees-update-partner-event-dialog.component';
 
 export interface ActivityDialogData {
     calendar: CalendarService,
@@ -44,6 +45,7 @@ export class PlanningEmployeesActivityDialogComponent implements OnInit {
     constructor(
         private api: ApiService,
         private env: EnvService,
+        private dialog: MatDialog,
         private translateService: TranslationService,
         private formBuilder: FormBuilder,
         private dialogRef: MatDialogRef<PlanningEmployeesActivityDialogComponent>,
@@ -96,6 +98,48 @@ export class PlanningEmployeesActivityDialogComponent implements OnInit {
         date = new Date(date.getTime());
         const formatter = new Intl.DateTimeFormat(locale.replace('_', '-'), { weekday: 'long', day: '2-digit', month: '2-digit' });
         return formatter.format(date);
+    }
+
+    public onModifyPartnerEvent() {
+        const data: UpdatePartnerEventDialogData = {
+            calendar: this.calendar,
+            id: this.activity.id,
+            name: this.activity.name,
+            eventType: this.activity.event_type || 'leave',
+            description: this.activity.description || '',
+            eventDate: new Date(this.activity.event_date),
+            timeSlotId: this.activity.time_slot_id,
+            partnerId: 0
+        };
+
+        if(typeof this.activity.partner_id === 'object' && this.activity.partner_id?.id) {
+            data.partnerId = this.activity.partner_id.id;
+        }
+        else if(typeof this.activity.partner_id === 'number') {
+            data.partnerId = this.activity.partner_id;
+        }
+
+        const dialog = this.dialog.open(PlanningEmployeesUpdatePartnerEventDialogComponent, {
+            width: '100vw',
+            height: '100vh',
+            maxWidth: '100vw',
+            maxHeight: '100vh',
+            panelClass: 'full-screen-dialog',
+            data: data
+        });
+
+        dialog.afterClosed().subscribe(() => {
+            this.api.modelCollect('sale\\booking\\PartnerEvent', ['name', 'event_type', 'description'], ['id', '=', this.activity.id])
+                .subscribe({
+                    next: ((partnerEvents: any[]) => {
+                        if(partnerEvents.length === 1) {
+                            this.activity.name = partnerEvents[0].name;
+                            this.activity.event_type = partnerEvents[0].event_type;
+                            this.activity.description = partnerEvents[0].description;
+                        }
+                    })
+                });
+        });
     }
 
     public onDeletePartnerEvent() {

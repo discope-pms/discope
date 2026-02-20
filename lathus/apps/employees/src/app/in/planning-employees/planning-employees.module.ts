@@ -17,6 +17,7 @@ import { PlanningEmployeesCalendarActivityCardComponent } from './_components/pl
 import { PlanningEmployeesFiltersDialogComponent } from './_components/planning-employees-filters/_components/planning-employees-filters-dialog/planning-employees-filters-dialog.component';
 import { PlanningEmployeesCalendarMomentDialogComponent } from './_components/planning-employees-calendar/_components/planning-employees-calendar-moment-dialog/planning-employees-calendar-moment-dialog.component';
 import { PlanningEmployeesCreatePartnerEventDialogComponent } from './_components/planning-employees-create-partner-event-dialog/planning-employees-create-partner-event-dialog.component';
+import { PlanningEmployeesUpdatePartnerEventDialogComponent } from './_components/planning-employees-update-partner-event-dialog/planning-employees-update-partner-event-dialog.component';
 
 @NgModule({
     imports: [
@@ -32,6 +33,7 @@ import { PlanningEmployeesCreatePartnerEventDialogComponent } from './_component
         PlanningEmployeesUnassignedComponent,
         PlanningEmployeesActivityDialogComponent,
         PlanningEmployeesCreatePartnerEventDialogComponent,
+        PlanningEmployeesUpdatePartnerEventDialogComponent,
         PlanningEmployeesCalendarActivityCardComponent,
         PlanningEmployeesFiltersDialogComponent,
         PlanningEmployeesCalendarMomentDialogComponent

@@ -97,6 +97,9 @@
     </div>
 
     <div class="actions">
+        <button *ngIf="activity?.is_partner_event" mat-stroked-button (click)="onModifyPartnerEvent()" color="primary">
+            {{ 'ACTIVITY_DIALOG_MODIFY_PARTNER_EVENT' | translate }}
+        </button>
         <button *ngIf="activity?.is_partner_event" mat-stroked-button (click)="onDeletePartnerEvent()" color="primary">
             {{ 'ACTIVITY_DIALOG_DELETE_PARTNER_EVENT' | translate }}
         </button>

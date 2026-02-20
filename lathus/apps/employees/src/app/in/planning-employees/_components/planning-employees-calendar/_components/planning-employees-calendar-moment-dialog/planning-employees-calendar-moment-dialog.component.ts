@@ -6,10 +6,7 @@ import { EnvService } from 'sb-shared-lib';
 import { combineLatest, from, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { ActivityDialogData,  PlanningEmployeesActivityDialogComponent } from '../../../planning-employees-activity-dialog/planning-employees-activity-dialog.component';
-import {
-    CreatePartnerEventDialogData,
-    PlanningEmployeesCreatePartnerEventDialogComponent
-} from "../../../planning-employees-create-partner-event-dialog/planning-employees-create-partner-event-dialog.component";
+import { CreatePartnerEventDialogData, PlanningEmployeesCreatePartnerEventDialogComponent } from '../../../planning-employees-create-partner-event-dialog/planning-employees-create-partner-event-dialog.component';
 
 export interface MomentDialogOpenData {
     calendar: CalendarService,
@@ -115,6 +112,7 @@ export class PlanningEmployeesCalendarMomentDialogComponent implements OnInit, O
 
     public onCreatePartnerEvent() {
         const data: CreatePartnerEventDialogData = {
+            calendar: this.calendar,
             eventDate: new Date(this.dayIndex),
             timeSlotId: this.timeSlotId,
             partnerId: this.employee.id
