@@ -6,6 +6,7 @@ import { EnvService } from 'sb-shared-lib';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { CalendarService } from '../../_services/calendar.service';
 import { ApiService } from '../../../../_services/api.service';
+import { TranslationService } from "../../../../_services/translation.service";
 
 export interface ActivityDialogData {
     calendar: CalendarService,
@@ -26,11 +27,24 @@ export class PlanningEmployeesActivityDialogComponent implements OnInit {
 
     public employees: { id: number, name: string }[] = [];
 
+    public userGroup: 'animator' | 'manager' | 'organizer' = 'animator';
+
     public form: FormGroup;
+
+    public eventTypeMap = {
+        camp_activity: this.translateService.translate('ACTIVITY_DIALOG_EVENT_TYPE_CAMP_ACTIVITY'),
+        leave: this.translateService.translate('ACTIVITY_DIALOG_EVENT_TYPE_LEAVE'),
+        other: this.translateService.translate('ACTIVITY_DIALOG_EVENT_TYPE_OTHER'),
+        rest: this.translateService.translate('ACTIVITY_DIALOG_EVENT_TYPE_REST'),
+        time_off: this.translateService.translate('ACTIVITY_DIALOG_EVENT_TYPE_TIME_OFF'),
+        trainer: this.translateService.translate('ACTIVITY_DIALOG_EVENT_TYPE_TRAINER'),
+        training: this.translateService.translate('ACTIVITY_DIALOG_EVENT_TYPE_TRAINING'),
+    };
 
     constructor(
         private api: ApiService,
         private env: EnvService,
+        private translateService: TranslationService,
         private formBuilder: FormBuilder,
         private dialogRef: MatDialogRef<PlanningEmployeesActivityDialogComponent>,
         @Inject(MAT_DIALOG_DATA) public data: ActivityDialogData
@@ -65,6 +79,9 @@ export class PlanningEmployeesActivityDialogComponent implements OnInit {
             });
 
             this.calendar.userGroup$.subscribe(userGroup => {
+                if(userGroup) {
+                    this.userGroup = userGroup;
+                }
                 if(userGroup === 'animator') {
                     this.form.get('employee')?.disable();
                 }

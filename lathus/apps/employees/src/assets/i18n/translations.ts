@@ -54,6 +54,15 @@ export const translations: { [lang: string]: { [key: string]: string } } = {
         'ACTIVITY_DIALOG_BOOKING_LABEL': 'Booking',
         'ACTIVITY_DIALOG_CAMP_LABEL': 'Camp',
         'ACTIVITY_DIALOG_EMPLOYEE_LABEL': 'Animator',
+        'ACTIVITY_DIALOG_EVENT_TYPE_LABEL': 'Type',
+        'ACTIVITY_DIALOG_EVENT_TYPE_CAMP_ACTIVITY': 'Camp activity',
+        'ACTIVITY_DIALOG_EVENT_TYPE_LEAVE': 'Leave',
+        'ACTIVITY_DIALOG_EVENT_TYPE_OTHER': 'Other',
+        'ACTIVITY_DIALOG_EVENT_TYPE_REST': 'Rest',
+        'ACTIVITY_DIALOG_EVENT_TYPE_TIME_OFF': 'Time off',
+        'ACTIVITY_DIALOG_EVENT_TYPE_TRAINER': 'Trainer',
+        'ACTIVITY_DIALOG_EVENT_TYPE_TRAINING': 'Training',
+        'ACTIVITY_DIALOG_DESCRIPTION_LABEL': 'Description',
         'ACTIVITY_DIALOG_CLOSE_BTN': 'Close',
         'ACTIVITY_DIALOG_SAVE_BTN': 'Save'
 
@@ -113,6 +122,15 @@ export const translations: { [lang: string]: { [key: string]: string } } = {
         'ACTIVITY_DIALOG_BOOKING_LABEL': 'Réservation',
         'ACTIVITY_DIALOG_CAMP_LABEL': 'Camp',
         'ACTIVITY_DIALOG_EMPLOYEE_LABEL': 'Animateur',
+        'ACTIVITY_DIALOG_EVENT_TYPE_LABEL': 'Type',
+        'ACTIVITY_DIALOG_EVENT_TYPE_CAMP_ACTIVITY': 'Activité camp',
+        'ACTIVITY_DIALOG_EVENT_TYPE_LEAVE': 'Congé',
+        'ACTIVITY_DIALOG_EVENT_TYPE_OTHER': 'Autre',
+        'ACTIVITY_DIALOG_EVENT_TYPE_REST': 'Repos',
+        'ACTIVITY_DIALOG_EVENT_TYPE_TIME_OFF': 'Temps libre',
+        'ACTIVITY_DIALOG_EVENT_TYPE_TRAINER': 'Formateur',
+        'ACTIVITY_DIALOG_EVENT_TYPE_TRAINING': 'Formation',
+        'ACTIVITY_DIALOG_DESCRIPTION_LABEL': 'Description',
         'ACTIVITY_DIALOG_CLOSE_BTN': 'Fermer',
         'ACTIVITY_DIALOG_SAVE_BTN': 'Enregistrer'
 

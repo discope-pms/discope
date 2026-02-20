@@ -84,6 +84,8 @@ export interface ActivityMapActivity {
     camp_group_id: number | null;
     group_num: number | null;
     is_partner_event: boolean;
+    description: string | undefined;
+    event_type: 'camp_activity' | 'leave' | 'other' | 'rest' | 'time_off' |'trainer' | 'training' | undefined;
     time_slot: "AM" | "PM" | "EV";
     customer_id: ActivityMapCustomer | null;
     partner_identity_id: ActivityMapPartnerIdentity | null;

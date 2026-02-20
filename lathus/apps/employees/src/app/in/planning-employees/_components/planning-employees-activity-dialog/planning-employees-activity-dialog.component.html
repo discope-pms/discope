@@ -65,6 +65,24 @@
                 </div>
             </div>
         </ng-container>
+
+        <ng-container *ngIf="activity?.is_partner_event && activity.event_type">
+            <div class="activity-detail">
+                <div class="label">{{ 'ACTIVITY_DIALOG_EVENT_TYPE_LABEL' | translate }}</div>
+                <div class="value">
+                    {{ eventTypeMap[activity.event_type] }}
+                </div>
+            </div>
+        </ng-container>
+
+        <ng-container *ngIf="activity?.is_partner_event && activity.description">
+            <div class="activity-detail">
+                <div class="label">{{ 'ACTIVITY_DIALOG_DESCRIPTION_LABEL' | translate }}</div>
+                <div class="value">
+                    {{ activity.description }}
+                </div>
+            </div>
+        </ng-container>
     </div>
 
     <div *ngIf="!activity?.is_partner_event" [formGroup]="form" class="form">
@@ -81,5 +99,5 @@
 
 <mat-dialog-actions align="end">
     <button mat-button (click)="close()">{{ 'ACTIVITY_DIALOG_CLOSE_BTN' | translate }}</button>
-    <button *ngIf="!activity?.is_partner_event" mat-button color="primary" (click)="closeAndSave()">{{ 'ACTIVITY_DIALOG_SAVE_BTN' | translate }}</button>
+    <button *ngIf="!activity?.is_partner_event && userGroup !== 'animator'" mat-button color="primary" (click)="closeAndSave()">{{ 'ACTIVITY_DIALOG_SAVE_BTN' | translate }}</button>
 </mat-dialog-actions>
