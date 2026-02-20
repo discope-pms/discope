@@ -27,7 +27,7 @@
         flex-direction: column;
         gap: 1px;
         min-width: 0;
-        overflow: hidden;
+        overflow-y: auto;
 
         .activity-card {
             width: 100%;
