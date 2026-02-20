@@ -1,13 +1,10 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { EnvService } from 'sb-shared-lib';
 import { CalendarService } from '../../_services/calendar.service';
-import {
-    FilterDialogOpenData,
-    PlanningEmployeesFiltersDialogComponent
-} from './_components/planning-employees-filters-dialog/planning-employees-filters-dialog.component';
+import { FilterDialogOpenData, PlanningEmployeesFiltersDialogComponent } from './_components/planning-employees-filters-dialog/planning-employees-filters-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
-import {combineLatest, from, Subject} from "rxjs";
-import {takeUntil} from "rxjs/operators";
+import { combineLatest, from, Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
     selector: 'app-planning-employees-filters',
