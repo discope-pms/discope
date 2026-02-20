@@ -169,12 +169,13 @@ export class CalendarService implements OnDestroy {
             this.employeeRole$,
             this.selectedEmployeeRoleCode$,
             this.employeeList$,
-            this.categoryList$
+            this.categoryList$,
+            this.productModelList$
         ])
             .pipe(
                 takeUntil(this.destroy$),
-                switchMap(([userGroup, employeeRole, selectedEmployeeRoleCode, employeeList, categoryList]) => {
-                    if(!userGroup || !employeeRole || !employeeList.length || !categoryList.length) {
+                switchMap(([userGroup, employeeRole, selectedEmployeeRoleCode, employeeList, categoryList, productModelList]) => {
+                    if(!userGroup || !employeeRole || !employeeList.length || !categoryList.length || !productModelList.length) {
                         return EMPTY;
                     }
 
@@ -182,30 +183,46 @@ export class CalendarService implements OnDestroy {
                     let employeesIds: number[] = [];
 
                     if(userGroup === 'organizer') {
-                        // filter product models
-                        let allProductModelsIds: number[] = [];
-                        for(let category of categoryList) {
-                            if(selectedEmployeeRoleCode === 'ALL' || selectedEmployeeRoleCode === category.code) {
-                                allProductModelsIds = [...allProductModelsIds, ...category.product_models_ids];
+                        // Load all
+                        if(selectedEmployeeRoleCode === 'ALL') {
+                            employeesIds = employeeList.map(e => e.id);
+                            productModelsIds = productModelList.map(pm => pm.id);
+                        }
+                        // Load all employees with a product model of the selected category
+                        else {
+                            const category = categoryList.find(c => c.code === selectedEmployeeRoleCode);
+                            if(category) {
+                                productModelsIds = category.product_models_ids;
+                                for(let employee of employeeList) {
+                                    for(let productModelId of productModelsIds) {
+                                        if(employee.activity_product_models_ids.includes(productModelId)) {
+                                            employeesIds.push(employee.id);
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+                            else {
+                                employeesIds = employeeList.map(e => e.id);
+                                productModelsIds = productModelList.map(pm => pm.id);
                             }
                         }
-                        productModelsIds = allProductModelsIds;
-
-                        // filter employees
-                        if(selectedEmployeeRoleCode !== 'ALL') {
-                            employeeList = employeeList.filter(e => e.role_id.code === selectedEmployeeRoleCode);
-                        }
-                        employeesIds = employeeList.map(e => e.id);
                     }
                     else {
-                        // filter product models
-                        const category = categoryList.find(c => c.code === employeeRole);
-                        if(category) {
-                            productModelsIds = category.product_models_ids;
-                        }
+                        // Load all employees of authenticated user role
+                        const employee = employeeList.find(e => e.partner_identity_id === this.user.identity_id.id);
+                        if(employee) {
+                            employeeList = employeeList.filter(e => e.id === employee.id || (e.role_id && e.role_id.code === employee.role_id.code));
+                            const mapProductModelIds: { [key: number]: boolean } = {};
+                            for(let employee of employeeList) {
+                                for(let productModelId of employee.activity_product_models_ids) {
+                                    mapProductModelIds[productModelId] = true;
+                                }
+                            }
 
-                        // filter employees
-                        employeesIds = employeeList.filter(e => e.role_id.code === employeeRole).map(e => e.id);
+                            employeesIds = employeeList.map(e => e.id);
+                            productModelsIds = Object.keys(mapProductModelIds).map(pmId => +pmId);
+                        }
                     }
 
                     this.selectedProductModelsIdsSubject.next(productModelsIds);
@@ -300,12 +317,15 @@ export class CalendarService implements OnDestroy {
     }
 
     private loadEmployeeList(): Observable<any> {
-        return this.api.fetchEmployees()
+        return this.api.fetchEmployees({
+            dateStart: this.dateFromSubject.value.toISOString().split('T')[0],
+            dateEnd: this.dateToSubject.value.toISOString().split('T')[0]
+        })
             .pipe(
                 takeUntil(this.destroy$),
                 tap(employees => {
                     if(employees.length > 0) {
-                        employees = employees.filter(e => e.role_id);
+                        employees = employees.filter(e => e.activity_product_models_ids.length);
 
                         this.employeeListSubject.next(employees);
 

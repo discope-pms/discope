@@ -118,11 +118,24 @@ export class ApiService {
         );
     }
 
-    public fetchEmployees(): Observable<Employee[]> {
+    public fetchEmployees(filters: { dateStart: string, dateEnd: string }): Observable<Employee[]> {
+        const domain: any = [
+            [
+                ['relationship', '=', 'employee'],
+                ['date_start', '<=', filters.dateEnd],
+                ['date_end', 'is', null]
+            ],
+            [
+                ['relationship', '=', 'employee'],
+                ['date_start', '<=', filters.dateEnd],
+                ['date_end', '>=', filters.dateStart]
+            ]
+        ];
+
         return this.modelCollect<Employee>(
             'hr\\employee\\Employee',
             ['id', 'name', 'relationship', 'is_active', 'activity_product_models_ids', 'role_id.code', 'role_id.name', 'partner_identity_id'],
-            [['relationship', '=', 'employee'], ['is_active', '=', true]],
+            domain,
             { order: 'name', sort: 'asc' }
         );
     }
