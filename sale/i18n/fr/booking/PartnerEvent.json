@@ -1,7 +1,7 @@
 {
-    "name": "Evénement relation",
-    "plural": "Evénements relation",
-    "description": "Evénements planning activitées d'une relation.",
+    "name": "Événement relation",
+    "plural": "Événements relation",
+    "description": "Événements planning activités d'une relation.",
     "model": {
         "description": {
             "label": "Description",
@@ -55,12 +55,18 @@
     },
     "view": {
         "form.default": {
-            "name": "Evénement relation",
+            "name": "Événement relation",
             "description": "",
+            "actions": {
+                "action.delete": {
+                    "label": "Supprimer",
+                    "help": "Supprimer l'événement"
+                }
+            },
             "layout": {}
         },
         "list.default": {
-            "name": "Evénements relation",
+            "name": "Événements relation",
             "description": "",
             "layout": {}
         }
