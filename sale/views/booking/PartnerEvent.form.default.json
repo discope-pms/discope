@@ -1,6 +1,15 @@
 {
-    "name": "Evénement",
+    "name": "Événement",
     "description": "",
+    "actions": [
+        {
+            "id": "action.delete",
+            "label": "Delete",
+            "description": "Delete partner event that isn't linked to a camp.",
+            "controller": "sale_booking_partnerevent_do-delete",
+            "confirm": true
+        }
+    ],
     "layout": {
         "groups": [
             {

@@ -1,0 +1,17 @@
+{
+    "name": "Supprimer",
+    "description": "Supprimer l'activité.",
+    "model": {
+        "id": {
+            "label": "Identifiant",
+            "description": "Identifiant de l'activité.",
+            "help": ""
+        }
+    },
+    "error": {
+        "errors": {
+            "unknown_activity": "Activité inconnu.",
+            "not_allowed": "La suppression d'un événement lié à une réservation ou un camp n'est pas possible."
+        }
+    }
+}

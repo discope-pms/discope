@@ -45,6 +45,7 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
     @Output() showPartnerEvent = new EventEmitter();
     @Output() createPartnerEvent = new EventEmitter();
     @Output() createActivities = new EventEmitter();
+    @Output() createPartnerEvents = new EventEmitter();
 
     @Output() openLegendDialog = new EventEmitter();
     @Output() openPrefDialog = new EventEmitter();
@@ -536,6 +537,10 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
 
     public oncreateActivities() {
         this.createActivities.emit();
+    }
+
+    public oncreatePartnerEvents() {
+        this.createPartnerEvents.emit();
     }
 
     public onhoverActivity(activity: any) {

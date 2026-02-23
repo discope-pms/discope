@@ -1,0 +1,17 @@
+{
+    "name": "Supprimer",
+    "description": "Supprimer l'événement.",
+    "model": {
+        "id": {
+            "label": "Identifiant",
+            "description": "Identifiant de l'événement.",
+            "help": ""
+        }
+    },
+    "error": {
+        "errors": {
+            "unknown_partner_event": "Événement inconnu.",
+            "not_allowed": "La suppression d'une activité lié à un camp n'est pas possible."
+        }
+    }
+}
