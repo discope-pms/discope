@@ -2,10 +2,10 @@
 
 <mat-dialog-content [formGroup]="form">
     <mat-form-field *ngIf="userGroup === 'organizer'" class="field" appearance="fill">
-        <mat-label>{{ 'FILTERS_DIALOG_EMPLOYEE_ROLE_LABEL' | translate }}</mat-label>
-        <mat-select formControlName="employeeRole">
-            <mat-option *ngFor="let employeeRole of employeeRoles" [value]="employeeRole.code">
-                {{ employeeRole.name }}
+        <mat-label>{{ 'FILTERS_DIALOG_CATEGORY_LABEL' | translate }}</mat-label>
+        <mat-select formControlName="category">
+            <mat-option *ngFor="let category of categories" [value]="category.code">
+                {{ category.name }}
             </mat-option>
         </mat-select>
     </mat-form-field>

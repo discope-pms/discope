@@ -20,7 +20,7 @@ export interface Category extends Model {
 }
 
 export interface EmployeeRole extends Model {
-    code: 'EQUI'|'ENV'|'SP'
+    code: 'EQUI'|'ENV'|'SP'|'CAMPS'
 }
 
 export interface Partner extends Model {
@@ -34,7 +34,7 @@ export interface Employee extends Partner {
     role_id: {
         id: number,
         name: string,
-        code: 'EQUI'|'ENV'|'SP'
+        code: 'EQUI'|'ENV'|'SP'|'CAMPS'
     },
     partner_identity_id: number
 }

@@ -1,9 +1,11 @@
-import {Component, Inject, OnDestroy, OnInit} from '@angular/core';
+import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { CalendarService } from '../../../../_services/calendar.service';
 import { FormBuilder, FormGroup } from '@angular/forms';
-import {Subject} from "rxjs";
-import {takeUntil} from "rxjs/operators";
+import { combineLatest, Subject} from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
+import { TranslationService } from '../../../../../../_services/translation.service';
+import { Employee } from '../../../../../../../type';
 
 export interface FilterDialogOpenData {
     calendar: CalendarService
@@ -19,12 +21,14 @@ export class PlanningEmployeesFiltersDialogComponent implements OnInit, OnDestro
     private readonly calendar: CalendarService;
 
     public userGroup: 'organizer'|'manager'|'animator'|null = null;
-    public initialSelectedEmployeeRole: 'ALL'|'EQUI'|'ENV'|'SP' =  'ALL';
+    public initialSelectedCategory: 'ALL'|'EQUI'|'ENV'|'SP' =  'ALL';
 
-    public employeeRoles: { name: string, code: 'ALL'|'EQUI'|'ENV'|'SP' }[] = [];
+    public categories: { name: string, code: 'ALL'|'EQUI'|'ENV'|'SP' }[] = [];
 
     public productModels: { id: number, name: string }[] = [];
-    public employees: { id: number, name: string }[] = [];
+    public employees: { id: string, name: string }[] = [];
+
+    public employeeList: Employee[] = [];
 
     public form: FormGroup;
 
@@ -32,6 +36,7 @@ export class PlanningEmployeesFiltersDialogComponent implements OnInit, OnDestro
 
     constructor(
         private formBuilder: FormBuilder,
+        private translateService: TranslationService,
         private dialogRef: MatDialogRef<PlanningEmployeesFiltersDialogComponent>,
         @Inject(MAT_DIALOG_DATA) public data: FilterDialogOpenData
     ) {
@@ -40,8 +45,9 @@ export class PlanningEmployeesFiltersDialogComponent implements OnInit, OnDestro
 
     ngOnInit() {
         this.form = this.formBuilder.group({
+            category: ['ALL'],
             employeeRole: ['ALL'],
-            employee: [0],
+            employee: ['ALL'],
             productModel: [0]
         });
 
@@ -49,32 +55,30 @@ export class PlanningEmployeesFiltersDialogComponent implements OnInit, OnDestro
             .pipe(takeUntil(this.destroy$))
             .subscribe(userGroup => this.userGroup = userGroup);
 
-        this.calendar.employeeRoleList$
+        this.calendar.categoryList$
             .pipe(takeUntil(this.destroy$))
-            .subscribe(employeeRoles => {
-                this.employeeRoles = [
-                    { code: 'ALL', name: 'Tous' },
-                    ...employeeRoles.map(er => {
-                        return { code: er.code, name: er.name }
-                    })
+            .subscribe(categories => {
+                this.categories = [
+                    { code: 'ALL', name: this.translateService.translate('FILTERS_DIALOG_CATEGORY_ALL_LABEL') },
+                    ...categories.map(er => { return { code: er.code, name: er.name }; })
                 ];
             });
 
-        this.calendar.selectedEmployeeRoleCode$
+        this.calendar.selectedCategoryCode$
             .pipe(takeUntil(this.destroy$))
-            .subscribe((selectedEmployeeRoleCode) => {
-                this.form.get('employeeRole')?.setValue(selectedEmployeeRoleCode);
-                this.initialSelectedEmployeeRole = selectedEmployeeRoleCode;
-            });
+            .subscribe((selectedCategoryCode) => {
+                this.form.get('category')?.setValue(selectedCategoryCode);
+                this.initialSelectedCategory = selectedCategoryCode;
+            })
 
         this.calendar.productModelList$
             .pipe(takeUntil(this.destroy$))
             .subscribe(productModels => {
                 this.productModels = [
-                    { id: 0, name: 'Toutes' },
+                    { id: 0, name: this.translateService.translate('FILTERS_DIALOG_PRODUCT_MODEL_ALL_LABEL') },
                     ...productModels
                         .sort((a, b) => a.name.localeCompare(b.name))
-                        .map(pm => {return { id: pm.id, name: pm.name } })
+                        .map(pm => { return { id: pm.id, name: pm.name }; })
                 ];
             });
 
@@ -91,20 +95,53 @@ export class PlanningEmployeesFiltersDialogComponent implements OnInit, OnDestro
 
         this.calendar.employeeList$
             .pipe(takeUntil(this.destroy$))
-            .subscribe(employees => {
+            .subscribe(employeeList => {
+                this.employeeList = employeeList;
+            });
+
+        combineLatest([
+            this.calendar.employeeRoleList$,
+            this.calendar.employeeList$,
+            this.calendar.userGroup$
+        ])
+            .pipe(takeUntil(this.destroy$))
+            .subscribe(([employeeRoleList, employeeList, userGroup]) => {
+                const roleEmployeesQtyMap = {
+                    EQUI: employeeList.filter(e => e.role_id && e.role_id.code === 'EQUI').length,
+                    ENV: employeeList.filter(e => e.role_id && e.role_id.code === 'ENV').length,
+                    SP: employeeList.filter(e => e.role_id && e.role_id.code === 'SP').length,
+                    CAMPS: employeeList.filter(e => e.role_id && e.role_id.code === 'CAMPS').length,
+                };
+
                 this.employees = [
-                    { id: 0, name: 'Tous' },
-                    ...employees
+                    { id: 'ALL', name: this.translateService.translate('FILTERS_DIALOG_EMPLOYEE_ALL_LABEL') },
+                    ...employeeRoleList
+                        .filter(() => userGroup === 'organizer')
                         .sort((a, b) => a.name.localeCompare(b.name))
-                        .map(pm => {return { id: pm.id, name: pm.name } })
+                        .map(er => { return { id: er.code, name: er.name + ' (' + roleEmployeesQtyMap[er.code] + ')' }; }),
+                    ...employeeList
+                        .sort((a, b) => a.name.localeCompare(b.name))
+                        .map(pm => { return { id: pm.id.toString(), name: pm.name }; })
                 ];
             });
 
-        this.calendar.employeesIdsToDisplay$
+        combineLatest([
+            this.calendar.employeeList$,
+            this.calendar.employeeRoleList$,
+            this.calendar.employeesIdsToDisplay$
+        ])
             .pipe(takeUntil(this.destroy$))
-            .subscribe((employeesIds) => {
+            .subscribe(([employeeList, employeeRoleList, employeesIds]) => {
                 if(employeesIds.length !== 1) {
-                    this.form.get('employee')?.setValue(0);
+                    let employee = 'ALL';
+                    for(let employeeRole of employeeRoleList) {
+                        const roleEmployeesIds = employeeList.filter(e => e.role_id && e.role_id.code === employeeRole.code).map(e => e.id);
+                        if(JSON.stringify(roleEmployeesIds) === JSON.stringify(employeesIds)) {
+                            employee = employeeRole.code;
+                        }
+                    }
+
+                    this.form.get('employee')?.setValue(employee);
                 }
                 else {
                     this.form.get('employee')?.setValue(employeesIds[0]);
@@ -118,19 +155,23 @@ export class PlanningEmployeesFiltersDialogComponent implements OnInit, OnDestro
     }
 
     public closeAndSave() {
-        const employeeRole = this.form.get('employeeRole')?.value;
+        const category = this.form.get('category')?.value;
         const employee = this.form.get('employee')?.value;
         const productModel = this.form.get('productModel')?.value;
 
-        if(employeeRole !== this.initialSelectedEmployeeRole) {
-            this.calendar.selectSelectedEmployeeRole(employeeRole);
+        if(category !== this.initialSelectedCategory) {
+            this.calendar.setSelectedCategoryCode(category);
         }
 
-        if(employee !== 0) {
-            this.calendar.setEmployeesIdsToDisplay([employee]);
+        if(employee === 'ALL') {
+            this.calendar.resetEmployeesIdsToDisplay();
+        }
+        else if(['EQUI','ENV', 'SP', 'CAMPS'].includes(employee)) {
+            const employeesIds = this.employeeList.filter(e => e.role_id && e.role_id.code === employee).map(e => e.id);
+            this.calendar.setEmployeesIdsToDisplay(employeesIds);
         }
         else {
-            this.calendar.resetEmployeesIdsToDisplay();
+            this.calendar.setEmployeesIdsToDisplay([parseInt(employee)]);
         }
 
         if(productModel !== 0) {
