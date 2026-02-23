@@ -9,6 +9,7 @@ import { PlanningEmployeesCalendarParamService, Partner, Employee, Provider } fr
 import { MatSnackBar } from '@angular/material/snack-bar';
 
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
+import { FormControl } from '@angular/forms';
 
 export class ProductModelCategory {
     constructor(
@@ -24,6 +25,12 @@ export class ProductModel {
         public categories_ids: number[] = [],
         public has_transport_required: boolean = false
     ) {}
+}
+
+interface vmModel {
+    employeeRoles: {
+        formControl: FormControl
+    }
 }
 
 @Component({
@@ -84,6 +91,10 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
 
     public hover_row_index = -1;
 
+    public vm: vmModel;
+
+    public employees_roles: any[] = [];
+
     // selection of contiguous cells for creating new assignments
     public selection =  {
         is_active: false,
@@ -128,6 +139,12 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
         this.headers = {};
         this.partners = [];
         this.previous_duration = 0;
+
+        this.vm = {
+            employeeRoles: {
+                formControl: new FormControl()
+            }
+        };
     }
 
     public ngOnChanges(changes: SimpleChanges): void {
@@ -143,6 +160,8 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
         });
 
         this.elementRef.nativeElement.style.setProperty('--rows_height', this.rowsHeight + 'px');
+
+        this.employees_roles = await this.api.collect('hr\\employee\\Role', [], ['name', 'code'], 'name', 'asc', 0, 100);
 
         this.productModelCategories = [
             { id: 0, name: 'TOUTES' },
@@ -210,6 +229,10 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
 
             }, 100);
         }
+    }
+
+    public oncloseEmployeeRolesSelect() {
+        this.params.employee_role_ids = this.vm.employeeRoles.formControl.value;
     }
 
     private calcDateIndex(day: Date): string {
@@ -410,7 +433,14 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
     private async onFiltersChange() {
         this.createHeaderDays();
 
-        this.partners = this.params.selected_partners;
+        this.partners = this.params.selected_partners.filter((p) => {
+            let displayPartner = true;
+            if(p.relationship === 'employee' && this.params.employee_role_ids.length > 0) {
+                const e = p as Employee;
+                displayPartner = e.role_id && this.params.employee_role_ids.includes(e.role_id);
+            }
+            return displayPartner;
+        });
 
         try {
             this.activities = await this.api.fetch('?get=sale_booking_activity_map', {
