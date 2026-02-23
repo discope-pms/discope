@@ -17,7 +17,7 @@ export class CalendarService implements OnDestroy {
     private userGroupSubject = new BehaviorSubject<'animator'|'manager'|'organizer'|null>(null);
     public userGroup$ = this.userGroupSubject.asObservable();
 
-    private employeeRoleSubject = new BehaviorSubject<'EQUI'|'ENV'|'SP'>('EQUI');
+    private employeeRoleSubject = new BehaviorSubject<'EQUI'|'ENV'|'SP'|'CAMPS'>('EQUI');
     public employeeRole$ = this.employeeRoleSubject.asObservable();
 
     /**
@@ -52,14 +52,14 @@ export class CalendarService implements OnDestroy {
     private daysDisplayedQtySubject = new BehaviorSubject<number>(1);
     public daysDisplayedQty$ = this.daysDisplayedQtySubject.asObservable();
 
-    private selectedEmployeeRoleCodeSubject = new BehaviorSubject<'ALL'|'EQUI'|'ENV'|'SP'>('ALL');
-    public selectedEmployeeRoleCode$ = this.selectedEmployeeRoleCodeSubject.asObservable();
+    private selectedCategoryCodeSubject = new BehaviorSubject<'ALL'|'EQUI'|'ENV'|'SP'>('ALL');
+    public selectedCategoryCode$ = this.selectedCategoryCodeSubject.asObservable();
 
-    // Should only depend on the employee role
+    // Should only depend on the category
     private selectedEmployeesIdsSubject = new BehaviorSubject<number[]>([]);
     public selectedEmployeesIds$ = this.selectedEmployeesIdsSubject.asObservable();
 
-    // Should only depend on the employee role
+    // Should only depend on the category
     private selectedProductModelsIdsSubject = new BehaviorSubject<number[]>([]);
     public selectedProductModelsIds$ = this.selectedProductModelsIdsSubject.asObservable();
 
@@ -167,14 +167,14 @@ export class CalendarService implements OnDestroy {
         combineLatest([
             this.userGroup$,
             this.employeeRole$,
-            this.selectedEmployeeRoleCode$,
+            this.selectedCategoryCode$,
             this.employeeList$,
             this.categoryList$,
             this.productModelList$
         ])
             .pipe(
                 takeUntil(this.destroy$),
-                switchMap(([userGroup, employeeRole, selectedEmployeeRoleCode, employeeList, categoryList, productModelList]) => {
+                switchMap(([userGroup, employeeRole, selectedCategoryCode, employeeList, categoryList, productModelList]) => {
                     if(!userGroup || !employeeRole || !employeeList.length || !categoryList.length || !productModelList.length) {
                         return EMPTY;
                     }
@@ -184,13 +184,13 @@ export class CalendarService implements OnDestroy {
 
                     if(userGroup === 'organizer') {
                         // Load all
-                        if(selectedEmployeeRoleCode === 'ALL') {
+                        if(selectedCategoryCode === 'ALL') {
                             employeesIds = employeeList.map(e => e.id);
                             productModelsIds = productModelList.map(pm => pm.id);
                         }
                         // Load all employees with a product model of the selected category
                         else {
-                            const category = categoryList.find(c => c.code === selectedEmployeeRoleCode);
+                            const category = categoryList.find(c => c.code === selectedCategoryCode);
                             if(category) {
                                 productModelsIds = category.product_models_ids;
                                 for(let employee of employeeList) {
@@ -430,8 +430,8 @@ export class CalendarService implements OnDestroy {
         }
     }
 
-    public selectSelectedEmployeeRole(employeeRoleCode: 'ALL'|'EQUI'|'ENV'|'SP') {
-        this.selectedEmployeeRoleCodeSubject.next(employeeRoleCode);
+    public setSelectedCategoryCode(categoryCode: 'ALL'|'EQUI'|'ENV'|'SP') {
+        this.selectedCategoryCodeSubject.next(categoryCode);
     }
 
     public setEmployeesIdsToDisplay(employeesIds: number[]) {

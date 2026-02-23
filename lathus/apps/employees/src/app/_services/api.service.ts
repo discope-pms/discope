@@ -105,7 +105,7 @@ export class ApiService {
         return this.modelCollect<EmployeeRole>(
             'hr\\employee\\Role',
             ['id', 'name', 'code'],
-            ['code', 'in', ['EQUI', 'ENV', 'SP']],
+            ['code', 'in', ['EQUI', 'ENV', 'SP', 'CAMPS']],
             { order: 'name', sort: 'asc' }
         );
     }

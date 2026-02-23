@@ -57,9 +57,12 @@ export const translations: { [lang: string]: { [key: string]: string } } = {
          * Filters
          */
         'FILTERS_DIALOG_TITLE': 'Filters',
-        'FILTERS_DIALOG_EMPLOYEE_ROLE_LABEL': 'Sector',
+        'FILTERS_DIALOG_CATEGORY_LABEL': 'Category',
+        'FILTERS_DIALOG_CATEGORY_ALL_LABEL': 'All',
         'FILTERS_DIALOG_EMPLOYEE_LABEL': 'Animator',
+        'FILTERS_DIALOG_EMPLOYEE_ALL_LABEL': 'All',
         'FILTERS_DIALOG_PRODUCT_MODEL_LABEL': 'Activity',
+        'FILTERS_DIALOG_PRODUCT_MODEL_ALL_LABEL': 'All',
         'FILTERS_DIALOG_CANCEL_BTN': 'Cancel',
         'FILTERS_DIALOG_APPLY_BTN': 'Apply',
 
@@ -176,9 +179,12 @@ export const translations: { [lang: string]: { [key: string]: string } } = {
          * Filters
          */
         'FILTERS_DIALOG_TITLE': 'Filtres',
-        'FILTERS_DIALOG_EMPLOYEE_ROLE_LABEL': 'Secteur',
-        'FILTERS_DIALOG_EMPLOYEE_LABEL': 'Animateur',
+        'FILTERS_DIALOG_CATEGORY_LABEL': 'Catégories',
+        'FILTERS_DIALOG_CATEGORY_ALL_LABEL': 'Toutes',
+        'FILTERS_DIALOG_EMPLOYEE_LABEL': 'Animateurs',
+        'FILTERS_DIALOG_EMPLOYEE_ALL_LABEL': 'Tous',
         'FILTERS_DIALOG_PRODUCT_MODEL_LABEL': 'Activité',
+        'FILTERS_DIALOG_PRODUCT_MODEL_ALL_LABEL': 'Toutes',
         'FILTERS_DIALOG_CANCEL_BTN': 'Annuler',
         'FILTERS_DIALOG_APPLY_BTN': 'Appliquer',
 
