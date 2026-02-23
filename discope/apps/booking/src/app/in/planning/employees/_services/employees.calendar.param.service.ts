@@ -19,7 +19,8 @@ export class Employee extends Partner {
         public name: string = '',
         public relationship: 'employee' = 'employee',
         public is_active: boolean = true,
-        public activity_product_models_ids: any[] = []
+        public activity_product_models_ids: any[] = [],
+        public role_id: number = 0
     ) {
         super(id, name, relationship, is_active);
     }
@@ -63,6 +64,8 @@ export class PlanningEmployeesCalendarParamService {
     private _product_model_id: number|null;
     // ids of the product models to display (all if empty)
     private _product_model_ids: number[];
+    // ids of the employee roles to display (all if empty)
+    private _employee_role_ids: number[];
     // timeout handler for debounce
     private timeout: any;
     // current state, for changes detection
@@ -78,7 +81,7 @@ export class PlanningEmployeesCalendarParamService {
      * Current state according to instant values of the instance.
      */
     private getState(): string {
-        return this._date_from.getTime() + this._date_to.getTime() + this._partners_ids.toString() + this._product_model_ids.toString();
+        return this._date_from.getTime() + this._date_to.getTime() + this._partners_ids.toString() + this._product_model_ids.toString() + this._employee_role_ids.toString();
     }
 
     private treatAsUTC(date:Date): Date {
@@ -118,6 +121,7 @@ export class PlanningEmployeesCalendarParamService {
         this._product_category_id = 0;
         this._product_model_id = null;
         this._product_model_ids = [];
+        this._employee_role_ids = [];
         this.state = this.getState();
     }
 
@@ -203,6 +207,11 @@ export class PlanningEmployeesCalendarParamService {
         this.updateRange();
     }
 
+    public set employee_role_ids(employee_role_ids: number[]) {
+        this._employee_role_ids = employee_role_ids;
+        this.updateRange();
+    }
+
 
     /***********
      * Getters *
@@ -257,5 +266,9 @@ export class PlanningEmployeesCalendarParamService {
 
     public get product_model_id() {
         return this._product_model_id;
+    }
+
+    public get employee_role_ids(): any[] {
+        return this._employee_role_ids;
     }
 }

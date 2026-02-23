@@ -18,7 +18,21 @@
             <!-- header -->
             <thead>
                 <tr class="head">
-                    <th #calTableRefColumn class="cell-room partner ref-column" rowspan="2"><span class="material-icons">people</span></th>
+                    <th #calTableRefColumn class="cell-room partner ref-column" style="width: 200px;" rowspan="2">
+                        <span class="material-icons" style="display: block;">people</span>
+                        <mat-form-field class="mini-select">
+                            <mat-select
+                                [formControl]="vm.employeeRoles.formControl"
+                                (closed)="oncloseEmployeeRolesSelect()"
+                                multiple
+                                disableRipple
+                            >
+                                <mat-option *ngFor="let role of employees_roles" [value]="role.id">
+                                    {{ role.name }}
+                                </mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </th>
                     <!--
                     <th class="head-months" *ngFor="let month of headers.months" [attr.colspan]="month.days.length">
                         {{ month.date | date : 'MMMM y' }}
