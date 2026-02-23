@@ -83,7 +83,7 @@
 					"label": "Paiements"
 				},
                 "section.bankchecks": {
-					"label": "Chèques bancaires"
+					"label": "Chèques bancaires & Bons de commande"
 				}
 			}
 		},

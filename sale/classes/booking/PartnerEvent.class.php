@@ -74,6 +74,15 @@ class PartnerEvent extends Model {
                 'default'           => 'other'
             ],
 
+            'camp_id' => [
+                'result_type'       => 'many2one',
+                'foreign_object'    => 'sale\camp\Camp',
+                'description'       => "Camp the activity is organised for.",
+                'relation'          => ['camp_group_id' => 'camp_id'],
+                'readonly'          => true,
+                'ondelete'          => 'cascade'
+            ],
+
             'camp_group_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\camp\CampGroup',
