@@ -73,7 +73,7 @@ ngx-material-timepicker-toggle {
     height: 100vh;
     width: 100vw;
 
-    mat-dialog-container {
+    .mat-dialog-container {
         border-radius: 0;
         outline: none;
 
@@ -84,8 +84,16 @@ ngx-material-timepicker-toggle {
         }
     }
 
-    mat-dialog-content {
+    .mat-dialog-title {
+        min-height: 50px;
+    }
+
+    .mat-dialog-content {
         flex-grow: 1;
         max-height: 80vh;
+    }
+
+    .mat-dialog-actions {
+        min-height: 80px;
     }
 }
