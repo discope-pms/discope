@@ -98,10 +98,6 @@ export class PlanningEmployeesUnassignedComponent implements OnInit, OnDestroy  
         const data: ActivityDialogData = { calendar: this.calendar, activity };
 
         this.dialog.open(PlanningEmployeesActivityDialogComponent, {
-            width: '100vw',
-            height: '100vh',
-            maxWidth: '100vw',
-            maxHeight: '100vh',
             panelClass: 'full-screen-dialog',
             data: data
         });

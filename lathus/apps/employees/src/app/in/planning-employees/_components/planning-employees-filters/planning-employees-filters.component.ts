@@ -72,10 +72,6 @@ export class PlanningEmployeesFiltersComponent implements OnInit, OnDestroy  {
         const data: FilterDialogOpenData = { calendar: this.calendar };
 
         this.dialog.open(PlanningEmployeesFiltersDialogComponent, {
-            width: '100vw',
-            height: '100vh',
-            maxWidth: '100vw',
-            maxHeight: '100vh',
             panelClass: 'full-screen-dialog',
             data: data
         });

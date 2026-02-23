@@ -104,10 +104,6 @@ export class PlanningEmployeesCalendarMomentDialogComponent implements OnInit, O
         const data: ActivityDialogData = { calendar: this.calendar, activity };
 
         this.dialog.open(PlanningEmployeesActivityDialogComponent, {
-            width: '100vw',
-            height: '100vh',
-            maxWidth: '100vw',
-            maxHeight: '100vh',
             panelClass: 'full-screen-dialog',
             data: data
         });
@@ -122,10 +118,6 @@ export class PlanningEmployeesCalendarMomentDialogComponent implements OnInit, O
         };
 
         this.dialog.open(PlanningEmployeesCreatePartnerEventDialogComponent, {
-            width: '100vw',
-            height: '100vh',
-            maxWidth: '100vw',
-            maxHeight: '100vh',
             panelClass: 'full-screen-dialog',
             data: data
         });
@@ -139,10 +131,6 @@ export class PlanningEmployeesCalendarMomentDialogComponent implements OnInit, O
         };
 
         this.dialog.open(PlanningEmployeesCreatePartnerEventSetDialogComponent, {
-            width: '100vw',
-            height: '100vh',
-            maxWidth: '100vw',
-            maxHeight: '100vh',
             panelClass: 'full-screen-dialog',
             data: data
         });

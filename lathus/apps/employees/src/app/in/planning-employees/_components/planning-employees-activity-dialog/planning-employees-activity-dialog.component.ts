@@ -122,10 +122,6 @@ export class PlanningEmployeesActivityDialogComponent implements OnInit {
         }
 
         const dialog = this.dialog.open(PlanningEmployeesUpdatePartnerEventDialogComponent, {
-            width: '100vw',
-            height: '100vh',
-            maxWidth: '100vw',
-            maxHeight: '100vh',
             panelClass: 'full-screen-dialog',
             data: data
         });

@@ -4,8 +4,8 @@ import { EnvService } from 'sb-shared-lib';
 import {combineLatest, Subject} from 'rxjs';
 import { CalendarService } from '../../_services/calendar.service';
 import { MomentDialogOpenData, PlanningEmployeesCalendarMomentDialogComponent } from './_components/planning-employees-calendar-moment-dialog/planning-employees-calendar-moment-dialog.component';
-import {MatDialog} from "@angular/material/dialog";
-import {takeUntil} from "rxjs/operators";
+import { MatDialog } from '@angular/material/dialog';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
     selector: 'app-planning-employees-calendar',
@@ -234,10 +234,6 @@ export class PlanningEmployeesCalendarComponent implements OnInit, AfterViewInit
         const data: MomentDialogOpenData = { calendar: this.calendar, employee, dayIndex, timeSlotCode };
 
         const dialog = this.dialog.open(PlanningEmployeesCalendarMomentDialogComponent, {
-            width: '100vw',
-            height: '100vh',
-            maxWidth: '100vw',
-            maxHeight: '100vh',
             panelClass: 'full-screen-dialog',
             data: data
         });
