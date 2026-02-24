@@ -569,6 +569,10 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
         this.createActivities.emit();
     }
 
+    public oncreatePartnerEvent() {
+        this.createPartnerEvent.emit();
+    }
+
     public oncreatePartnerEvents() {
         this.createPartnerEvents.emit();
     }

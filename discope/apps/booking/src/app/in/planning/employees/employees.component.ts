@@ -313,18 +313,27 @@ export class PlanningEmployeesComponent implements OnInit, AfterViewInit, OnDest
         this.context.change(descriptor);
     }
 
-    public onCreatePartnerEvent(data: { partnerId: number, eventDate: Date, timeSlotCode: 'AM'|'PM'|'EV' }) {
+    public onCreatePartnerEvent(data?: { partnerId: number, eventDate: Date, timeSlotCode: 'AM'|'PM'|'EV' }) {
+        const domain: any[] = [];
+        if(data) {
+            if(data.partnerId) {
+                domain.push(['partner_id', '=', data.partnerId]);
+            }
+            else if(data.eventDate) {
+                domain.push(['event_date', '=', Math.floor(data.eventDate.getTime() / 1000)]);
+            }
+            else if(data.timeSlotCode) {
+                domain.push(['time_slot_id', '=', this.mapTimeSlot[data.timeSlotCode].id]);
+            }
+        }
+
         let descriptor: any = {
             context_silent: true, // do not update sidebar
             context: {
                 entity: 'sale\\booking\\PartnerEvent',
                 type: 'form',
                 name: 'default',
-                domain: [
-                    ['partner_id', '=', data.partnerId],
-                    ['event_date', '=', Math.floor(data.eventDate.getTime() / 1000)],
-                    ['time_slot_id', '=', this.mapTimeSlot[data.timeSlotCode].id]
-                ],
+                domain: domain,
                 mode: 'edit',
                 purpose: 'create',
                 display_mode: 'popup',
