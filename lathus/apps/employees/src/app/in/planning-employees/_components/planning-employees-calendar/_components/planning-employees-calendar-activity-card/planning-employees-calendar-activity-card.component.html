@@ -4,7 +4,7 @@
         <!-- Booking -->
         <ng-container *ngIf="activity.booking_id">
             <div>
-                <mat-icon *ngIf="!activity.booking_line_group_id?.has_person_with_disability" class="disability-icon" aria-hidden="true">accessible</mat-icon>
+                <mat-icon *ngIf="activity.booking_line_group_id?.has_person_with_disability" class="disability-icon" aria-hidden="true">accessible</mat-icon>
                 <span>{{ activity.group_num }} - {{ activity.customer_id.name }}</span>
             </div>
             <div>{{ activity.name }}</div>
@@ -19,7 +19,7 @@
 
         <!-- Other -->
         <ng-container *ngIf="!activity.booking_id && !activity.camp_id">
-            {{ activity.name }}
+            <div>{{ activity.name }}</div>
         </ng-container>
     </div>
 
@@ -36,8 +36,8 @@
         </ng-container>
 
         <!-- Other -->
-        <div>
-            {{ activity.name }}
-        </div>
+        <ng-container *ngIf="!activity.camp_id">
+            <div>{{ activity.name }}</div>
+        </ng-container>
     </div>
 </div>

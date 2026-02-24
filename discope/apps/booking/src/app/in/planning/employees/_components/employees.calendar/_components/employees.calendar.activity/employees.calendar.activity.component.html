@@ -59,7 +59,7 @@
                 </ng-container>
 
                 <!-- Other -->
-                <ng-container>
+                <ng-container *ngIf="!activity.camp_id">
                     <div>{{ activity.name }}</div>
                 </ng-container>
             </ng-container>
