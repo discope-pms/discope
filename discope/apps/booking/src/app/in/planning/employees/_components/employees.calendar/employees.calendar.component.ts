@@ -10,6 +10,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { FormControl } from '@angular/forms';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 
 export class ProductModelCategory {
     constructor(
@@ -134,7 +135,8 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
         private env: EnvService,
         private snack: MatSnackBar,
         private elementRef: ElementRef,
-        private cd: ChangeDetectorRef
+        private cd: ChangeDetectorRef,
+        private sanitizer: DomSanitizer
     ) {
         this.headers = {};
         this.partners = [];
@@ -193,6 +195,10 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
         });
 
         observer.observe(this.calTable.nativeElement);
+    }
+
+    public getSafeHtml(html: string): SafeHtml {
+        return this.sanitizer.bypassSecurityTrustHtml(html);
     }
 
     private updateTableDimensions(): void {
@@ -389,7 +395,7 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
                 `<dt>${activity.name} <b>${activity.counter}/${activity.counter_total}</b></dt>` +
                 `<br>` +
                 `<dt>${schedule_from} - ${schedule_to}</dt>` +
-                `<dt><button>Créer événement</button></dt>` +
+                `<dt><button data-action="createPartnerEvent" data-date="${activity.activity_date}" data-partner-id="${activity.partner_id.id}" data-time-slot-code="${activity.time_slot}">Créer événement</button></dt>` +
                 '</dl>';
         }
         else if(activity.camp_id) {
@@ -402,7 +408,7 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
                 `<dt>${activity.name} <b>${activity.counter}/${activity.counter_total}</b></dt>` +
                 `<br>` +
                 `<dt>${schedule_from} - ${schedule_to}</dt>` +
-                `<dt><button>Créer événement</button></dt>` +
+                `<dt><button data-action="createPartnerEvent" data-date="${activity.activity_date}" data-partner-id="${activity.partner_id.id}" data-time-slot-code="${activity.time_slot}">Créer événement</button></dt>` +
                 '</dl>';
         }
         else {
@@ -411,24 +417,39 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
                 `<dt>${activity.name}</dt>` +
                 `<br>` +
                 `<dt>${schedule_from} - ${schedule_to}</dt>` +
-                `<dt><button>Créer événement</button></dt>` +
+                `<dt><button data-action="createPartnerEvent" data-date="${activity.activity_date}" data-partner-id="${activity.partner_id.id}" data-time-slot-code="${activity.time_slot}">Créer événement</button></dt>` +
                 '</dl>';
         }
     }
 
-    private humanReadableSchedule(schedule: number) {
-        const hours = Math.floor(schedule / 3600);
-        const minutes = Math.floor((schedule % 3600) / 60);
-        const seconds = schedule % 60;
+    public onclickDescription(event: any) {
+        const target = event.target as HTMLElement;
+        if (target.tagName === 'BUTTON') {
+            const action = target.getAttribute('data-action');
+            if (action === 'createPartnerEvent') {
+                // remove timezone offset
+                const day = new Date(target.getAttribute('data-date'));
+                const eventDate = new Date();
+                eventDate.setFullYear(day.getFullYear());
+                eventDate.setMonth(day.getMonth());
+                eventDate.setDate(day.getDate());
 
-        return (
-            hours.toString().padStart(2, '0') + ':' +
-            minutes.toString().padStart(2, '0') + ':' +
-            seconds.toString().padStart(2, '0')
-        );
+                const partnerId = target.getAttribute('data-partner-id');
+                const timeSlotCode = target.getAttribute('data-time-slot-code');
+
+                // event_date
+                this.createPartnerEvent.emit({
+                    eventDate,
+                    partnerId,
+                    timeSlotCode
+                });
+            }
+        }
     }
 
     public getPartnerEventDescription(partnerEvent: any): string {
+        const timeSlot = Object.values(this.mapTimeSlot).find(timeSlot => timeSlot.id === partnerEvent.time_slot_id);
+
         if(partnerEvent.camp_id) {
             // auto generated partner event because the partner is responsible for the camp group
             return '<dl>' +
@@ -439,6 +460,7 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
                 `<dt>${partnerEvent.name}</dt>` +
                 `<br>` +
                 (partnerEvent.description ? `<dt>${partnerEvent.description}</dt>` : '') +
+                `<dt><button data-action="createPartnerEvent" data-date="${partnerEvent.event_date}" data-partner-id="${partnerEvent.partner_id}" data-time-slot-code="${timeSlot?.code}">Créer événement</button></dt>` +
                 '</dl>';
         }
         else {
@@ -447,6 +469,7 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
                 `<dt>${partnerEvent.name}</dt>` +
                 `<br>` +
                 (partnerEvent.description ? `<dt>${partnerEvent.description}</dt>` : '') +
+                `<dt><button data-action="createPartnerEvent" data-date="${partnerEvent.event_date}" data-partner-id="${partnerEvent.partner_id}" data-time-slot-code="${timeSlot?.code}">Créer événement</button></dt>` +
                 '</dl>';
         }
     }

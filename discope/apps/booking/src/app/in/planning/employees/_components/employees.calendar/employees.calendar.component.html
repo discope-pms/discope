@@ -150,7 +150,7 @@
                                                 <mat-icon *ngIf="activity.booking_id && activity.booking_line_group_id.has_person_with_disability" aria-hidden="true">accessible</mat-icon>
                                                 <mat-icon *ngIf="activity.booking_id && activity.booking_id.date_from === activity.booking_id.date_to" aria-hidden="true">event</mat-icon>
                                             </div>
-                                            <div class="content" *ngIf="vDescription?.value?.length" style="margin: 0 !important; font-size: 0.85rem;" [innerHTML]="vDescription.value"></div>
+                                            <div class="content" *ngIf="vDescription?.value?.length" style="margin: 0 !important; font-size: 0.85rem;" [innerHTML]="getSafeHtml(vDescription.value)" (click)="onclickDescription($event)"></div>
                                         </div>
                                     </div>
                                 </ng-container>
@@ -172,7 +172,7 @@
 
                                     <div *ngIf="hovered_activity == partnerEvent" class="cell-hint" [style]="'transform: translateX(' + ((i === 0 || i < (headers.days.length - 1)) ? -16 : -230) + 'px) translateY(calc(' + (j+1) + '*(var(--rows_height)) + 10px)'" #vDescription="var" [var]="{value: getPartnerEventDescription(partnerEvent)}" (mouseenter)="onhoverActivity(partnerEvent)" (mouseleave)="onhoverActivity(null)">
                                         <div class="tooltip">
-                                            <div class="content" *ngIf="vDescription?.value?.length" style="margin: 0 !important; font-size: 0.85rem;" [innerHTML]="vDescription.value"></div>
+                                            <div class="content" *ngIf="vDescription?.value?.length" style="margin: 0 !important; font-size: 0.85rem;" [innerHTML]="getSafeHtml(vDescription.value)" (click)="onclickDescription($event)"></div>
                                         </div>
                                     </div>
                                 </ng-container>
@@ -219,7 +219,7 @@
                                                 <mat-icon *ngIf="activity.booking_id && activity.booking_line_group_id.has_person_with_disability" aria-hidden="true">accessible</mat-icon>
                                                 <mat-icon *ngIf="activity.booking_id && activity.booking_id.date_from === activity.booking_id.date_to" aria-hidden="true">event</mat-icon>
                                             </div>
-                                            <div class="content" *ngIf="vDescription?.value?.length" style="margin: 0 !important; font-size: 0.85rem;" [innerHTML]="vDescription.value"></div>
+                                            <div class="content" *ngIf="vDescription?.value?.length" style="margin: 0 !important; font-size: 0.85rem;" [innerHTML]="getSafeHtml(vDescription.value)" (click)="onclickDescription($event)"></div>
                                         </div>
                                     </span>
                                 </ng-container>
@@ -241,7 +241,7 @@
 
                                     <div *ngIf="hovered_activity == partnerEvent" class="cell-hint" [style]="'transform: translateX(' + ((i === 0 || i < (headers.days.length - 1)) ? -16 : -230) + 'px) translateY(calc(' + (j+1) + '*(var(--rows_height)) + 10px)'" #vDescription="var" [var]="{value: getPartnerEventDescription(partnerEvent)}" (mouseenter)="onhoverActivity(partnerEvent)" (mouseleave)="onhoverActivity(null)">
                                         <div class="tooltip">
-                                            <div class="content" *ngIf="vDescription?.value?.length" style="margin: 0 !important; font-size: 0.85rem;" [innerHTML]="vDescription.value"></div>
+                                            <div class="content" *ngIf="vDescription?.value?.length" style="margin: 0 !important; font-size: 0.85rem;" [innerHTML]="getSafeHtml(vDescription.value)" (click)="onclickDescription($event)"></div>
                                         </div>
                                     </div>
                                 </ng-container>
@@ -288,7 +288,7 @@
                                                 <mat-icon *ngIf="activity.booking_id && activity.booking_line_group_id.has_person_with_disability" aria-hidden="true">accessible</mat-icon>
                                                 <mat-icon *ngIf="activity.booking_id && activity.booking_id.date_from === activity.booking_id.date_to" aria-hidden="true">event</mat-icon>
                                             </div>
-                                            <div class="content" *ngIf="vDescription?.value?.length" style="margin: 0 !important; font-size: 0.85rem;" [innerHTML]="vDescription.value"></div>
+                                            <div class="content" *ngIf="vDescription?.value?.length" style="margin: 0 !important; font-size: 0.85rem;" [innerHTML]="getSafeHtml(vDescription.value)" (click)="onclickDescription($event)"></div>
                                         </div>
                                     </span>
                                 </ng-container>
@@ -310,7 +310,7 @@
 
                                     <div *ngIf="hovered_activity == partnerEvent" class="cell-hint" [style]="'transform: translateX(' + ((i === 0 || i < (headers.days.length - 1)) ? -16 : -230) + 'px) translateY(calc(' + (j+1) + '*(var(--rows_height)) + 10px)'" #vDescription="var" [var]="{value: getPartnerEventDescription(partnerEvent)}" (mouseenter)="onhoverActivity(partnerEvent)" (mouseleave)="onhoverActivity(null)">
                                         <div class="tooltip">
-                                            <div class="content" *ngIf="vDescription?.value?.length" style="margin: 0 !important; font-size: 0.85rem;" [innerHTML]="vDescription.value"></div>
+                                            <div class="content" *ngIf="vDescription?.value?.length" style="margin: 0 !important; font-size: 0.85rem;" [innerHTML]="getSafeHtml(vDescription.value)" (click)="onclickDescription($event)"></div>
                                         </div>
                                     </div>
                                 </ng-container>

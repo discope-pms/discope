@@ -319,10 +319,10 @@ export class PlanningEmployeesComponent implements OnInit, AfterViewInit, OnDest
             if(data.partnerId) {
                 domain.push(['partner_id', '=', data.partnerId]);
             }
-            else if(data.eventDate) {
+            if(data.eventDate) {
                 domain.push(['event_date', '=', Math.floor(data.eventDate.getTime() / 1000)]);
             }
-            else if(data.timeSlotCode) {
+            if(data.timeSlotCode) {
                 domain.push(['time_slot_id', '=', this.mapTimeSlot[data.timeSlotCode].id]);
             }
         }
