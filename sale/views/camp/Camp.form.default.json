@@ -406,7 +406,8 @@
                                                 "value": "booking_meals_ids",
                                                 "width": "100%",
                                                 "widget": {
-                                                    "view": "list.camp"
+                                                    "view": "list.camp",
+                                                    "limit": "50"
                                                 }
                                             }
                                         ]
