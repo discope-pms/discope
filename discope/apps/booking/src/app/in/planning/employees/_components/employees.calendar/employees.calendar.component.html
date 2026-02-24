@@ -144,7 +144,7 @@
                                         (cdkDragStarted)="onDragStart(activity)"
                                     ></planning-employees-calendar-activity>
 
-                                    <div *ngIf="hovered_activity == activity" class="cell-hint" [style]="'transform: translateX(' + ((i === 0 || i < (headers.days.length - 1)) ? -16 : -230) + 'px) translateY(calc(var(--rows_height) + 10px)'" #vDescription="var" [var]="{value: getActivityDescription(activity)}" (mouseenter)="onhoverActivity(activity)" (mouseleave)="onhoverActivity(null)">
+                                    <div *ngIf="hovered_activity == activity" class="cell-hint" [style]="'transform: translateX(' + ((i === 0 || i < (headers.days.length - 1)) ? -16 : -230) + 'px) translateY(calc(1*(var(--rows_height)) + 10px)'" #vDescription="var" [var]="{value: getActivityDescription(activity)}" (mouseenter)="onhoverActivity(activity)" (mouseleave)="onhoverActivity(null)">
                                         <div class="tooltip" [class]="{'tooltip--with-header': activity.booking_id && (activity.booking_line_group_id.has_person_with_disability || activity.booking_id.date_from === activity.booking_id.date_to) }">
                                             <div class="header" style="color: #514d4d;">
                                                 <mat-icon *ngIf="activity.booking_id && activity.booking_line_group_id.has_person_with_disability" aria-hidden="true">accessible</mat-icon>
@@ -213,7 +213,7 @@
                                         (cdkDragStarted)="onDragStart(activity)">
                                     </planning-employees-calendar-activity>
 
-                                    <span *ngIf="hovered_activity == activity" class="cell-hint" [style]="'transform: translateX(' + ((i === 0 || i < (headers.days.length - 1)) ? -16 : -230) + 'px) translateY(calc(' + (j+1) + '*(var(--rows_height)) + 10px)'" #vDescription="var" [var]="{value: getActivityDescription(activity)}" (mouseenter)="onhoverActivity(activity)" (mouseleave)="onhoverActivity(null)">
+                                    <span *ngIf="hovered_activity == activity" class="cell-hint" [style]="'transform: translateX(' + ((i === 0 || i < (headers.days.length - 1)) ? -16 : -230) + 'px) translateY(calc(1*(var(--rows_height)) + 10px)'" #vDescription="var" [var]="{value: getActivityDescription(activity)}" (mouseenter)="onhoverActivity(activity)" (mouseleave)="onhoverActivity(null)">
                                         <div class="tooltip" [class]="{'tooltip--with-header': activity.booking_id && (activity.booking_line_group_id.has_person_with_disability || activity.booking_id.date_from === activity.booking_id.date_to) }">
                                             <div class="header" style="color: #514d4d;">
                                                 <mat-icon *ngIf="activity.booking_id && activity.booking_line_group_id.has_person_with_disability" aria-hidden="true">accessible</mat-icon>
@@ -282,7 +282,7 @@
                                         (cdkDragStarted)="onDragStart(activity)">
                                     </planning-employees-calendar-activity>
 
-                                    <span *ngIf="hovered_activity == activity" class="cell-hint" [style]="'transform: translateX(' + ((i === 0 || i < (headers.days.length - 1)) ? -16 : -230) + 'px) translateY(calc(' + (j+1) + '*(var(--rows_height)) + 10px)'" #vDescription="var" [var]="{value: getActivityDescription(activity)}" (mouseenter)="onhoverActivity(activity)" (mouseleave)="onhoverActivity(null)">
+                                    <span *ngIf="hovered_activity == activity" class="cell-hint" [style]="'transform: translateX(' + ((i === 0 || i < (headers.days.length - 1)) ? -16 : -230) + 'px) translateY(calc(1*(var(--rows_height)) + 10px)'" #vDescription="var" [var]="{value: getActivityDescription(activity)}" (mouseenter)="onhoverActivity(activity)" (mouseleave)="onhoverActivity(null)">
                                         <div class="tooltip" [class]="{'tooltip--with-header': activity.booking_id && (activity.booking_line_group_id.has_person_with_disability || activity.booking_id.date_from === activity.booking_id.date_to) }">
                                             <div class="header" style="color: #514d4d;">
                                                 <mat-icon *ngIf="activity.booking_id && activity.booking_line_group_id.has_person_with_disability" aria-hidden="true">accessible</mat-icon>
