@@ -291,7 +291,7 @@ if(!empty($params['partners_ids'])) {
 $activity_partner_activities_ids = $orm->search(PartnerEvent::getType(), $domain);
 
 if(!empty($activity_partner_activities_ids)) {
-    $partner_events = $orm->read(PartnerEvent::getType(), $activity_partner_activities_ids, ['id', 'name', 'description', 'partner_id', 'event_date', 'time_slot_id', 'event_type', 'camp_id', 'camp_group_id']);
+    $partner_events = $orm->read(PartnerEvent::getType(), $activity_partner_activities_ids, ['id', 'name', 'description', 'partner_id', 'event_date', 'time_slot_id', 'event_type', 'camp_group_id']);
 
     $map_camp_groups = [];
     // retrieve all foreign objects identifiers
@@ -309,7 +309,7 @@ if(!empty($activity_partner_activities_ids)) {
             $map_camps[$camp_group['camp_id']] = true;
         }
     }
-    $camps = $orm->read(Camp::getType(), array_keys($map_camps), ['id', 'name', 'short_name', 'date_from', 'date_to', 'min_age', 'max_age', 'enrollments_qty', 'employee_ratio']);
+    $camps = $orm->read(Camp::getType(), array_keys($map_camps), ['id', 'name', 'sojourn_number', 'short_name', 'date_from', 'date_to', 'min_age', 'max_age', 'enrollments_qty', 'employee_ratio']);
 
     foreach($partner_events as $partner_event) {
         $date_index = date('Y-m-d', $partner_event['event_date']);

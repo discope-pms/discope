@@ -43,8 +43,8 @@
             border-radius: 5px;
 
             &.not-first {
-                border-top-left-radius: 0px;
-                border-bottom-left-radius: 0px;
+                border-top-left-radius: 0;
+                border-bottom-left-radius: 0;
             }
 
             &.part {
@@ -59,74 +59,52 @@
                 font-size: 12px;
             }
 
-            .activity-booking {
+            .first-line {
                 display: flex;
+
+                .info {
+                    flex: 0 1 20%;
+                }
+                .icon {
+                    margin-left: auto;
+                }
             }
 
-            .activity-customer {
-                display: flex;
-            }
-
-            .activity-camp {
-                display: flex;
-            }
-
-            .activity-partner-event {
-                margin-top: 2px;
-            }
-
-            .activity-ooo {
-                display: flex;
-            }
-
-            .activity-customer-details {
+            .second-line {
                 flex: 0 1 20%;
                 margin-top: -4px;
-            }
-
-            .activity-camp-details {
-                flex: 0 1 20%;
-                margin-top: -4px;
-            }
-
-            .activity-ooo-details {
-                flex: 0 1 20%;
-                margin-top: 0;
             }
 
             &.less-28 {
-                .activity-booking {
+                .first-line {
                     display: none;
                 }
-                .activity-customer-details {
+
+                .second-line {
                     flex: 1;
                     margin-top: 0;
                 }
             }
+
             &.less-28.less-15 {
-                .activity-booking {
+                .first-line {
                     display: none;
                 }
-                .activity-customer-details {
+
+                .second-line {
                     flex: 1;
                     margin-top: -2px;
                 }
-                .activity-ooo-details {
-                    flex: 1;
-                    margin-top: -1px;
-                }
             }
+
             &.less-28.less-15.less-12 {
-                .activity-booking {
+                .first-line {
                     display: none;
                 }
-                .activity-customer-details {
+
+                .second-line {
                     flex: 1;
                     margin-top: -4px;
-                }
-
-                .activity-ooo-details {
-                    margin-top: -3px;
                 }
             }
         }
