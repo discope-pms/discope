@@ -8,7 +8,7 @@
         (mouseleave)="onLeaveActivity(activity)"
     >
         <div (click)="onShowBooking(activity)" >
-            <!-- Booking or camp activity -->
+            <!-- Activity -->
             <ng-container *ngIf="!activity?.is_partner_event">
                 <!-- Booking -->
                 <ng-container *ngIf="activity.booking_id">
@@ -16,7 +16,7 @@
                     <div class="first-line">
                         <div class="info">
                             <mat-icon *ngIf="activity.booking_line_group_id.has_person_with_disability" aria-hidden="true" style="height: 12px; width: 12px;">accessible</mat-icon>
-                            {{ activity.group_num }} - {{ activity.customer_id.name }}
+                            <span>{{ activity.group_num }} - {{ activity.customer_id.name }}</span>
                         </div>
                         <div class="icon">
                             <span class="material-icons">{{ getIcon() }}</span>
@@ -34,9 +34,6 @@
                         <div class="info">
                             {{ activity.camp_id.sojourn_number }} - {{ activity.group_num }} - {{ activity.name }}
                         </div>
-                        <div class="icon">
-                            <span class="material-icons">{{ getIcon() }}</span>
-                        </div>
                     </div>
                     <div class="second-line">
                         {{ activity.camp_id.short_name }}
@@ -44,7 +41,7 @@
                 </ng-container>
 
                 <!-- Other -->
-                <ng-container *ngIf="!activity.booking_id && !activity.camp_id" class="activity-other">
+                <ng-container *ngIf="!activity.booking_id && !activity.camp_id">
                     <div>{{ activity.name }}</div>
                 </ng-container>
             </ng-container>

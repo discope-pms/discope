@@ -4,6 +4,14 @@
         border: 1px solid #f1f1f1;
         border-radius: 5px;
 
+        .activity,
+        .partner-event {
+            > div {
+                white-space: nowrap;
+                overflow: hidden;
+            }
+        }
+
         .activity {
             position: relative;
             width: 100%;
@@ -15,15 +23,8 @@
 
             .disability-icon {
                 position: absolute;
-                right: -10px;
-                top: -10px;
-            }
-        }
-
-        .partner-event {
-            > div {
-                white-space: nowrap;
-                overflow: hidden;
+                right: 0;
+                top: 0;
             }
         }
     }
