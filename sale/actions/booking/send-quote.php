@@ -117,7 +117,7 @@ $main_attachment_name = Lang::get_term('sale', 'quote', 'quote', $params['lang']
 $signature = '';
 try {
     $data = eQual::run('get', 'identity_center-signature', [
-        'center_id'     => $booking['center_id'],
+        'center_id'     => $booking['center_id']['id'],
         'lang'          => $params['lang']
     ]);
     $signature = (isset($data['signature']))?$data['signature']:'';
