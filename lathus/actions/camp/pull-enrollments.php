@@ -257,6 +257,7 @@ usort($data, function($a, $b) {
     2) Add enrollments that haven't been added yet
 */
 
+$created_enrollments = [];
 if(!empty($data)) {
     //  2.1) Remove already handled enrollments from data received
 
@@ -292,7 +293,7 @@ if(!empty($data)) {
             ['date_from', '>=', strtotime('first day of january this year')],
             ['date_from', '<', strtotime('last day of december this year')]
         ])
-        ->read(['sojourn_number', 'saturday_morning_product_id'])
+        ->read(['name', 'sojourn_number', 'saturday_morning_product_id'])
         ->get();
 
     $map_soj_nums_camps = [];
@@ -345,7 +346,7 @@ if(!empty($data)) {
                     'year_license_ffe'  => !empty($ext_child_horseriding['anneeLicence']) && is_numeric($ext_child_horseriding['anneeLicence']) ? intval($ext_child_horseriding['anneeLicence']) : null,
                     'external_ref'      => $ext_enrollment['wpOrderId']
                 ])
-                ->read(['id'])
+                ->read(['firstname', 'lastname'])
                 ->first();
         }
 
@@ -410,6 +411,21 @@ if(!empty($data)) {
             ])
             ->read(['center_office_id', 'camp_id' => ['date_from']])
             ->first();
+
+        $created_enrollments[] = [
+            'id'                => $enrollment['id'],
+            'status'            => $enrollment_status,
+            'external_ref'      => $ext_enrollment['wpOrderId'],
+            'camp'              => [
+                'id'                => $camp['id'],
+                'name'              => $camp['name']
+            ],
+            'child'             => [
+                'id'                => $child['id'],
+                'firstname'         => $child['firstname'],
+                'lastname'          => $child['lastname']
+            ]
+        ];
 
         $enrollment_warnings = [];
 
@@ -747,5 +763,9 @@ if(!empty($data)) {
 }
 
 $context->httpResponse()
-        ->status(204)
+        ->body([
+            'count' => count($created_enrollments),
+            'data'  => $created_enrollments
+        ])
+        ->status(200)
         ->send();
