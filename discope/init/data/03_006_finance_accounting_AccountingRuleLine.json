@@ -1,0 +1,43 @@
+[
+    {
+        "name": "finance\\accounting\\AccountingRuleLine",
+        "lang": "fr",
+        "data": [
+            {
+                "id": 1,
+                "name": "défaut",
+                "account_id": 2,
+                "share": 1,
+                "accounting_rule_id": 1
+            },
+            {
+                "id": 2,
+                "name": "défaut",
+                "account_id": 3,
+                "share": 1,
+                "accounting_rule_id": 2
+            },
+            {
+                "id": 3,
+                "name": "défaut",
+                "account_id": 4,
+                "share": 1,
+                "accounting_rule_id": 3
+            },
+            {
+                "id": 4,
+                "name": "défaut",
+                "account_id": 5,
+                "share": 1,
+                "accounting_rule_id": 4
+            },
+            {
+                "id": 5,
+                "name": "défaut",
+                "account_id": 6,
+                "share": 1,
+                "accounting_rule_id": 5
+            }
+        ]
+    }
+]
