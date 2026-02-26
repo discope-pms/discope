@@ -32,7 +32,7 @@
                 "calculation_method_id": null,
                 "price_list_id": 1,
                 "is_active": 1,
-                "accounting_rule_id": null,
+                "accounting_rule_id": 5,
                 "product_id": 3,
                 "vat_rate": null
             },

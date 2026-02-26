@@ -12,6 +12,56 @@
                 "nature": "B",
                 "type": null,
                 "is_visible": 0
+            },
+            {
+                "id": 2,
+                "description": "Nuitées",
+                "code": "2",
+                "account_chart_id": 1,
+                "analytic_section_id": null,
+                "nature": "B",
+                "type": null,
+                "is_visible": 1
+            },
+            {
+                "id": 3,
+                "description": "Repas 1",
+                "code": "3",
+                "account_chart_id": 1,
+                "analytic_section_id": null,
+                "nature": "B",
+                "type": null,
+                "is_visible": 1
+            },
+            {
+                "id": 4,
+                "description": "Repas 2",
+                "code": "4",
+                "account_chart_id": 1,
+                "analytic_section_id": null,
+                "nature": "B",
+                "type": null,
+                "is_visible": 1
+            },
+            {
+                "id": 5,
+                "description": "Taxe de séjour 1",
+                "code": "5",
+                "account_chart_id": 1,
+                "analytic_section_id": null,
+                "nature": "B",
+                "type": null,
+                "is_visible": 1
+            },
+            {
+                "id": 6,
+                "description": "Taxe de séjour 2",
+                "code": "6",
+                "account_chart_id": 1,
+                "analytic_section_id": null,
+                "nature": "B",
+                "type": null,
+                "is_visible": 1
             }
         ]
     }

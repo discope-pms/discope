@@ -83,9 +83,9 @@ Setting::assert_value('finance', 'accounting', 'account.discount', '7080000');
 Setting::assert_value('finance', 'accounting', 'account.downpayment', '7080000');
 Setting::assert_value('finance', 'accounting', 'account.sales_taxes', 451);
 Setting::assert_value('finance', 'accounting', 'account.trade_debtors', 400);
-Setting::assert_value('finance', 'accounting', 'fiscal_year');
-Setting::assert_value('finance', 'accounting', 'fiscal_year.date_from');
-Setting::assert_value('finance', 'accounting', 'fiscal_year.date_to');
+Setting::assert_value('finance', 'accounting', 'fiscal_year', 2023);
+Setting::assert_value('finance', 'accounting', 'fiscal_year.date_from', '2023-01-01');
+Setting::assert_value('finance', 'accounting', 'fiscal_year.date_to', '2023-12-31');
 // === sale.accounting ===
 Setting::assert_value('sale', 'accounting', 'invoice.downpayment_account', false);
 Setting::assert_value('sale', 'accounting', 'invoice.sequence_format', '%2d{year}-%02d{office}-%05d{sequence}');
