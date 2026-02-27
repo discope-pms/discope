@@ -328,7 +328,7 @@ if(!empty($data)) {
                 ['birthdate', '=', $ext_child_birthdate],
                 ['gender', '=', $ext_child_gender]
             ])
-            ->read(['id'])
+            ->read(['firstname', 'lastname'])
             ->first();
 
         if(is_null($child)) {
