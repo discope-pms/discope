@@ -117,8 +117,8 @@
 					"description": "Permet de supprimer financement de remboursement un obsolète."
 				},
                 "action.add_bank_check": {
-					"label": "Enregistrer chèque bancaire",
-					"description": "Enregistrer un chèque bancaire à un financement, marquer le financement comme payé et mettre à jour son statut en cours."
+					"label": "Enregistrer chèque ou bon",
+					"description": "Ajouter un chèque bancaire ou un bon de commande à un financement, marquer le financement comme payé et mettre à jour son statut en cours."
 				},
                 "action.add_manual_payment": {
 					"label": "Ajouter un paiement",
@@ -137,7 +137,7 @@
 					"label": "Paiements"
 				},
                 "section.bankchecks": {
-					"label": "Chèques bancaires"
+					"label": "Chèques bancaires & Bons de commande"
 				}
 			}
 		},
@@ -171,7 +171,7 @@
 					"label": "Paiements"
 				},
                 "section.bankchecks": {
-					"label": "Chèques bancaires"
+					"label": "Chèques bancaires & Bons de commande"
 				}
 			}
 		},
@@ -205,7 +205,7 @@
 					"label": "Paiements"
 				},
                 "section.bankchecks": {
-					"label": "Chèques bancaires"
+					"label": "Chèques bancaires & Bons de commande"
 				}
 			}
 		},
