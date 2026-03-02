@@ -1,0 +1,19 @@
+.handset-page-header {
+    display: flex;
+    padding: 15px;
+    border-bottom: solid 1px rgba(0, 0, 0, 0.5);
+    align-items: center;
+
+    &__back-btn-container {
+        width: 60px;
+    }
+
+    &__back-btn {
+        background-color: #3f51b5;
+        color: white;
+    }
+
+    &__title {
+        font-size: 20px;
+    }
+}

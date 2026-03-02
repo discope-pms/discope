@@ -1,0 +1,194 @@
+<form [formGroup]="form" class="guest-form">
+    <div *ngIf="form.controls.firstname && form.controls.lastname && form.controls.gender"
+            class="guest-form__group">
+        <div class="guest-form__group-icon">
+            <mat-icon>person</mat-icon>
+        </div>
+        <div class="guest-form__group-input">
+            <mat-form-field class="form-field-firstname">
+                <mat-label>{{ 'GUEST_FORM_FIRST_NAME' | translate }} *</mat-label>
+                <input type="text"
+                       autocomplete="off"
+                       matInput
+                       formControlName="firstname" />
+            </mat-form-field>
+
+            <mat-form-field class="form-field-lastname">
+                <mat-label>{{ 'GUEST_FORM_LAST_NAME' | translate }} *</mat-label>
+                <input type="text"
+                       autocomplete="off"
+                       matInput
+                       formControlName="lastname" />
+            </mat-form-field>
+
+            <ng-container *ngIf="isWeb$ | async as isWeb">
+                <mat-form-field *ngIf="isWeb.matches" class="form-field-gender">
+                    <mat-label>{{ 'GUEST_FORM_GENDER' | translate }} *</mat-label>
+                    <mat-select formControlName="gender">
+                        <mat-option *ngFor="let item of genderOptions" [value]="item.value">
+                            {{ item.label | translate }}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </ng-container>
+
+            <ng-container *ngIf="isHandset$ | async as isHandset">
+                <mat-form-field *ngIf="isHandset.matches" class="form-field-gender">
+                    <mat-label>{{ 'GUEST_FORM_GENDER' | translate }}</mat-label>
+                    <input type="text"
+                        autocomplete="off"
+                        matInput
+                        readonly
+                        (click)="show_popup['gender'] = true"
+                        formControlName="gender" />
+                </mat-form-field>
+                <select-option-popup *ngIf="show_popup?.gender"
+                        [options]="genderOptions"
+                        (select)="onSelectGender($event)">
+                </select-option-popup>
+            </ng-container>
+
+
+            <div class="form-field-is_coordinator" style="padding-top: 20px;">
+                <mat-slide-toggle
+                        formControlName="is_coordinator">
+                    {{ 'GUEST_TABLE_COL_TITLE_COORDINATOR' | translate }}
+                </mat-slide-toggle>
+
+            </div>
+
+        </div>
+    </div>
+
+    <div *ngIf="form.controls.date_of_birth && form.controls.citizen_identification"
+            class="guest-form__two-groups-inline">
+        <div class="guest-form__group">
+            <div class="guest-form__group-icon">
+                <mat-icon>event</mat-icon>
+            </div>
+
+            <div class="guest-form__group-input">
+                <ng-container *ngIf="isHandset$ | async as isHandset">
+                    <!-- show date picker according to available width @see touchUi -->
+                    <mat-form-field *ngIf="isHandset.matches" class="form-field-date-of-birth">
+                        <mat-label>{{ 'GUEST_FORM_DATE_OF_BIRTH' | translate }} *</mat-label>
+                        <input
+                            matInput
+                            formControlName="date_of_birth"
+                            [matDatepicker]="datepicker" />
+                        <mat-datepicker-toggle matSuffix [for]="datepicker"></mat-datepicker-toggle>
+
+                        <mat-datepicker touchUi disabled="false" #datepicker>
+                            <mat-datepicker-actions>
+                                <button mat-button matDatepickerCancel>{{ 'DATEPICKER_CANCEL' | translate }}</button>
+                                <button mat-raised-button color="primary" matDatepickerApply>{{ 'DATEPICKER_APPLY' | translate }}</button>
+                            </mat-datepicker-actions>
+                        </mat-datepicker>
+
+                        <mat-hint>{{ 'GUEST_FORM_DATE_OF_BIRTH_HINT' | translate }}</mat-hint>
+                    </mat-form-field>
+                </ng-container>
+                <ng-container *ngIf="isWeb$ | async as isWeb">
+                    <mat-form-field *ngIf="isWeb.matches" class="form-field-date-of-birth">
+                        <mat-label>{{ 'GUEST_FORM_DATE_OF_BIRTH' | translate }} *</mat-label>
+                        <input
+                            matInput
+                            formControlName="date_of_birth"
+                            [matDatepicker]="datepicker" />
+                        <mat-datepicker-toggle matSuffix [for]="datepicker"></mat-datepicker-toggle>
+
+                        <mat-datepicker disabled="false" #datepicker>
+                            <mat-datepicker-actions>
+                                <button mat-button matDatepickerCancel>{{ 'DATEPICKER_CANCEL' | translate }}</button>
+                                <button mat-raised-button color="primary" matDatepickerApply>{{ 'DATEPICKER_APPLY' | translate }}</button>
+                            </mat-datepicker-actions>
+                        </mat-datepicker>
+
+                        <mat-hint>{{ 'GUEST_FORM_DATE_OF_BIRTH_HINT' | translate }}</mat-hint>
+                    </mat-form-field>
+                </ng-container>
+            </div>
+        </div>
+
+        <div class="guest-form__group">
+            <div class="guest-form__group-icon">
+                <mat-icon>pin</mat-icon>
+            </div>
+
+            <div class="guest-form__group-input">
+                <mat-form-field class="form-field-citizen-identification">
+                    <mat-label>{{ 'GUEST_FORM_CITIZEN_IDENTIFICATION' | translate }}</mat-label>
+                    <input type="text"
+                           autocomplete="off"
+                           matInput
+                           formControlName="citizen_identification"/>
+                    <mat-hint>{{ 'GUEST_FORM_CITIZEN_IDENTIFICATION_HINT' | translate }}</mat-hint>
+                </mat-form-field>
+            </div>
+        </div>
+    </div>
+
+    <ng-container *ngIf="form.controls.is_coordinator.value">
+    <div *ngIf="form.controls.address_street && form.controls.address_zip && form.controls.address_city && form.controls.address_country"
+         class="guest-form__group">
+        <div class="guest-form__group-icon">
+            <mat-icon>location_on</mat-icon>
+        </div>
+
+        <div class="guest-form__group-input">
+            <mat-form-field class="form-field-address-street">
+                <mat-label>{{ 'GUEST_FORM_ADDRESS_STREET' | translate }}</mat-label>
+                <input type="text"
+                       autocomplete="off"
+                       matInput
+                       formControlName="address_street" />
+            </mat-form-field>
+
+            <mat-form-field class="form-field-address-zip">
+                <mat-label>{{ 'GUEST_FORM_ADDRESS_ZIP' | translate }}</mat-label>
+                <input type="text"
+                       autocomplete="off"
+                       matInput
+                       formControlName="address_zip" />
+            </mat-form-field>
+
+            <mat-form-field class="form-field-address-city">
+                <mat-label>{{ 'GUEST_FORM_ADDRESS_CITY' | translate }}</mat-label>
+                <input type="text"
+                       autocomplete="off"
+                       matInput
+                       formControlName="address_city" />
+            </mat-form-field>
+
+            <ng-container *ngIf="isWeb$ | async as isWeb">
+                <mat-form-field *ngIf="isWeb.matches" class="form-field-address-country">
+                    <mat-label>{{ 'GUEST_FORM_ADDRESS_COUNTRY' | translate }}</mat-label>
+                    <mat-select formControlName="address_country">
+                        <mat-option *ngFor="let item of countryOptions" [value]="item.value">
+                            {{ item.label | translate }}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </ng-container>
+
+            <ng-container *ngIf="isHandset$ | async as isHandset">
+                <mat-form-field *ngIf="isHandset.matches" class="form-field-address-country">
+                    <mat-label>{{ 'GUEST_FORM_ADDRESS_COUNTRY' | translate }}</mat-label>
+                    <input type="text"
+                        autocomplete="off"
+                        matInput
+                        readonly
+                        (click)="show_popup['address_country'] = true"
+                        formControlName="address_country" />
+                </mat-form-field>
+                <select-option-popup *ngIf="show_popup?.address_country"
+                        [options]="countryOptions"
+                        (select)="onSelectCountry($event)">
+                </select-option-popup>
+            </ng-container>
+
+        </div>
+    </div>
+    </ng-container>
+
+</form>

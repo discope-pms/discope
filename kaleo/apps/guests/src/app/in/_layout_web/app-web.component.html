@@ -1,0 +1,45 @@
+<div class="app-web">
+
+    <div *ngIf="guestUser" class="app-header">
+        <div class="button-help" style="margin-left: 20px; margin-top: 25px; width: 60px; transform: scale(1.5); transform-origin: center;">
+            <button (click)="showHelp.emit()" mat-icon-button aria-label="Example icon button with a vertical three dot icon">
+                <mat-icon>help_outline</mat-icon>
+            </button>
+        </div>
+
+        <booking-information
+                *ngIf="booking"
+                [bookingName]="booking.name"
+                [centerName]="booking.center_id.name"
+                [centerAddress]="centerAddress"
+                [centerPhone]="booking.center_id.phone"
+                [centerEmail]="booking.center_id.email">
+        </booking-information>
+
+        <div class="app-header__right-panel">
+            <div><b>{{ guestUser.email }}</b></div>
+            <div class="submit-container">
+                <button
+                        [disabled]="!booking || booking.guest_list_id.status != 'pending' || !isSubmittable"
+                        mat-raised-button
+                        color="primary"
+                        (click)="submitGuestList.emit()">
+                    {{ 'SUBMIT_CONTAINER_SUBMIT' | translate }}
+                </button>
+                <div *ngIf="booking && booking.guest_list_id.status == 'pending'">{{ 'SUBMIT_CONTAINER_COMPLETION' | translate }}: {{ completionPercentage }}%</div>
+                <div *ngIf="booking && booking.guest_list_id.status != 'pending'" style="display: flex;align-items: center;"><mat-icon>file_download</mat-icon> <a class="download-link" (click)="requestDownload()">{{ 'SUBMIT_CONTAINER_DOWNLOAD' | translate }}</a></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="app-body">
+        <sojourns
+            [bookingLinesGroups]="bookingLinesGroups"
+            [guestListItems]="guestListItems"
+            [disabled]="!booking || booking.guest_list_id.status !== 'pending'"
+            (deleteGuestListItem)="deleteGuestListItem.emit($event)"
+            (addGuestListItem)="addGuestListItem.emit($event)"
+            (updateGuestListItem)="updateGuestListItem.emit($event)">
+        </sojourns>
+    </div>
+</div>

@@ -1,0 +1,23 @@
+:host {
+    position: relative;
+
+    .mat-dialog-close {
+        text-align: right;
+        height: 40px;
+    }
+
+    .mat-dialog-content {
+        max-height: calc(100% - 40px) !important;
+
+        ::ng-deep {
+            h1 {
+                font-size: 20px;
+            }
+
+            h2 {
+                font-size: 18px;
+            }
+        }
+
+    }
+}

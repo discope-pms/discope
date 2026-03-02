@@ -1,0 +1,21 @@
+<app-content-layout [loading]="loading" [backNavigateTo]="'/bookings/pending'">
+    <ng-template #title>
+        {{ 'BOOKINGS_UPCOMING_TITLE' | translate }}
+    </ng-template>
+
+    <app-booking-list [bookingList]="bookingList" (itemClick)="goTo($event)"></app-booking-list>
+
+    <app-empty-table-message *ngIf="bookingList.length === 0 && !loading">
+        {{ 'BOOKINGS_UPCOMING_EMPTY_TABLE' | translate }}
+    </app-empty-table-message>
+
+    <ng-template #footer>
+        <div class="footer">
+            <app-icon-button [icon]="'print'"
+                             [fill]="true"
+                             [disabled]="!lastBookingDate"
+                             (click)="downloadUpcomingBookingsPdf()"
+            ></app-icon-button>
+        </div>
+    </ng-template>
+</app-content-layout>

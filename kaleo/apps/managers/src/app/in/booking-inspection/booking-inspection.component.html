@@ -1,0 +1,53 @@
+<app-content-layout
+        [loading]="loading"
+        [backNavigateTo]="'/bookings/' + (bookingInspection?.type_inspection === 'checkedin' ? 'upcoming' : 'pending')">
+    <ng-template #title>
+        {{ titleStr }}
+        <div class="check-badge"
+                [class.checkin]="bookingInspection?.type_inspection == 'checkedin'"
+                [class.checkout]="bookingInspection?.type_inspection !== 'checkedin'">
+            {{ checkStr }}
+        </div>
+    </ng-template>
+
+    <app-booking-info
+            [dateFrom]="booking.dateFrom"
+            [dateTo]="booking.dateTo"
+            [customerId]="booking.customerIdentityId"
+            [customerDisplayName]="booking.customerDisplayName">
+    </app-booking-info>
+
+    <div class="meter-reading-list">
+        <app-meter-reading
+                *ngFor="let meterReading of meterReadingList"
+                [typeMeter]="meterReading.typeMeter"
+                [meterNumber]="meterReading.meterNumber"
+                [indexValue]="meterReading.indexValue"
+                (deleteClick)="deleteMeterReading(meterReading.id)">
+        </app-meter-reading>
+
+        <app-empty-table-message *ngIf="meterReadingList.length === 0">
+            {{ 'BOOKING_INSPECTION_NO_CONSUMPTION_READINGS_YET' | translate }}
+        </app-empty-table-message>
+    </div>
+
+    <app-icon-button
+            class="add-btn"
+            [icon]="'add'"
+            [fill]="true"
+            [outlined]="true"
+            (click)="goToNew()">
+    </app-icon-button>
+
+    <ng-template #footer>
+        <div class="footer">
+            <button mat-raised-button
+                    class="confirm-btn"
+                    color="primary"
+                    [disabled]="bookingInspection?.status !== 'pending' || meterReadingList.length === 0"
+                    (click)="goToConfirm()">
+                {{ 'BOOKING_INSPECTION_CONFIRM_BTN' | translate }}
+            </button>
+        </div>
+    </ng-template>
+</app-content-layout>

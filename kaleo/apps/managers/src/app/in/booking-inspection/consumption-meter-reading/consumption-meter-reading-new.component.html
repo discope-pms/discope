@@ -1,0 +1,45 @@
+<app-content-layout [backNavigateTo]="'/booking-inspection/' + bookingInspectionId">
+    <ng-template #title>
+        {{ 'CONSUMPTION_METER_READING_NEW_TITLE' | translate }}
+    </ng-template>
+
+    <form *ngIf="consumptionMeters.length > 0" [formGroup]="form">
+        <mat-form-field class="form-field">
+            <mat-label>{{ 'CONSUMPTION_METER_READING_NEW_METER_FIELD' | translate }}</mat-label>
+            <mat-select formControlName="consumption_meter_id" (selectionChange)="onMeterChange()">
+                <mat-option *ngFor="let consumptionMeter of consumptionMeters" [value]="consumptionMeter.id">
+                    {{ translateTypeMeter(consumptionMeter.type_meter) }} - {{ consumptionMeter.meter_number }}
+                </mat-option>
+            </mat-select>
+        </mat-form-field>
+
+        <mat-form-field class="form-field">
+            <mat-label>{{ 'CONSUMPTION_METER_READING_NEW_INDEX_VALUE_FIELD' | translate }}</mat-label>
+            <input matInput
+                    formControlName="index_value"
+                    (blur)="onIndexChange()"
+                    type="text"
+                    maxlength="9"
+                    placeholder="00000,000">
+            <mat-hint>Valeur actuelle du compteur</mat-hint>
+            <mat-error>L'index ne peut pas être inférieur au précédent</mat-error>
+        </mat-form-field>
+    </form>
+
+    <app-empty-table-message *ngIf="consumptionMeters.length === 0 && !loading">
+        {{ 'CONSUMPTION_METER_READING_NEW_EMPTY_TABLE' | translate }}
+    </app-empty-table-message>
+
+    <ng-template #footer>
+        <div class="footer">
+            <button mat-raised-button
+                    class="save-btn"
+                    color="primary"
+                    [disabled]="consumptionMeters.length === 0"
+                    (click)="save()"
+            >
+                {{ 'CONSUMPTION_METER_READING_NEW_SAVE_BTN' | translate }}
+            </button>
+        </div>
+    </ng-template>
+</app-content-layout>

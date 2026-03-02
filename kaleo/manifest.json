@@ -1,0 +1,23 @@
+{
+    "name": "kaleo",
+    "author": "Yesbabylon SA",
+    "version": "1.0",
+    "version_name": "Discope",
+    "depends_on": [
+        "core",
+        "documents",
+        "finance",
+        "identity",
+        "realestate",
+        "sale",
+        "support",
+        "communication",
+        "discope"
+    ],
+    "apps": [
+        "planning",
+        "calstatic",
+        "guests",
+        "managers"
+    ]
+}

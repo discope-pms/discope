@@ -1,0 +1,11 @@
+<div mat-dialog-content class="mat-dialog-content">
+    <div>
+        <p><strong>Téléchargement de votre fiche d’hébergement.</strong></p>
+        <p>Le lien ci-dessous vous permet de télécharger un fichier XLS contenant la liste des informations d’hébergement telles que vous les avez soumises.</p>
+        <p>Vous pouvez utiliser ce fichier pour consultation ou, si besoin, pour formuler une demande de modification.</p>
+        <p>Dans le cas d'une modification, toute demande doit être soumise pour validation au gîte pour lequel la réservation a été prise, sous réserve de son acceptation.</p>
+        <p><strong>Avertissement :</strong> Kaleo se réserve le droit de refuser toute demande de modification. Une modification soumise pourrait donc ne pas être acceptée.</p>
+    </div>
+
+    <button mat-flat-button class="btn-ok" (click)="download()" color="primary">{{ 'SUBMIT_CONTAINER_DOWNLOAD' | translate }}</button>
+</div>

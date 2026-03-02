@@ -1,0 +1,23 @@
+<div class="info">
+    <div class="name-and-period-container">
+        <div class="name">
+            {{ name }}
+        </div>
+        <div class="period">
+            {{ formatDate(dateFrom) + ' - ' + formatDate(dateTo) }}
+        </div>
+    </div>
+
+    <div class="customer">
+        <div class="customer-ref">{{ customer_id }} - <span class="display-name">{{ customer_display_name }}</span></div>
+        <div class="count-nights">({{ nb_nights }} nuits)</div>
+    </div>
+</div>
+
+<div class="action">
+    <app-icon-button
+            [icon]="'arrow_right'"
+            [outlined]="true"
+            [fill]="true">
+    </app-icon-button>
+</div>

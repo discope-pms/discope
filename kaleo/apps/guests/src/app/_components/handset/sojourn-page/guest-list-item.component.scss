@@ -1,0 +1,38 @@
+.guest-list-item {
+    display: flex;
+    background: #efefef;
+    border-radius: 10px;
+
+    &__number {
+        display: flex;
+        justify-content: center;
+        width: 50px;
+    }
+
+    &__details {
+        display: flex;
+        flex-grow: 1;
+        flex-wrap: wrap;
+        row-gap: 5px;
+    }
+
+    &__detail-firstname,
+    &__detail-lastname,
+    &__detail-date-of-birth,
+    &__detail-country {
+        width: 50%;
+    }
+
+    &__actions-container {
+        display: flex;
+        align-items: center;
+    }
+
+    &__edit-btn {
+        color: #3f51b5;
+    }
+
+    &__delete-btn {
+        color: red;
+    }
+}

@@ -1,0 +1,56 @@
+<app-content-layout [loading]="loading"
+                    [backNavigateTo]="'/booking-inspection/' + bookingInspection?.id"
+>
+    <ng-template #title>
+        {{ 'CONSUMPTION_METER_INSPECTION_CONFIRM_TITLE' | translate }} <div class="check-badge">{{ checkStr }}</div>
+    </ng-template>
+
+    <app-booking-info-confirm [bookingName]="booking.name"
+                              [centerName]="booking.center_name"
+                              [date]="booking.date_from"
+                              [customerId]="booking.customer_identity_id"
+                              [customerDisplayName]="booking.customer_display_name">
+    </app-booking-info-confirm>
+
+    <div class="meter-reading-list">
+        <app-meter-reading-confirm *ngFor="let meterReading of meterReadingList"
+                                   [typeMeter]="meterReading.typeMeter"
+                                   [meterUnit]="meterReading.meterUnit"
+                                   [indexValue]="meterReading.indexValue"
+                                   [unitPrice]="meterReading.unitPrice">
+        </app-meter-reading-confirm>
+
+        <app-empty-table-message *ngIf="meterReadingList.length === 0">
+            {{ 'CONSUMPTION_METER_INSPECTION_CONFIRM_EMPTY_TABLE' | translate }}
+        </app-empty-table-message>
+    </div>
+
+    <div class="recipients">
+        <div class="title">{{ 'CONSUMPTION_METER_INSPECTION_CONFIRM_RECIPIENTS_TITLE' | translate }}</div>
+
+        <app-recipient-list-form [form]="formEmailList"
+                                 [formArray]="formArrayEmails"
+                                 [bookingContactEmailList]="bookingContactEmailList"
+                                 (removeIndex)="removeEmailControl($event)">
+        </app-recipient-list-form>
+
+        <app-icon-button class="add-btn"
+                         [icon]="'add'"
+                         [fill]="true"
+                         [outlined]="true"
+                         (click)="addEmailControl()">
+        </app-icon-button>
+    </div>
+
+    <ng-template #footer>
+        <div class="footer">
+            <button mat-raised-button
+                    class="send-btn"
+                    color="primary"
+                    (click)="send()">
+                {{ 'CONSUMPTION_METER_INSPECTION_CONFIRM_SAVE_BTN' | translate }}
+            </button>
+        </div>
+    </ng-template>
+</app-content-layout>
+

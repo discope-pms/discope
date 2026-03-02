@@ -1,0 +1,17 @@
+:host {
+    display: flex;
+    flex-direction: column;
+
+    .period {
+        font-weight: bold;
+    }
+
+    .customer {
+        color: rgba(0, 0, 0, 0.6);
+        font-size: 0.8rem;
+    }
+
+    .customer-display-name {
+        text-transform: uppercase;
+    }
+}

@@ -1,0 +1,33 @@
+.sojourns-page {
+    display: flex;
+    height: 100%;
+    flex-direction: column;
+
+    .booking-details-container {
+        display: flex;
+        align-items: center;
+        margin-bottom: 20px;
+        padding: 20px;
+    }
+
+    .booking-line-groups-container {
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+        overflow-y: auto;
+        padding: 0 20px;
+    }
+
+    .submit-btn-container {
+        display: flex;
+        height: 100px;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .submit-btn {
+        width: 60%;
+        height: 60px;
+        font-size: 20px;
+    }
+}

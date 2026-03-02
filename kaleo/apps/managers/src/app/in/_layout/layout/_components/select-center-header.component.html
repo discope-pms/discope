@@ -1,0 +1,24 @@
+<div class="center-select-wrapper">
+    <mat-select class="center-select"
+                [value]="selectedCenter?.id"
+                (valueChange)="centerChange($event)"
+    >
+        <mat-option *ngFor="let center of centerList" [value]="center.id">
+            {{ center.name }}
+        </mat-option>
+    </mat-select>
+</div>
+
+<app-icon-button *ngIf="showCenterSettingsBtn"
+                 class="center-settings-btn"
+                 [icon]="'settings'"
+                 (click)="goTo('center-settings')"
+></app-icon-button>
+
+<div class="grow"></div>
+
+<app-icon-button class="user-settings-btn"
+                 [icon]="'person'"
+                 [fill]="true"
+                 (click)="goTo('user-settings')"
+></app-icon-button>

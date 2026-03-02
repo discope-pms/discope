@@ -1,0 +1,18 @@
+<div class="booking-line-group-details">
+    <div class="booking-line-group-details__details-container">
+        <div>
+            <b>{{ 'SOJOURN_HEADER_FROM_TO' | translateWithVar:{ from: dateFrom | date, to: dateTo | date  } }}</b>
+        </div>
+        <div class="completion-percentage">
+            {{ 'SUBMIT_CONTAINER_COMPLETION' | translate }}: <b>{{ completionPercentageRounded }}%</b>
+        </div>
+    </div>
+    <div class="booking-line-group-details__btn-container">
+        <button
+                class="booking-line-group-details__btn"
+                mat-button mat-icon-button
+                (click)="openGroup.emit()">
+            <mat-icon>play_arrow</mat-icon>
+        </button>
+    </div>
+</div>

@@ -1,0 +1,17 @@
+<div class="consumption-meter">
+    <span class="type">{{ typeMeterStr }}</span> ({{ meterUnit }})
+</div>
+
+<div class="reading">
+    <div class="index-container">
+        <div class="label">{{ 'CONSUMPTION_METER_INSPECTION_CONFIRM_READING_INDEX' | translate }}</div>
+        <div class="value">{{ paddedIndexValue }}</div>
+    </div>
+
+    <div class="grow"></div>
+
+    <div class="unit-price-container">
+        <div class="label">{{ 'CONSUMPTION_METER_INSPECTION_CONFIRM_READING_UNIT_PRICE' | translate }}</div>
+        <div class="value">{{ unitPrice }} EUR</div>
+    </div>
+</div>

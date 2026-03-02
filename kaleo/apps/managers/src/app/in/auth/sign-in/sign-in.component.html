@@ -1,0 +1,45 @@
+<mat-card class="card">
+    <div class="header">
+        <mat-icon class="icon">login</mat-icon>
+
+        <div>
+            <mat-card-title class="title">{{ 'SIGN_IN_CARD_TITLE' | translate }}</mat-card-title>
+            <mat-card-subtitle>{{ 'SIGN_IN_CARD_SUBTITLE' | translate }}</mat-card-subtitle>
+        </div>
+    </div>
+
+    <form [formGroup]="form" class="form">
+        <mat-form-field class="field" appearance="fill">
+            <mat-label>{{ 'SIGN_IN_FORM_FIELD_LABEL_USERNAME' | translate }}</mat-label>
+            <input type="text"
+                   autocomplete="username"
+                   matInput
+                   formControlName="username"
+            />
+        </mat-form-field>
+
+        <mat-form-field class="field" appearance="fill">
+            <mat-label>{{ 'SIGN_IN_FORM_FIELD_LABEL_PASSWORD' | translate }}</mat-label>
+            <input type="password"
+                   autocomplete="current-password"
+                   matInput
+                   formControlName="password"
+            />
+        </mat-form-field>
+
+        <button mat-raised-button
+                class="connection-btn"
+                color="primary"
+                (click)="signIn()"
+        >
+            {{ 'SIGN_IN_FORM_CONNECTION_BTN' | translate }}
+        </button>
+    </form>
+
+    <div class="messages">
+        <div *ngIf="showConnectionErrorMsg" class="message message--error">
+            <mat-icon class="icon">not_interested</mat-icon>
+            <span class="text">{{ 'SIGN_IN_ERROR_MSG_INVALID_USERNAME_OR_PASSWORD' | translate }}</span>
+        </div>
+    </div>
+</mat-card>

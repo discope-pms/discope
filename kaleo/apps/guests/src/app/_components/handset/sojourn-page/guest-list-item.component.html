@@ -1,0 +1,37 @@
+<div class="guest-list-item">
+    <div class="guest-list-item__number">
+        {{ number }}.
+    </div>
+
+    <div class="guest-list-item__details">
+        <div class="guest-list-item__detail-firstname">
+            <b>{{ guest.firstname && guest.firstname.length ? guest.firstname : '-' }}</b>
+        </div>
+        <div class="guest-list-item__detail-lastname">
+            <b>{{ guest.lastname && guest.lastname.length ? guest.lastname : '-' }}</b>
+        </div>
+        <div class="guest-list-item__detail-date-of-birth">
+            {{ guestDateOfBirth && guestDateOfBirth.length ? guestDateOfBirth : '-' }}
+        </div>
+        <div class="guest-list-item__detail-country">
+            {{ mapCountries[guest.address_country] }}
+        </div>
+    </div>
+
+    <div class="guest-list-item__actions-container">
+        <button class="guest-list-item__edit-btn"
+                mat-button mat-icon-button
+                [disabled]="disabled"
+                (click)="editGuestListItem.emit(guest.id)"
+        >
+            <mat-icon>edit</mat-icon>
+        </button>
+        <button class="guest-list-item__delete-btn"
+                mat-button mat-icon-button
+                [disabled]="disabled"
+                (click)="deleteGuestListItem.emit(guest.id)"
+        >
+            <mat-icon>delete</mat-icon>
+        </button>
+    </div>
+</div>

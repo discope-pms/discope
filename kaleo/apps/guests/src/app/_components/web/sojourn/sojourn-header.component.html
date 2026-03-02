@@ -1,0 +1,22 @@
+<div class="sojourn-header">
+
+    <div class="period">
+        <div>{{ 'SOJOURN_HEADER_FROM_TO' | translateWithVar:{ from: dateFrom | date, to: dateTo | date  } }}</div>
+    </div>
+
+    <div class="count_pers">
+        <div>{{ 'SOJOURN_HEADER_ADULTS' | translateWithVar: { nbAdults } }}</div>
+        <div>{{ 'SOJOURN_HEADER_CHILDREN' | translateWithVar: { nbChildren } }}</div>
+    </div>
+
+    <div class="total">
+        <div class="total-text">{{ guestCount }}/{{ nbPers }}</div>
+        <button
+                class="expand-button"
+                mat-button mat-icon-button
+                (click)="expandClicked()">
+            <mat-icon>{{ opened ? 'expand_less' : 'expand_more' }}</mat-icon>
+        </button>
+    </div>
+
+</div>

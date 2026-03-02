@@ -1,0 +1,93 @@
+/* You can add global styles to this file, and also import other style files */
+@import '@angular/material/prebuilt-themes/indigo-pink.css';
+
+
+body {
+  overflow: hidden;
+}
+
+#sb-container .sb-context {
+  height: calc(100vh - 133px);
+}
+
+/* minor angular material customizations */
+
+.mat-select-panel .mat-option {
+  height: 40px !important;
+}
+
+/* make overlay elements full height and width for handset and mobile */
+@media (max-width: 450px) {
+    .cdk-overlay-pane {
+        max-width: 100vw !important;
+        max-height: 100vh !important;
+        height: 100vh !important;
+        width: 100vw !important;
+    }
+
+    .mat-dialog-title {
+        margin: 20px 0 !important;
+    }
+
+    .mat-datepicker-content-touch .mat-datepicker-content-container {
+        margin-top: 20px;
+        width: 100% !important;
+        height: 100% !important;
+    }
+
+    .full-screen-dialog .mat-dialog-container {
+        overflow: hidden !important;
+        padding: 0;
+        height: 100vh;
+        max-height: 100vh;
+    }
+
+    .mat-dialog-content {
+        max-height: 100% !important;
+    }
+
+}
+
+
+/* external libraries customizations */
+
+.timepicker {
+
+  .timepicker__header {
+    background-color: #3f51b5 !important;
+  }
+
+  .timepicker-dial__control {
+    outline: none;
+  }  
+
+  .clock-face__clock-hand {
+    background-color: #3f51b5 !important;
+
+    &::after {
+      background-color: #3f51b5 !important;
+    }
+
+    &::before {
+      border-color: #3f51b5 !important;
+    }
+  }
+
+  .clock-face__number {
+    > span.active {
+      background-color: #3f51b5 !important;
+    }
+  }
+
+  button:not(.timepicker-dial__item) {
+    color: #3f51b5 !important;
+  }
+}
+
+ngx-material-timepicker-toggle {
+  button {
+    svg {
+      fill: #646464;
+    }
+  }
+}

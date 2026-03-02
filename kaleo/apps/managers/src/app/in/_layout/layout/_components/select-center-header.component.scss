@@ -1,0 +1,51 @@
+@import '../../../../../variables';
+
+:host {
+    display: flex;
+    background-color: $base-color;
+    height: 60px;
+    align-items: center;
+
+    .center-select-wrapper {
+        min-width: 180px;
+        margin-left: 10px;
+        border-radius: 10px;
+        overflow: hidden;
+
+        @media screen and (min-width: 500px) {
+            min-width: 200px;
+        }
+
+        @media screen and (min-width: 600px) {
+            min-width: 250px;
+        }
+
+        @media screen and (min-width: 700px) {
+            min-width: 300px;
+        }
+    }
+
+    .center-select {
+        width: 100%;
+        background-color: $secondary-color;
+        padding: 10px;
+
+        ::ng-deep {
+            .mat-select-min-line {
+                color: #FFFFFF;
+            }
+        }
+    }
+
+    .grow {
+        flex-grow: 1;
+    }
+
+    .center-settings-btn {
+        margin-left: 10px;
+    }
+
+    .user-settings-btn {
+        margin-right: 10px;
+    }
+}

@@ -1,0 +1,16 @@
+.guest-bulk-form-dialog__title-container {
+    display: flex;
+
+    .guest-bulk-form-dialog__title {
+        flex-grow: 1;
+    }
+
+    .guest-bulk-form-dialog__close-btn {
+        cursor: pointer;
+    }
+}
+
+.guest-bulk-form-dialog__actions {
+    display: flex;
+    justify-content: flex-end;
+}

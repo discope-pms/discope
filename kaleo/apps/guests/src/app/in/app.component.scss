@@ -1,0 +1,71 @@
+:host {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    box-sizing: border-box;
+
+    .overlay-container {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100vw;
+        height: 100vh;
+        z-index: 2;
+        background-color: rgba(255, 255, 255, 0.3);
+        backdrop-filter: blur(10px);
+
+        mat-spinner {
+            position: absolute;
+            left: calc(50% - 50px);
+            top: 33%;
+        }
+    }
+
+    .container {
+        margin: auto;
+    }
+}
+
+
+
+@media screen and (min-width: 1800px) {
+    :host {
+        .container {
+            width: 50%;
+        }
+    }
+}
+
+@media screen and  (min-width: 1400px) and (max-width: 1800px) {
+    :host {
+        .container {
+            width: 60%;
+        }
+    }
+}
+
+@media screen and  (min-width: 1200px) and (max-width: 1400px) {
+    :host {
+        .container {
+            width: 70%;
+        }
+    }
+}
+
+@media screen and  (min-width: 1024px) and (max-width: 1200px) {
+    :host {
+        .container {
+            width: 80%;
+        }
+    }
+}
+
+@media screen and (max-width: 1024px) {
+    :host {
+        .container {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+        }
+    }
+}

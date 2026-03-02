@@ -1,0 +1,13 @@
+<div mat-dialog-close class="mat-dialog-close">
+    <button mat-icon-button>
+        <mat-icon>close</mat-icon>
+    </button>
+</div>
+
+<div mat-dialog-content class="mat-dialog-content">
+    <div class="content" [innerHTML]="'SUBMIT_CONFIRMATION_NOTICE' | translate">
+</div>
+
+<div class="mat-dialog-actions">
+    <button mat-flat-button class="btn-ok" (click)="dialogRef.close()" color="primary" type="submit">Ok</button>
+</div>

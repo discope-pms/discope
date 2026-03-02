@@ -1,0 +1,37 @@
+<div class="overlay-container" *ngIf="loading"><mat-spinner></mat-spinner></div>
+
+<div class="container">
+    <ng-container *ngIf="has_auth_error">
+        <div style="text-align: center; margin-top: 40px;" [innerHTML]="'MESSAGE_ERROR_AUTHENTICATION_ERROR' | translate"></div>
+    </ng-container>
+
+    <ng-container *ngIf="!has_auth_error">
+
+        <ng-container *ngIf="isHandset$ | async as isHandset">
+            <app-handset *ngIf="isHandset.matches && booking"
+                    [booking]="booking"
+                    [completionPercentage]="completion_percentage"
+                    [isSubmittable]="is_submittable"
+                    (deleteGuestListItem)="deleteGuestListItem($event)"
+                    (addGuestListItem)="addGuestListItem($event)"
+                    (updateGuestListItem)="updateGuestListItem($event)"
+                    (showHelp)="showHelp()"
+                    (submitGuestList)="submit()">
+            </app-handset>
+        </ng-container>
+
+        <ng-container *ngIf="isWeb$ | async as isWeb">
+            <app-web *ngIf="isWeb.matches && booking"
+                    [booking]="booking"
+                    [completionPercentage]="completion_percentage"
+                    [isSubmittable]="is_submittable"
+                    (deleteGuestListItem)="deleteGuestListItem($event)"
+                    (addGuestListItem)="addGuestListItem($event)"
+                    (updateGuestListItem)="updateGuestListItem($event)"
+                    (showHelp)="showHelp()"
+                    (submitGuestList)="submit()">
+            </app-web>
+        </ng-container>
+
+    </ng-container>
+</div>

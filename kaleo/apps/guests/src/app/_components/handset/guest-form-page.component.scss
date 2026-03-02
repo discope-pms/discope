@@ -1,0 +1,25 @@
+.guest-form-page {
+    display: flex;
+    height: 100%;
+    flex-direction: column;
+
+    &__form-container {
+        padding: 20px 10px;
+        flex-grow: 1;
+        overflow-y: auto;
+    }
+
+    &__submit-btn-container {
+        display: flex;
+        height: 100px;
+        justify-content: center;
+        align-items: center;
+        border-top: solid 1px rgba(0, 0, 0, 0.5);
+    }
+
+    &__submit-btn {
+        width: 60%;
+        height: 60px;
+        font-size: 20px;
+    }
+}

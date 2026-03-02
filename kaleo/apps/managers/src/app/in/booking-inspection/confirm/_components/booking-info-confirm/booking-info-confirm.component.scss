@@ -1,0 +1,27 @@
+:host {
+    display: flex;
+    flex-direction: column;
+    row-gap: 2px;
+
+    .booking-name {
+        font-size: 1.2rem;
+        font-weight: bold;
+    }
+
+    .center-and-date-container {
+        display: flex;
+
+        .center-name {
+            flex-grow: 1;
+        }
+    }
+
+    .customer {
+        color: rgba(0, 0, 0, 0.6);
+        font-size: 0.8rem;
+
+        .customer-display-name {
+            text-transform: uppercase;
+        }
+    }
+}

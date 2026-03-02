@@ -1,0 +1,9 @@
+<app-booking-item
+        *ngFor="let bookingItem of bookingItemList"
+        [name]="bookingItem.name"
+        [date_from]="bookingItem.date_from"
+        [date_to]="bookingItem.date_to"
+        [customer_id]="bookingItem.customer_id"
+        [customer_display_name]="bookingItem.customer_display_name"
+        (click)="itemClick.emit(bookingItem.id)">
+</app-booking-item>

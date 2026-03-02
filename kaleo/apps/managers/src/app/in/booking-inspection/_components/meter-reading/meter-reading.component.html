@@ -1,0 +1,16 @@
+<div class="info">
+    <div class="type-and-number-container">
+        <div class="type-meter">{{ typeMeterStr }}</div>
+        <div class="meter-number">{{ meterNumber }}</div>
+    </div>
+
+    <div class="index-value">{{ paddedIndexValue }}</div>
+</div>
+
+<div class="action">
+    <app-icon-button [icon]="'delete'"
+                     [fill]="true"
+                     [outlined]="true"
+                     (click)="deleteClick.emit()"
+    ></app-icon-button>
+</div>

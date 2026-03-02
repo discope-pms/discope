@@ -1,0 +1,28 @@
+<div class="overlay-container" *ngIf="loading"><mat-spinner></mat-spinner></div>
+
+<div class="container">
+    <ng-container *ngIf="!has_error && !is_sent">
+        <div>{{'REQUEST_ONE_TIME_LINK' | translate}}</div>
+        <div style="display: flex; flex-direction: column;">
+            <mat-form-field>
+                <mat-label>{{'REQUEST_YOUR_EMAIL_ADDRESS' | translate}}</mat-label>
+                <input matInput [formControl]="emailFormControl" />
+                <mat-error *ngIf="emailFormControl.invalid && emailFormControl.touched">
+                    {{'REQUEST_INVALID_EMAIL_ADDRESS' | translate}}
+                </mat-error>
+            </mat-form-field>
+            <button mat-flat-button color="primary" (click)="sendLink()">{{'REQUEST_SEND_LINK' | translate}}</button>
+        </div>
+    </ng-container>
+
+    <ng-container *ngIf="is_sent">
+        <div>{{'REQUEST_MESSAGE_SENT' | translate}}</div>
+    </ng-container>
+
+    <ng-container *ngIf="has_error">
+        <div>{{'REQUEST_ERROR_OCCURRED' | translate}}</div>
+        <div style="display: flex; flex-direction: column;">
+            <button mat-flat-button color="primary" (click)="retry()">{{'REQUEST_RETRY' | translate}}</button>
+        </div>
+    </ng-container>
+</div>

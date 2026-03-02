@@ -1,0 +1,20 @@
+<mat-form-field class="form-field"
+                [class.mat-form-field-invalid]="!isValid && isTouched"
+                [appearance]="'outline'">
+    <mat-label>{{ label }}</mat-label>
+
+    <input type="text"
+            matInput
+            [value]="value"
+            [placeholder]="placeholder"
+            [matAutocomplete]="auto"
+            (input)="onInput($event)"
+            (focus)="onFocus()"
+            (blur)="onBlur()"
+            [disabled]="isFirst">
+    <mat-autocomplete #auto="matAutocomplete" (optionSelected)="emailSelected($event)">
+        <mat-option *ngFor="let email of emailFilteredList" [value]="email">
+            {{ email }}
+        </mat-option>
+    </mat-autocomplete>
+</mat-form-field>

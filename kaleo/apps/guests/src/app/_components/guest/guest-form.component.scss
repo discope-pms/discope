@@ -1,0 +1,80 @@
+:host {
+
+    .guest-form {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .guest-form__two-groups-inline {
+        display: flex;
+
+        .guest-form__group {
+            width: 50%;
+        }
+
+        .guest-form__group-input {
+            width: calc(100% - 40px);
+        }
+    }
+
+    .guest-form__group {
+        display: flex;
+        margin-bottom: 10px;
+    }
+
+    .guest-form__group-date-of-birth,
+    .guest-form__group-citizen-identification {
+        width: 50%;
+    }
+
+    .guest-form__group-icon {
+        display: flex;
+        min-width: 40px;
+        padding-top: 18px;
+        justify-content: center;
+    }
+
+    .guest-form__group-input {
+        display: flex;
+        flex-wrap: wrap;
+        flex-grow: 1;
+        padding: 5px 10px;
+
+        .form-field-firstname,
+        .form-field-lastname,
+        .form-field-date-of-birth,
+        .form-field-citizen-identification {
+            width: 100%;
+        }
+
+        .form-field-gender,
+        .form-field-is_coordinator {
+            width: 50%;
+        }
+        .form-field-is_coordinator {
+            padding-left: 20px;
+        }
+
+        .form-field-address-street {
+            width: 80%;
+            padding-right: 20px;
+        }
+
+        .form-field-address-zip {
+            width: 20%;
+        }
+
+        .form-field-address-city,
+        .form-field-address-country {
+            width: 50%;
+        }
+
+        .form-field-address-city {
+            padding-right: 10px;
+        }
+
+        .form-field-address-country {
+            padding-left: 10px;
+        }
+    }
+}

@@ -1,0 +1,28 @@
+<app-content-layout [loading]="loading" [backNavigateTo]="'/bookings/pending'">
+    <ng-template #title>
+        {{ 'CONSUMPTION_METERS_TITLE' | translate }}
+    </ng-template>
+
+    <div class="list">
+        <app-consumption-meters-item *ngFor="let consumptionMeter of consumptionMeterList"
+                                     [typeMeter]="consumptionMeter.type_meter"
+                                     [meterNumber]="consumptionMeter.meter_number"
+                                     (click)="goToEdit(consumptionMeter.id)"
+        ></app-consumption-meters-item>
+
+        <app-empty-table-message *ngIf="consumptionMeterList.length === 0 && !loading">
+            {{ 'CONSUMPTION_METERS_EMPTY_TABLE' | translate }}
+        </app-empty-table-message>
+
+        <app-icon-button class="add-btn"
+                         [icon]="'add'"
+                         [fill]="true"
+                         [outlined]="true"
+                         (click)="goToNew()"
+        ></app-icon-button>
+    </div>
+
+    <ng-template #footer>
+        <div class="footer"></div>
+    </ng-template>
+</app-content-layout>

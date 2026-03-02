@@ -1,0 +1,22 @@
+<div mat-dialog-title class="mat-dialog-title">Traitement d'informations à caractère personnel</div>
+
+<div mat-dialog-content class="mat-dialog-content">
+    <div style="margin: 10px 0;">
+        Cette apllication vous permet d'encoder les coordonnées des participants qui seront présents lors du séjour dans le Centre d'hébergement du réseau Kaleo auprès duquel vous avez fait une réservation, conformément à l'Arrêté Royal du 8 octobre 1981, modifié par l'Arrêté Royal du 3 octobre 2021.<br />
+        <br />
+        Afin d'être en conformité avec la loi du 30 juillet 2018 relative à la protection des personnes physiques à l'égard des traitements de données à caractère personnel, il est nécessaire que vous donniez votre consentement pour la gestion des données que vous nous transmettez.
+    </div>
+
+    <div style="margin: 10px 0; text-align: center;">
+        <a style="cursor: pointer;" (click)="showNotice()">
+            Voir la notice de la politique de traitement des données
+        </a>
+    </div>
+
+    <div style="margin: 15px 0;">
+        <mat-checkbox [(ngModel)]="consent_checked" [checked]="consent_checked"></mat-checkbox>
+        J'ai lu et j'accepte la politique de gestion des données à caractère personnel telle que repise dans la notice RGPD, et je consens à ce que les données transmises soient traitées conformément à celle-ci.<br />
+    </div>
+
+    <button mat-flat-button class="btn-ok" (click)="submit()" color="primary" type="submit">{{ 'GDRPR_CONSENT_DIALOG_BUTTON' | translate }}</button>
+</div>

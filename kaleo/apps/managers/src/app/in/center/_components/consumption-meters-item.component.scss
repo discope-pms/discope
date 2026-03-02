@@ -1,0 +1,22 @@
+:host {
+    display: flex;
+    width: 100%;
+    align-items: center;
+
+    .type-meter {
+        width: 130px;
+        font-weight: bold;
+        text-transform: uppercase;
+    }
+
+    .meter-number {
+        flex-grow: 1;
+        font-weight: bold;
+    }
+
+    .action {
+        display: flex;
+        width: 60px;
+        justify-content: center;
+    }
+}

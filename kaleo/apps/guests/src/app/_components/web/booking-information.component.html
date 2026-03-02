@@ -1,0 +1,15 @@
+<div class="booking-information">
+    <div class="booking-information__item">
+        <div class="item-title">{{'BOOKING_INFO_BOOKING' | translate}}:</div>
+        <div class="booking-name">{{ bookingName }}</div>
+    </div>
+    <div class="booking-information__item">
+        <div class="item-title">{{'BOOKING_INFO_PLACE' | translate}}:</div>
+        <div class="place-details">
+            <div class="place-details__name" style="font-weight: bold;">{{ centerName }}</div>
+            <div class="place-details__address">{{ centerAddress }}</div>
+            <div class="place-details__phone"><a href="tel:{{ centerPhone }}">{{ centerPhone }}</a></div>
+            <div class="place-details__email"><a href="mailto:{{ centerEmail }}">{{ centerEmail }}</a></div>
+        </div>
+    </div>
+</div>

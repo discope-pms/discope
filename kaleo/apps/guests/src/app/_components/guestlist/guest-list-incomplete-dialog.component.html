@@ -1,0 +1,15 @@
+<div class="guest-list-incomplete-dialog__title-container" mat-dialog-title>
+    <h3 class="guest-list-incomplete-dialog__title">{{ 'GUEST_LIST_INCOMPLETE_DIALOG_TITLE' | translate }}</h3>
+    <div class="guest-list-incomplete-dialog__close-btn" mat-dialog-close>
+        <mat-icon>close</mat-icon>
+    </div>
+</div>
+
+<div mat-dialog-content>
+    <p [innerHTML]="'GUEST_LIST_INCOMPLETE_DIALOG_MESSAGE' | translate"></p>
+</div>
+
+<div mat-dialog-actions class="guest-list-incomplete-dialog__actions">
+    <button mat-button (click)="cancel()">{{ 'GUEST_LIST_INCOMPLETE_DIALOG_CANCEL' | translate }}</button>
+    <button mat-button (click)="submit()" color="primary" type="submit">{{ 'GUEST_LIST_INCOMPLETE_DIALOG_SUBMIT' | translate }}</button>
+</div>

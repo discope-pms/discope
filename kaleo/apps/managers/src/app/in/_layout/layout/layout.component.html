@@ -1,0 +1,10 @@
+<app-select-center-header class="header"
+                          [selectedCenter]="selectedCenter"
+                          [centerList]="centerList"
+                          [showCenterSettingsBtn]="showCenterSettingsBtn"
+                          (selectedCenterChange)="centerChange($event)"
+></app-select-center-header>
+
+<div class="content">
+    <router-outlet></router-outlet>
+</div>

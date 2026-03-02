@@ -1,0 +1,14 @@
+:host {
+    display: flex;
+    height: 100%;
+    flex-direction: column;
+
+    .header {
+        height: 60px;
+    }
+
+    .content {
+        max-height: calc(100% - 60px);
+        flex-grow: 1;
+    }
+}

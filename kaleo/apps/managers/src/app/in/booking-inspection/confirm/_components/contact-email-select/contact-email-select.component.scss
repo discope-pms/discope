@@ -1,0 +1,12 @@
+:host {
+    .form-field {
+        width: 100%;
+        max-height: 46px;
+        border-radius: 4px;
+        font-size: 12px !important;
+
+        .mat-input-element{
+            font-size: 16px !important;
+        }
+    }
+}

@@ -1,0 +1,30 @@
+<div class="sojourn-page">
+
+    <handset-page-header
+            class="header"
+            [title]="title"
+            (back)="back.emit()">
+    </handset-page-header>
+
+    <div class="guest-list-items-container">
+        <guest-list-item
+                *ngFor="let guest of guestList; index as i"
+                class="guest-list-item"
+                [number]="i + 1"
+                [guest]="guest"
+                [disabled]="disabled"
+                (editGuestListItem)="editGuestListItem.emit(guest.id)"
+                (deleteGuestListItem)="deleteGuestListItem.emit(guest.id)">
+        </guest-list-item>
+    </div>
+
+    <button
+            class="add-btn"
+            mat-button mat-icon-button
+            [class.sojourn-page__add-btn--disabled]="guestList.length >= group.nb_pers"
+            [disabled]="disabled || guestList.length >= group.nb_pers"
+            (click)="addGuestListItem.emit()">
+        <mat-icon>add</mat-icon>
+    </button>
+
+</div>

@@ -1,0 +1,51 @@
+<div class="sojourns-wrapper">
+    <ng-container *ngIf="bookingLinesGroups">
+        <div class="sojourn" *ngFor="let group of bookingLinesGroups">
+            <sojourn-header
+                    class="sojourn__header"
+                    [opened]="openedGroupId === group.id"
+                    [dateFrom]="group.date_from"
+                    [dateTo]="group.date_to"
+                    [guestCount]="mapGroupGuestListItem[group.id].length"
+                    [nbPers]="group.nb_pers"
+                    [nbAdults]="group.nb_pers - group.nb_children"
+                    [nbChildren]="group.nb_children"
+                    (expand)="expandClicked(group.id)">
+            </sojourn-header>
+
+            <div [class.hidden]="openedGroupId != group.id">
+                <div class="sojourn__actions">
+                    <mat-form-field class="action-selection">
+                        <mat-select
+                                [disabled]="selectedGuestListItemIds.length === 0"
+                                [(value)]="selectedAction"
+                                (valueChange)="doSelectionAction()">
+                            <mat-option *ngFor="let item of selectionActionOptions" [value]="item.value">
+                                {{ item.label | translateWithVar: { selectionQty: selectedGuestListItemIds.length } }}
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                    <div class="action-add">
+                        <button
+                                [class.disabled]="mapGroupGuestListItem[group.id].length >= group.nb_pers"
+                                [disabled]="disabled || mapGroupGuestListItem[group.id].length >= group.nb_pers"
+                                mat-button
+                                mat-icon-button
+                                (click)="addGuestListItem.emit(group.id)">
+                            <mat-icon>add</mat-icon>
+                        </button>
+                    </div>
+                </div>
+                <sojourn-guest-table
+                        class="sojourn__guest-table"
+                        [guestList]="mapGroupGuestListItem[group.id]"
+                        [disabled]="disabled"
+                        [(selectedGuestListItemIds)]="selectedGuestListItemIds"
+                        (deleteGuestListItem)="deleteGuestListItem.emit($event)"
+                        (updateGuestListItem)="updateGuestListItem.emit($event)"
+                        (editGuestListItem)="openEditGuestDialog($event)">
+                </sojourn-guest-table>
+            </div>
+        </div>
+    </ng-container>
+</div>

@@ -1,0 +1,16 @@
+.guest-form-dialog__title-container {
+    display: flex;
+
+    .guest-form-dialog__title {
+        flex-grow: 1;
+    }
+
+    .guest-form-dialog__close-btn {
+        cursor: pointer;
+    }
+}
+
+.guest-form-dialog__actions {
+    display: flex;
+    justify-content: flex-end;
+}

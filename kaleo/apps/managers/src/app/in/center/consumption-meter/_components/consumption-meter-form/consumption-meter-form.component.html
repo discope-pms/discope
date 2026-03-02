@@ -1,0 +1,53 @@
+<form [formGroup]="form">
+    <mat-form-field class="form-field">
+        <mat-label>{{ 'CONSUMPTION_METER_FORM_TYPE_METER' | translate }}</mat-label>
+        <mat-select formControlName="type_meter">
+            <mat-option *ngFor="let typeMeter of typerMeterList" [value]="typeMeter.value">
+                {{ typeMeter.label }}
+            </mat-option>
+        </mat-select>
+    </mat-form-field>
+
+    <mat-form-field class="form-field">
+        <mat-label>{{ 'CONSUMPTION_METER_FORM_METER_UNIT' | translate }}</mat-label>
+        <mat-select formControlName="meter_unit">
+            <mat-option *ngFor="let meterUnit of meterUnitList" [value]="meterUnit">
+                {{ meterUnit }}
+            </mat-option>
+        </mat-select>
+    </mat-form-field>
+
+    <mat-form-field class="form-field">
+        <mat-label>{{ 'CONSUMPTION_METER_FORM_METER_NUMBER' | translate }}</mat-label>
+        <input matInput formControlName="meter_number" type="text">
+    </mat-form-field>
+
+    <div class="fields-container">
+        <mat-checkbox formControlName="has_ean" style="margin-top: -5px;">
+            {{ 'CONSUMPTION_METER_FORM_HAS_EAN' | translate }}
+        </mat-checkbox>
+
+        <mat-form-field class="form-field">
+            <mat-label>{{ 'CONSUMPTION_METER_FORM_METER_EAN' | translate }}</mat-label>
+            <input matInput formControlName="meter_ean" type="text">
+        </mat-form-field>
+    </div>
+
+    <app-product-select class="form-field"
+                        [label]="'CONSUMPTION_METER_FORM_PRODUCT' | translate"
+                        [productId]="form.controls.product_id.value"
+                        (selectionChange)="changeSelectedProduct($event)">
+    </app-product-select>
+
+    <div class="fields-container">
+        <mat-form-field class="form-field">
+            <mat-label>{{ 'CONSUMPTION_METER_FORM_INDEX_VALUE' | translate }}</mat-label>
+            <input matInput formControlName="index_value" type="number">
+        </mat-form-field>
+        <mat-form-field class="form-field">
+            <mat-label>{{ 'CONSUMPTION_METER_FORM_COEFFICIENT' | translate }}</mat-label>
+            <input matInput formControlName="coefficient" type="number">
+        </mat-form-field>
+
+    </div>
+</form>

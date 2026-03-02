@@ -1,0 +1,18 @@
+@import '../../../../variables';
+
+:host {
+    color: #FFFFFF;
+
+    .filled {
+        background-color: #FFFFFF;
+        color: $secondary-color;
+    }
+
+    .outlined {
+        border: solid 1px $secondary-color;
+    }
+
+    .disabled {
+        opacity: 0.5;
+    }
+}

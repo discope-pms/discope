@@ -1,0 +1,57 @@
+:host {
+    display: block;
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+    box-sizing: border-box;
+    padding-top: 30px;
+
+    .app-web {
+        display: flex;
+        flex-direction: column;
+
+        .app-header {
+            position: relative;
+            display: flex;
+            margin-bottom: 40px;
+
+            &__right-panel {
+                margin-left: auto;
+                display: flex;
+                flex-direction: column;
+                align-items: flex-end;
+                justify-content: space-between;
+            }
+
+            .submit-container {
+                display: flex;
+                flex-direction: column;
+                justify-content: flex-end;
+
+                button {
+                    width: 150px;
+                    height: 50px;
+                    font-size: 24px;
+                    margin-bottom: 10px;
+                }
+
+                a.download-link {
+                    cursor: pointer;
+
+                    &:hover {
+                        text-decoration: none;
+                    }
+                }
+
+                div {
+                    text-align: center;
+                }
+            }
+        }
+
+        .app-body {
+            width: 100%;
+        }
+    }
+
+}

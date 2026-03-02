@@ -1,0 +1,17 @@
+:host {
+    .user-container {
+        display: flex;
+        width: 100%;
+        align-items: center;
+        column-gap: 20px;
+
+        .login {
+            font-weight: bold;
+        }
+    }
+
+    .lang-select {
+        max-width: 80px;
+        margin-top: 20px;
+    }
+}

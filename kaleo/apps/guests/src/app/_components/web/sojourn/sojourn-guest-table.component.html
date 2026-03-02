@@ -1,0 +1,135 @@
+<table mat-table [dataSource]="guestListExtended.reverse()" class="guests-table">
+    <ng-container matColumnDef="select">
+        <th mat-header-cell *matHeaderCellDef>
+            <mat-checkbox
+                    [checked]="selectionAll"
+                    [disabled]="disabled || guestList.length === 0"
+                    (change)="selectionAllChange()">
+            </mat-checkbox>
+        </th>
+        <td mat-cell *matCellDef="let element">
+            <mat-checkbox
+                    [checked]="selectionGuests[element.id]"
+                    [disabled]="disabled"
+                    (change)="selectionGuestChange(element.id)">
+            </mat-checkbox>
+        </td>
+    </ng-container>
+
+    <ng-container matColumnDef="firstname">
+        <th class="header-cell" mat-header-cell *matHeaderCellDef>{{ 'GUEST_TABLE_COL_TITLE_FIRSTNAME' | translate }}</th>
+        <td mat-cell *matCellDef="let element">
+            <mat-form-field class="guest-table__form-field">
+                <input type="text"
+                       autocomplete="off"
+                       matInput
+                       [value]="element.firstname"
+                       [disabled]="disabled"
+                       (blur)="updateStringFieldValue(element.id, 'firstname', $event)" />
+            </mat-form-field>
+        </td>
+    </ng-container>
+
+    <ng-container matColumnDef="lastname">
+        <th class="header-cell" mat-header-cell *matHeaderCellDef>{{ 'GUEST_TABLE_COL_TITLE_LASTNAME' | translate }}</th>
+        <td mat-cell *matCellDef="let element">
+            <mat-form-field class="guest-table__form-field">
+                <input type="text"
+                       autocomplete="off"
+                       matInput
+                       [value]="element.lastname"
+                       [disabled]="disabled"
+                       (blur)="updateStringFieldValue(element.id, 'lastname', $event)" />
+            </mat-form-field>
+        </td>
+    </ng-container>
+
+    <ng-container matColumnDef="is_coordinator">
+        <th class="header-cell is_coordinator" mat-header-cell *matHeaderCellDef>{{ 'GUEST_TABLE_COL_TITLE_COORDINATOR' | translate }}</th>
+        <td mat-cell *matCellDef="let element" class="is_coordinator">
+            <mat-slide-toggle [ngModel]="element.is_coordinator"
+                    [disabled]="disabled"
+                    (change)="updateToggleFieldValue(element.id, 'is_coordinator', $event)">
+            </mat-slide-toggle>
+        </td>
+    </ng-container>
+
+    <ng-container matColumnDef="date_of_birth">
+        <th class="header-cell" mat-header-cell *matHeaderCellDef>{{ 'GUEST_TABLE_COL_TITLE_DATE_OF_BIRTH' | translate }}</th>
+        <td mat-cell *matCellDef="let element" [class.mat-column-date_of_birth--not-disabled]="!disabled">
+            <mat-form-field  class="guest-table__form-field">
+                <input
+                    matInput
+                    [matDatepicker]="datepicker"
+                    [value]="element.date_of_birth_string"
+                    (dateChange)="updateDateOfBirthFieldValue(element.id, $event)"
+                    [disabled]="disabled" />
+                <mat-datepicker-toggle matSuffix [for]="datepicker"></mat-datepicker-toggle>
+                <mat-datepicker [disabled]="disabled" #datepicker>
+                    <mat-datepicker-actions>
+                        <button mat-button matDatepickerCancel>{{ 'DATEPICKER_CANCEL' | translate }}</button>
+                        <button mat-raised-button color="primary" matDatepickerApply>{{ 'DATEPICKER_APPLY' | translate }}</button>
+                    </mat-datepicker-actions>
+                </mat-datepicker>
+            </mat-form-field>
+        </td>
+    </ng-container>
+
+    <ng-container matColumnDef="citizen_identification">
+        <th class="header-cell" mat-header-cell *matHeaderCellDef>{{ 'GUEST_TABLE_COL_TITLE_CITIZEN_IDENTIFICATION' | translate }}</th>
+        <td mat-cell *matCellDef="let element">
+            <mat-form-field class="guest-table__form-field">
+                <input type="text"
+                       autocomplete="off"
+                       matInput
+                       [value]="element.citizen_identification"
+                       [disabled]="disabled || citizenIdentificationInputDisabled[element.id]"
+                       (blur)="updateStringFieldValue(element.id, 'citizen_identification', $event)" />
+            </mat-form-field>
+        </td>
+    </ng-container>
+
+    <ng-container matColumnDef="address_country">
+        <th class="header-cell" mat-header-cell *matHeaderCellDef>{{ 'GUEST_TABLE_COL_TITLE_COUNTRY' | translate }}</th>
+        <td mat-cell *matCellDef="let element">
+            <mat-form-field class="guest-table__form-field">
+                <mat-select
+                        [value]="element.address_country"
+                        [disabled]="disabled"
+                        (valueChange)="updateSelectFieldValue(element.id, 'address_country', $event)">
+                    <mat-option *ngFor="let item of countryOptions | keyvalue" [value]="item.key">
+                        {{ item.value }}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+        </td>
+    </ng-container>
+
+    <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef></th>
+        <td mat-cell *matCellDef="let element;">
+            <button
+                    mat-button
+                    mat-icon-button
+                    class="action-edit"
+                    [disabled]="disabled"
+                    color="primary"
+                    (click)="editClicked(element.id)">
+                <mat-icon>edit</mat-icon>
+            </button>
+
+            <button
+                    mat-button
+                    mat-icon-button
+                    class="action-delete"
+                    [disabled]="disabled"
+                    color="warn"
+                    (click)="deleteClicked(element.id)">
+                <mat-icon>delete</mat-icon>
+            </button>
+        </td>
+    </ng-container>
+
+    <tr class="header-row" mat-header-row *matHeaderRowDef="['select', 'firstname', 'lastname', 'is_coordinator', 'date_of_birth', 'citizen_identification', 'address_country', 'actions']"></tr>
+    <tr class="body-row" mat-row *matRowDef="let row; columns: ['select', 'firstname', 'lastname', 'is_coordinator', 'date_of_birth', 'citizen_identification', 'address_country', 'actions'];"></tr>
+</table>

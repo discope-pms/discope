@@ -1,0 +1,17 @@
+<div class="guest-form-dialog__title-container" mat-dialog-title>
+    <h3 class="guest-form-dialog__title">{{ 'GUEST_FORM_DIALOG_TITLE' | translate }}</h3>
+    <div class="guest-form-dialog__close-btn" mat-dialog-close>
+        <mat-icon>close</mat-icon>
+    </div>
+</div>
+
+<div mat-dialog-content>
+    <guest-form [form]="form"></guest-form>
+</div>
+
+<div class="guest-form-dialog__actions"
+     mat-dialog-actions
+>
+    <button mat-button (click)="cancel()">{{ 'GUEST_FORM_DIALOG_CANCEL' | translate }}</button>
+    <button mat-button (click)="save()" color="primary" type="submit">{{ 'GUEST_FORM_DIALOG_SAVE' | translate }}</button>
+</div>

@@ -1,0 +1,5 @@
+<mat-selection-list>
+    <mat-list-option *ngFor="let option of options" [value]="option.value" (click)="onSelect(option)">
+        {{ option.label | translate }}
+    </mat-list-option>
+</mat-selection-list>

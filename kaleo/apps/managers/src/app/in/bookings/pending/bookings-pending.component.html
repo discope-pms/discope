@@ -1,0 +1,20 @@
+<app-content-layout [loading]="loading" [showBack]="false">
+    <ng-template #title>
+        {{ 'BOOKINGS_PENDING_TITLE' | translate }}
+    </ng-template>
+
+    <app-booking-list [bookingList]="bookingList" (itemClick)="goTo($event)"></app-booking-list>
+
+    <app-empty-table-message *ngIf="bookingList.length === 0 && !loading">
+        {{ 'BOOKINGS_PENDING_EMPTY_TABLE' | translate }}
+    </app-empty-table-message>
+
+    <ng-template #footer>
+        <div class="footer">
+            <app-icon-button [icon]="'upcoming'"
+                             [fill]="true"
+                             (click)="goToUpcomingBookings()"
+            ></app-icon-button>
+        </div>
+    </ng-template>
+</app-content-layout>

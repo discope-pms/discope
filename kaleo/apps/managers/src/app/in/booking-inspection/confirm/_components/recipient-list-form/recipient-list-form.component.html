@@ -1,0 +1,24 @@
+<form [formGroup]="form">
+    <div formArrayName="emails" class="email-list">
+        <div *ngFor="let control of formArray.controls; let i = index"
+                class="email-container"
+                [id]="'booking-inspection-confirm__email-container-' + i">
+            <app-contact-email-select class="email-input"
+                    [formControlName]="i"
+                    [label]="'CONSUMPTION_METER_INSPECTION_CONFIRM_RECIPIENT_X' | translateWithVar : { x: (i + 1) }"
+                    [placeholder]="'example@domain.com'"
+                    [emailList]="bookingContactEmailList"
+                    [isValid]="control.valid"
+                    [isTouched]="control.touched"
+                    [isFirst]="i == 0">
+            </app-contact-email-select>
+
+            <app-icon-button *ngIf="i > 0 && i <= 5"
+                    class="remove-btn"
+                    [icon]="'delete'"
+                    [fill]="true"
+                    (click)="removeIndex.emit(i)">
+            </app-icon-button>
+        </div>
+    </div>
+</form>

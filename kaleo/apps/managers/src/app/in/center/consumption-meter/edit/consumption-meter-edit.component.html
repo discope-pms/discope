@@ -1,0 +1,19 @@
+<app-content-layout [loading]="loading"
+                    [backNavigateTo]="'/center/' + selectedCenter?.id + '/consumption-meters'">
+    <ng-template #title>
+        {{ 'CONSUMPTION_METER_EDIT_TITLE' | translate }}
+    </ng-template>
+
+    <app-consumption-meter-form [form]="form"></app-consumption-meter-form>
+
+    <ng-template #footer>
+        <div class="footer">
+            <button mat-raised-button
+                    class="save-btn"
+                    color="primary"
+                    (click)="save()">
+                {{ 'CONSUMPTION_METER_EDIT_SAVE_BTN' | translate }}
+            </button>
+        </div>
+    </ng-template>
+</app-content-layout>

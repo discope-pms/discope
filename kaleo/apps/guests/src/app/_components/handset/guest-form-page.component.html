@@ -1,0 +1,20 @@
+<div class="guest-form-page">
+    <handset-page-header
+            [title]="title"
+            (back)="back.emit()">
+    </handset-page-header>
+
+    <div class="guest-form-page__form-container">
+        <guest-form [form]="form"></guest-form>
+    </div>
+
+    <div class="guest-form-page__submit-btn-container">
+        <button
+                mat-raised-button
+                class="guest-form-page__submit-btn"
+                color="primary"
+                (click)="save()">
+            {{ 'SAVE_GUEST_BTN_HANDSET' | translate }}
+        </button>
+    </div>
+</div>

@@ -1,0 +1,69 @@
+.sojourns-wrapper {
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+    gap: 25px 0;
+}
+
+.sojourn {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+
+    .hidden {
+        display: none;
+    }
+
+    &__header {
+        width: 100%;
+        margin-bottom: 5px;
+    }
+
+    &__actions {
+        display: flex;
+        justify-content: space-between;
+
+        .action-selection {
+            width: 200px;
+            height: 50px;
+            margin-left: 10px;
+        }
+
+        .action-add {
+            display: flex;
+            align-items: center;
+
+            button {
+                background-color: #3f51b5;
+                color: white;
+                width: 35px;
+                height: 35px;
+                margin-right: 5px;
+                line-height: 25px;
+
+                &:disabled {
+                    background-color: #E1DFE4;
+                    color: rgba(0, 0, 0, .26);
+                }
+            }
+
+        }
+
+    }
+
+
+    &__guest-table {
+        width: 100%;
+        margin-bottom: 20px;
+    }
+
+    &__add-guest-btn {
+        background-color: #3f51b5;
+        color: white !important;
+
+        &--disabled {
+            background-color: #E1DFE4;
+            color: rgba(0, 0, 0, .26);
+        }
+    }
+}

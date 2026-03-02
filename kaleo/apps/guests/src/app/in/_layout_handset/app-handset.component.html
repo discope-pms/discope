@@ -1,0 +1,28 @@
+<div class="app-handset">
+    <sojourns-page *ngIf="!selectedGroup && !selectedGuest"
+            [booking]="booking"
+            [mapGroupCompletedGuestListItemQty]="mapGroupCompletedGuestListItemQty"
+            [isSubmittable]="isSubmittable"
+            (openGroup)="openGroup($event)"
+            (showHelp)="showHelp.emit()"
+            (submitGuestList)="submitGuestList.emit()">
+    </sojourns-page>
+
+    <sojourn-page *ngIf="selectedGroup && !selectedGuest"
+            [group]="selectedGroup"
+            [guestList]="mapGroupGuestListItem[selectedGroup.id]"
+            [title]="('BOOKING_SOJOURN_HANDSET_PAGE_TITLE' | translate) + ' ('+ mapGroupGuestListItem[selectedGroup.id].length + '/' + (selectedGroup.nb_pers) + ')'"
+            [disabled]="!booking || booking.guest_list_id.status !== 'pending'"
+            (back)="closeGroup()"
+            (editGuestListItem)="editGuestListItem($event)"
+            (deleteGuestListItem)="deleteGuestListItem.emit($event)"
+            (addGuestListItem)="addGuestListItem.emit(selectedGroup.id)">
+    </sojourn-page>
+
+    <guest-form-page *ngIf="selectedGroup && selectedGuest"
+            [guest]="selectedGuest"
+            [title]="'GUEST_EDITION_FORM_HANDSET_PAGE_TITLE' | translate"
+            (back)="closeGuest()"
+            (updateGuestListItem)="updateGuestListItem.emit($event)">
+    </guest-form-page>
+</div>

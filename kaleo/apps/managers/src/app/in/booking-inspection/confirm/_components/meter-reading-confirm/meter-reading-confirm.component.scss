@@ -1,0 +1,52 @@
+:host {
+    width: 100%;
+
+    .consumption-meter {
+        font-size: 1.2rem;
+        font-weight: bold;
+        color: grey;
+
+        .type {
+            text-transform: uppercase;
+        }
+    }
+
+    .reading {
+        display: flex;
+
+        .index-container,
+        .unit-price-container {
+            display: flex;
+        }
+
+        .grow {
+            flex-grow: 1;
+        }
+
+        .index-container {
+            min-width: 150px;
+
+            .label {
+                text-transform: uppercase;
+            }
+
+            .value {
+                flex-grow: 1;
+                letter-spacing: 3px;
+                text-align: right;
+            }
+        }
+
+        .unit-price-container {
+            min-width: 140px;
+
+            .label {
+            }
+
+            .value {
+                flex-grow: 1;
+                text-align: right;
+            }
+        }
+    }
+}

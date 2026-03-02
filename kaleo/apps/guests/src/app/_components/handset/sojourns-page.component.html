@@ -1,0 +1,38 @@
+<div class="sojourns-page">
+    <div class="booking-details-container">
+        <div class="button-help" style="margin-left: 10px; width: 50px; transform: scale(1.5); transform-origin: center;">
+            <button (click)="showHelp.emit()" mat-icon-button aria-label="Example icon button with a vertical three dot icon">
+                <mat-icon>help_outline</mat-icon>
+            </button>
+        </div>
+        <div style="flex: 1;">
+            <booking-details
+                    [bookingName]="booking.name"
+                    [centerName]="booking.center_id.name"
+                    [centerPhone]="booking.center_id.phone"
+                    [centerEmail]="booking.center_id.email">
+            </booking-details>
+        </div>
+    </div>
+
+    <div class="booking-line-groups-container">
+        <booking-line-group-details
+                *ngFor="let group of booking.booking_lines_groups_ids"
+                [dateFrom]="group.date_from"
+                [dateTo]="group.date_to"
+                [completionPercentage]="mapGroupCompletedGuestListItemQty[group.id] / group.nb_pers * 100"
+                (openGroup)="openGroup.emit(group.id)">
+        </booking-line-group-details>
+    </div>
+
+    <div class="submit-btn-container">
+        <button mat-raised-button
+                class="submit-btn"
+                color="primary"
+                [disabled]="booking.guest_list_id.status !== 'pending' || !isSubmittable"
+                (click)="submitGuestList.emit()">
+            {{ 'SUBMIT_BTN_HANDSET' | translate }}
+        </button>
+        <div *ngIf="booking && booking.guest_list_id.status != 'pending'" style="display: flex;align-items: center;"><mat-icon>file_download</mat-icon> <a class="download-link" (click)="requestDownload()">{{ 'SUBMIT_CONTAINER_DOWNLOAD' | translate }}</a></div>
+    </div>
+</div>

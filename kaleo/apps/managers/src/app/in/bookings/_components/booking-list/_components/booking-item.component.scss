@@ -1,0 +1,61 @@
+:host {
+    display: flex;
+    align-items: center;
+
+    .info {
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+        row-gap: 4px;
+
+        .name-and-period-container {
+            display: flex;
+        }
+
+        .name {
+            flex-grow: 1;
+            font-weight: bold
+        }
+
+        .period {
+            min-width: 180px;
+            font-weight: bold
+        }
+
+        .customer {
+            display: flex;
+            color: rgba(0, 0, 0, 0.6);
+            font-size: 0.8rem;
+
+            .customer-ref {
+                flex: 1;
+                max-width: calc(100vW - 125px);
+                overflow: hidden;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+
+                .display-name {
+                    text-transform: uppercase;
+                }
+
+            }
+
+            .count-nights {
+                margin-left: auto;
+            }
+
+            @media screen and (max-width: 400px) {
+                .count-nights {
+                    display: none;
+                }
+            }
+        }
+
+    }
+
+    .action {
+        display: flex;
+        width: 60px;
+        justify-content: center;
+    }
+}

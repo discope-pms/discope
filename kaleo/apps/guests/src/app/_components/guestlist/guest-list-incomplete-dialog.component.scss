@@ -1,0 +1,16 @@
+.guest-list-incomplete-dialog__title-container {
+    display: flex;
+
+    .guest-list-incomplete-dialog__title {
+        flex-grow: 1;
+    }
+
+    .guest-list-incomplete-dialog__close-btn {
+        cursor: pointer;
+    }
+}
+
+.guest-list-incomplete-dialog__actions {
+    display: flex;
+    justify-content: flex-end;
+}

@@ -1,0 +1,15 @@
+{
+    "name": "guests",
+    "description": "App for Guest lists management.",
+    "version": "1.0",
+    "authors": ["Yesbabylon"],
+    "license": "LGPL-3",
+    "repository": "",
+    "url": "/guests",
+    "access": {
+        "groups": [
+            "users"
+        ]
+    },
+    "show_in_apps": false
+}

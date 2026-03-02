@@ -1,0 +1,35 @@
+<div mat-dialog-content class="mat-dialog-content">
+    <div>
+        <p><strong>Bienvenue sur la fiche d'hébergement de votre réservation.</strong></p>
+
+        <p>Cette application vous permet de renseigner les identités des personnes reprises dans votre réservation.<br />
+
+        Pour vous aider dans l'encodage, plusieurs indicateurs vous renseignent sur l'état de la fiche:</p>
+        <ul>
+            <li>
+                <strong>Finalisation :</strong> un pourcentage vous indique le niveau de complétion de votre fiche 
+                (<em>"Finalisation : x%"</em>, sous le bouton <strong>"Soumettre"</strong>).
+            </li>
+            <li>
+                <strong>Validité :</strong> si certaines informations nécessaires sont manquantes pour soumettre la fiche, le bouton <strong>"Soumettre"</strong> reste désactivé.
+            </li>
+        </ul>
+
+        <p>Si votre réservation inclut plusieurs séjours, chaque séjour aura sa propre section avec les dates correspondantes.</p>
+
+        <p>Pour chaque séjour, il faut, au minimum, une personne désignée comme responsable (vous pouvez en désigner plusieurs si nécessaire).
+        Cela signifie qu'une fiche peut être soumise, même si tous les participants ne sont pas renseignés.</p>
+
+        <p><strong>Pour pouvoir soumettre la fiche</strong>, il faut que, pour chaque ligne, tous les champs soient remplis 
+        (à l'exception du NISS pour les enfants de moins de 15 ans).<br /> 
+        Si vous ne disposez pas de toutes les informations obligatoires pour compléter une ligne, vous devrez supprimer celle-ci pour pouvoir soumettre la fiche.</p>
+
+        <p>
+            Après l'envoi de vos informations, la fiche reste accessible, en lecture seule, jusqu'à la fin de votre réservation.<br />
+            Un lien "Exporter" vous permet de télécharger la liste des participants au format XLS.
+        </p> 
+    </div>
+
+
+    <button mat-flat-button class="btn-ok" (click)="dialog.closeAll()" color="primary">OK</button>
+</div>

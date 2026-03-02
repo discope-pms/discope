@@ -1,0 +1,7 @@
+<div class="overlay-container" *ngIf="!ready"><mat-spinner></mat-spinner></div>
+
+<div class="container">
+    <ng-container *ngIf="has_auth_error">
+        <div style="text-align: center;">{{'MESSAGE_ERROR_TOKEN_INVALID_OR_EXPIRED' | translate}}</div>
+    </ng-container>
+</div>
