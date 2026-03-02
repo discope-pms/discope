@@ -84,7 +84,7 @@
                         "route": "/",
                         "description": "",
                         "context": {
-                            "entity": "sale\\booking\\Invoice",
+                            "entity": "finance\\accounting\\Invoice",
                             "view": "list.order",
                             "domain": [ ["status", "=", "proforma"] ]
                         }
@@ -96,7 +96,7 @@
                         "route": "/",
                         "description": "",
                         "context": {
-                            "entity": "sale\\booking\\Invoice",
+                            "entity": "finance\\accounting\\Invoice",
                             "view": "list.order",
                             "domain": [ ["status", "=", "invoice"] ]
                         }
