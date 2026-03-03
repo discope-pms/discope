@@ -16,8 +16,8 @@
         ]
     },
     "show_in_apps": true,
-    "short_name": "Discope",
-    "start_url": "/managers/",
+    "short_name": "Cal Animateurs",
+    "start_url": "/employees/",
     "display": "standalone",
     "background_color": "#ffffff",
     "theme_color": "#000000",
