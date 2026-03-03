@@ -1,9 +1,29 @@
-<div class="name">
-    {{ name }}
+<div class="details-section">
+    <div class="title">{{ 'USER_SETTINGS_USER_SECTION_TITLE' | translate }}</div>
+    <div class="details">
+        <div class="detail-wrapper">
+            <div class="label">{{ 'USER_SETTINGS_NAME_LABEL' | translate }}</div>
+            <div class="value">{{ name }}</div>
+        </div>
+        <div class="detail-wrapper">
+            <div class="label">{{ 'USER_SETTINGS_LOGIN_LABEL' | translate }}</div>
+            <div class="value">{{ login }}</div>
+        </div>
+    </div>
 </div>
 
-<div class="login">
-    {{ login }}
+<div class="details-section">
+    <div class="title">{{ 'USER_SETTINGS_PLANNING_SECTION_TITLE' | translate }}</div>
+    <div class="details">
+        <div class="detail-wrapper">
+            <div class="label">{{ 'USER_SETTINGS_GROUP_LABEL' | translate }}</div>
+            <div class="value">{{ planningGroup }}</div>
+        </div>
+        <div class="detail-wrapper">
+            <div class="label">{{ 'USER_SETTINGS_ROLE_LABEL' | translate }}</div>
+            <div class="value">{{ planningRole }}</div>
+        </div>
+    </div>
 </div>
 
 <button mat-raised-button color="secondary" (click)="signOut()">

@@ -1,6 +1,6 @@
 <div class="header">
     <div class="back">
-        <app-icon-button [icon]="'arrow_back'" (click)="back()"></app-icon-button>
+        <app-icon-button [disabled]="!canGoBack" [icon]="'arrow_back'" (click)="back()"></app-icon-button>
     </div>
 
     <div class="title">

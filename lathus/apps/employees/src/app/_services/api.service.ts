@@ -119,6 +119,17 @@ export class ApiService {
         );
     }
 
+    public fetchEmployeeByIdentityId(partnerIdentityId: number): Observable<Employee[]> {
+        const domain = ['partner_identity_id', '=', partnerIdentityId];
+
+        return this.modelCollect<Employee>(
+            'hr\\employee\\Employee',
+            ['id', 'name', 'relationship', 'is_active', 'activity_product_models_ids', 'role_id.code', 'role_id.name', 'partner_identity_id'],
+            domain,
+            { order: 'name', sort: 'asc' }
+        );
+    }
+
     public fetchEmployees(filters: { dateStart: string, dateEnd: string }): Observable<Employee[]> {
         const domain: any = [
             [
