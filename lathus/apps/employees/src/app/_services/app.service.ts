@@ -10,6 +10,12 @@ import { takeUntil } from 'rxjs/operators';
 })
 export class AppService implements OnDestroy {
 
+    private userSubject = new BehaviorSubject<any>(null);
+    public user$ = this.userSubject.asObservable();
+
+    private employeeSubject = new BehaviorSubject<any>(null);
+    public employee$ = this.employeeSubject.asObservable();
+
     private centerListSubject = new BehaviorSubject<Center[]>([]);
     public centerList$ = this.centerListSubject.asObservable();
 
@@ -22,12 +28,18 @@ export class AppService implements OnDestroy {
         private api: ApiService,
         private auth: AuthService
     ) {
-        // Load center when user authenticated
+        // Load user, employee and center when user authenticated
         this.auth.getObservable()
             .pipe(takeUntil(this.destroy$))
             .subscribe(user => {
+                this.userSubject.next(user);
                 if(user) {
                     this.loadCenterList(user.centers_ids);
+                    this.loadEmployee(user.identity_id.id);
+                }
+                else {
+                    this.centerSubject.next(null);
+                    this.centerListSubject.next([]);
                 }
             });
     }
@@ -56,6 +68,24 @@ export class AppService implements OnDestroy {
                 },
                 error: (error) => {
                     console.error('Error fetching centers:', error);
+                }
+            });
+    }
+
+    private loadEmployee(identityId: number) {
+        this.api.fetchEmployeeByIdentityId(identityId)
+            .pipe(takeUntil(this.destroy$))
+            .subscribe({
+                next: (employees) => {
+                    if(employees.length > 0) {
+                        this.employeeSubject.next(employees[0]);
+                    }
+                    else {
+                        console.error('Employee not found!');
+                    }
+                },
+                error: (error) => {
+                    console.error('Error fetching employee by identity id:', error);
                 }
             });
     }

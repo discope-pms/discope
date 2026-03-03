@@ -46,6 +46,17 @@ export const translations: { [lang: string]: { [key: string]: string } } = {
         /**
          * User settings
          */
+        'USER_SETTINGS_USER_SECTION_TITLE': 'User',
+        'USER_SETTINGS_NAME_LABEL': 'Name',
+        'USER_SETTINGS_LOGIN_LABEL': 'Login',
+        'USER_SETTINGS_PLANNING_SECTION_TITLE': 'Planning employees',
+        'USER_SETTINGS_GROUP_LABEL': 'Group',
+        'USER_SETTINGS_GROUP_ORGANIZER': 'Organizer',
+        'USER_SETTINGS_GROUP_MANAGER': 'Manager',
+        'USER_SETTINGS_GROUP_ANIMATOR': 'Animator',
+        'USER_SETTINGS_GROUP_NONE': 'None',
+        'USER_SETTINGS_ROLE_LABEL': 'Role',
+        'USER_SETTINGS_ROLE_NONE': 'None',
         'USER_SETTINGS_SIGN_OUT_BTN': 'Sign out',
 
         /**
@@ -168,6 +179,17 @@ export const translations: { [lang: string]: { [key: string]: string } } = {
         /**
          * User settings
          */
+        'USER_SETTINGS_USER_SECTION_TITLE': 'Utilisateur',
+        'USER_SETTINGS_NAME_LABEL': 'Nom',
+        'USER_SETTINGS_LOGIN_LABEL': 'Login',
+        'USER_SETTINGS_PLANNING_SECTION_TITLE': 'Calendrier animateurs',
+        'USER_SETTINGS_GROUP_LABEL': 'Groupe',
+        'USER_SETTINGS_GROUP_ORGANIZER': 'Organisateur',
+        'USER_SETTINGS_GROUP_MANAGER': 'Manager',
+        'USER_SETTINGS_GROUP_ANIMATOR': 'Animateur',
+        'USER_SETTINGS_GROUP_NONE': 'Aucun',
+        'USER_SETTINGS_ROLE_LABEL': 'Rôle',
+        'USER_SETTINGS_ROLE_NONE': 'Aucun',
         'USER_SETTINGS_SIGN_OUT_BTN': 'Se déconnecter',
 
         /**
