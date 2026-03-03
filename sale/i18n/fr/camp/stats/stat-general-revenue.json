@@ -1,0 +1,82 @@
+{
+    "name": "Chiffre d'affaire général",
+    "plural": "Chiffre d'affaires généraux",
+    "description": "",
+    "model": {
+        "center_id": {
+            "label": "Centre",
+            "description": "Centre pour lequel obtenir les stats.",
+            "help": ""
+        },
+        "all_centers": {
+            "label": "Tous les centres",
+            "description": "Tous les centres pour lesquels obtenir les stats.",
+            "help": ""
+        },
+        "center": {
+            "label": "Centre",
+            "description": "Centre auquel est assignée le séjour.",
+            "help": ""
+        },
+        "date_from": {
+            "label": "Du",
+            "description": "Date de début du séjour.",
+            "help": ""
+        },
+        "date_to": {
+            "label": "Au",
+            "description": "Date de fin du séjour.",
+            "help": ""
+        },
+        "aamm": {
+            "label": "mois",
+            "description": "Index de la période.",
+            "help": ""
+        },
+        "nb_children": {
+            "label": "# enfants",
+            "description": "Nombre d'enfants.",
+            "help": ""
+        },
+        "camps": {
+            "label": "Camps",
+            "description": "Total des produits camps.",
+            "help": ""
+        },
+        "saturday_mornings": {
+            "label": "Samedis matins",
+            "description": "Total des produits samedi matin.",
+            "help": ""
+        },
+        "weekends": {
+            "label": "Lier 2 séjours",
+            "description": "Total des produits lier deux séjours.",
+            "help": ""
+        },
+        "discounts": {
+            "label": "Réductions appliquées",
+            "description": "Total des réductions appliquées.",
+            "help": ""
+        },
+        "financial_helps": {
+            "label": "Aides financières (à collecter)",
+            "description": "Total des aides financières à collecter.",
+            "help": ""
+        },
+        "enrollments": {
+            "label": "Inscriptions",
+            "description": "Total des inscriptions.",
+            "help": ""
+        }
+    },
+    "view": {
+        "search.default": {
+        },
+        "list.default": {
+        }
+    },
+    "error": {
+        "errors": {
+        }
+    }
+}
