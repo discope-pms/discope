@@ -111,6 +111,25 @@
                 "description": "",
                 "children": [
                     {
+                        "id": "stats.camps.turnover",
+                        "icon": "business",
+                        "type": "parent",
+                        "label": "Turnover",
+                        "description": "",
+                        "children": [
+                            {
+                                "id": "stats.camps.turnover.general-revenue",
+                                "type": "entry",
+                                "label": "General revenue",
+                                "description": "",
+                                "context": {
+                                    "entity": "sale\\camp\\stats\\stat-general-revenue",
+                                    "view": "list.default"
+                                }
+                            }
+                        ]
+                    },
+                    {
                         "id": "stats.camps.camps",
                         "icon": "",
                         "type": "parent",
