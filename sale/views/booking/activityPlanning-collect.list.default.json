@@ -5,6 +5,7 @@
         "groups": ["booking.default.user"]
     },
     "header": {
+        "selection": false,
         "actions": {
             "ACTION.CREATE": false
         },
