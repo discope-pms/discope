@@ -130,10 +130,12 @@
             "description": "",
             "actions": {
                 "action.delete": {
-                    "label": "Supprimer"
+                    "label": "Supprimer",
+                    "description": "Supprimer l'activité qui n'est liée à aucune réservation ni camp."
                 },
                 "action.delete_all": {
-                    "label": "Supprimer toutes les occurrences"
+                    "label": "Supprimer toutes",
+                    "description": "Supprimer toutes les occurrences de ce jeu d'actitvité, lié à aucune réservation ni camp."
                 }
             },
             "layout": {

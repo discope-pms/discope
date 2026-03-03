@@ -14,7 +14,7 @@
         },
         {
             "id": "action.delete_all",
-            "label": "Delete all occurrences",
+            "label": "Delete all",
             "description": "Delete all activities created within the same set.",
             "controller": "sale_booking_bookingactivity_do-delete-all",
             "confirm": true,
