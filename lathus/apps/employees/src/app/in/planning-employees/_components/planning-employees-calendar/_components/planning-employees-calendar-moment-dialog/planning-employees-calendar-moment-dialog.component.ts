@@ -7,9 +7,7 @@ import { combineLatest, from, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { ActivityDialogData,  PlanningEmployeesActivityDialogComponent } from '../../../planning-employees-activity-dialog/planning-employees-activity-dialog.component';
 import { CreatePartnerEventDialogData, PlanningEmployeesCreatePartnerEventDialogComponent } from '../../../planning-employees-create-partner-event-dialog/planning-employees-create-partner-event-dialog.component';
-import {
-    CreatePartnerEventSetDialogData, PlanningEmployeesCreatePartnerEventSetDialogComponent
-} from "../../../planning-employees-create-partner-event-serie-dialog/planning-employees-create-partner-event-set-dialog.component";
+import { CreatePartnerEventSetDialogData, PlanningEmployeesCreatePartnerEventSetDialogComponent } from '../../../planning-employees-create-partner-event-set-dialog/planning-employees-create-partner-event-set-dialog.component';
 
 export interface MomentDialogOpenData {
     calendar: CalendarService,

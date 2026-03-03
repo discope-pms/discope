@@ -25,7 +25,7 @@
             <input matEndDate formControlName="date_to">
         </mat-date-range-input>
         <mat-datepicker-toggle matSuffix [for]="sojournDateRangePicker"></mat-datepicker-toggle>
-        <mat-date-range-picker #sojournDateRangePicker></mat-date-range-picker>
+        <mat-date-range-picker #sojournDateRangePicker [touchUi]="true"></mat-date-range-picker>
     </mat-form-field>
 </mat-dialog-content>
 

@@ -423,6 +423,11 @@ export class CalendarService implements OnDestroy {
         this.dateFromSubject.next(nextDateFrom);
     }
 
+    public setDate(date: Date) {
+        this.loadingSubject.next(true);
+        this.dateFromSubject.next(date);
+    }
+
     public setDaysDisplayedQty(daysDisplayedQty: number) {
         if(daysDisplayedQty !== this.daysDisplayedQtySubject.value) {
             this.loadingSubject.next(true);
