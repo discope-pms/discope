@@ -351,24 +351,6 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
     }
 
     public getActivityDescription(activity: any): string {
-        const dateScheduleFrom = new Date(`1970-01-01T${activity.schedule_from}Z`);
-        const schedule_from = new Intl.DateTimeFormat(this.environment.locale.replace('_', '-'), {
-            timeZone: this.environment['core.locale.timezone'],
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit',
-            hour12: false
-        }).format(dateScheduleFrom);
-
-        const dateScheduleTo = new Date(`1970-01-01T${activity.schedule_to}Z`);
-        const schedule_to = new Intl.DateTimeFormat(this.environment.locale.replace('_', '-'), {
-            timeZone: this.environment['core.locale.timezone'],
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit',
-            hour12: false
-        }).format(dateScheduleTo);
-
         if(activity.booking_id) {
             // booking activity
             let group_details = `<dt>Groupe ${activity.group_num}`;
@@ -394,7 +376,7 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
                 `<br>` +
                 `<dt>${activity.name} <b>${activity.counter}/${activity.counter_total}</b></dt>` +
                 `<br>` +
-                `<dt>${schedule_from} - ${schedule_to}</dt>` +
+                `<dt>${activity.schedule_from} - ${activity.schedule_to}</dt>` +
                 `<dt><button data-action="createPartnerEvent" data-date="${activity.activity_date}" data-partner-id="${activity.partner_id.id}" data-time-slot-code="${activity.time_slot}">Créer événement</button></dt>` +
                 '</dl>';
         }
@@ -407,7 +389,7 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
                 `<br>` +
                 `<dt>${activity.name} <b>${activity.counter}/${activity.counter_total}</b></dt>` +
                 `<br>` +
-                `<dt>${schedule_from} - ${schedule_to}</dt>` +
+                `<dt>${activity.schedule_from} - ${activity.schedule_to}</dt>` +
                 `<dt><button data-action="createPartnerEvent" data-date="${activity.activity_date}" data-partner-id="${activity.partner_id.id}" data-time-slot-code="${activity.time_slot}">Créer événement</button></dt>` +
                 '</dl>';
         }
@@ -416,7 +398,7 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
             return '<dl>' +
                 `<dt>${activity.name}</dt>` +
                 `<br>` +
-                `<dt>${schedule_from} - ${schedule_to}</dt>` +
+                `<dt>${activity.schedule_from} - ${activity.schedule_to}</dt>` +
                 `<dt><button data-action="createPartnerEvent" data-date="${activity.activity_date}" data-partner-id="${activity.partner_id.id}" data-time-slot-code="${activity.time_slot}">Créer événement</button></dt>` +
                 '</dl>';
         }
