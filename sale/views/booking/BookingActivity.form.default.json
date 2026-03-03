@@ -11,6 +11,14 @@
             "description": "Delete activity that isn't linked to a booking or a camp.",
             "controller": "sale_booking_bookingactivity_do-delete",
             "confirm": true
+        },
+        {
+            "id": "action.delete_all",
+            "label": "Delete all occurrences",
+            "description": "Delete all activities created within the same set.",
+            "controller": "sale_booking_bookingactivity_do-delete-all",
+            "confirm": true,
+            "visible": ["booking_activity_set_id", "<>", null]
         }
     ],
     "layout": {
@@ -31,6 +39,12 @@
                                                 "widget": {
                                                     "heading": true
                                                 }
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "booking_activity_set_id",
+                                                "width": "0%",
+                                                "visible": false
                                             },
                                             {
                                                 "type": "field",

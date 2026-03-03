@@ -308,7 +308,8 @@ class BookingActivity extends Model {
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\booking\BookingActivitySet',
                 'description'       => "Set this activity is part of.",
-                'readonly'          => true
+                'readonly'          => true,
+                'ondelete'          => 'cascade'
             ]
 
         ];

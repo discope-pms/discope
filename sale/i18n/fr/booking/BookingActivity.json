@@ -131,6 +131,9 @@
             "actions": {
                 "action.delete": {
                     "label": "Supprimer"
+                },
+                "action.delete_all": {
+                    "label": "Supprimer toutes les occurrences"
                 }
             },
             "layout": {
