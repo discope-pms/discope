@@ -89,7 +89,7 @@ export class BookingServicesBookingComponent
         }
         console.debug('BookingServicesBookingComponent::ngOnChanges', changes);
         if(changes.booking_id && this.booking_id > 0) {
-            this.load(this.booking_id);
+            this.load(this.booking_id, this.maximized_group_id);
         }
     }
 
@@ -132,13 +132,13 @@ export class BookingServicesBookingComponent
     /**
      * Load a Booking object using the sale_pos_order_tree controller
      */
-    public async load(booking_id: number, group_id: number = null) {
+    public async load(booking_id: number, group_id: number = 0) {
         if(booking_id <= 0){
             return;
         }
 
         const data: any = { id: booking_id };
-        if(group_id) {
+        if(group_id > 0) {
             data.booking_line_group_id = group_id;
         }
 
