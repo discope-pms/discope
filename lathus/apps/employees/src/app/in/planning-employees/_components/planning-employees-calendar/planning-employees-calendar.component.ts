@@ -143,17 +143,7 @@ export class PlanningEmployeesCalendarComponent implements OnInit, AfterViewInit
                                 }
 
                                 for(let partnerEvent of allPartnerEvents) {
-                                    let partnerHasActivity = false;
-                                    for(let activity of allActivities) {
-                                        if(partnerEvent.camp_group_id && activity.camp_group_id === partnerEvent.camp_group_id) {
-                                            partnerHasActivity = true;
-                                        }
-                                    }
-
-                                    // don't show camp partner event if employee handles the activity
-                                    if(!partnerHasActivity) {
-                                        activitiesToDisplay.push(partnerEvent);
-                                    }
+                                    activitiesToDisplay.push(partnerEvent);
                                 }
 
                                 activityMapToDisplay[userId][dateIndex][timeSlotCode] = activitiesToDisplay;
