@@ -40,6 +40,12 @@ use sale\camp\Camp;
             'type'              => 'boolean',
             'description'       => "Show only the children with birthday during camp.",
             'default'           => false
+        ],
+
+        'params' => [
+            'description'   => 'Additional params to relay to the data controller.',
+            'type'          => 'array',
+            'default'       => []
         ]
 
     ],
@@ -55,6 +61,29 @@ use sale\camp\Camp;
  * @var \equal\php\Context  $context
  */
 ['context' => $context] = $providers;
+
+/**
+ * Functions
+ */
+
+$sortResult = function($a, $b, $order, $sort) {
+    if(!isset($a[$order], $b[$order])) {
+        return 0;
+    }
+
+    $val_a = $a[$order]['name'] ?? $a[$order];
+    $val_b = $b[$order]['name'] ?? $b[$order];
+
+    if($sort === 'asc') {
+        return $val_a <=> $val_b;
+    }
+
+    return $val_b <=> $val_a;
+};
+
+/**
+ * Data controller
+ */
 
 $camps = Camp::search(
     [
@@ -116,6 +145,13 @@ if($params['only_birthday']) {
         $result,
         fn($item) => $item['has_camp_birthday']
     );
+}
+
+if(isset($params['params']['order'])) {
+    $order = $params['params']['order'];
+    $sort = $params['params']['sort'] ?? 'asc';
+
+    usort($result, fn($a, $b) => $sortResult($a, $b, $order, $sort));
 }
 
 $context->httpResponse()
