@@ -325,29 +325,7 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
         let date_index = this.calcDateIndex(day);
         const allItems = this.activities[partner.id]?.[date_index]?.[time_slot] ?? [];
 
-        const allActivities = allItems.filter((a: any) => !a.is_partner_event);
-        const allPartnerEvents = allItems.filter((a: any) => a.is_partner_event);
-
-        const filteredPartnerEvents = [];
-        for(let partnerEvent of allPartnerEvents) {
-            if(partnerEvent.event_type !== 'camp_activity') {
-                filteredPartnerEvents.push(partnerEvent);
-                continue;
-            }
-
-            let partnerHasActivity = false;
-            for(let activity of allActivities) {
-                if(partnerEvent.camp_group_id && activity.camp_group_id === partnerEvent.camp_group_id) {
-                    partnerHasActivity = true;
-                }
-            }
-            // Add camp activity partner event only if the partner does not handle the activity
-            if(!partnerHasActivity) {
-                filteredPartnerEvents.push(partnerEvent);
-            }
-        }
-
-        return filteredPartnerEvents;
+        return allItems.filter((a: any) => a.is_partner_event);
     }
 
     public getActivityDescription(activity: any): string {
@@ -439,7 +417,8 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
                 (partnerEvent.camp_id ? `<dt>Groupe ${partnerEvent.group_num}, ${partnerEvent.camp_id.enrollments_qty} personne${partnerEvent.camp_id.enrollments_qty > 1 ? 's' : ''} (${partnerEvent.camp_id.min_age} - ${partnerEvent.camp_id.max_age})</dt>` : '') +
                 (partnerEvent.camp_id ? `<dt>Camp du ${partnerEvent.camp_id.date_from} au ${partnerEvent.camp_id.date_to}</dt>` : '') +
                 (partnerEvent.camp_id ? `<br>` : '') +
-                `<dt>${partnerEvent.name}</dt>` +
+                `<dt><b>Responsable du groupe</b></dt>` +
+                `<dt>Activité : ${partnerEvent.name}</dt>` +
                 `<br>` +
                 (partnerEvent.description ? `<dt>${partnerEvent.description}</dt>` : '') +
                 `<dt><button data-action="createPartnerEvent" data-date="${partnerEvent.event_date}" data-partner-id="${partnerEvent.partner_id}" data-time-slot-code="${timeSlot?.code}">Créer événement</button></dt>` +
