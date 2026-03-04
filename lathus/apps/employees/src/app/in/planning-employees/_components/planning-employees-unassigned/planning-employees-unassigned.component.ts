@@ -76,10 +76,18 @@ export class PlanningEmployeesUnassignedComponent implements OnInit, OnDestroy  
     }
 
     public refreshDaysIndexes(dateFrom: Date, days: number) {
+        const getDayIndex = (date: Date): string => {
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const year = date.getFullYear();
+
+            return `${year}-${month}-${day}`;
+        };
+
         const daysIndexes: string[] = [];
         for(let i = 0; i < days; i++) {
             const date = new Date(dateFrom.getTime() + i * 24 * 60 * 60 * 1000);
-            daysIndexes.push(date.toISOString().split('T')[0]);
+            daysIndexes.push(getDayIndex(date));
         }
 
         this.daysIndexes = daysIndexes;
