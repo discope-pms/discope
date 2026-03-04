@@ -14,7 +14,7 @@
             <div class="value">
                 <div>{{ activity.name }}</div>
                 <div *ngIf="activity.booking_id || activity.camp_id" style="font-size: 0.75rem;">
-                    <ng-container *ngIf="!activity?.is_partner_event">{{ activity.counter }}/{{ activity.counter_total }})</ng-container>
+                    <ng-container *ngIf="!activity?.is_partner_event">({{ activity.counter }}/{{ activity.counter_total }})</ng-container>
                 </div>
             </div>
         </div>
