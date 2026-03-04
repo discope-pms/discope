@@ -88,8 +88,11 @@ export const translations: { [lang: string]: { [key: string]: string } } = {
         /**
          * Activity details
          */
-        'ACTIVITY_DIALOG_TITLE': 'Activity',
+        'ACTIVITY_DIALOG_TITLE_ACTIVITY': 'Activity',
+        'ACTIVITY_DIALOG_TITLE_PARTNER_EVENT': 'Partner event',
+        'ACTIVITY_DIALOG_TITLE_PARTNER_EVENT_CAMP': 'Camp group leader',
         'ACTIVITY_DIALOG_ACTIVITY_LABEL': 'Activity',
+        'ACTIVITY_DIALOG_PARTNER_EVENT_LABEL': 'Partner event',
         'ACTIVITY_DIALOG_DATE_LABEL': 'Date',
         'ACTIVITY_DIALOG_GROUP_LABEL': 'Group',
         'ACTIVITY_DIALOG_PEOPLE': 'people',
@@ -221,8 +224,11 @@ export const translations: { [lang: string]: { [key: string]: string } } = {
         /**
          * Activity details
          */
-        'ACTIVITY_DIALOG_TITLE': 'Activité',
+        'ACTIVITY_DIALOG_TITLE_ACTIVITY': 'Activité',
+        'ACTIVITY_DIALOG_TITLE_PARTNER_EVENT': 'Événement',
+        'ACTIVITY_DIALOG_TITLE_PARTNER_EVENT_CAMP': 'Responsable groupe de camp',
         'ACTIVITY_DIALOG_ACTIVITY_LABEL': 'Activité',
+        'ACTIVITY_DIALOG_PARTNER_EVENT_LABEL': 'Événement',
         'ACTIVITY_DIALOG_DATE_LABEL': 'Date',
         'ACTIVITY_DIALOG_GROUP_LABEL': 'Groupe',
         'ACTIVITY_DIALOG_PEOPLE': 'personnes',

@@ -1,13 +1,20 @@
-<h2 mat-dialog-title>{{ 'ACTIVITY_DIALOG_TITLE' | translate }}</h2>
+<h2 mat-dialog-title>
+    <ng-container *ngIf="!activity?.is_partner_event">{{ 'ACTIVITY_DIALOG_TITLE_ACTIVITY' | translate }}</ng-container>
+    <ng-container *ngIf="activity?.is_partner_event && activity.event_type !== 'camp_activity'">{{ 'ACTIVITY_DIALOG_TITLE_PARTNER_EVENT' | translate }}</ng-container>
+    <ng-container *ngIf="activity?.is_partner_event && activity.event_type === 'camp_activity'">{{ 'ACTIVITY_DIALOG_TITLE_PARTNER_EVENT_CAMP' | translate }}</ng-container>
+</h2>
 
 <mat-dialog-content>
     <div class="activity-details">
         <div class="activity-detail">
-            <div class="label">{{ 'ACTIVITY_DIALOG_ACTIVITY_LABEL' | translate }}</div>
+            <div class="label">
+                <ng-container *ngIf="!activity?.is_partner_event || activity.event_type === 'camp_activity'">{{ 'ACTIVITY_DIALOG_ACTIVITY_LABEL' | translate }}</ng-container>
+                <ng-container *ngIf="activity?.is_partner_event && activity.event_type !== 'camp_activity'">{{ 'ACTIVITY_DIALOG_PARTNER_EVENT_LABEL' | translate }}</ng-container>
+            </div>
             <div class="value">
                 <div>{{ activity.name }}</div>
                 <div *ngIf="activity.booking_id || activity.camp_id" style="font-size: 0.75rem;">
-                    ({{ activity.counter }}/{{ activity.counter_total }})
+                    <ng-container *ngIf="!activity?.is_partner_event">{{ activity.counter }}/{{ activity.counter_total }})</ng-container>
                 </div>
             </div>
         </div>
@@ -44,7 +51,7 @@
                 <div class="value">
                     <div *ngIf="activity?.customer_id?.name">{{ activity?.customer_id?.name }}</div>
                     <div>{{ 'ACTIVITY_DIALOG_FROM' | translate }} {{ activity.booking_id.date_from }} {{ 'ACTIVITY_DIALOG_TO' | translate }} {{ activity.booking_id.date_to }}</div>
-                    <div>{{ activity.booking_id.nb_pers }} {{ 'ACTIVITY_DIALOG_PEOPLE' | translate }}</div>
+                    <div>{{ activity.booking_id?.nb_pers }} {{ 'ACTIVITY_DIALOG_PEOPLE' | translate }}</div>
                 </div>
             </div>
         </ng-container>
@@ -70,7 +77,7 @@
             <div class="activity-detail">
                 <div class="label">{{ 'PARTNER_EVENT_TYPE_LABEL' | translate }}</div>
                 <div class="value">
-                    {{ eventTypeMap[activity.event_type] }}
+                    {{ eventTypeMap[activity?.event_type ?? 'other'] }}
                 </div>
             </div>
         </ng-container>
