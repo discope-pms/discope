@@ -1,0 +1,110 @@
+{
+    "name": "Stat General Revenues",
+    "description": "",
+    "controller": "sale_camp_stats_stat-general-revenue",
+    "header": {
+        "actions": {
+            "ACTION.CREATE" : false
+        }
+    },
+    "operations": {
+        "Total": {
+            "nb_children":{
+                "operation": "SUM",
+                "usage": "numeric/integer"
+            },
+            "camps":{
+                "operation": "SUM",
+                "usage": "amount/money:2"
+            },
+            "saturday_mornings":{
+                "operation": "SUM",
+                "usage": "amount/money:2"
+            },
+            "weekends":{
+                "operation": "SUM",
+                "usage": "amount/money:2"
+            },
+            "discounts":{
+                "operation": "SUM",
+                "usage": "amount/money:2"
+            },
+            "financial_helps":{
+                "operation": "SUM",
+                "usage": "amount/money:2"
+            },
+            "enrollments":{
+                "operation": "SUM",
+                "usage": "amount/money:2"
+            }
+        }
+    },
+    "group_by": [{"field": "center"}],
+    "layout": {
+        "items": [
+            {
+                "type": "field",
+                "value": "center",
+                "width": "25%"
+            },
+            {
+                "type": "field",
+                "value": "aamm",
+                "width": "8%"
+            },
+            {
+                "type": "field",
+                "value": "nb_children",
+                "width": "8%"
+            },
+            {
+                "type": "field",
+                "value": "camps",
+                "width": "15%",
+                "widget": {
+                    "usage": "amount/money:2"
+                }
+            },
+            {
+                "type": "field",
+                "value": "saturday_mornings",
+                "width": "15%",
+                "widget": {
+                    "usage": "amount/money:2"
+                }
+            },
+            {
+                "type": "field",
+                "value": "weekends",
+                "width": "15%",
+                "widget": {
+                    "usage": "amount/money:2"
+                }
+            },
+            {
+                "type": "field",
+                "value": "discounts",
+                "width": "15%",
+                "widget": {
+                    "usage": "amount/money:2"
+                }
+            },
+            {
+                "type": "field",
+                "value": "financial_helps",
+                "width": "15%",
+                "widget": {
+                    "usage": "amount/money:2"
+                }
+            },
+            {
+                "type": "field",
+                "value": "enrollments",
+                "width": "15%",
+                "widget": {
+                    "usage": "amount/money:2"
+                }
+            }
+        ]
+    }
+}

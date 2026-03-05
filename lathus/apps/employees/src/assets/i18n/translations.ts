@@ -46,6 +46,17 @@ export const translations: { [lang: string]: { [key: string]: string } } = {
         /**
          * User settings
          */
+        'USER_SETTINGS_USER_SECTION_TITLE': 'User',
+        'USER_SETTINGS_NAME_LABEL': 'Name',
+        'USER_SETTINGS_LOGIN_LABEL': 'Login',
+        'USER_SETTINGS_PLANNING_SECTION_TITLE': 'Planning employees',
+        'USER_SETTINGS_GROUP_LABEL': 'Group',
+        'USER_SETTINGS_GROUP_ORGANIZER': 'Organizer',
+        'USER_SETTINGS_GROUP_MANAGER': 'Manager',
+        'USER_SETTINGS_GROUP_ANIMATOR': 'Animator',
+        'USER_SETTINGS_GROUP_NONE': 'None',
+        'USER_SETTINGS_ROLE_LABEL': 'Role',
+        'USER_SETTINGS_ROLE_NONE': 'None',
         'USER_SETTINGS_SIGN_OUT_BTN': 'Sign out',
 
         /**
@@ -77,8 +88,11 @@ export const translations: { [lang: string]: { [key: string]: string } } = {
         /**
          * Activity details
          */
-        'ACTIVITY_DIALOG_TITLE': 'Activity',
+        'ACTIVITY_DIALOG_TITLE_ACTIVITY': 'Activity',
+        'ACTIVITY_DIALOG_TITLE_PARTNER_EVENT': 'Partner event',
+        'ACTIVITY_DIALOG_TITLE_PARTNER_EVENT_CAMP': 'Camp group leader',
         'ACTIVITY_DIALOG_ACTIVITY_LABEL': 'Activity',
+        'ACTIVITY_DIALOG_PARTNER_EVENT_LABEL': 'Partner event',
         'ACTIVITY_DIALOG_DATE_LABEL': 'Date',
         'ACTIVITY_DIALOG_GROUP_LABEL': 'Group',
         'ACTIVITY_DIALOG_PEOPLE': 'people',
@@ -168,6 +182,17 @@ export const translations: { [lang: string]: { [key: string]: string } } = {
         /**
          * User settings
          */
+        'USER_SETTINGS_USER_SECTION_TITLE': 'Utilisateur',
+        'USER_SETTINGS_NAME_LABEL': 'Nom',
+        'USER_SETTINGS_LOGIN_LABEL': 'Login',
+        'USER_SETTINGS_PLANNING_SECTION_TITLE': 'Calendrier animateurs',
+        'USER_SETTINGS_GROUP_LABEL': 'Groupe',
+        'USER_SETTINGS_GROUP_ORGANIZER': 'Organisateur',
+        'USER_SETTINGS_GROUP_MANAGER': 'Manager',
+        'USER_SETTINGS_GROUP_ANIMATOR': 'Animateur',
+        'USER_SETTINGS_GROUP_NONE': 'Aucun',
+        'USER_SETTINGS_ROLE_LABEL': 'Rôle',
+        'USER_SETTINGS_ROLE_NONE': 'Aucun',
         'USER_SETTINGS_SIGN_OUT_BTN': 'Se déconnecter',
 
         /**
@@ -199,8 +224,11 @@ export const translations: { [lang: string]: { [key: string]: string } } = {
         /**
          * Activity details
          */
-        'ACTIVITY_DIALOG_TITLE': 'Activité',
+        'ACTIVITY_DIALOG_TITLE_ACTIVITY': 'Activité',
+        'ACTIVITY_DIALOG_TITLE_PARTNER_EVENT': 'Événement',
+        'ACTIVITY_DIALOG_TITLE_PARTNER_EVENT_CAMP': 'Responsable groupe de camp',
         'ACTIVITY_DIALOG_ACTIVITY_LABEL': 'Activité',
+        'ACTIVITY_DIALOG_PARTNER_EVENT_LABEL': 'Événement',
         'ACTIVITY_DIALOG_DATE_LABEL': 'Date',
         'ACTIVITY_DIALOG_GROUP_LABEL': 'Groupe',
         'ACTIVITY_DIALOG_PEOPLE': 'personnes',

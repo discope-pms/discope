@@ -7,9 +7,7 @@ import { combineLatest, from, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { ActivityDialogData,  PlanningEmployeesActivityDialogComponent } from '../../../planning-employees-activity-dialog/planning-employees-activity-dialog.component';
 import { CreatePartnerEventDialogData, PlanningEmployeesCreatePartnerEventDialogComponent } from '../../../planning-employees-create-partner-event-dialog/planning-employees-create-partner-event-dialog.component';
-import {
-    CreatePartnerEventSetDialogData, PlanningEmployeesCreatePartnerEventSetDialogComponent
-} from "../../../planning-employees-create-partner-event-serie-dialog/planning-employees-create-partner-event-set-dialog.component";
+import { CreatePartnerEventSetDialogData, PlanningEmployeesCreatePartnerEventSetDialogComponent } from '../../../planning-employees-create-partner-event-set-dialog/planning-employees-create-partner-event-set-dialog.component';
 
 export interface MomentDialogOpenData {
     calendar: CalendarService,
@@ -71,11 +69,28 @@ export class PlanningEmployeesCalendarMomentDialogComponent implements OnInit, O
             });
 
         this.calendar.activityMap$.subscribe(activityMap => {
-            let activities: any[] = [];
+            let allItems: any[] = [];
             if(activityMap?.[this.employee.id]?.[this.dayIndex]?.[this.timeSlotCode]?.length) {
-                activities = activityMap?.[this.employee.id]?.[this.dayIndex]?.[this.timeSlotCode];
+                allItems = activityMap?.[this.employee.id]?.[this.dayIndex]?.[this.timeSlotCode];
             }
-            this.activities = activities;
+
+            const allActivities = allItems
+                .filter((a: any) => !a.is_partner_event)
+                .sort((a: any, b: any) => {
+                    if(a.schedule_from < b.schedule_from) {
+                        return -1;
+                    }
+                    if(a.schedule_from > b.schedule_from) {
+                        return 1;
+                    }
+                    return 0;
+                });
+            const allPartnerEvents = allItems.filter((a: any) => a.is_partner_event);
+
+            this.activities = [
+                ...allActivities,
+                ...allPartnerEvents
+            ];
         });
 
         this.calendar.userGroup$.subscribe(userGroup => {

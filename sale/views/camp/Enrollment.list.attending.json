@@ -20,7 +20,7 @@
                 "type": "field",
                 "value": "id",
                 "width": "10%",
-                "sortable": false,
+                "sortable": true,
                 "readonly": true,
                 "visible": false
             },
@@ -28,7 +28,7 @@
                 "type": "field",
                 "value": "camp_id",
                 "width": "20%",
-                "sortable": false,
+                "sortable": true,
                 "readonly": true,
                 "visible": false
             },
@@ -36,21 +36,21 @@
                 "type": "field",
                 "value": "child_firstname",
                 "width": "20%",
-                "sortable": false,
+                "sortable": true,
                 "readonly": true
             },
             {
                 "type": "field",
                 "value": "child_lastname",
                 "width": "20%",
-                "sortable": false,
+                "sortable": true,
                 "readonly": true
             },
             {
                 "type": "field",
                 "value": "child_gender",
                 "width": "20%",
-                "sortable": false,
+                "sortable": true,
                 "readonly": true
             },
             {
@@ -64,7 +64,7 @@
                 "type": "field",
                 "value": "child_birthdate",
                 "width": "20%",
-                "sortable": false,
+                "sortable": true,
                 "readonly": true
             },
             {
@@ -78,21 +78,21 @@
                 "type": "field",
                 "value": "main_guardian_id",
                 "width": "20%",
-                "sortable": false,
+                "sortable": true,
                 "readonly": true
             },
             {
                 "type": "field",
                 "value": "main_guardian_mobile",
                 "width": "20%",
-                "sortable": false,
+                "sortable": true,
                 "readonly": true
             },
             {
                 "type": "field",
                 "value": "main_guardian_phone",
                 "width": "20%",
-                "sortable": false,
+                "sortable": true,
                 "readonly": true
             },
             {
@@ -115,7 +115,7 @@
                 "type": "field",
                 "value": "is_ase",
                 "width": "20%",
-                "sortable": false,
+                "sortable": true,
                 "readonly": true,
                 "visible": false
             },

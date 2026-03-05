@@ -1,10 +1,11 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { EnvService } from 'sb-shared-lib';
 import { CalendarService } from '../../_services/calendar.service';
 import { FilterDialogOpenData, PlanningEmployeesFiltersDialogComponent } from './_components/planning-employees-filters-dialog/planning-employees-filters-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
 import { combineLatest, from, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import { MatDatepicker } from '@angular/material/datepicker';
 
 @Component({
     selector: 'app-planning-employees-filters',
@@ -19,6 +20,8 @@ export class PlanningEmployeesFiltersComponent implements OnInit, OnDestroy  {
     public displayMultipleDays = false;
 
     private destroy$ = new Subject<void>();
+
+    @ViewChild('picker') picker!: MatDatepicker<Date>;
 
     constructor(
         private calendar: CalendarService,
@@ -63,8 +66,16 @@ export class PlanningEmployeesFiltersComponent implements OnInit, OnDestroy  {
     }
 
     private formatDate(date: Date, locale: string): string {
+        const now = new Date();
+        const currentYear = now.getFullYear();
+
+        const format: any = { weekday: 'short', day: '2-digit', month: '2-digit' };
+        if(date.getFullYear() !== currentYear) {
+            format.year = '2-digit';
+        }
+
         date = new Date(date.getTime());
-        const formatter = new Intl.DateTimeFormat(locale.replace('_', '-'), { weekday: 'short', day: '2-digit', month: '2-digit' });
+        const formatter = new Intl.DateTimeFormat(locale.replace('_', '-'), format);
         return formatter.format(date);
     }
 
@@ -77,11 +88,19 @@ export class PlanningEmployeesFiltersComponent implements OnInit, OnDestroy  {
         });
     }
 
+    public onOpenPicker() {
+        this.picker.open();
+    }
+
     public onPreviousDate() {
         this.calendar.setPreviousDate();
     }
 
     public onNextDate() {
         this.calendar.setNextDate();
+    }
+
+    public onChangeDate(event: any) {
+        this.calendar.setDate(event.value);
     }
 }

@@ -131,7 +131,17 @@ export class PlanningEmployeesCalendarComponent implements OnInit, AfterViewInit
                         for(let timeSlotCode of timeSlotCodes) {
                             if(dateActivityMap[timeSlotCode] !== undefined) {
                                 const allItems = dateActivityMap[timeSlotCode];
-                                const allActivities = allItems.filter((a: any) => !a.is_partner_event);
+                                const allActivities = allItems
+                                    .filter((a: any) => !a.is_partner_event)
+                                    .sort((a: any, b: any) => {
+                                        if(a.schedule_from < b.schedule_from) {
+                                            return -1;
+                                        }
+                                        if(a.schedule_from > b.schedule_from) {
+                                            return 1;
+                                        }
+                                        return 0;
+                                    });
                                 const allPartnerEvents = allItems.filter((a: any) => a.is_partner_event);
 
                                 const activitiesToDisplay: ActivityMapActivity[] = [];
@@ -143,17 +153,7 @@ export class PlanningEmployeesCalendarComponent implements OnInit, AfterViewInit
                                 }
 
                                 for(let partnerEvent of allPartnerEvents) {
-                                    let partnerHasActivity = false;
-                                    for(let activity of allActivities) {
-                                        if(partnerEvent.camp_group_id && activity.camp_group_id === partnerEvent.camp_group_id) {
-                                            partnerHasActivity = true;
-                                        }
-                                    }
-
-                                    // don't show camp partner event if employee handles the activity
-                                    if(!partnerHasActivity) {
-                                        activitiesToDisplay.push(partnerEvent);
-                                    }
+                                    activitiesToDisplay.push(partnerEvent);
                                 }
 
                                 activityMapToDisplay[userId][dateIndex][timeSlotCode] = activitiesToDisplay;
@@ -178,10 +178,18 @@ export class PlanningEmployeesCalendarComponent implements OnInit, AfterViewInit
     }
 
     public refreshDaysIndexes(dateFrom: Date, days: number) {
+        const getDayIndex = (date: Date): string => {
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const year = date.getFullYear();
+
+            return `${year}-${month}-${day}`;
+        };
+
         const daysIndexes: string[] = [];
         for(let i = 0; i < days; i++) {
             const date = new Date(dateFrom.getTime() + i * 24 * 60 * 60 * 1000);
-            daysIndexes.push(date.toISOString().split('T')[0]);
+            daysIndexes.push(getDayIndex(date));
         }
 
         this.daysIndexes = daysIndexes;

@@ -3,7 +3,7 @@ import { BehaviorSubject, combineLatest, EMPTY, forkJoin, Observable, Subject } 
 import { ActivityMap, Category, Employee, EmployeeRole, ProductModel, TimeSlot } from '../../../../type';
 import { takeUntil, switchMap, debounceTime, tap, catchError, filter } from 'rxjs/operators';
 import { ApiService } from '../../../_services/api.service';
-import { AuthService } from 'sb-shared-lib';
+import { AppService } from '../../../_services/app.service';
 
 @Injectable()
 export class CalendarService implements OnDestroy {
@@ -90,8 +90,8 @@ export class CalendarService implements OnDestroy {
     private destroy$ = new Subject<void>();
 
     constructor(
-        private api: ApiService,
-        private auth: AuthService
+        private app: AppService,
+        private api: ApiService
     ) {}
 
     ngOnDestroy() {
@@ -101,10 +101,10 @@ export class CalendarService implements OnDestroy {
 
     public init() {
         // Listen to auth user to set user related data
-        this.auth.getObservable()
+        this.app.user$
             .pipe(takeUntil(this.destroy$))
-            .subscribe((user) => {
-               this.user = user;
+            .subscribe(user => {
+                this.user = user;
 
                 let role: 'animator'|'manager'|'organizer'|null = null;
                 if(user) {
@@ -421,6 +421,11 @@ export class CalendarService implements OnDestroy {
         nextDateFrom.setDate(this.dateFromSubject.value.getDate() + 1);
 
         this.dateFromSubject.next(nextDateFrom);
+    }
+
+    public setDate(date: Date) {
+        this.loadingSubject.next(true);
+        this.dateFromSubject.next(date);
     }
 
     public setDaysDisplayedQty(daysDisplayedQty: number) {

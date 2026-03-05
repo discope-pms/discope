@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { AppService } from '../../../_services/app.service';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { filter } from 'rxjs/operators';
-import {Location} from "@angular/common";
+import { Location } from '@angular/common';
 
 @Component({
     selector: 'app-layout',
@@ -12,6 +12,7 @@ import {Location} from "@angular/common";
 export class LayoutComponent implements OnInit {
 
     public title = '';
+    public canGoBack = false;
 
     constructor(
         private app: AppService,
@@ -38,9 +39,11 @@ export class LayoutComponent implements OnInit {
 
         if (route?.snapshot.data) {
             this.title = route.snapshot.data['title'] ?? '';
+            this.canGoBack = route.snapshot.data['back'] ?? false;
         }
         else {
             this.title = '';
+            this.canGoBack = false;
         }
     }
 
