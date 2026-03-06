@@ -6,7 +6,9 @@
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 
+use core\Mail;
 use core\setting\Setting;
+use equal\email\Email;
 use lathus\sale\camp\Enrollment as LathusEnrollment;
 use lathus\sale\camp\Guardian as LathusGuardian;
 use lathus\sale\camp\Institution as LathusInstitution;
@@ -227,545 +229,615 @@ $formatMoney = function ($value) use($currency) {
  * Action
  */
 
-/*
-    1) Fetch enrollments from CPA Lathus API
-*/
+$result = [
+    'created'   => 0,
+    'updated'   => 0,
+    'ignored'   => 0,
+    'processed' => 0,
+    'errors'    => 0,
+    'warnings'  => 0,
+    'logs'      => []
+];
 
-$data = [];
+try {
+    /*
+        1) Fetch enrollments from CPA Lathus API
+    */
 
-$count_attempts = 0;
-$flag_success = false;
-while(!$flag_success) {
-    try {
-        $data = eQual::run('get', 'lathus_camp_enrollments');
-        $flag_success = true;
-    }
-    catch(Exception $e) {
-        ++$count_attempts;
-    }
+    $data = [];
 
-    if(!$flag_success && $count_attempts >= 3) {
-        throw new Exception('cpa_lathus_api_unreachable', QN_ERROR_UNKNOWN);
-    }
-}
+    $count_attempts = 0;
+    $flag_success = false;
+    while(!$flag_success) {
+        try {
+            $data = eQual::run('get', 'lathus_camp_enrollments');
+            $flag_success = true;
+        }
+        catch(Exception $e) {
+            ++$count_attempts;
+        }
 
-usort($data, function($a, $b) {
-    return (new DateTime($a['date']))->getTimestamp() <=> (new DateTime($b['date']))->getTimestamp();
-});
-
-/*
-    2) Add enrollments that haven't been added yet
-*/
-
-$created_enrollments = [];
-if(!empty($data)) {
-    //  2.1) Remove already handled enrollments from data received
-
-    $fetched_external_refs = [];
-    foreach($data as $ext_enrollment) {
-        $fetched_external_refs[] = $ext_enrollment['wpOrderId'];
-    }
-
-    $handled_enrollments = [];
-    if(!empty($fetched_external_refs)) {
-        $handled_enrollments = Enrollment::search(['external_ref', 'in', $fetched_external_refs])
-            ->read(['external_ref'])
-            ->get(true);
-    }
-
-    $handled_enrollments_ext_refs = array_column($handled_enrollments, 'external_ref');
-
-    foreach($data as $index => $ext_enrollment) {
-        if(in_array($ext_enrollment['wpOrderId'], $handled_enrollments_ext_refs)) {
-            unset($data[$index]);
+        if(!$flag_success && $count_attempts >= 3) {
+            ++$result['errors'];
+            $result['logs'][] = "ERR  - Unable to reach API : " . $e->getMessage();
+            throw new Exception('cpa_lathus_api_unreachable', EQ_ERROR_UNKNOWN);
         }
     }
 
-    //  2.2) Create camp map on sojourn_number key
+    usort($data, function($a, $b) {
+        return (new DateTime($a['date']))->getTimestamp() <=> (new DateTime($b['date']))->getTimestamp();
+    });
 
-    $map_soj_nums = [];
-    foreach($data as $ext_enrollment) {
-        $map_soj_nums[$ext_enrollment['metaJson']['numeroCamp']] = true;
-    }
+    /*
+        2) Add enrollments that haven't been added yet
+    */
 
-    $camps = Camp::search([
-            ['sojourn_number', 'in', array_keys($map_soj_nums)],
-            ['date_from', '>=', strtotime('first day of january this year')],
-            ['date_from', '<', strtotime('last day of december this year')]
-        ])
-        ->read(['name', 'sojourn_number', 'saturday_morning_product_id'])
-        ->get();
+    if(!empty($data)) {
+        //  2.1) Remove already handled enrollments from data received
 
-    $map_soj_nums_camps = [];
-    foreach($camps as $camp) {
-        $map_soj_nums_camps[$camp['sojourn_number']] = $camp;
-    }
-
-    //  2.3) Add external enrollments
-
-    foreach($data as $ext_enrollment) {
-        $ext_enrollment_created = (new DateTime($ext_enrollment['date']))->getTimestamp();
-        if($ext_enrollment_created < strtotime('first day of january this year')) {
-            continue;
+        $fetched_external_refs = [];
+        foreach($data as $ext_enrollment) {
+            $fetched_external_refs[] = $ext_enrollment['wpOrderId'];
         }
 
-        if(!isset($map_soj_nums_camps[$ext_enrollment['metaJson']['numeroCamp']])) {
-            continue;
+        $handled_enrollments = [];
+        if(!empty($fetched_external_refs)) {
+            $handled_enrollments = Enrollment::search(['external_ref', 'in', $fetched_external_refs])
+                ->read(['external_ref'])
+                ->get(true);
         }
 
-        $camp = $map_soj_nums_camps[$ext_enrollment['metaJson']['numeroCamp']];
+        $handled_enrollments_ext_refs = array_column($handled_enrollments, 'external_ref');
 
-        //  2.3.1) Find/create child
+        foreach($data as $index => $ext_enrollment) {
+            if(in_array($ext_enrollment['wpOrderId'], $handled_enrollments_ext_refs)) {
+                unset($data[$index]);
+            }
+        }
 
-        $ext_child = $ext_enrollment['metaJson']['enfant'];
+        //  2.2) Create camp map on sojourn_number key
 
-        $ext_child_birthdate = DateTime::createFromFormat('d/m/Y', $ext_child['dateDeNaissance'])->getTimestamp();
-        $ext_child_gender = $ext_child['sexe'] === 'Fille' ? 'F' : 'M';
+        $map_soj_nums = [];
+        foreach($data as $ext_enrollment) {
+            $map_soj_nums[$ext_enrollment['metaJson']['numeroCamp']] = true;
+        }
 
-        $child = Child::search([
-                ['firstname', 'ilike', trim($ext_child['prenom'])],
-                ['lastname', 'ilike', trim($ext_child['nom'])],
-                ['birthdate', '=', $ext_child_birthdate],
-                ['gender', '=', $ext_child_gender]
+        $camps = Camp::search([
+                ['sojourn_number', 'in', array_keys($map_soj_nums)],
+                ['date_from', '>=', strtotime('first day of january this year')],
+                ['date_from', '<', strtotime('last day of december this year')]
             ])
-            ->read(['firstname', 'lastname'])
-            ->first();
+            ->read(['name', 'sojourn_number', 'saturday_morning_product_id'])
+            ->get();
 
-        if(is_null($child)) {
-            $ext_child_horseriding = $ext_enrollment['metaJson']['equitation'] ?? null;
+        $map_soj_nums_camps = [];
+        foreach($camps as $camp) {
+            $map_soj_nums_camps[$camp['sojourn_number']] = $camp;
+        }
 
-            $child = Child::create([
-                    'firstname'         => ucwords(strtolower($ext_child['prenom'])),
-                    'lastname'          => $ext_child['nom'],
-                    'birthdate'         => $ext_child_birthdate,
-                    'gender'            => $ext_child_gender,
-                    'is_cpa_member'     => $ext_enrollment['metaJson']['aides']['hasClubCpa'] ?? false,
-                    'cpa_club'          => $ext_enrollment['metaJson']['aides']['clubCpa'] ?? null,
-                    'has_license_ffe'   => !is_null($ext_child_horseriding),
-                    'license_ffe'       => $ext_child_horseriding ? $ext_child_horseriding['dernierGalopValide'] : null,
-                    'year_license_ffe'  => !empty($ext_child_horseriding['anneeLicence']) && is_numeric($ext_child_horseriding['anneeLicence']) ? intval($ext_child_horseriding['anneeLicence']) : null,
-                    'external_ref'      => $ext_enrollment['wpOrderId']
+        //  2.3) Add external enrollments
+
+        foreach($data as $ext_enrollment) {
+            $ext_enrollment_created = (new DateTime($ext_enrollment['date']))->getTimestamp();
+            if($ext_enrollment_created < strtotime('first day of january this year')) {
+                continue;
+            }
+
+            if(!isset($map_soj_nums_camps[$ext_enrollment['metaJson']['numeroCamp']])) {
+                continue;
+            }
+
+            $camp = $map_soj_nums_camps[$ext_enrollment['metaJson']['numeroCamp']];
+
+            //  2.3.1) Find/create child
+
+            $ext_child = $ext_enrollment['metaJson']['enfant'];
+
+            $ext_child_birthdate = DateTime::createFromFormat('d/m/Y', $ext_child['dateDeNaissance'])->getTimestamp();
+            $ext_child_gender = $ext_child['sexe'] === 'Fille' ? 'F' : 'M';
+
+            $child = Child::search([
+                    ['firstname', 'ilike', trim($ext_child['prenom'])],
+                    ['lastname', 'ilike', trim($ext_child['nom'])],
+                    ['birthdate', '=', $ext_child_birthdate],
+                    ['gender', '=', $ext_child_gender]
                 ])
                 ->read(['firstname', 'lastname'])
                 ->first();
-        }
 
-        //  2.3.2) Create guardians and institution
+            if(is_null($child)) {
+                $ext_child_horseriding = $ext_enrollment['metaJson']['equitation'] ?? null;
 
-        //  2.3.2.1) Create main guardian
+                $child = Child::create([
+                        'firstname'         => ucwords(strtolower($ext_child['prenom'])),
+                        'lastname'          => $ext_child['nom'],
+                        'birthdate'         => $ext_child_birthdate,
+                        'gender'            => $ext_child_gender,
+                        'is_cpa_member'     => $ext_enrollment['metaJson']['aides']['hasClubCpa'] ?? false,
+                        'cpa_club'          => $ext_enrollment['metaJson']['aides']['clubCpa'] ?? null,
+                        'has_license_ffe'   => !is_null($ext_child_horseriding),
+                        'license_ffe'       => $ext_child_horseriding ? $ext_child_horseriding['dernierGalopValide'] : null,
+                        'year_license_ffe'  => !empty($ext_child_horseriding['anneeLicence']) && is_numeric($ext_child_horseriding['anneeLicence']) ? intval($ext_child_horseriding['anneeLicence']) : null,
+                        'external_ref'      => $ext_enrollment['wpOrderId']
+                    ])
+                    ->read(['firstname', 'lastname'])
+                    ->first();
+            }
 
-        $main_guardian = $findOrCreateGuardian($ext_enrollment['metaJson']['pere'], $ext_child, $child['id']);
+            //  2.3.2) Create guardians and institution
 
-        Child::id($child['id'])->update(['main_guardian_id' => $main_guardian['id']]);
+            //  2.3.2.1) Create main guardian
 
-        //  2.3.2.2) Create second guardian or institution
+            $main_guardian = $findOrCreateGuardian($ext_enrollment['metaJson']['pere'], $ext_child, $child['id']);
 
-        switch($ext_enrollment['metaJson']['typeReservation']) {
-            case 'Particulier':
-                $ext_second_guardian = $ext_enrollment['metaJson']['mere'];
+            Child::id($child['id'])->update(['main_guardian_id' => $main_guardian['id']]);
 
-                if(!empty($ext_second_guardian['prenom']) && !empty($ext_second_guardian['nom'])) {
-                    $findOrCreateGuardian($ext_second_guardian, $ext_child, $child['id']);
+            //  2.3.2.2) Create second guardian or institution
+
+            switch($ext_enrollment['metaJson']['typeReservation']) {
+                case 'Particulier':
+                    $ext_second_guardian = $ext_enrollment['metaJson']['mere'];
+
+                    if(!empty($ext_second_guardian['prenom']) && !empty($ext_second_guardian['nom'])) {
+                        $findOrCreateGuardian($ext_second_guardian, $ext_child, $child['id']);
+                    }
+                    break;
+                case 'Structure':
+                    $institution = $findOrCreateInstitution($ext_enrollment['metaJson']['institution']);
+
+                    Child::id($child['id'])->update([
+                        'is_foster'         => true,
+                        'institution_id'    => $institution['id']
+                    ]);
+
+                    break;
+            }
+
+            //  2.3.4) Create enrollment
+
+            $c = Camp::id($camp['id'])
+                ->read(['max_children', 'enrollments_qty'])
+                ->first();
+
+            $enrollment_status = 'pending';
+            if($c['enrollments_qty'] >= $c['max_children']) {
+                $enrollment_status = 'waitlisted';
+            }
+
+            $enrollment_phone = null;
+            if(!empty($ext_child['telephone'])) {
+                $enrollment_phone = $sanitizePhoneNumber($ext_child['telephone']);
+                if(empty($enrollment_phone)) {
+                    $enrollment_phone = null;
                 }
-                break;
-            case 'Structure':
-                $institution = $findOrCreateInstitution($ext_enrollment['metaJson']['institution']);
+            }
 
-                Child::id($child['id'])->update([
-                    'is_foster'         => true,
-                    'institution_id'    => $institution['id']
+            $enrollment = LathusEnrollment::create([
+                    'date_created'      => $ext_enrollment_created,
+                    'camp_id'           => $camp['id'],
+                    'child_id'          => $child['id'],
+                    'main_guardian_id'  => $main_guardian['id'],
+                    'is_external'       => true,
+                    'external_ref'      => $ext_enrollment['wpOrderId'],
+                    'external_data'     => json_encode($ext_enrollment),
+                    'status'            => $enrollment_status,
+                    'phone'             => $enrollment_phone
+                ])
+                ->read(['center_office_id', 'camp_id' => ['date_from']])
+                ->first();
+
+            ++$result['created'];
+            $result['logs'][] = "INFO - Created enrollment [{$enrollment['id']}]: " . json_encode([
+                    'id'                => $enrollment['id'],
+                    'status'            => $enrollment_status,
+                    'external_ref'      => $ext_enrollment['wpOrderId'],
+                    'camp'              => [
+                        'id'                => $camp['id'],
+                        'name'              => $camp['name']
+                    ],
+                    'child'             => [
+                        'id'                => $child['id'],
+                        'firstname'         => $child['firstname'],
+                        'lastname'          => $child['lastname']
+                    ]
                 ]);
 
-                break;
-        }
+            $enrollment_warnings = [];
 
-        //  2.3.4) Create enrollment
+            //  2.3.5) Handle adding additional enrollment lines if child stays on the weekend or until Saturday
 
-        $c = Camp::id($camp['id'])
-            ->read(['max_children', 'enrollments_qty'])
-            ->first();
-
-        $enrollment_status = 'pending';
-        if($c['enrollments_qty'] >= $c['max_children']) {
-            $enrollment_status = 'waitlisted';
-        }
-
-        $enrollment_phone = null;
-        if(!empty($ext_child['telephone'])) {
-            $enrollment_phone = $sanitizePhoneNumber($ext_child['telephone']);
-            if(empty($enrollment_phone)) {
-                $enrollment_phone = null;
-            }
-        }
-
-        $enrollment = LathusEnrollment::create([
-                'date_created'      => $ext_enrollment_created,
-                'camp_id'           => $camp['id'],
-                'child_id'          => $child['id'],
-                'main_guardian_id'  => $main_guardian['id'],
-                'is_external'       => true,
-                'external_ref'      => $ext_enrollment['wpOrderId'],
-                'external_data'     => json_encode($ext_enrollment),
-                'status'            => $enrollment_status,
-                'phone'             => $enrollment_phone
-            ])
-            ->read(['center_office_id', 'camp_id' => ['date_from']])
-            ->first();
-
-        $created_enrollments[] = [
-            'id'                => $enrollment['id'],
-            'status'            => $enrollment_status,
-            'external_ref'      => $ext_enrollment['wpOrderId'],
-            'camp'              => [
-                'id'                => $camp['id'],
-                'name'              => $camp['name']
-            ],
-            'child'             => [
-                'id'                => $child['id'],
-                'firstname'         => $child['firstname'],
-                'lastname'          => $child['lastname']
-            ]
-        ];
-
-        $enrollment_warnings = [];
-
-        //  2.3.5) Handle adding additional enrollment lines if child stays on the weekend or until Saturday
-
-        $saturday_morning = false;
-        $weekend = false;
-        foreach($ext_enrollment['metaJson']['sejour']['montantOptionPourCalcul'] as $option) {
-            if(strpos($option, 'Option 1') === 0) {
-                $saturday_morning = true;
-            }
-            elseif(strpos($option, 'Option 2') === 0) {
-                $weekend = true;
-            }
-        }
-
-        if($saturday_morning !== $weekend) {
-            $weekend_extra = $saturday_morning ? 'saturday-morning' : 'full';
-
-            Enrollment::id($enrollment['id'])->update(['weekend_extra' => $weekend_extra]);
-        }
-        elseif($saturday_morning && $weekend) {
-            Enrollment::id($enrollment['id'])->update(['weekend_extra' => 'full']);
-
-            $dispatch->dispatch('lodging.camp.pull_enrollments.weekend_extra_inconsistency', 'sale\camp\Enrollment', $enrollment['id'], 'warning', null, [], [], null, 1);
-        }
-
-        //  2.3.5) Create price adapters for: sponsors, works councils, loyalty discounts and custom discounts
-
-        $discount_amount = 0;
-
-        if(isset($ext_enrollment['metaJson']['reductions'])) {
-            $sponsorings = $ext_enrollment['metaJson']['reductions'];
-
-            //  2.3.5.1) Handle sponsor "commune"
-
-            if(!empty($sponsorings['montantAideCommunePourCalcul'])) {
-                $sponsor_name = preg_replace("/\s*\([^)]*\)/", "", $sponsorings['montantAideCommunePourCalcul']);
-
-                $sponsor = Sponsor::search([
-                    ['name', 'ilike', $sponsor_name],
-                    ['sponsor_type', '=', 'commune']
-                ])
-                    ->read(['name', 'amount', 'sponsor_type'])
-                    ->first();
-
-                if(!is_null($sponsor)) {
-                    PriceAdapter::create([
-                        'enrollment_id'         => $enrollment['id'],
-                        'sponsor_id'            => $sponsor['id'],
-                        'name'                  => $sponsor['name'],
-                        'value'                 => intval($sponsorings['montantAideCommune']),
-                        'origin_type'           => $sponsor['sponsor_type'],
-                        'price_adapter_type'    => 'amount',
-                        'is_manual_discount'    => false
-                    ]);
+            $saturday_morning = false;
+            $weekend = false;
+            foreach($ext_enrollment['metaJson']['sejour']['montantOptionPourCalcul'] as $option) {
+                if(strpos($option, 'Option 1') === 0) {
+                    $saturday_morning = true;
                 }
-                else {
-                    PriceAdapter::create([
-                        'enrollment_id'         => $enrollment['id'],
-                        'name'                  => $sponsorings['montantAideCommunePourCalcul'],
-                        'value'                 => intval($sponsorings['montantAideCommune']),
-                        'origin_type'           => 'commune',
-                        'price_adapter_type'    => 'amount',
-                        'is_manual_discount'    => false
-                    ]);
-
-                    $dispatch->dispatch('lodging.camp.pull_enrollments.sponsor_not_found', 'sale\camp\Enrollment', $enrollment['id'], 'important', null, [], [], null, 1);
-
-                    $enrollment_warnings[] = "Nom de l'aidant (commune) non trouvé : {$sponsorings['montantAideCommunePourCalcul']}";
+                elseif(strpos($option, 'Option 2') === 0) {
+                    $weekend = true;
                 }
             }
 
-            //  2.3.5.2) Handle sponsor "community-of-communes"
+            if($saturday_morning !== $weekend) {
+                $weekend_extra = $saturday_morning ? 'saturday-morning' : 'full';
 
-            if(!empty($sponsorings['montantPriseEnChargePourCalcul'])) {
-                $sponsor_name = preg_replace("/\s*\([^)]*\)/", "", $sponsorings['montantPriseEnChargePourCalcul']);
+                Enrollment::id($enrollment['id'])->update(['weekend_extra' => $weekend_extra]);
+            }
+            elseif($saturday_morning && $weekend) {
+                Enrollment::id($enrollment['id'])->update(['weekend_extra' => 'full']);
 
-                $sponsor = Sponsor::search([
+                $dispatch->dispatch('lodging.camp.pull_enrollments.weekend_extra_inconsistency', 'sale\camp\Enrollment', $enrollment['id'], 'warning', null, [], [], null, 1);
+            }
+
+            //  2.3.5) Create price adapters for: sponsors, works councils, loyalty discounts and custom discounts
+
+            $discount_amount = 0;
+
+            if(isset($ext_enrollment['metaJson']['reductions'])) {
+                $sponsorings = $ext_enrollment['metaJson']['reductions'];
+
+                //  2.3.5.1) Handle sponsor "commune"
+
+                if(!empty($sponsorings['montantAideCommunePourCalcul'])) {
+                    $sponsor_name = preg_replace("/\s*\([^)]*\)/", "", $sponsorings['montantAideCommunePourCalcul']);
+
+                    $sponsor = Sponsor::search([
                         ['name', 'ilike', $sponsor_name],
-                        ['sponsor_type', '=', 'community-of-communes']
+                        ['sponsor_type', '=', 'commune']
                     ])
-                    ->read(['name', 'amount', 'sponsor_type'])
-                    ->first();
+                        ->read(['name', 'amount', 'sponsor_type'])
+                        ->first();
 
-                if(!is_null($sponsor)) {
-                    PriceAdapter::create([
-                        'enrollment_id'         => $enrollment['id'],
-                        'sponsor_id'            => $sponsor['id'],
-                        'name'                  => $sponsor['name'],
-                        'value'                 => intval($sponsorings['montantPriseEnCharge']),
-                        'origin_type'           => $sponsor['sponsor_type'],
-                        'price_adapter_type'    => 'amount',
-                        'is_manual_discount'    => false
-                    ]);
+                    if(!is_null($sponsor)) {
+                        PriceAdapter::create([
+                            'enrollment_id'         => $enrollment['id'],
+                            'sponsor_id'            => $sponsor['id'],
+                            'name'                  => $sponsor['name'],
+                            'value'                 => intval($sponsorings['montantAideCommune']),
+                            'origin_type'           => $sponsor['sponsor_type'],
+                            'price_adapter_type'    => 'amount',
+                            'is_manual_discount'    => false
+                        ]);
+                    }
+                    else {
+                        PriceAdapter::create([
+                            'enrollment_id'         => $enrollment['id'],
+                            'name'                  => $sponsorings['montantAideCommunePourCalcul'],
+                            'value'                 => intval($sponsorings['montantAideCommune']),
+                            'origin_type'           => 'commune',
+                            'price_adapter_type'    => 'amount',
+                            'is_manual_discount'    => false
+                        ]);
+
+                        $dispatch->dispatch('lodging.camp.pull_enrollments.sponsor_not_found', 'sale\camp\Enrollment', $enrollment['id'], 'important', null, [], [], null, 1);
+
+                        $enrollment_warnings[] = "Nom de l'aide (commune) non trouvé : {$sponsorings['montantAideCommunePourCalcul']}";
+
+                        ++$result['warnings'];
+                        $result['logs'][] = "WARN - No sponsor found in {$sponsorings['montantAideCommunePourCalcul']} for enrollment [{$enrollment['id']}].";
+                    }
                 }
-                else {
+
+                //  2.3.5.2) Handle sponsor "community-of-communes"
+
+                if(!empty($sponsorings['montantPriseEnChargePourCalcul'])) {
+                    $sponsor_name = preg_replace("/\s*\([^)]*\)/", "", $sponsorings['montantPriseEnChargePourCalcul']);
+
+                    $sponsor = Sponsor::search([
+                            ['name', 'ilike', $sponsor_name],
+                            ['sponsor_type', '=', 'community-of-communes']
+                        ])
+                        ->read(['name', 'amount', 'sponsor_type'])
+                        ->first();
+
+                    if(!is_null($sponsor)) {
+                        PriceAdapter::create([
+                            'enrollment_id'         => $enrollment['id'],
+                            'sponsor_id'            => $sponsor['id'],
+                            'name'                  => $sponsor['name'],
+                            'value'                 => intval($sponsorings['montantPriseEnCharge']),
+                            'origin_type'           => $sponsor['sponsor_type'],
+                            'price_adapter_type'    => 'amount',
+                            'is_manual_discount'    => false
+                        ]);
+                    }
+                    else {
+                        PriceAdapter::create([
+                            'enrollment_id'         => $enrollment['id'],
+                            'name'                  => $sponsorings['montantPriseEnChargePourCalcul'],
+                            'value'                 => intval($sponsorings['montantPriseEnCharge']),
+                            'origin_type'           => 'community-of-communes',
+                            'price_adapter_type'    => 'amount',
+                            'is_manual_discount'    => true
+                        ]);
+
+                        $dispatch->dispatch('lodging.camp.pull_enrollments.sponsor_not_found', 'sale\camp\Enrollment', $enrollment['id'], 'important', null, [], [], null, 1);
+
+                        $enrollment_warnings[] = "Nom de l'aide (communauté de communes) non trouvé : {$sponsorings['montantPriseEnChargePourCalcul']}";
+
+                        ++$result['warnings'];
+                        $result['logs'][] = "WARN - No sponsor found in {$sponsorings['montantPriseEnChargePourCalcul']} for enrollment [{$enrollment['id']}].";
+                    }
+                }
+
+                //  2.3.5.3) Handle works council
+
+                if(!empty($sponsorings['montantComiteEntreprisePourCalcul'])) {
+                    $works_council = WorksCouncil::search(['name', 'ilike', $sponsorings['montantComiteEntreprisePourCalcul']])
+                        ->read(['code'])
+                        ->first();
+
+                    if(!is_null($works_council)) {
+                        if(isset($ext_enrollment['metaJson']['code']['ce']) && strtoupper(trim($ext_enrollment['metaJson']['code']['ce'])) === strtoupper($works_council['code'])) {
+                            Enrollment::id($enrollment['id'])
+                                ->update(['works_council_id' => $works_council['id']]);
+                        }
+                        else {
+                            $dispatch->dispatch('lodging.camp.pull_enrollments.work_council_wrong_code', 'sale\camp\Enrollment', $enrollment['id'], 'warning', null, [], [], null, 1);
+
+                            if(empty($ext_enrollment['metaJson']['code']['ce'])) {
+                                $enrollment_warnings[] = "Aucun code CE renseigné par le client.";
+
+                                ++$result['warnings'];
+                                $result['logs'][] = "WARN - No CE code provided for enrollment [{$enrollment['id']}].";
+                            }
+                            else {
+                                $enrollment_warnings[] = "Code CE renseigné par client : {$ext_enrollment['metaJson']['code']['ce']}";
+
+                                ++$result['warnings'];
+                                $result['logs'][] = "WARN - Unknwon provided CE code [{$ext_enrollment['metaJson']['code']['ce']}] for enrollment [{$enrollment['id']}].";
+                            }
+                        }
+                    }
+                    else {
+                        $dispatch->dispatch('lodging.camp.pull_enrollments.work_council_not_found', 'sale\camp\Enrollment', $enrollment['id'], 'important', null, [], [], null, 1);
+
+                        $enrollment_warnings[] = "Nom du CE (conseil d'entreprise) non trouvé : {$sponsorings['montantComiteEntreprisePourCalcul']}";
+
+                        ++$result['warnings'];
+                        $result['logs'][] = "WARN - Unknwon provided CE code [{$sponsorings['montantComiteEntreprisePourCalcul']}] for enrollment [{$enrollment['id']}].";
+                    }
+                }
+
+                //  2.3.5.4) Handle loyalty discount
+
+                if(!empty($sponsorings['montantOptionFidelitePourCalcul'])) {
+                    $discount = null;
+                    if(strpos($sponsorings['montantOptionFidelitePourCalcul'], 'Option 1') === 0) {
+                        $discount = '80_euro';
+                    }
+                    elseif(strpos($sponsorings['montantOptionFidelitePourCalcul'], 'Option 2') === 0) {
+                        $discount = '10_percent';
+                    }
+
+                    switch($discount) {
+                        case '80_euro':
+                            PriceAdapter::create([
+                                'enrollment_id'         => $enrollment['id'],
+                                'name'                  => "Réduction de 80 €",
+                                'description'           => "Réduction de 80 € sur le 3e séjour de la même famille (frère ou sœur)",
+                                'value'                 => floatval($sponsorings['montantOptionFidelite']),
+                                'origin_type'           => 'loyalty-discount',
+                                'price_adapter_type'    => 'amount',
+                                'is_manual_discount'    => true
+                            ]);
+                            break;
+                        case '10_percent':
+                            // Use amount "price_adapter_type" for 10% to be sure to have same discount as the one proposed online
+                            PriceAdapter::create([
+                                'enrollment_id'         => $enrollment['id'],
+                                'name'                  => "Réduction de 10%",
+                                'description'           => "Réduction de 10% sur le tarif du 2e séjour du même enfant",
+                                'value'                 => floatval($sponsorings['montantOptionFidelite']),
+                                'origin_type'           => 'loyalty-discount',
+                                'price_adapter_type'    => 'amount',
+                                'is_manual_discount'    => true
+                            ]);
+                            break;
+                    }
+
+                    $discount_amount += floatval($sponsorings['montantOptionFidelite']);
+                }
+
+                //  2.3.5.5) Handle custom discount
+
+                if(!empty($sponsorings['montantAutre'])) {
                     PriceAdapter::create([
                         'enrollment_id'         => $enrollment['id'],
-                        'name'                  => $sponsorings['montantPriseEnChargePourCalcul'],
-                        'value'                 => intval($sponsorings['montantPriseEnCharge']),
-                        'origin_type'           => 'community-of-communes',
+                        'name'                  => !empty($sponsorings['libelleAutre']) ? $sponsorings['libelleAutre'] : "Autre aide (préciser)",
+                        'description'           => "Aide entrée par l'utilisateur lors de l'inscription en ligne.",
+                        'value'                 => floatval($sponsorings['montantAutre']),
+                        'origin_type'           => 'other',
                         'price_adapter_type'    => 'amount',
                         'is_manual_discount'    => true
                     ]);
 
-                    $dispatch->dispatch('lodging.camp.pull_enrollments.sponsor_not_found', 'sale\camp\Enrollment', $enrollment['id'], 'important', null, [], [], null, 1);
-
-                    $enrollment_warnings[] = "Nom de l'aidant (communauté de communes) non trouvé : {$sponsorings['montantPriseEnChargePourCalcul']}";
+                    $discount_amount += floatval($sponsorings['montantAutre']);
                 }
             }
 
-            //  2.3.5.3) Handle works council
+            //  2.3.6) Handle help from CAF and MSA
 
-            if(!empty($sponsorings['montantComiteEntreprisePourCalcul'])) {
-                $works_council = WorksCouncil::search(['name', 'ilike', $sponsorings['montantComiteEntreprisePourCalcul']])
-                    ->read(['code'])
-                    ->first();
+            if(isset($ext_enrollment['metaJson']['aides'])) {
+                $helps = $ext_enrollment['metaJson']['aides'];
 
-                if(!is_null($works_council)) {
-                    if(isset($ext_enrollment['metaJson']['code']['ce']) && strtoupper(trim($ext_enrollment['metaJson']['code']['ce'])) === strtoupper($works_council['code'])) {
-                        Enrollment::id($enrollment['id'])
-                            ->update(['works_council_id' => $works_council['id']]);
-                    }
-                    else {
-                        $dispatch->dispatch('lodging.camp.pull_enrollments.work_council_wrong_code', 'sale\camp\Enrollment', $enrollment['id'], 'warning', null, [], [], null, 1);
+                if(!empty($helps['montantCaf'])) {
+                    PriceAdapter::create([
+                        'enrollment_id'         => $enrollment['id'],
+                        'name'                  => "CAF".(!empty(trim($helps['libelleCaf'])) ? ': "'.trim($helps['libelleCaf']).'"' : ''),
+                        'description'           => "Aide CAF".(!empty(trim($helps['libelleCaf'])) ? ': "'.trim($helps['libelleCaf']).'"' : ''),
+                        'value'                 => floatval($helps['montantCaf']),
+                        'origin_type'           => 'department-caf',
+                        'price_adapter_type'    => 'amount',
+                        'is_manual_discount'    => true
+                    ]);
+                }
 
-                        if(empty($ext_enrollment['metaJson']['code']['ce'])) {
-                            $enrollment_warnings[] = "Aucun code CE renseigné par le client.";
+                if(!empty($helps['montantMSA'])) {
+                    PriceAdapter::create([
+                        'enrollment_id'         => $enrollment['id'],
+                        'name'                  => "MSA".(!empty(trim($helps['libelleMSA'])) ? ': "'.trim($helps['libelleMSA']).'"' : ''),
+                        'description'           => "Aide MSA".(!empty(trim($helps['libelleMSA'])) ? ': "'.trim($helps['libelleMSA']).'"' : ''),
+                        'value'                 => floatval($helps['montantMSA']),
+                        'origin_type'           => 'department-msa',
+                        'price_adapter_type'    => 'amount',
+                        'is_manual_discount'    => true
+                    ]);
+                }
+            }
+
+            //  2.3.7) Force price of the enrollment to the one given by Lathus API
+
+            $ext_price = floatval($ext_enrollment['metaJson']['sejour']['montantTotal']);
+            if(!empty($ext_enrollment['metaJson']['sejour']['montantOption'])) {
+                $ext_price += floatval($ext_enrollment['metaJson']['sejour']['montantOption']);
+            }
+
+            $enrollment_price = Enrollment::id($enrollment['id'])->read(['price'])->first()['price'];
+            $ext_price_discounted = $ext_price - $discount_amount;
+            if($enrollment_price !== $ext_price_discounted) {
+                $dispatch->dispatch('lodging.camp.pull_enrollments.price_mismatch', 'sale\camp\Enrollment', $enrollment['id'], 'warning', null, [], [], null, 1);
+                $enrollment_warnings[] = "Prix calculé par le site web {$formatMoney($ext_price_discounted)}";
+                $enrollment_warnings[] = "Prix calculé par Discope {$formatMoney($enrollment_price)}";
+                ++$result['warnings'];
+                $result['logs'][] = "WARN - Computed price mismatch for enrollment [{$enrollment['id']}].";
+            }
+
+            //  2.3.9) Cancel or confirm enrollment
+
+            if($ext_enrollment['status'] === 'cancelled') {
+                try {
+                    //  If customer cancelled the enrollment
+                    eQual::run('do', 'sale_camp_enrollment_cancel', [
+                        'id'        => $enrollment['id'],
+                        'reason'    => 'other',
+                        'fee'       => 0
+                    ]);
+                }
+                catch(Exception $e) {
+                    trigger_error("APP::sale_camp_enrollment_cancel unable to cancel the enrollment", E_USER_WARNING,);
+                    $dispatch->dispatch('lodging.camp.pull_enrollments.cancel_error', 'sale\camp\Enrollment', $enrollment['id'], 'important', null, [], [], null, 1);
+                }
+            }
+            elseif($enrollment_status === 'pending') {
+                try {
+                    //  If spot available confirm, else add to waiting list
+                    eQual::run('do', 'sale_camp_enrollment_confirm', [
+                        'id' => $enrollment['id']
+                    ]);
+                }
+                catch(Exception $e) {
+                    trigger_error("APP::sale_camp_enrollment_confirm unable to confirm the enrollment", E_USER_WARNING,);
+                    $dispatch->dispatch('lodging.camp.pull_enrollments.confirm_error', 'sale\camp\Enrollment', $enrollment['id'], 'important', null, [], [], null, 1);
+                }
+            }
+
+            //  2.3.10) Handle payments
+
+            if(!empty($ext_enrollment['metaJson']['reglement']['montantChequesVacances'])) {
+                Task::create([
+                    'enrollment_id' => $enrollment['id'],
+                    'name'          => 'Réception chèque vacances',
+                    'notes'         => "Montant du chèque vacances attendu {$formatMoney($ext_enrollment['metaJson']['reglement']['montantChequesVacances'])}"
+                ]);
+            }
+
+            if(isset($ext_enrollment['metaJson']['payment']['method'])) {
+                switch($ext_enrollment['metaJson']['payment']['method']) {
+                    case 'cheque':
+                        if(!empty($ext_enrollment['metaJson']['reglement']['montantCheque'])) {
+                            Task::create([
+                                'enrollment_id' => $enrollment['id'],
+                                'name'          => 'Réception chèque bancaire',
+                                'notes'         => "Montant du chèque bancaire attendu {$formatMoney($ext_enrollment['metaJson']['reglement']['montantCheque'])}"
+                            ]);
                         }
-                        else {
-                            $enrollment_warnings[] = "Code CE renseigné par client : {$ext_enrollment['metaJson']['code']['ce']}";
-                        }
-                    }
-                }
-                else {
-                    $dispatch->dispatch('lodging.camp.pull_enrollments.work_council_not_found', 'sale\camp\Enrollment', $enrollment['id'], 'important', null, [], [], null, 1);
-
-                    $enrollment_warnings[] = "Nom du CE (conseil d'entreprise) non trouvé : {$sponsorings['montantComiteEntreprisePourCalcul']}";
-                }
-            }
-
-            //  2.3.5.4) Handle loyalty discount
-
-            if(!empty($sponsorings['montantOptionFidelitePourCalcul'])) {
-                $discount = null;
-                if(strpos($sponsorings['montantOptionFidelitePourCalcul'], 'Option 1') === 0) {
-                    $discount = '80_euro';
-                }
-                elseif(strpos($sponsorings['montantOptionFidelitePourCalcul'], 'Option 2') === 0) {
-                    $discount = '10_percent';
-                }
-
-                switch($discount) {
-                    case '80_euro':
-                        PriceAdapter::create([
-                            'enrollment_id'         => $enrollment['id'],
-                            'name'                  => "Réduction de 80 €",
-                            'description'           => "Réduction de 80 € sur le 3e séjour de la même famille (frère ou sœur)",
-                            'value'                 => floatval($sponsorings['montantOptionFidelite']),
-                            'origin_type'           => 'loyalty-discount',
-                            'price_adapter_type'    => 'amount',
-                            'is_manual_discount'    => true
-                        ]);
                         break;
-                    case '10_percent':
-                        // Use amount "price_adapter_type" for 10% to be sure to have same discount as the one proposed online
-                        PriceAdapter::create([
-                            'enrollment_id'         => $enrollment['id'],
-                            'name'                  => "Réduction de 10%",
-                            'description'           => "Réduction de 10% sur le tarif du 2e séjour du même enfant",
-                            'value'                 => floatval($sponsorings['montantOptionFidelite']),
-                            'origin_type'           => 'loyalty-discount',
-                            'price_adapter_type'    => 'amount',
-                            'is_manual_discount'    => true
-                        ]);
-                        break;
-                }
-
-                $discount_amount += floatval($sponsorings['montantOptionFidelite']);
-            }
-
-            //  2.3.5.5) Handle custom discount
-
-            if(!empty($sponsorings['montantAutre'])) {
-                PriceAdapter::create([
-                    'enrollment_id'         => $enrollment['id'],
-                    'name'                  => !empty($sponsorings['libelleAutre']) ? $sponsorings['libelleAutre'] : "Autre aide (préciser)",
-                    'description'           => "Aide entrée par l'utilisateur lors de l'inscription en ligne.",
-                    'value'                 => floatval($sponsorings['montantAutre']),
-                    'origin_type'           => 'other',
-                    'price_adapter_type'    => 'amount',
-                    'is_manual_discount'    => true
-                ]);
-
-                $discount_amount += floatval($sponsorings['montantAutre']);
-            }
-        }
-
-        //  2.3.6) Handle help from CAF and MSA
-
-        if(isset($ext_enrollment['metaJson']['aides'])) {
-            $helps = $ext_enrollment['metaJson']['aides'];
-
-            if(!empty($helps['montantCaf'])) {
-                PriceAdapter::create([
-                    'enrollment_id'         => $enrollment['id'],
-                    'name'                  => "CAF".(!empty(trim($helps['libelleCaf'])) ? ': "'.trim($helps['libelleCaf']).'"' : ''),
-                    'description'           => "Aide CAF".(!empty(trim($helps['libelleCaf'])) ? ': "'.trim($helps['libelleCaf']).'"' : ''),
-                    'value'                 => floatval($helps['montantCaf']),
-                    'origin_type'           => 'department-caf',
-                    'price_adapter_type'    => 'amount',
-                    'is_manual_discount'    => true
-                ]);
-            }
-
-            if(!empty($helps['montantMSA'])) {
-                PriceAdapter::create([
-                    'enrollment_id'         => $enrollment['id'],
-                    'name'                  => "MSA".(!empty(trim($helps['libelleMSA'])) ? ': "'.trim($helps['libelleMSA']).'"' : ''),
-                    'description'           => "Aide MSA".(!empty(trim($helps['libelleMSA'])) ? ': "'.trim($helps['libelleMSA']).'"' : ''),
-                    'value'                 => floatval($helps['montantMSA']),
-                    'origin_type'           => 'department-msa',
-                    'price_adapter_type'    => 'amount',
-                    'is_manual_discount'    => true
-                ]);
-            }
-        }
-
-        //  2.3.7) Force price of the enrollment to the one given by Lathus API
-
-        $ext_price = floatval($ext_enrollment['metaJson']['sejour']['montantTotal']);
-        if(!empty($ext_enrollment['metaJson']['sejour']['montantOption'])) {
-            $ext_price += floatval($ext_enrollment['metaJson']['sejour']['montantOption']);
-        }
-
-        $enrollment_price = Enrollment::id($enrollment['id'])->read(['price'])->first()['price'];
-        $ext_price_discounted = $ext_price - $discount_amount;
-        if($enrollment_price !== $ext_price_discounted) {
-            $dispatch->dispatch('lodging.camp.pull_enrollments.price_mismatch', 'sale\camp\Enrollment', $enrollment['id'], 'warning', null, [], [], null, 1);
-
-            $enrollment_warnings[] = "Prix calculé par le site web {$formatMoney($ext_price_discounted)}";
-            $enrollment_warnings[] = "Prix calculé par Discope {$formatMoney($enrollment_price)}";
-        }
-
-        //  2.3.9) Cancel or confirm enrollment
-
-        if($ext_enrollment['status'] === 'cancelled') {
-            try {
-                //  If customer cancelled the enrollment
-                eQual::run('do', 'sale_camp_enrollment_cancel', [
-                    'id'        => $enrollment['id'],
-                    'reason'    => 'other',
-                    'fee'       => 0
-                ]);
-            }
-            catch(Exception $e) {
-                trigger_error("APP::sale_camp_enrollment_cancel unable to cancel the enrollment", E_USER_WARNING,);
-                $dispatch->dispatch('lodging.camp.pull_enrollments.cancel_error', 'sale\camp\Enrollment', $enrollment['id'], 'important', null, [], [], null, 1);
-            }
-        }
-        elseif($enrollment_status === 'pending') {
-            try {
-                //  If spot available confirm, else add to waiting list
-                eQual::run('do', 'sale_camp_enrollment_confirm', [
-                    'id' => $enrollment['id']
-                ]);
-            }
-            catch(Exception $e) {
-                trigger_error("APP::sale_camp_enrollment_confirm unable to confirm the enrollment", E_USER_WARNING,);
-                $dispatch->dispatch('lodging.camp.pull_enrollments.confirm_error', 'sale\camp\Enrollment', $enrollment['id'], 'important', null, [], [], null, 1);
-            }
-        }
-
-        //  2.3.10) Handle payments
-
-        if(!empty($ext_enrollment['metaJson']['reglement']['montantChequesVacances'])) {
-            Task::create([
-                'enrollment_id' => $enrollment['id'],
-                'name'          => 'Réception chèque vacances',
-                'notes'         => "Montant du chèque vacances attendu {$formatMoney($ext_enrollment['metaJson']['reglement']['montantChequesVacances'])}"
-            ]);
-        }
-
-        if(isset($ext_enrollment['metaJson']['payment']['method'])) {
-            switch($ext_enrollment['metaJson']['payment']['method']) {
-                case 'cheque':
-                    if(!empty($ext_enrollment['metaJson']['reglement']['montantCheque'])) {
-                        Task::create([
-                            'enrollment_id' => $enrollment['id'],
-                            'name'          => 'Réception chèque bancaire',
-                            'notes'         => "Montant du chèque bancaire attendu {$formatMoney($ext_enrollment['metaJson']['reglement']['montantCheque'])}"
-                        ]);
-                    }
-                    break;
-                case 'monetico':
-                    if(
-                        !empty($ext_enrollment['metaJson']['reglement']['montantCB'])
-                        && !in_array($ext_enrollment['metaJson']['payment']['status'], ['failed', 'cancelled'])
-                    ) {
-                        $funding = Funding::search(['enrollment_id', '=', $enrollment['id']])
-                            ->read(['id'])
-                            ->first();
-
-                        if(is_null($funding)) {
-                            //  If not confirmed we need to create the funding anyway to handle the payment
-                            Enrollment::id($enrollment['id'])->do('generate_funding');
-
+                    case 'monetico':
+                        if(
+                            !empty($ext_enrollment['metaJson']['reglement']['montantCB'])
+                            && !in_array($ext_enrollment['metaJson']['payment']['status'], ['failed', 'cancelled'])
+                        ) {
                             $funding = Funding::search(['enrollment_id', '=', $enrollment['id']])
                                 ->read(['id'])
                                 ->first();
-                        }
 
-                        Payment::create([
-                                'enrollment_id'     => $enrollment['id'],
-                                'center_office_id'  => $enrollment['center_office_id'],
-                                'is_manual'         => false,
-                                'amount'            => floatval($ext_enrollment['metaJson']['reglement']['montantCB']),
-                                'payment_origin'    => 'online',
-                                'payment_method'    => 'bank_card',
-                                'external_ref'      => $ext_enrollment['metaJson']['payment']['transactionId']
-                            ])
-                            ->update(['funding_id' => $funding['id']]);
-                    }
-                    break;
+                            if(is_null($funding)) {
+                                //  If not confirmed we need to create the funding anyway to handle the payment
+                                Enrollment::id($enrollment['id'])->do('generate_funding');
+
+                                $funding = Funding::search(['enrollment_id', '=', $enrollment['id']])
+                                    ->read(['id'])
+                                    ->first();
+                            }
+
+                            Payment::create([
+                                    'enrollment_id'     => $enrollment['id'],
+                                    'center_office_id'  => $enrollment['center_office_id'],
+                                    'is_manual'         => false,
+                                    'amount'            => floatval($ext_enrollment['metaJson']['reglement']['montantCB']),
+                                    'payment_origin'    => 'online',
+                                    'payment_method'    => 'bank_card',
+                                    'external_ref'      => $ext_enrollment['metaJson']['payment']['transactionId']
+                                ])
+                                ->update(['funding_id' => $funding['id']]);
+                        }
+                        break;
+                }
+                ++$result['processed'];
+            }
+
+            if(!empty($enrollment_warnings)) {
+                Enrollment::id($enrollment['id'])
+                    ->update([
+                        'description' => implode('', array_map(fn($error) => "<p>$error</p>", $enrollment_warnings))
+                    ]);
             }
         }
-
-        if(!empty($enrollment_warnings)) {
-            Enrollment::id($enrollment['id'])->update([
-                'description' => implode('', array_map(fn($error) => "<p>$error</p>", $enrollment_warnings))
-            ]);
-        }
     }
+
+
+}
+catch(Exception $e) {
+    // unexpected error: send an email alert
+    $msg = $e->getMessage();
+    // handle serialized objects as message
+    $data = @unserialize($msg);
+
+    if($data !== false && is_array($data)) {
+        $message = json_encode($data);
+    }
+    else {
+        $message = $msg;
+    }
+
+    $result['logs'][] = $message;
+    ++$result['errors'];
+
+}
+
+if($result['errors'] > 0) {
+    // convert result to string
+    ob_start();
+    print_r($result);
+    $report = ob_get_clean();
+
+    $message = new Email();
+    $message->setTo(constant('EMAIL_ERRORS_RECIPIENT'))
+            // ->addCc(constant('EMAIL_ERRORS_RECIPIENT'))
+            ->setSubject('ERROR CPA-Lathus')
+            ->setContentType("text/html")
+            ->setBody("<html>
+            <body>
+            <p>Erreur inattendue lors de l'exécution du script " . __FILE__ . " :</p>
+            <pre>" . $report . "</pre>
+            </body>
+            </html>");
+
+    // queue message
+    Mail::queue($message);
 }
 
 $context->httpResponse()
-        ->body([
-            'count' => count($created_enrollments),
-            'data'  => $created_enrollments
-        ])
+        ->body($result)
         ->status(200)
         ->send();
