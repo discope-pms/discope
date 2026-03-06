@@ -15,6 +15,13 @@
             },
             {
                 "type": "field",
+                "value": "created",
+                "width": "5%",
+                "readonly": true,
+                "visible": false
+            },
+            {
+                "type": "field",
                 "value": "child_id",
                 "width": "20%",
                 "sortable": false,
@@ -79,8 +86,8 @@
             {
                 "type": "field",
                 "value": "status",
-                "width": "20%",
-                "sortable": false,
+                "width": "15%",
+                "sortable": true,
                 "readonly": true
             },
             {
