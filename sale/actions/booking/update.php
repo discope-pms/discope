@@ -87,46 +87,27 @@ else {
 // they need to be disabled here to prevent recursive cycles that could lead to deep cycling issues.
 $orm->disableEvents();
 
-$data = [
-    'has_tour_operator' => ($params['fields']['has_tour_operator'] ?? '') === 'true',
-    'tour_operator_id'  => $params['fields']['tour_operator_id'] ?? null,
-    'tour_operator_ref' => $params['fields']['tour_operator_ref'] ?? ''
-];
-if(isset($params['fields']['customer_nature_id'])) {
-    $data['customer_nature_id'] = $params['fields']['customer_nature_id'];
-}
-if(isset($params['fields']['center_id'])) {
-    $data['center_id'] = $params['fields']['center_id'];
-}
-if(isset($params['fields']['organisation_id'])) {
-    $data['organisation_id'] = $params['fields']['organisation_id'];
-}
-if(isset($params['fields']['date_from'])) {
-    $data['date_from'] = strtotime($params['fields']['date_from']);
-}
-if(isset($params['fields']['date_to'])) {
-    $data['date_to'] = strtotime($params['fields']['date_to']);
-}
-
-$orm->update(Booking::getType(), $booking_id, $data);
+$orm->update(Booking::getType(), $booking_id, [
+        'customer_nature_id'    => $params['fields']['customer_nature_id'],
+        'center_id'             => $params['fields']['center_id'],
+        'organisation_id'       => $params['fields']['organisation_id'],
+        'date_from'             => strtotime($params['fields']['date_from']),
+        'date_to'               => strtotime($params['fields']['date_to']),
+        'has_tour_operator'     => ($params['fields']['has_tour_operator'] ?? '') === 'true',
+        'tour_operator_id'      => $params['fields']['tour_operator_id'] ?? null,
+        'tour_operator_ref'     => $params['fields']['tour_operator_ref'] ?? ''
+    ]);
 
 
 // restore events in case this controller is chained with others
 $orm->enableEvents();
 
-if(isset($params['fields']['customer_identity_id'])) {
-    Booking::id($booking_id)
-        // assign identity & sync with customer
-        ->update(['customer_identity_id'    => $params['fields']['customer_identity_id']]);
-}
-
-if(isset($params['fields']['customer_rate_class_id'])) {
-    Booking::id($booking_id)
-           ->update(['customer_rate_class_id'  => $params['fields']['customer_rate_class_id']]);
-}
-
-// re-create contacts
-Booking::id($booking_id)->do('import_contacts');
+Booking::id($booking_id)
+    // assign identity & sync with customer
+       ->update(['customer_identity_id'    => $params['fields']['customer_identity_id']])
+       ->update(['customer_rate_class_id'  => $params['fields']['customer_rate_class_id']])
+    // re-create contacts
+       ->do('import_contacts');
 
 // 2) check customer history
 

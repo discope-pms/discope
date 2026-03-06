@@ -202,7 +202,7 @@ $findOrCreateInstitution = function($ext_institution) use($sanitizePhoneNumber, 
 
     if(is_null($institution)) {
         $institution = LathusInstitution::create([
-            'name'              => $ext_institution['nom'],
+            'name'              => !empty($ext_institution['nom']) ? $ext_institution['nom'] : 'N/A',
             'address_street'    => $ext_institution['adresse1'],
             'address_dispatch'  => $ext_institution['adresse2'],
             'address_zip'       => $ext_institution['codePostal'],
