@@ -31,6 +31,7 @@ use sale\pay\Payment;
     'access'        => [
         'visibility'    => 'protected'
     ],
+    'constants'     => ['EMAIL_ERRORS_RECIPIENT'],
     'response'      => [
         'content-type'  => 'application/json',
         'charset'       => 'utf-8',
