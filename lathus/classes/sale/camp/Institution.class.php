@@ -17,14 +17,34 @@ class Institution extends \sale\camp\Institution {
     public static function getColumns(): array {
         return [
 
+            'name' => [
+                'type'              => 'string',
+                'description'       => "Name of the institution."
+            ],
+
+            'email' => [
+                'type'              => 'string',
+                'description'       => "Email address of the institution."
+            ],
+
             'phone' => [
                 'type'              => 'string',
-                'description'       => "Fix phone number of the child's guardian."
+                'description'       => "Fix phone number of the child's institution."
+            ],
+
+            'address_street' => [
+                'type'              => 'string',
+                'description'       => "Street and number of the child's institution.",
+            ],
+
+            'address_zip' => [
+                'type'              => 'string',
+                'description'       => "Zip code of the child's institution.",
             ],
 
             'address_city' => [
                 'type'              => 'string',
-                'description'       => "City of the child's guardian.",
+                'description'       => "City of the child's institution.",
                 'dependents'        => ['is_ccvg']
             ]
 
