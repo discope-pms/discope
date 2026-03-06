@@ -18,12 +18,18 @@ use sale\camp\Enrollment;
             'required'      => true
         ],
 
+        /*
+        // #deprecated
+        // #memo - Le statut Validée indique que l’inscription ne nécessite plus de traitement : tous les documents et paiements ont été reçus.
+        Au niveau logique-métier, on ne doit pas pouvoir forcer la validation, car dans ce cas on perd la visibilité sur le fait que des choses restent à faire.
+        Grâce à ce statut, on peut savoir, au plus tard au moment de l’arrivée d’un enfant, que le dossier n’est pas complet.
+
         'do_not_check_payment' => [
             'type'          => 'boolean',
             'description'   => "Check enrollment's payment status before validation?",
             'required'      => true
         ]
-
+        */
     ],
     'access'        => [
         'visibility'        => 'protected',
@@ -43,11 +49,6 @@ use sale\camp\Enrollment;
  */
 ['context' => $context, 'dispatch' => $dispatch] = $providers;
 
-// force check payment if param not given
-if(!isset($params['do_not_check_payment'])) {
-    $params['do_not_check_payment'] = false;
-}
-
 $enrollment = Enrollment::id($params['id'])
     ->read(['status', 'all_documents_received', 'payment_status', 'camp_id' => ['center_office_id']])
     ->first();
@@ -65,9 +66,7 @@ if(!$enrollment['all_documents_received']) {
 }
 
 if($enrollment['payment_status'] !== 'paid') {
-    if(!$params['do_not_check_payment']) {
-        throw new Exception("not_paid", EQ_ERROR_INVALID_PARAM);
-    }
+    throw new Exception("not_paid", EQ_ERROR_INVALID_PARAM);
 
     $dispatch->dispatch('lodging.camp.enrollment.validate.not_paid', 'sale\camp\Enrollment', $enrollment['id'], 'warning', null, [], [], null, $enrollment['camp_id']['center_office_id']);
 }
