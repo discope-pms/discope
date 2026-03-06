@@ -213,10 +213,13 @@ foreach($booking['booking_lines_groups_ids'] as $group_id => $group) {
             ])
             ->update([
                 'total'                     => $group['total']
-            ])
+            ]);
+            /*
+            #todo - Find why the booking price is sometimes not calculated correctly (KAL-466) (Note: this is a quickfix)
             ->update([
                 'price'                     => $group['price']
             ]);
+            */
 
     }
     else {
@@ -242,10 +245,13 @@ foreach($booking['booking_lines_groups_ids'] as $group_id => $group) {
                 ])
                 ->update([
                     'total'                     => $line['total']
-                ])
+                ]);
+                /*
+                #todo - Find why the booking price is sometimes not calculated correctly (KAL-466) (Note: this is a quickfix)
                 ->update([
                     'price'                     => $line['price']
                 ]);
+                */
         }
 
     }
