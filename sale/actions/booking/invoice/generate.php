@@ -78,6 +78,8 @@ $booking = Booking::id($params['id'])
             'vat_rate',
             'unit_price',
             'qty',
+            'price',
+            'total',
             'nb_nights',
             'nb_pers',
             'booking_lines_ids' => [
