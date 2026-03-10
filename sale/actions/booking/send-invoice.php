@@ -102,10 +102,18 @@ if(!$booking) {
     throw new Exception("unknown_booking", QN_ERROR_UNKNOWN_OBJECT);
 }
 
+if(empty($params['title'])) {
+    throw new Exception("empty_title", EQ_ERROR_INVALID_PARAM);
+}
+
+if(empty($params['message'])) {
+    throw new Exception("empty_message", EQ_ERROR_INVALID_PARAM);
+}
+
 // generate attachment
 $attachment = eQual::run('get', 'sale_booking_print-invoice', [
     'id'        => $params['invoice_id'],
-    'view_id'   =>'print.default',
+    'view_id'   => 'print.default',
     'lang'      => $params['lang'],
     'mode'      => $params['mode']
 ]);
