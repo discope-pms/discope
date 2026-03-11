@@ -320,6 +320,7 @@ $dispatch->cancel('lodging.booking.overbooking', 'sale\booking\Booking', $bookin
 $dispatch->cancel('lodging.booking.rental_units_ready', 'sale\booking\Booking', $booking['id']);
 $dispatch->cancel('lodging.booking.rental_units_assignment', 'sale\booking\Booking', $booking['id']);
 $dispatch->cancel('lodging.booking.sojourns_accomodations', 'sale\booking\Booking', $booking['id']);
+$dispatch->cancel('sale.booking.followup.task.reminder', 'sale\booking\Booking', $booking['id']);
 
 $context->httpResponse()
         ->status(200)
