@@ -372,10 +372,10 @@ class Payment extends Model {
      */
     public static function ondelete($om, $oids) {
         // set back related statement line status to 'pending'
-        $payments = $om->read(__CLASS__, $oids, ['statement_line_id', 'funding_id']);
+        $payments = $om->read(self::getType(), $oids, ['statement_line_id', 'funding_id']);
         if($payments > 0) {
             foreach($payments as $pid => $payment) {
-                // #memo #workaround 2026-03-11 - attempt to fix BankStatementLine unexpectedly set back to 'pending' on unidentified action
+                // #memo #workaround 2026-03-11 - attempt to fix BankStatementLine unexpectedly set back to 'pending' on unidentified action (SOLUTION: OrderPaymentPart does not extend Payment anymore)
                 // #memo - once reconciled, a bank statement line should never be set back to pending
                 // #memo - a Payment does not always relate to a bank statement line
                 // $om->update('sale\pay\BankStatementLine', $payment['statement_line_id'], ['status' => 'pending']);
