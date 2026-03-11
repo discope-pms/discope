@@ -43,6 +43,26 @@
                     "order": "id",
                     "sort": "desc"
                 }
+            },
+            {
+                "id": "item.waiting_followup_tasks",
+                "label": "Waiting tasks",
+                "description": "",
+                "icon": "list_alt",
+                "type": "entry",
+                "route": "/",
+                "context": {
+                    "entity": "sale\\booking\\followup\\Task",
+                    "view": "list.default",
+                    "order": "id",
+                    "sort": "desc",
+                    "domain": [
+                        ["entity", "=", "sale\\booking\\Booking"],
+                        ["is_done", "=", false],
+                        ["deadline_date", ">=", "date.this.day"]
+                    ]
+                },
+                "visible": [true, "=", "env.sale.features.booking.tasks_table"]
             }
         ]
     }

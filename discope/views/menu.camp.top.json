@@ -13,6 +13,25 @@
                 "type": "entry",
                 "route": "/planning/employees",
                 "visible": [true, "=", "env.sale.features.booking.employee_planning"]
+            },
+            {
+                "id": "item.waiting_followup_tasks",
+                "label": "Waiting tasks",
+                "description": "",
+                "icon": "list_alt",
+                "type": "entry",
+                "route": "/",
+                "context": {
+                    "entity": "sale\\camp\\followup\\Task",
+                    "view": "list.default",
+                    "order": "id",
+                    "sort": "desc",
+                    "domain": [
+                        ["entity", "=", "sale\\camp\\Enrollment"],
+                        ["is_done", "=", false],
+                        ["deadline_date", ">=", "date.this.day"]
+                    ]
+                }
             }
         ]
     }
