@@ -40,8 +40,8 @@ list($context, $orm, $auth) = [$providers['context'], $providers['orm'], $provid
 
 // read booking object
 $booking = Booking::id($params['id'])
-                  ->read(['id', 'type_id', 'status', 'nb_pers', 'is_from_channelmanager', 'booking_lines_ids', 'customer_id', 'customer_identity_id'])
-                  ->first(true);
+    ->read(['type_id', 'status', 'nb_pers', 'is_from_channelmanager', 'booking_lines_ids' => ['product_id'], 'customer_id'])
+    ->first(true);
 
 if(!$booking) {
     throw new Exception("unknown_booking", QN_ERROR_UNKNOWN_OBJECT);
@@ -53,6 +53,18 @@ if($booking['status'] != 'checkedout') {
 
 if($booking['is_from_channelmanager'] !== true && $booking['type_id'] !== 1) {
     throw new Exception("incompatible_booking", QN_ERROR_INVALID_PARAM);
+}
+
+$has_invalid_line = false;
+foreach($booking['booking_lines_ids'] as $line) {
+    if(is_null($line['product_id'])) {
+        $has_invalid_line = true;
+        break;
+    }
+}
+
+if($has_invalid_line) {
+    throw new Exception("invalid_line", QN_ERROR_INVALID_PARAM);
 }
 
 

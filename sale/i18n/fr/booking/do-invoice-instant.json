@@ -13,7 +13,8 @@
             "unknown_booking": "Réservation inconnue.",
             "incompatible_status": "Le statut de la réservation n'est pas 'terminée'.",
             "incompatible_booking": "Seules les factures OTA et individuel peuvent faire l'objet d'une facturation rapide.",
-            "invoice_not_found": "La facture n'a pas pu être émise."
+            "invoice_not_found": "La facture n'a pas pu être émise.",
+            "invalid_line": "Une ligne de service est invalide."
         }
     }
 }

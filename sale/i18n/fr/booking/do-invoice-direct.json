@@ -1,15 +1,10 @@
 {
     "name": "Facturer",
-    "description": "Une facture pro-forma sera (re)générée.\n\nIMPORTANT: il ne faut renseigner un payeur que s'il est différent du client de la réservation.",
+    "description": "Une facture pro-forma sera (re)générée.",
     "model": {
         "id": {
             "label": "Identifiant",
             "description": "Identifiant de la réservation ciblée.",
-            "help": ""
-        },
-        "partner_id": {
-            "label": "Payeur",
-            "description": "Organisation à qui envoyer la facture, si différent du client.",
             "help": ""
         }
     },
