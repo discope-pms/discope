@@ -160,7 +160,7 @@ foreach($order['order_payments_ids'] as $pid => $payment) {
                 'payment_origin'    => 'cashdesk',
                 'payment_method'    => $payment_method,
                 'status'            => 'paid',
-                'order_payment_id'  => $pid
+                'order_payment_id'  => $payment['id']
             ])
             ->update([
                 'funding_id'        => $order['funding_id']['id']

@@ -382,7 +382,10 @@ class Payment extends Model {
         $payments = $om->read(__CLASS__, $oids, ['statement_line_id', 'funding_id']);
         if($payments > 0) {
             foreach($payments as $pid => $payment) {
-                $om->update('sale\pay\BankStatementLine', $payment['statement_line_id'], ['status' => 'pending']);
+                // #memo #workaround 2026-03-11 - attempt to fix BankStatementLine unexpectedly set back to 'pending' on unidentified action
+                // #memo - once reconciled, a bank statement line should never be set back to pending
+                // #memo - a Payment does not always relate to a bank statement line
+                // $om->update('sale\pay\BankStatementLine', $payment['statement_line_id'], ['status' => 'pending']);
                 $om->update('sale\pay\Funding', $payment['funding_id'], ['is_paid' => false, 'paid_amount' => null]);
             }
         }
