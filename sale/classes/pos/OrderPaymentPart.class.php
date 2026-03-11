@@ -1,24 +1,27 @@
 <?php
 /*
     This file is part of the Discope property management software <https://github.com/discope-pms/discope>
-    Some Rights Reserved, Discope PMS, 2020-2024
+    Some Rights Reserved, Discope PMS, 2020-2026
     Original author(s): Yesbabylon SRL
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
+
 namespace sale\pos;
 
 use sale\booking\Booking;
 use sale\booking\Funding;
 use sale\booking\Invoice;
 
-class OrderPaymentPart extends \sale\booking\Payment {
-
-    public function getTable() {
-        return 'sale_pos_orderpaymentpart';
-    }
+class OrderPaymentPart extends \equal\orm\Model {
 
     public static function getColumns() {
         return [
+
+            'partner_id' => [
+                'type'              => 'many2one',
+                'foreign_object'    => 'identity\Partner',
+                'description'       => "The partner to whom the payment relates."
+            ],
 
             'order_payment_id' => [
                 'type'              => 'many2one',
@@ -41,6 +44,12 @@ class OrderPaymentPart extends \sale\booking\Payment {
                 'description'       => 'The order the part relates to (based on payment).'
             ],
 
+            'receipt_date' => [
+                'type'              => 'datetime',
+                'description'       => "Time of reception of the payment.",
+                'default'           => time()
+            ],
+
             'payment_method' => [
                 'type'              => 'string',
                 'selection'         => [
@@ -61,11 +70,25 @@ class OrderPaymentPart extends \sale\booking\Payment {
                 'default'           => 'cashdesk'
             ],
 
+            'operation_id' => [
+                'type'              => 'many2one',
+                'foreign_object'    => 'sale\pos\Operation',
+                'description'       => 'The operation the payment relates to.',
+                'visible'           => [ ['payment_origin', '=', 'cashdesk'] ]
+            ],
+
             'booking_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\booking\Booking',
                 'description'       => 'Booking the payment part relates to.',
                 'ondelete'          => 'null'
+            ],
+
+            // #todo - check if necessary (only used in 2023 and start of 2024)
+            'voucher_ref' => [
+                'type'              => 'string',
+                'description'       => 'The reference of the voucher the payment relates to.',
+                'visible'           => [ ['payment_method', '=', 'voucher'] ]
             ],
 
             'funding_id' => [
@@ -81,6 +104,19 @@ class OrderPaymentPart extends \sale\booking\Payment {
                 'description'       => 'Center office related to the statement (from order_id).'
             ],
 
+            // #todo - check if still necessary (only used in 2023)
+            'invoice_id' => [
+                'type'              => 'many2one',
+                'foreign_object'    => 'finance\accounting\Invoice',
+                'description'       => 'The invoice targeted by the payment, if any.'
+            ],
+
+            'is_exported' => [
+                'type'              => 'boolean',
+                'description'       => 'Mark the payment as exported (part of an export to elsewhere).',
+                'default'           => false
+            ],
+
             'status' => [
                 'type'              => 'string',
                 'selection'         => [
@@ -90,6 +126,38 @@ class OrderPaymentPart extends \sale\booking\Payment {
                 'description'       => 'Current status of the payment part.',
                 'default'           => 'pending',
                 'onupdate'          => 'onupdateStatus'
+            ],
+
+            // #todo - check if still necessary (only used in 2023)
+            'has_psp' => [
+                'type'              => 'boolean',
+                'description'       => 'Flag to tell payment was done through a Payment Service Provider.',
+                'default'           => false
+            ],
+
+            // #todo - check if still necessary (only used in 2023)
+            'psp_fee_amount' => [
+                'type'              => 'float',
+                'description'       => 'Amount of the fee of the Service Provider.'
+            ],
+
+            // #todo - check if still necessary (only used in 2023)
+            'psp_fee_currency' => [
+                'type'              => 'string',
+                'description'       => 'Currency of the PSP fee amount.',
+                'default'           => 'EUR'
+            ],
+
+            // #todo - check if still necessary (only used in 2023)
+            'psp_type' => [
+                'type'              => 'string',
+                'description'       => 'Identification string of the payment service provider (ex. \'stripe\').'
+            ],
+
+            // #todo - check if still necessary (only used in 2023)
+            'psp_ref' => [
+                'type'              => 'string',
+                'description'       => 'Reference allowing to retrieve the payment details from PSP.'
             ]
 
         ];
@@ -174,6 +242,14 @@ class OrderPaymentPart extends \sale\booking\Payment {
         }
     }
 
+    public static function canupdate($om, $ids, $values, $lang='en') {
+        if(count($values) == 1 && isset($values['funding_id'])) {
+            return [];
+        }
+
+        return parent::canupdate($om, $ids, $values, $lang);
+    }
+
     public static function candelete($om, $ids) {
         $parts = $om->read(self::getType(), $ids, [ 'order_id.status' ]);
 
@@ -184,7 +260,7 @@ class OrderPaymentPart extends \sale\booking\Payment {
                 }
             }
         }
-        // ignore parent `candelete()`
-        return [];
+
+        return parent::candelete($om, $ids);
     }
 }
