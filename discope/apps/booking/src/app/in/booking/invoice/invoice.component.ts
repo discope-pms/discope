@@ -334,6 +334,7 @@ export class BookingInvoiceComponent implements OnInit, AfterContentInit {
                         title = title.replace("{date_to}", str_date_to);
 
                         this.vm.title.formControl.setValue(title);
+                        this.title = title;
                     }
                     else if(part.name == 'body') {
                         let body = part.value;
@@ -344,6 +345,7 @@ export class BookingInvoiceComponent implements OnInit, AfterContentInit {
                         body = body.replace("{date_to}", str_date_to);
 
                         this.vm.message.formControl.setValue(body);
+                        this.message = body;
                     }
                 }
 

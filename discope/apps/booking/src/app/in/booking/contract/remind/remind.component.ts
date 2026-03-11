@@ -322,9 +322,11 @@ export class BookingContractRemindComponent implements OnInit, AfterContentInit 
                         title = title.replace("{date_to}", str_date_to);
 
                         this.vm.title.formControl.setValue(title);
+                        this.title = title;
                     }
                     else if(part.name == 'body') {
                         this.vm.message.formControl.setValue(part.value);
+                        this.message = part.value;
                     }
                 }
 

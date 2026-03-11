@@ -270,10 +270,12 @@ export class BookingInvoiceComponent implements OnInit, AfterContentInit {
                         if(part.value && part.value.length) {
                             let title = part.value.replace(/<[^>]*>?/gm, '')
                             this.vm.title.formControl.setValue(title);
+                            this.title = title;
                         }
                     }
                     else if(part.name == 'body') {
                         this.vm.message.formControl.setValue(part.value);
+                        this.message = part.value;
                     }
                 }
 

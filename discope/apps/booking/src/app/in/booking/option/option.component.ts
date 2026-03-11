@@ -343,6 +343,7 @@ export class BookingOptionComponent implements OnInit, AfterContentInit {
                         title = title.replace("{date_to}", str_date_to);
 
                         this.vm.title.formControl.setValue(title);
+                        this.title = title;
                     }
                     else if(part.name == 'body') {
                         let value = part.value;
@@ -364,7 +365,9 @@ export class BookingOptionComponent implements OnInit, AfterContentInit {
                         }
 
                         this.vm.message.formControl.setValue(value);
-                    }else if(part.name == 'mention') {
+                        this.message = value;
+                    }
+                    else if(part.name == 'mention') {
                         this.vm.mention.formControl.setValue(part.value);
                     }
                 }

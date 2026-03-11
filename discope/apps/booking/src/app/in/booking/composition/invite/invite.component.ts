@@ -308,6 +308,7 @@ export class BookingCompositionInviteComponent implements OnInit, AfterContentIn
                         title = title.replace("{date_to}", str_date_to);
 
                         this.vm.title.formControl.setValue(title);
+                        this.title = title;
                     }
                     else if(part.name == 'body') {
                         let body = part.value;
@@ -319,6 +320,7 @@ export class BookingCompositionInviteComponent implements OnInit, AfterContentIn
                         let url = environment.backend_url + '/guests/#/request/' + this.booking_id;
                         body = body.replace("{link}", url);
                         this.vm.message.formControl.setValue(body);
+                        this.message = body;
                     }
                 }
 
