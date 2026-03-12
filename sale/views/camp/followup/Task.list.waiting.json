@@ -1,6 +1,6 @@
 {
-    "name": "Tasks",
-    "description": "List of follow up tasks related to enrollments.",
+    "name": "Waiting tasks",
+    "description": "List of waiting follow up tasks related to enrollments.",
     "access": {
         "groups": ["camp.default.administrator", "camp.default.user"]
     },

@@ -68,6 +68,11 @@
             "name": "Tâches",
             "description": "",
             "layout": {}
+        },
+        "list.waiting": {
+            "name": "Tâches en attente",
+            "description": "Tâches qui ne sont pas réalisées et ont une date limite dépassée.",
+            "layout": {}
         }
     },
     "error": {}

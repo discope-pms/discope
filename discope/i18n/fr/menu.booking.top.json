@@ -18,7 +18,7 @@
             "help": ""
         },
         "item.waiting_followup_tasks": {
-            "label": "Tâches non réalisées",
+            "label": "Tâches en attente",
             "help": ""
         }
     }

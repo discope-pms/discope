@@ -70,7 +70,7 @@ if(!empty($tasks)) {
         $message_model = MessageModel::create([
             'name'          => $params['message_model'],
             'label'         => "Enrollment task deadline has expired",
-            'description'   => "A enrollment task was not handled within the required timeframe."
+            'description'   => "An enrollment task was not handled within the required timeframe."
         ])
             ->read(['name'])
             ->first();

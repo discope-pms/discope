@@ -20,7 +20,6 @@
                 "description": "",
                 "icon": "list_alt",
                 "type": "entry",
-                "route": "/",
                 "context": {
                     "entity": "sale\\camp\\followup\\Task",
                     "view": "list.waiting",
