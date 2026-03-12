@@ -335,7 +335,8 @@ try {
 
         $map_soj_nums = [];
         foreach($data as $ext_enrollment) {
-            $map_soj_nums[$ext_enrollment['metaJson']['numeroCamp']] = true;
+            $num_camp = preg_replace('/[^0-9]/', '', $ext_enrollment['metaJson']['numeroCamp']);
+            $map_soj_nums[$num_camp] = true;
         }
 
         $camps = Camp::search([
@@ -358,17 +359,19 @@ try {
             // #memo - programs for enrollments are only open during january
             if($ext_enrollment_created < strtotime('first day of january this year')) {
                 ++$result['warnings'];
-                $result['logs'][] = "WARN - Skipped enrollment created on previous year for enrollment [{$enrollment['id']}].";
+                $result['logs'][] = "WARN - Skipped enrollment created on previous year for enrollment [{$ext_enrollment['wpOrderId']}].";
                 continue;
             }
 
-            if(!isset($map_soj_nums_camps[$ext_enrollment['metaJson']['numeroCamp']])) {
+            $num_camp = preg_replace('/[^0-9]/', '', $ext_enrollment['metaJson']['numeroCamp']);
+
+            if(!isset($map_soj_nums_camps[$num_camp])) {
                 ++$result['warnings'];
-                $result['logs'][] = "WARN - Skipped enrollment [{$enrollment['id']}] on unknown camp {$ext_enrollment['metaJson']['numeroCamp']}.";
+                $result['logs'][] = "WARN - Skipped enrollment [{$ext_enrollment['wpOrderId']}] on unknown camp {$num_camp}.";
                 continue;
             }
 
-            $camp = $map_soj_nums_camps[$ext_enrollment['metaJson']['numeroCamp']];
+            $camp = $map_soj_nums_camps[$num_camp];
 
             //  2.3.1) Find/create child
 
