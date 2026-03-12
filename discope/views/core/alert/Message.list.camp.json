@@ -6,6 +6,10 @@
         [
             ["object_class", "=", "sale\\camp\\Enrollment"],
             ["group_id", "in", "user.center_offices_ids"]
+        ],
+        [
+            ["object_class", "=", "sale\\camp\\followup\\Task"],
+            ["group_id", "in", "user.center_offices_ids"]
         ]
     ],
     "header": {
