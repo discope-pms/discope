@@ -21,8 +21,8 @@ use equal\http\HttpRequest;
         ],
         'limit' => [
             'type'          => 'integer',
-            'description'   => 'Index of the requested page.',
-            'help'          => 'Responses hold 30 items per requested page.',
+            'description'   => 'Number of items requested per page.',
+            'help'          => '#memo - As of 2026-03-12 this param does not operate on the API.',
             'min'           => 0,
             'default'       => 0
         ]

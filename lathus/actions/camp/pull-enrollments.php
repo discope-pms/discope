@@ -27,6 +27,20 @@ use sale\pay\Payment;
 [$params, $providers] = eQual::announce([
     'description'   => "Pull enrollments from CPA Lathus API.",
     'params'        => [
+        'page' => [
+            'type'          => 'integer',
+            'description'   => 'Page to fetch from the remote API..',
+            'help'          => 'By default, each page holds 30 items.',
+            'default'       => 1
+        ],
+        'limit' => [
+            'type'          => 'integer',
+            'description'   => 'Number of items to request from the history.',
+            'help'          => '#memo - As of 2026-03-12 this param does not operate on the API.',
+            'max'           => 200,
+            'default'       => 30
+        ]
+        // #memo `page_count` cannot be implemented since there is a req_limit of 60s
     ],
     'access'        => [
         'visibility'    => 'protected'
@@ -226,6 +240,32 @@ $formatMoney = function ($value) use($currency) {
     return number_format((float)($value), 2, ",", ".") . ' ' .$currency;
 };
 
+$getEnrollmentsPage = function(int $page = 1, int $limit = 30) {
+
+    $count_attempts = 0;
+    $max_attempts = 3;
+
+    while($count_attempts < $max_attempts) {
+        try {
+            return eQual::run('get', 'lathus_camp_enrollments', [
+                'page'  => $page,
+                'limit' => $limit
+            ]);
+        }
+        catch(Exception $e) {
+            ++$count_attempts;
+
+            if($count_attempts >= $max_attempts) {
+                break;
+            }
+
+            sleep(1);
+        }
+    }
+
+    return null;
+};
+
 /**
  * Action
  */
@@ -247,22 +287,14 @@ try {
 
     $data = [];
 
-    $count_attempts = 0;
-    $flag_success = false;
-    while(!$flag_success) {
-        try {
-            $data = eQual::run('get', 'lathus_camp_enrollments');
-            $flag_success = true;
-        }
-        catch(Exception $e) {
-            ++$count_attempts;
-        }
+    if(($data = $getEnrollmentsPage($params['page'], $params['limit'])) === null) {
+        ++$result['errors'];
+        $result['logs'][] = "ERR  - Unable to reach API";
+        throw new Exception('cpa_lathus_api_unreachable', EQ_ERROR_UNKNOWN);
+    }
 
-        if(!$flag_success && $count_attempts >= 3) {
-            ++$result['errors'];
-            $result['logs'][] = "ERR  - Unable to reach API : " . $e->getMessage();
-            throw new Exception('cpa_lathus_api_unreachable', EQ_ERROR_UNKNOWN);
-        }
+    if(!is_array($data)) {
+        throw new Exception('invalid_api_response', EQ_ERROR_UNKNOWN);
     }
 
     usort($data, function($a, $b) {
