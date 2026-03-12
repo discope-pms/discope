@@ -355,11 +355,16 @@ try {
 
         foreach($data as $ext_enrollment) {
             $ext_enrollment_created = (new DateTime($ext_enrollment['date']))->getTimestamp();
+            // #memo - programs for enrollments are only open during january
             if($ext_enrollment_created < strtotime('first day of january this year')) {
+                ++$result['warnings'];
+                $result['logs'][] = "WARN - Skipped enrollment created on previous year for enrollment [{$enrollment['id']}].";
                 continue;
             }
 
             if(!isset($map_soj_nums_camps[$ext_enrollment['metaJson']['numeroCamp']])) {
+                ++$result['warnings'];
+                $result['logs'][] = "WARN - Skipped enrollment [{$enrollment['id']}] on unknown camp {$ext_enrollment['metaJson']['numeroCamp']}.";
                 continue;
             }
 
@@ -517,9 +522,9 @@ try {
                     $sponsor_name = preg_replace("/\s*\([^)]*\)/", "", $sponsorings['montantAideCommunePourCalcul']);
 
                     $sponsor = Sponsor::search([
-                        ['name', 'ilike', $sponsor_name],
-                        ['sponsor_type', '=', 'commune']
-                    ])
+                            ['name', 'ilike', $sponsor_name],
+                            ['sponsor_type', '=', 'commune']
+                        ])
                         ->read(['name', 'amount', 'sponsor_type'])
                         ->first();
 
