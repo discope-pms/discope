@@ -85,8 +85,8 @@ if(!empty($tasks)) {
 
         $dispatch->dispatch(
             $message_model['name'],
-            Booking::getType(),
-            $task['booking_id']['id'],
+            Task::getType(),
+            $id,
             $params['severity'],
             'sale_booking_followup_Task_check-done',
             $dispatch_params,

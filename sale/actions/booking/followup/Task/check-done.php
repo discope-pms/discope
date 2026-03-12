@@ -63,10 +63,9 @@ if(is_null($task)) {
     throw new Exception("unknown_task", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
-if($task['is_done']) {
-    eQual::run('do', 'core_alert_dismiss', ['id' => $task['id']]);
-}
-else {
+$dispatch->cancel($params['message_model'], Task::getType(), $task['id']);
+
+if(!$task['is_done']) {
     $dispatch_params = [
         'id'            => $task['id'],
         'message_model' => $params['message_model'],
@@ -75,8 +74,8 @@ else {
 
     $dispatch->dispatch(
         $params['message_model'],
-        Booking::getType(),
-        $task['booking_id']['id'],
+        Task::getType(),
+        $task['id'],
         $params['severity'],
         'sale_booking_followup_Task_check-done',
         $dispatch_params,

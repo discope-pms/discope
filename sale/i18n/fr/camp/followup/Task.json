@@ -48,9 +48,9 @@
             "description": "L'entité concernée.",
             "help": ""
         },
-        "booking_id": {
-            "label": "Réservation",
-            "description": "La réservation que la tâche concerne.",
+        "enrollment_id": {
+            "label": "Inscription",
+            "description": "L'inscription que la tâche concerne.",
             "help": ""
         }
     },

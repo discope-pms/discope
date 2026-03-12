@@ -85,8 +85,8 @@ if(!empty($tasks)) {
 
         $dispatch->dispatch(
             $message_model['name'],
-            Enrollment::getType(),
-            $task['enrollment_id']['id'],
+            Task::getType(),
+            $id,
             $params['severity'],
             'sale_camp_followup_Task_check-done',
             $dispatch_params,
