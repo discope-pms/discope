@@ -15,7 +15,16 @@ use equal\http\HttpRequest;
         'page' => [
             'type'          => 'integer',
             'description'   => 'Index of the requested page.',
+            'help'          => 'Responses hold 30 items per requested page by default (@see `limit`).',
+            'min'           => 1,
             'default'       => 1
+        ],
+        'limit' => [
+            'type'          => 'integer',
+            'description'   => 'Index of the requested page.',
+            'help'          => 'Responses hold 30 items per requested page.',
+            'min'           => 0,
+            'default'       => 0
         ]
     ],
     'access'        => [
@@ -45,33 +54,33 @@ if(is_null($api_key)) {
     throw new \Exception("missing_api_key", EQ_ERROR_INVALID_CONFIG);
 }
 
-if($params['page'] > 1) {
+// rebuild URL with given params
+$parts = parse_url($api_uri);
 
- $parts = parse_url($api_uri);
-
-    // retrieve existing params, if any
-    $query = [];
-    if(isset($parts['query'])) {
-        parse_str($parts['query'], $query);
-    }
-
-    // add / replace `page`
-    $query['page'] = 2;
-
-    // rebuild URL
-    $api_uri = preg_replace(
-            '/\?.*$/',
-            '',
-            $api_uri
-        );
-
-    // ensure there is a path
-    if(!isset($parts['path']) || $parts['path'] === '') {
-        $api_uri .= '/';
-    }
-
-    $api_uri .= '?' . http_build_query($query);
+// retrieve existing params, if any
+$query = [];
+if(isset($parts['query'])) {
+    parse_str($parts['query'], $query);
 }
+
+if($params['page'] > 1) {
+    // add / replace `page`
+    $query['page'] = $params['page'];
+}
+
+if($params['limit'] > 0) {
+    // add / replace `itemsPerPage`
+    $query['itemsPerPage'] = $params['limit'];
+}
+
+$api_uri = preg_replace('/\?.*$/', '', $api_uri);
+
+// ensure there is a path
+if(!isset($parts['path']) || $parts['path'] === '') {
+    $api_uri .= '/';
+}
+
+$api_uri .= '?' . http_build_query($query);
 
 $request = new HttpRequest('GET ' . $api_uri);
 
