@@ -12,6 +12,11 @@ use equal\http\HttpRequest;
 [$params, $providers] = eQual::announce([
     'description'   => "Retrieve a batch of the latest enrollments, as provided from CPA Lathus API in response to configured api_uri.",
     'params'        => [
+        'page' => [
+            'type'          => 'integer',
+            'description'   => 'Index of the requested page.',
+            'default'       => 1
+        ]
     ],
     'access'        => [
         'visibility'    => 'protected',
@@ -40,7 +45,35 @@ if(is_null($api_key)) {
     throw new \Exception("missing_api_key", EQ_ERROR_INVALID_CONFIG);
 }
 
-$request = new HttpRequest('GET '.$api_uri);
+if($params['page'] > 1) {
+
+ $parts = parse_url($api_uri);
+
+    // retrieve existing params, if any
+    $query = [];
+    if(isset($parts['query'])) {
+        parse_str($parts['query'], $query);
+    }
+
+    // add / replace `page`
+    $query['page'] = 2;
+
+    // rebuild URL
+    $api_uri = preg_replace(
+            '/\?.*$/',
+            '',
+            $api_uri
+        );
+
+    // ensure there is a path
+    if(!isset($parts['path']) || $parts['path'] === '') {
+        $api_uri .= '/';
+    }
+
+    $api_uri .= '?' . http_build_query($query);
+}
+
+$request = new HttpRequest('GET ' . $api_uri);
 
 $request->header('Content-Type', 'application/json');
 $request->header('X-API-KEY', $api_key);
