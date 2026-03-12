@@ -53,13 +53,13 @@
                 "route": "/",
                 "context": {
                     "entity": "sale\\booking\\followup\\Task",
-                    "view": "list.default",
+                    "view": "list.waiting",
                     "order": "id",
                     "sort": "desc",
                     "domain": [
                         ["entity", "=", "sale\\booking\\Booking"],
                         ["is_done", "=", false],
-                        ["deadline_date", ">=", "date.this.day"]
+                        ["deadline_date", "<=", "date.this.day"]
                     ]
                 },
                 "visible": [true, "=", "env.sale.features.booking.tasks_table"]
