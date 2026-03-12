@@ -13,8 +13,19 @@ class Task extends \core\followup\Task {
         return "Enrollment task that has been or must be completed.";
     }
 
+    public static function getLink(): string {
+        return "/camp/#/task/object.id";
+    }
+
     public static function getColumns(): array {
         return [
+
+            'is_done' => [
+                'type'              => 'boolean',
+                'description'       => "Whether the task is done.",
+                'default'           => false,
+                'onupdate'          => 'onupdateIsDone'
+            ],
 
             'done_by' => [
                 'type'              => 'many2one',
@@ -95,5 +106,29 @@ class Task extends \core\followup\Task {
             ]
 
         ];
+    }
+
+    protected static function doCancelAlerts($self, $dispatch) {
+        foreach($self as $task) {
+            $dispatch->cancel('sale.enrollment.followup.task.reminder', 'sale\camp\followup\Task', $task['id']);
+        }
+    }
+
+    public static function getActions(): array {
+        return [
+
+            'cancel_alerts' => [
+                'description'   => "Cancel alerts linked to this task.",
+                'policies'      => [],
+                'function'      => 'doCancelAlerts'
+            ]
+
+        ];
+    }
+
+    public static function onupdateIsDone($self) {
+        parent::onupdateIsDone($self);
+
+        $self->do('cancel_alerts');
     }
 }
