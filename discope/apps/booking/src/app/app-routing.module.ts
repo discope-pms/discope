@@ -19,6 +19,14 @@ const routes: Routes = [
         loadChildren: () => import(`./in/booking/booking.module`).then(m => m.AppInBookingModule)
     },
     {
+        path: 'task/:task_id',
+        loadChildren: () => import(`./in/task/task.module`).then(m => m.AppInTaskModule)
+    },
+    {
+        path: 'tasks',
+        loadChildren: () => import(`./in/tasks/tasks.module`).then(m => m.AppInTasksModule)
+    },
+    {
         path: 'repairings',
         loadChildren: () => import(`./in/repairings/repairings.module`).then(m => m.AppInRepairingsModule)
     },

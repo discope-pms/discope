@@ -43,6 +43,15 @@
                     "order": "id",
                     "sort": "desc"
                 }
+            },
+            {
+                "id": "item.waiting_followup_tasks",
+                "label": "Waiting tasks",
+                "description": "",
+                "icon": "list_alt",
+                "type": "entry",
+                "route": "/tasks/waiting",
+                "visible": [true, "=", "env.sale.features.booking.tasks_table"]
             }
         ]
     }

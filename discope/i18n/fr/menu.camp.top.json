@@ -4,6 +4,10 @@
         "item.planning_employees": {
             "label": "Calendrier Animateurs",
             "help": ""
+        },
+        "item.waiting_followup_tasks": {
+            "label": "Tâches en attente",
+            "help": ""
         }
     }
 }

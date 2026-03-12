@@ -16,6 +16,10 @@
         "item.bookings": {
             "label": "Réservations",
             "help": ""
+        },
+        "item.waiting_followup_tasks": {
+            "label": "Tâches en attente",
+            "help": ""
         }
     }
 }

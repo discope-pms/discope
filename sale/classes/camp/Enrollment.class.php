@@ -1221,7 +1221,8 @@ class Enrollment extends Model {
             ->do('update_fundings_due_to_paid')
             ->update(['paid_amount' => null]);
 
-        $self->do('remove_presences');
+        $self->do('remove_presences')
+            ->do('cancel_alerts');
     }
 
     public static function getWorkflow(): array {
@@ -1953,6 +1954,12 @@ class Enrollment extends Model {
         }
     }
 
+    public static function doCancelAlerts($self, $dispatch) {
+        foreach($self as $id => $enrollment) {
+            $dispatch->cancel('sale.enrollment.followup.task.reminder', 'sale\camp\Enrollment', $id);
+        }
+    }
+
     public static function doRefreshCampProductLine($self) {
         $self->read([
             'is_clsh',
@@ -2329,6 +2336,12 @@ class Enrollment extends Model {
                 'description'   => "Remove the child day presences to the camp.",
                 'policies'      => [],
                 'function'      => 'doRemovePresences'
+            ],
+
+            'cancel_alerts' => [
+                'description'   => "Cancel alerts related to the enrollment.",
+                'policies'      => [],
+                'function'      => 'doCancelAlerts'
             ],
 
             'refresh_camp_product_line' => [
