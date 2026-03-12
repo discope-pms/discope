@@ -183,7 +183,7 @@ foreach($attachments as $attachment) {
 }
 
 // queue message
-$mail_id = Mail::send($message, 'sale\camp\Enrollment', $enrollment['id']);
+$mail_id = Mail::queue($message, 'sale\camp\Enrollment', $enrollment['id']);
 
 // needed because pre-registration need to link multiple enrollments to one mail
 EnrollmentMail::create([
