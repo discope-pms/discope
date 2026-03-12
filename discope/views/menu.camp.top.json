@@ -20,17 +20,7 @@
                 "description": "",
                 "icon": "list_alt",
                 "type": "entry",
-                "context": {
-                    "entity": "sale\\camp\\followup\\Task",
-                    "view": "list.waiting",
-                    "order": "id",
-                    "sort": "desc",
-                    "domain": [
-                        ["entity", "=", "sale\\camp\\Enrollment"],
-                        ["is_done", "=", false],
-                        ["deadline_date", "<=", "date.this.day"]
-                    ]
-                }
+                "route": "/tasks/waiting"
             }
         ]
     }

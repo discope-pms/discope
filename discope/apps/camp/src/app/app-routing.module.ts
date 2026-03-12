@@ -23,6 +23,10 @@ const routes: Routes = [
         loadChildren: () => import(`./in/task/task.module`).then(m => m.AppInTaskModule)
     },
     {
+        path: 'tasks',
+        loadChildren: () => import(`./in/tasks/tasks.module`).then(m => m.AppInTasksModule)
+    },
+    {
         path: 'planning',
         loadChildren: () => import(`./in/planning/planning.module`).then(m => m.AppInPlanningModule)
     },
