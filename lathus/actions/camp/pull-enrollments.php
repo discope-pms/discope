@@ -271,6 +271,7 @@ $getEnrollmentsPage = function(int $page = 1, int $limit = 30) {
  */
 
 $result = [
+    'fetched'   => 0,
     'created'   => 0,
     'updated'   => 0,
     'ignored'   => 0,
@@ -296,6 +297,8 @@ try {
     if(!is_array($data)) {
         throw new Exception('invalid_api_response', EQ_ERROR_UNKNOWN);
     }
+
+    $result['fetched'] = count($data);
 
     usort($data, function($a, $b) {
         return (new DateTime($a['date']))->getTimestamp() <=> (new DateTime($b['date']))->getTimestamp();
