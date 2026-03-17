@@ -240,7 +240,7 @@ $formatMoney = function ($value) use($currency) {
     return number_format((float)($value), 2, ",", ".") . ' ' .$currency;
 };
 
-$getEnrollmentsPage = function(int $page = 1, int $limit = 30): array|null {
+$getEnrollmentsPage = function(int $page = 1, int $limit = 30) {
 
     $count_attempts = 0;
     $max_attempts = 3;
