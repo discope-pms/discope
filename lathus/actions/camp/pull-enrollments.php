@@ -240,7 +240,7 @@ $formatMoney = function ($value) use($currency) {
     return number_format((float)($value), 2, ",", ".") . ' ' .$currency;
 };
 
-$getEnrollmentsPage = function(int $page = 1, int $limit = 30) {
+$getEnrollmentsPage = function(int $page = 1, int $limit = 30): array|null {
 
     $count_attempts = 0;
     $max_attempts = 3;
@@ -879,6 +879,8 @@ if($result['errors'] > 0) {
 
     // queue message
     Mail::queue($message);
+
+    throw new Exception(serialize($result), EQ_ERROR_UNKNOWN);
 }
 
 $context->httpResponse()
