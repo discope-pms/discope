@@ -333,8 +333,8 @@
         },
         "is_exclusive": {
             "label": "Activité exclusive",
-            "description": "Activité ne pouvant pas être assignée avec d'autre à un même moment.",
-            "help": "Activité ne pouvant pas être assignée avec d'autre à une même date et une même tranche horaire qu'une autre activité."
+            "description": "Activité ne pouvant pas être assignée avec d'autres à un même moment.",
+            "help": "Activité ne pouvant pas être assignée à une même date et une même tranche horaire que d'autres activités."
         },
         "is_billable": {
             "label": "Est facturable",
