@@ -302,6 +302,11 @@
                                             },
                                             {
                                                 "type": "field",
+                                                "value": "is_exclusive",
+                                                "width": "100%"
+                                            },
+                                            {
+                                                "type": "field",
                                                 "value": "has_activity_duration",
                                                 "width": "66%"
                                             },
