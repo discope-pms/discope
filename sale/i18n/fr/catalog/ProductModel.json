@@ -378,7 +378,7 @@
             "description": "Les modèles de produits servent de dénominateur commun pour les variantes de produits (appelées Produits).",
             "layout": {
                 "section.product_model": {
-                    "label": "Infos Génerales"
+                    "label": "Infos générales"
                 },
                 "section.specifics": {
                     "label": "Spécificités"
