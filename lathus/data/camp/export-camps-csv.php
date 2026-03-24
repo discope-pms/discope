@@ -34,15 +34,17 @@ if(intval(date('m')) >= 9) {
 }
 
 $camps = Camp::search(
-    [
-        ['date_from', '>=', strtotime('first day of January '.$year)],
-        ['date_to', '<=', strtotime('last day of December '.$year)],
-        ['is_clsh', '=', false],
-        ['status', '=', 'published']
-    ],
-    ['sort' => ['sojourn_number' => 'asc']]
-)
+        [
+            ['date_from', '>=', strtotime('first day of January '.$year)],
+            ['date_to', '<=', strtotime('last day of December '.$year)],
+            ['is_clsh', '=', false],
+            ['status', '=', 'published']
+        ],
+        ['sort' => ['sojourn_number' => 'asc']]
+    )
     ->read([
+        'name',
+        'short_name',
         'sojourn_number',
         'date_from',
         'date_to',

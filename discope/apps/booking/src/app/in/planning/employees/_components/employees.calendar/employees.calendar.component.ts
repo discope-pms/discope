@@ -864,56 +864,42 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
         try {
             const employeeActivities = this.activities[partner.id][date_index][time_slot].filter((a: any) => !a.is_partner_event);
             const timeSlot = this.mapTimeSlot[time_slot];
-            if(employeeActivities.length === 1 && this.dropZonePosition === 'center') {
-                // handle only one activity is assigned to employee's moment
+
+            if(this.dropZonePosition === 'center' || employeeActivities.length === 1) {
+                // when dropped on center, do not change the activity times
                 await this.api.call('?do=model_update', {
                     entity: 'sale\\booking\\BookingActivity',
                     id: this.currentDraggedActivity.id,
                     fields: {
                         employee_id: partner.id,
-                        schedule_from: timeSlot.schedule_from,
-                        schedule_to: timeSlot.schedule_to
+                        // #memo - always keep activity times (default = timeslot times) - no check required
+                        schedule_from: this.currentDraggedActivity.schedule_from,
+                        schedule_to: this.currentDraggedActivity.schedule_to
                     }
                 });
             }
+            // dropZonePosition !== 'center' ('left' or 'right') And length > 1
             else {
-                if(employeeActivities.length === 1) {
-                    // handle one activity assigned to employee's moment and positioned left/right
-                    const scheduleIntervals = this.splitSchedule(timeSlot.schedule_from, timeSlot.schedule_to, 2);
-                    const interval = this.dropZonePosition === 'left' ? scheduleIntervals[0] : scheduleIntervals[1];
+                // handle multiple activities assigned to employee's moment
+                const scheduleIntervals = this.splitSchedule(timeSlot.schedule_from, timeSlot.schedule_to, employeeActivities.length);
+
+                let index = 0;
+                for(let activity of employeeActivities) {
+                    const interval = scheduleIntervals[index++];
+
+                    const fields: any = {
+                        schedule_from: interval.from,
+                        schedule_to: interval.to
+                    };
+                    if(this.currentDraggedActivity.id === activity.id) {
+                        fields.employee_id = partner.id
+                    }
 
                     await this.api.call('?do=model_update', {
                         entity: 'sale\\booking\\BookingActivity',
-                        id: employeeActivities[0].id,
-                        fields: {
-                            schedule_from: interval.from,
-                            schedule_to: interval.to,
-                            employee_id: partner.id
-                        }
+                        id: activity.id,
+                        fields
                     });
-                }
-                else {
-                    // handle multiple activities assigned to employee's moment
-                    const scheduleIntervals = this.splitSchedule(timeSlot.schedule_from, timeSlot.schedule_to, employeeActivities.length);
-
-                    let index = 0;
-                    for(let activity of employeeActivities) {
-                        const interval = scheduleIntervals[index++];
-
-                        const fields: any = {
-                            schedule_from: interval.from,
-                            schedule_to: interval.to
-                        };
-                        if(this.currentDraggedActivity.id === activity.id) {
-                            fields.employee_id = partner.id
-                        }
-
-                        await this.api.call('?do=model_update', {
-                            entity: 'sale\\booking\\BookingActivity',
-                            id: activity.id,
-                            fields
-                        });
-                    }
                 }
             }
 
