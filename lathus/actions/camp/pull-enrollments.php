@@ -879,6 +879,8 @@ if($result['errors'] > 0) {
 
     // queue message
     Mail::queue($message);
+
+    throw new Exception(serialize($result), EQ_ERROR_UNKNOWN);
 }
 
 $context->httpResponse()

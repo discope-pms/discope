@@ -36,7 +36,8 @@ class EnrollmentLine extends Model {
                 'description'       => "The product targeted by the line.",
                 'required'          => true,
                 'domain'            => ['is_camp', '=', true],
-                'onupdate'          => 'onupdateProductId'
+                'onupdate'          => 'onupdateProductId',
+                'dependents'        => ['name']
             ],
 
             'price_id' => [

@@ -86,6 +86,10 @@
             "label": "À valider",
             "help": "Inscriptions confirmées, récupération des documents et paiements."
         },
+        "pending.enrollments.validated-not-paid": {
+            "label": "Attente paiement",
+            "help": "Inscriptions validées, dont le paiement n'est pas complet."
+        },
         "pending.enrollments.registration-file": {
             "label": "Gestion dossiers",
             "help": "Toutes les inscription avec information à propos de la complétion du dossier."

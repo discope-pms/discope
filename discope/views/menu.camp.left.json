@@ -283,6 +283,18 @@
                                 }
                             },
                             {
+                                "id": "pending.enrollments.validated-not-paid",
+                                "type": "entry",
+                                "label": "Collect payment",
+                                "description": "List validated enrollments that aren't entirely paid.",
+                                "icon": "",
+                                "route": "/camps",
+                                "context": {
+                                    "entity": "sale\\camp\\Enrollment",
+                                    "view": "list.validated-not-paid"
+                                }
+                            },
+                            {
                                 "id": "pending.enrollments.registration-file",
                                 "type": "entry",
                                 "label": "Handle registration files",

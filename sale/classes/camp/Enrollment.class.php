@@ -2085,9 +2085,6 @@ class Enrollment extends Model {
                     ->first();
 
                 $product_id = $enrollment['camp_id']['product_id'];
-                if(!is_null($camp_product_line)) {
-                    $product_id = $camp_product_line['product_id'];
-                }
 
                 $product = Product::id($product_id)
                     ->read([
@@ -2130,8 +2127,10 @@ class Enrollment extends Model {
                         ]);
                     }
                     else {
-                        EnrollmentLine::id($camp_product_line['id'])
-                            ->update(['price_id' => $camp_price['id']]);
+                        EnrollmentLine::id($camp_product_line['id'])->update([
+                            'product_id'    => $product_id,
+                            'price_id'      => $camp_price['id']
+                        ]);
                     }
                 }
             }

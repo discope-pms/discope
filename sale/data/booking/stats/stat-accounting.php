@@ -91,7 +91,8 @@ if( (isset($params['center_office_id']) || isset($params['organisation_id'])) &&
             ['state', 'in', ['instance', 'archive']],
             ['date', '>=', $params['date_from']],
             ['date', '<=', $date_to],
-            ['status', '=', 'invoice']
+            ['status', '=', 'invoice'],
+            ['type', '=', 'invoice']
         ],
         isset($params['center_office_id']) ? [['center_office_id', '=', $params['center_office_id']]] : [],
         isset($params['organisation_id']) ? [['organisation_id', '=', $params['organisation_id']]] : []
