@@ -182,6 +182,16 @@
                                                 "label": "Employee",
                                                 "value": "employee_id",
                                                 "width": "33%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "",
+                                                "width": "33%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "is_exclusive",
+                                                "width": "33%"
                                             }
                                         ]
                                     },

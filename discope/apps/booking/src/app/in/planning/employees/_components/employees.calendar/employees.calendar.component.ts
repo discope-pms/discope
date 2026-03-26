@@ -805,7 +805,7 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
                     this.snack.open('Cette activité doit être assignée à un employé.');
                 }
                 else {
-                    this.snack.open('Cette activité ne peut pas être assignée à ce prestatire ou à cette plage horaire.', 'ERREUR');
+                    this.snack.open('Cette activité ne peut pas être assignée à ce prestataire ou à cette plage horaire.', 'ERREUR');
                 }
             }
 
