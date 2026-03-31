@@ -740,7 +740,8 @@ class BookingActivity extends Model {
                     ['activity_date', '=', $activity_date],
                     ['time_slot_id', '=', $time_slot_id],
                     ['employee_id', '=', $employee_id],
-                    ['is_exclusive', '=', true]
+                    ['is_exclusive', '=', true],
+                    ['is_cancelled', '=', false]
                 ])
                     ->ids();
 
