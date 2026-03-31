@@ -1140,7 +1140,7 @@ class Enrollment extends Model {
                 return ['camp_id' => ['camp_full' => "The camp is full."]];
             }
 
-            if($confirmed_ase_enrollments >= $enrollment['camp_id']['ase_quota']) {
+            if($enrollment['is_ase'] && $confirmed_ase_enrollments >= $enrollment['camp_id']['ase_quota']) {
                 return ['camp_id' => ['camp_ase_full' => "The camp ASE quota is reached."]];
             }
         }
