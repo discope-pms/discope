@@ -27,25 +27,21 @@
     "sort": "asc",
     "domain": [
         [
-            ["center_id", "in", "user.centers_ids"],
             ["is_accomodation", "=", true],
             ["cleanup_type", "<>", "none"],
             ["type", "=", "book"]
         ],
         [
-            ["center_id", "in", "user.centers_ids"],
             ["is_accomodation", "=", true],
             ["make_beds", "=", true],
             ["type", "=", "book"]
         ],
         [
-            ["center_id", "in", "user.centers_ids"],
             ["is_accomodation", "=", true],
             ["bed_linens", "=", true],
             ["type", "=", "book"]
         ],
         [
-            ["center_id", "in", "user.centers_ids"],
             ["is_accomodation", "=", true],
             ["description", "is not", null],
             ["description", "<>", ""],
