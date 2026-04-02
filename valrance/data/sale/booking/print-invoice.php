@@ -636,7 +636,9 @@ $invoice_lines = InvoiceLine::search(['invoice_id', '=', $invoice['id']])
         'vat_rate',
         'total',
         'price',
-        'product_id' => ['label']
+        'is_supply',
+        'booking_activity_id'   => ['product_id'],
+        'product_id'            => ['label']
     ])
     ->get(true);
 
@@ -662,6 +664,13 @@ foreach($invoice_lines as $line) {
     }
     elseif(!empty($line['description'])) {
         $grouping_name = $line['description'];
+    }
+
+    // if a supply is linked to an activity, it must be grouped according to the grouping code of the product linked to the activity (and not the grouping associated with its own product)
+    if($line['is_supply'] && $line['booking_activity_id']) {
+        if(isset($map_products_groupings[$line['booking_activity_id']['product_id']])) {
+            $grouping_name = $map_products_groupings[$line['booking_activity_id']['product_id']]['name'];
+        }
     }
 
     if(!isset($map_groupings_lines[$grouping_name])) {
