@@ -82,6 +82,9 @@ else {
     if(count($user['centers_ids']) == 1) {
         $domain = Domain::conditionAdd($domain, ['center_id', '=', reset($user['centers_ids'])]);
     }
+    elseif(count($user['centers_ids']) > 1) {
+        $domain = Domain::conditionAdd($domain, ['center_id', 'in', $user['centers_ids']]);
+    }
     else {
         $domain = Domain::conditionAdd($domain, ['center_id', '=', 0]);
     }
