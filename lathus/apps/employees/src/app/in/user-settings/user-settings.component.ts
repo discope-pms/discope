@@ -45,7 +45,7 @@ export class UserSettingsComponent implements OnInit, OnDestroy {
                     this.planningGroup = this.translationService.translate('USER_SETTINGS_GROUP_ORGANIZER');
                 }
                 else if(user.groups.includes('planning.employees.manager')) {
-                    this.planningGroup = this.translationService.translate('USER_SETTINGS_GROUP_MANGER');
+                    this.planningGroup = this.translationService.translate('USER_SETTINGS_GROUP_MANAGER');
                 }
                 else if(user.groups.includes('planning.employees.animator')) {
                     this.planningGroup = this.translationService.translate('USER_SETTINGS_GROUP_ANIMATOR');
