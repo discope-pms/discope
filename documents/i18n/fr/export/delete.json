@@ -1,0 +1,23 @@
+{
+  "name": "Supprimer",
+  "description": "Supprimer l'export et repasser les objets liés comme non exportés.",
+  "model": {
+    "id": {
+      "label": "Identifiant de l'export",
+      "description": "Identifiant de l'export à supprimer.",
+      "help": ""
+    },
+    "confirm": {
+      "label": "Confirmer",
+      "description": "Confirmer la suppression de l'export.",
+      "help": ""
+    }
+  },
+  "error": {
+    "errors": {
+      "missing_confirmation": "Confirmation manquante",
+      "export_unknown": "Export non trouvé",
+      "deletion_not_allowed": "La suppression est seulement possible pour le dernière export."
+    }
+  }
+}

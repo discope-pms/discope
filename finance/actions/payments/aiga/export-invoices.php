@@ -354,7 +354,9 @@ if(!empty($result)) {
     $export = Export::create([
         'center_office_id'  => $params['center_office_id'],
         'export_type'       => 'invoices',
-        'data'              => $data
+        'data'              => $data,
+        'object_class'      => Invoice::getType(),
+        'object_ids'        => json_encode(array_column($invoices, 'id'))
     ])
         ->read(['id'])
         ->first();

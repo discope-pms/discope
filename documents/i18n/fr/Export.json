@@ -27,6 +27,10 @@
                 "action.download": {
                     "label": "Télécharger",
                     "description": "Obtenir l'archive ZIP."
+                },
+                "action.delete": {
+                    "label": "Supprimer",
+                    "description": "Supprimer l'export et passer les objets liés comme non exportés."
                 }
             }
         },
