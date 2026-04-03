@@ -741,7 +741,9 @@ if($data === false) {
 $export = Export::create([
     'center_office_id'      => $params['center_office_id'],
     'export_type'           => 'payments',
-    'data'                  => $data
+    'data'                  => $data,
+    'object_class'          => Payment::getType(),
+    'object_ids'            => json_encode(array_column($payments, 'id'))
 ])
     ->read(['id'])
     ->first();

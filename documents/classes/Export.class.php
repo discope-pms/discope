@@ -45,6 +45,17 @@ class Export extends Document {
                 'type'              => 'boolean',
                 'default'           => false,
                 'description'       => 'Mark the archive as already exported.'
+            ],
+
+            'object_class' => [
+                'type'              => 'string',
+                'description'       => 'Namespace of the concerned entity.'
+            ],
+
+            'object_ids' => [
+                'type'              => 'string',
+                'usage'             => 'text/json',
+                'description'       => 'Ids of the associated entities.'
             ]
 
         ];
@@ -63,5 +74,50 @@ class Export extends Document {
         }
 
         return $result;
+    }
+
+    public static function policyReversible($self): array {
+        $result = [];
+        $self->read(['object_class']);
+        foreach($self as $export) {
+            if(empty($export['object_class'])) {
+                return ['object_class' => ['not_configured' => "The object class must be configured to reverse the export."]];
+            }
+        }
+
+        return $result;
+    }
+
+    public static function getPolicies(): array {
+        return [
+
+            'reversible' => [
+                'description'   => "Checks if the export can be reversed.",
+                'function'      => 'policyReversible'
+            ]
+
+        ];
+    }
+
+    protected static function doReverse($self) {
+        $self->read(['object_class', 'object_ids']);
+        foreach($self as $export) {
+            $ids = json_decode($export['object_ids'], true);
+            if(!empty($ids)) {
+                $export['object_class']::ids($ids)->update(['is_exported' => false]);
+            }
+        }
+    }
+
+    public static function getActions(): array {
+        return [
+
+            'reverse' => [
+                'description'   => "Before deletion, reverse the export, set 'is_exported' false for concerned entities.",
+                'policies'      => [],
+                'function'      => 'doReverse'
+            ]
+
+        ];
     }
 }

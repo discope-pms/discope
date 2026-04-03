@@ -753,7 +753,9 @@ if(count($invoices_header_data)) {
     $export = Export::create([
         'center_office_id'      => $params['center_office_id'],
         'export_type'           => $journal['type'] === 'sales' ? 'invoices' : 'invoices_peppol',
-        'data'                  => $data
+        'data'                  => $data,
+        'object_class'          => Invoice::getType(),
+        'object_ids'            => json_encode(array_column($invoices, 'id'))
     ])
         ->read(['id'])
         ->first();

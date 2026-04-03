@@ -18,6 +18,15 @@
             "params": {
                 "id": "object.id"
             }
+        },
+        {
+            "id": "action.delete",
+            "label": "Delete",
+            "description": "Delete the export.",
+            "controller": "documents_export_delete",
+            "params": {
+                "id": "object.id"
+            }
         }
     ],
     "layout": {
