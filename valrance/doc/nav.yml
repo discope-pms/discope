@@ -1,1 +1,15 @@
 - 'Accueil': 'index.md'
+- 'Vue d''ensemble':
+    - 'Introduction': 'overview/index.md'
+    - 'Personnalisations du package': 'overview/customizations.md'
+- 'Réservations':
+    - 'Programme par groupe': 'booking/programme-par-groupe.md'
+- 'Documents':
+    - 'Vue d''ensemble': 'documents/index.md'
+    - 'Réservation': 'documents/booking-print.md'
+    - 'Contrat': 'documents/contract-print.md'
+    - 'Facture': 'documents/invoice-print.md'
+- 'Statistiques':
+    - 'Vue d''ensemble': 'stats/index.md'
+    - 'Contrats & réservations': 'stats/contracts-and-bookings.md'
+    - 'Fiches récapitulatives': 'stats/summary-sheets.md'

@@ -1,17 +1,18 @@
 # Discope - Relais Valrance
 
+Cette documentation décrit les personnalisations spécifiques au package `valrance`.
 
-## Stratégies de paramétrage & personnalisations
+Le package contient principalement :
 
-* présence d'un paramètre de configuration (SettingValue) qu'il est possible de configurer
-	=> c'est la solution à privilégier pour les fonctionnalités natives de Discope, mais dont l'utilisation dépend de l'organisation
-	une alternative moins propre mais acceptable, est de conditionner l'affichage d'une action ou d'une vue à l'appartenance d'un utilisateur à un groupe et, en parallèle de ne créer les groupes cibles que sur les instances concernées
+- une application de statistiques dédiée au Relais Valrance ;
+- des exports métiers pour les réservations et contrats ;
+- des impressions personnalisées pour les réservations, contrats et factures ;
+- des règles de présentation propres aux séjours et au programme par groupe.
 
+## Parcours conseillé
 
-* surcharge d'une entité pour pouvoir assigner une vue spécifique (form), au sein d'un package dédié au client
-	=> c'est la stratégie à mettre en œuvre lorsqu'il y a des vues spécifiques à un client (mise en page, filtre, actions, …)
+- [Vue d'ensemble](overview/index.md)
+- [Programme par groupe](booking/programme-par-groupe.md)
+- [Impressions et documents](documents/index.md)
+- [Statistiques Valrance](stats/index.md)
 
-* s'il s'agit d'un ensemble de fonctionnalités regroupées en une App qui est spécifique à un client, alors l'App concernée est placée dans un package dédié au client
-
-
-* s'il s'agit d'une personnalisation mineure (état d'un contexte, ordre d'affichage, zones ouvertes, ...), les informations peuvent être stockées eclusivement dan le frontend via le local storage.
