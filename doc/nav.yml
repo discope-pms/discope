@@ -1,9 +1,6 @@
 - 'Accueil': 'index.md'
 - 'Concepts':
     - 'Vue d’ensemble': 'concepts/index.md'
-    - 'Organisation': 'concepts/organization.md'
-    - 'Centres': 'concepts/centers.md'
-    - 'Unités locatives': 'concepts/rental_units.md'
 - 'Installation':
     - 'Vue d’ensemble': 'setup/index.md'
     - 'Sécurité': 'setup/security.md'
