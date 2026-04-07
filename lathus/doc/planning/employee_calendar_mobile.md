@@ -1,225 +1,475 @@
-Parfait 👍 tu as raison.
+## PWA Planning Animateurs
 
-Ce que tu m’as donné, ce sont des **spécifications fonctionnelles et techniques**.
-Voici maintenant une **page de documentation orientée utilisateur / produit**, expliquant :
+# 1. Application
 
-* ce que c’est
-* à quoi ça sert
-* comment ça fonctionne
-* sans ton technique trop “spec”
+L'App **PWA Planning Animateurs** est une interface mobile qui sert à la **consultation et la manipulation opérationnelle du planning animateurs**.
 
----
+* Application **mobile-first**
+* **Distincte de l’interface desktop**
+* **Connectée en temps réel à l’API Discope**
+* **Sans persistance locale ni mode offline**
 
-# 📱 PWA Planning Animateurs – CPA Lathus
-
-## Présentation
-
-La **PWA Planning Animateurs** est une application mobile spécifique développée pour le **CPA Lathus**.
-
-Elle s’intègre directement à **Discope** et propose une interface mobile dédiée à la gestion du planning des animateurs.
-
-Contrairement à l’interface web classique de Discope (orientée desktop), cette application est conçue exclusivement pour un usage sur smartphone.
-
-Elle permet aux équipes terrain de :
-
-* Consulter le planning
-* Assigner des activités
-* Gérer les indisponibilités
-* Réorganiser les affectations rapidement
-
-Le tout en temps réel, connecté directement à l’API Discope.
+Elle ne constitue pas un système autonome :
+→ **toute la logique métier est portée par l’API**
 
 ---
 
-# 🎯 À quoi sert l’application ?
+# 2. Modèle fonctionnel
 
-L’application répond à un besoin simple :
+## 2.1 Acteurs
 
-> Permettre aux animateurs et responsables de gérer le planning depuis le terrain, rapidement et sans passer par l’interface desktop.
+| Acteur       | Rôle fonctionnel                                        |
+| ------------ | ------------------------------------------------------- |
+| Animateur    | Consultation uniquement                                 |
+| Manager      | Gestion opérationnelle (assignations, indisponibilités) |
+| Organisateur | Supervision globale                                     |
 
-Elle est utilisée par :
-
-* **Les animateurs** (consultation)
-* **Les managers de secteur** (gestion opérationnelle)
-* **Les organisateurs** (vision globale et coordination)
+Les droits sont déterminés par les **userGroups**, avec priorité au plus permissif.
 
 ---
 
-# 🗂 Comment est structuré le planning ?
+## 2.2 Concepts métier
 
-Le planning est organisé sous forme de tableau :
+### EmployeeRole
 
-* Chaque ligne représente un **animateur**
-* Chaque colonne correspond à un **moment de la journée**
+Rôle métier d’un animateur.
 
-Les moments sont fixes :
+* Cardinalité : **1 employé → 1 rôle**
+* Usage :
 
-* MAT. (matin)
-* APR. (après-midi)
+  * Filtrage du planning
+  * Détermination du périmètre de visibilité
+
+⚠️ Important :
+
+* Les `EmployeeRole` sont **souvent configurés avec des libellés similaires aux catégories d’activités**
+* **Aucun lien structurel n’existe** entre rôle et catégorie
+* Toute correspondance est **conventionnelle côté client**, pas garantie par le modèle
+
+---
+
+### UserGroup
+
+Rôle applicatif (permissions).
+
+* Cardinalité : **N groupes par utilisateur**
+* Règle :
+
+  * **union des droits**
+  * priorité au plus permissif
+
+---
+
+### Activity (assignable)
+
+Activité planifiée.
+
+Cas particulier :
+
+* **activité sans animateur → “activité à assigner”**
+
+Ce n’est **ni** :
+
+* un créneau vide
+* un événement libre (PartnerEvent)
+
+---
+
+### ProductModel (structurant)
+
+Les activités sont liées à un `product_model_id`.
+
+```text
+BookingActivity → product_model_id
+```
+
+Ce modèle produit constitue la base de structuration des activités :
+
+* typologie
+* regroupements implicites
+* filtrage
+
+⚠️ Important :
+
+* Il n’existe **pas de relation directe avec une entité Category métier**
+* La notion de "catégorie" est **dérivée indirectement du catalogue produit**
+
+---
+
+### Category (notion dérivée)
+
+La notion de catégorie :
+
+* n’est pas portée par une entité métier explicite
+* est reconstruite à partir des `product_model_ids`
+
+👉 Concrètement :
+
+```text
+Category ≈ regroupement de product_model_ids
+```
+
+Conséquences :
+
+* dépend du **jeu de données chargé**
+* non stable si chargement partiel
+* non exploitable de manière uniforme selon les rôles
+
+---
+
+### PartnerEvent
+
+Objet générique représentant :
+
+* indisponibilité
+* blocage
+* note interne
+* événement administratif
+
+→ **aucun autre système d’absence n’existe**
+
+---
+
+# 3. Structure du planning
+
+## 3.1 Modèle de grille
+
+Le planning est une grille :
+
+* **Lignes** : animateurs
+* **Colonnes** : moments fixes
+
+Moments définis globalement :
+
+* MAT.
+* APR.
 * SOIR
 
-Un animateur ne peut avoir qu’une seule activité par moment.
+---
 
-L’affichage peut couvrir :
+## 3.2 Définition d’un “moment”
 
-* Un seul jour
-* Plusieurs jours selon la largeur de l’écran
+Un moment est une clé unique :
 
-La navigation se fait simplement :
+```
+(employee, date, timeslot)
+```
 
-* Par swipe horizontal
-* Ou via les boutons de navigation
-* Avec possibilité de sélectionner une date via un calendrier
+Contraintes :
+
+* **1 seule assignation par moment**
+* Pas de multi-affectation
 
 ---
 
-# 👥 Gestion des rôles
+## 3.3 Affichage
 
-## Rôle métier (Employee Role)
+* Vue glissante (jour/semaine)
+* Nombre de jours dépend de la largeur écran
+* Navigation :
 
-Chaque animateur possède un **rôle métier** (ex : Équitation, Environnement, Sport & Cirque, Camps).
-
-Ce rôle permet :
-
-* De filtrer l’affichage
-* De déterminer les activités compatibles
-
-Un animateur ne peut avoir qu’un seul rôle métier.
+  * swipe horizontal
+  * boutons
+  * sélection calendrier
 
 ---
 
-## Rôles applicatifs (Groupes utilisateurs)
+# 4. Gestion des assignations
 
-Les droits dans l’application dépendent du groupe utilisateur :
+## 4.1 Source des assignations
 
-### Animateur
+Deux sources :
 
-* Consultation uniquement
-
-### Manager
-
-* Réassigner un animateur
-* Supprimer une assignation
-* Créer ou modifier une indisponibilité
-
-### Organisateur
-
-* Accès complet
-* Gestion globale du planning
-
-Si un utilisateur appartient à plusieurs groupes, le niveau de droit le plus élevé s’applique.
+1. Activités déjà assignées
+2. Activités à assigner (pool)
 
 ---
 
-# ➕ Activités à assigner
+## 4.2 Interaction principale
 
-Certaines activités sont planifiées sans animateur.
+### Drag & Drop
 
-Elles apparaissent dans un panneau spécifique :
-**“Activités à assigner”**
+Cas autorisés :
 
-Depuis ce panneau, un manager ou organisateur peut :
+* panneau → cellule
+* cellule → cellule
 
-* Glisser-déposer l’activité vers un animateur
-* La repositionner si nécessaire
+Contraintes :
 
-Chaque modification est validée immédiatement par le système central.
-
----
-
-# 🔄 Comment fonctionne l’assignation ?
-
-L’assignation se fait par **glisser-déposer** :
-
-1. Sélectionner une activité non assignée
-2. La déposer sur un animateur, à un moment donné
-
-Une validation automatique est effectuée.
-
-Si une erreur survient (ex : conflit, problème réseau), un message s’affiche et aucune modification n’est conservée.
+* drop uniquement sur zone visible
+* pas d’auto-scroll
+* validation **uniquement via API**
 
 ---
 
-# 📌 Gestion des indisponibilités
+## 4.3 Validation
 
-Les absences et indisponibilités sont gérées via des événements internes appelés **PartnerEvent**.
+* aucune mutation locale persistée
+* chaque action → appel API
 
-Ils peuvent représenter :
+En cas d’erreur :
 
-* Une absence
-* Une réunion interne
-* Un blocage horaire
-* Une note organisationnelle
-
-Il n’existe pas de système séparé d’absences : tout passe par ce mécanisme.
+* rollback implicite (aucun état local)
+* affichage d’un message (snack)
 
 ---
 
-# 🔍 Filtres et affichage
+## 4.4 Suppressions
 
-L’application permet de filtrer :
-
-### Les animateurs
-
-* Par rôle métier (secteur)
-* Par nom
-
-### Les activités
-
-* Toutes
-* Par type d’activité
-
-L’affichage par défaut dépend du profil :
-
-* Animateur → planning de son secteur
-* Manager → planning de son secteur
-* Organisateur → planning complet
+| Action                 | Manager | Organisateur |
+| ---------------------- | ------- | ------------ |
+| Supprimer assignation  | ✔       | ✔            |
+| Supprimer PartnerEvent | ✖       | ✔            |
+| Supprimer activité     | ✖       | ✖            |
 
 ---
 
-# 🔄 Synchronisation
+# 5. Consultation d’un moment
 
-L’application fonctionne exclusivement en ligne.
+Interaction :
 
-* Chaque action est validée en temps réel
-* Il n’y a pas de mode hors connexion
-* Il n’y a pas de sauvegarde locale
+* clic → ouverture dialog fullscreen
 
-Si deux personnes modifient le planning simultanément, la dernière modification validée par le système prévaut.
+Contenu (lecture seule) :
 
----
+* réservation
+* groupe
+* numéro
+* date
+* tranche (MAT/APR/SOIR)
+* heures précises
+* type d’activité (product model)
 
-# 📜 Historique
-
-L’historique des modifications n’est pas disponible dans l’application mobile.
-
-Il reste accessible via l’interface web Discope.
-
----
-
-# 🔐 Sécurité
-
-* Authentification via session sécurisée
-* Vérification des permissions côté serveur
-* Aucune action critique ne dépend uniquement de l’application mobile
+→ **aucune édition dans l’application**
 
 ---
 
-# 🚫 Limitations connues
+# 6. Filtres
 
-L’application ne permet pas :
+## 6.1 Animateurs
 
-* La suppression d’une activité planifiée
-* La gestion avancée des conflits simultanés
-* Le fonctionnement hors ligne
-* L’historique intégré
-
-Elle est volontairement conçue comme un outil mobile opérationnel, simple et rapide.
+* par `employeeRole`
+* par nom
 
 ---
 
-Si tu veux, je peux maintenant :
+## 6.2 Activités
 
-* soit la réécrire dans le style exact que tu utilises dans ta doc Discope
-* soit l’intégrer dans un format cohérent avec ta structure eQual / produit
-* soit la rendre encore plus orientée “manuel utilisateur” avec cas concrets.
+* toutes
+* par modèle produit (`product_model_id`)
+
+---
+
+## 6.3 Catégories (comportement spécifique)
+
+⚠️ Le filtre "catégorie" n’est **pas basé sur une entité Category explicite**.
+
+Il repose sur :
+
+```text
+un sous-ensemble de product_model_ids
+```
+
+### Cas Organisateur (Admin)
+
+* Chargement basé sur le **catalogue produit**
+* Vision complète des `product_model_ids`
+* Possibilité de reconstruire un filtre catégorie global
+
+👉 Le filtre catégorie est ici :
+
+* **catalogue-driven**
+* stable et cohérent
+
+---
+
+### Cas Manager / Animateur
+
+* Chargement basé sur les **activités des employés du groupe**
+* Sous-ensemble dynamique de `product_model_ids`
+* Mélange possible de catégories
+
+👉 Le filtre catégorie catalogue :
+
+* **non reconstructible correctement**
+* donc absent dans l’état actuel
+
+---
+
+### Conséquence
+
+Il existe en réalité deux logiques de filtrage :
+
+```text
+1. Filtre catégorie (catalogue)
+2. Filtre catégorie (activités chargées)
+```
+
+Ces deux filtres :
+
+* reposent sur des sources différentes
+* ne sont pas compatibles
+* doivent être considérés comme distincts
+
+---
+
+### Évolution possible
+
+Pour les managers / animateurs :
+
+* ajout d’un filtre catégorie basé sur les **activités visibles**
+* appliqué en surcouche
+* mutuellement exclusif avec le filtre catalogue
+
+---
+
+## 6.4 Scope par défaut
+
+| Groupe       | Scope   |
+| ------------ | ------- |
+| Animateur    | secteur |
+| Manager      | secteur |
+| Organisateur | global  |
+
+---
+
+# 7. Synchronisation et concurrence
+
+## 7.1 Modèle
+
+* **temps réel**
+* **stateless côté client**
+* aucune cache métier
+
+---
+
+## 7.2 Conflits
+
+* aucune gestion de verrou
+* stratégie : **last write wins**
+
+---
+
+## 7.3 Rafraîchissement
+
+* pas d’auto-refresh
+* refresh manuel uniquement
+
+---
+
+# 8. Offline
+
+Non supporté :
+
+* aucune donnée stockée
+* aucune action différée
+* connexion obligatoire
+
+---
+
+# 9. Sécurité
+
+* authentification via session
+* permissions validées côté API
+* front-end non autoritaire
+
+---
+
+# 10. Architecture technique
+
+## 10.1 Stack
+
+* Angular
+* Angular Material
+* CSS Grid / Flexbox
+* PWA
+
+---
+
+## 10.2 Layout
+
+* grille dynamique (pas de `<table>`)
+* responsive mobile-first
+
+---
+
+## 10.3 Gestion des gestes
+
+Implémentation native :
+
+* `touchstart`
+* `touchmove`
+* `touchend`
+
+Conditions :
+
+* détection horizontale : `|dx| > |dy|`
+* seuil minimal
+* `preventDefault` uniquement si swipe confirmé
+
+CSS :
+
+```
+touch-action: pan-y;
+```
+
+---
+
+## 10.4 Chargement des données
+
+Deux stratégies distinctes :
+
+### Mode Organisateur
+
+```text
+Chargement via product_model
+→ catalogue complet
+→ structuration globale
+```
+
+### Mode Manager / Animateur
+
+```text
+Chargement via activités des employés
+→ sous-ensemble dynamique
+→ dépend des assignations
+```
+
+Conséquence :
+
+* les données ne sont **pas homogènes**
+* certaines fonctionnalités (ex : catégories) ne sont **pas universellement applicables**
+
+---
+
+# 11. Règles structurantes
+
+## 11.1 Invariants métier
+
+* 1 animateur = 1 rôle métier
+* 1 moment = 1 assignation max
+* absence = PartnerEvent
+* aucune modification locale persistée
+
+---
+
+## 11.2 Responsabilités
+
+| Front (PWA)         | API                 |
+| ------------------- | ------------------- |
+| UI / interactions   | logique métier      |
+| validation minimale | validation complète |
+| affichage           | source de vérité    |
+
+---
+
+# 12. Hors scope explicite
+
+* mode offline
+* historique dans l’app
+* verrou concurrentiel
+* suppression d’activité
+* gestion avancée des conflits
+* auto-refresh
+* système d’absences dédié
+
