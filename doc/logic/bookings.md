@@ -1288,68 +1288,82 @@ consacrée à l'export du listing des arrivées (précédemment
 
 #### Annulation sans frais
 
-Annulation d'une réservation sans facturation.
+##### Comment procéder :
 
-Conséquences :
+1. Ouvrir la fiche de réservation et cliquer sur **"Annuler"**.
+2. Sélectionner n'importe quel **motif d'annulation**.
+3. Laisser le champ **"Frais d'annulation"** à 0.
+4. Cliquer sur **"Exécuter"**.
 
-  - La réservation est marquée comme annulée et son status passe à "Annulée".
-  - Les financements non payés sont supprimés.
-  - Les montants des financements restants sont ajustés au montant déjà payé.
-  - Un financement négatif est créé pour le remboursement du client.
+##### Conséquences :
+
+- Le statut de la réservation passe à **"Annulée"** et *is_cancelled* est défini à **TRUE**.
+- Les financements non payés sont supprimés.
+- Les montants des financements restants sont ajustés au montant déjà payé.
+- Un financement négatif est créé pour le remboursement du client.
 
 #### Annulation avec frais
 
-Annulation d'une réservation avec facturation de frais d'annulation.
+##### Comment procéder :
 
-Conséquences :
+1. Ouvrir la fiche de réservation et cliquer sur **"Annuler"**.
+2. Sélectionner n'importe quel **motif d'annulation**.
+3. Indiquer un montant supérieur à 0 dans le champ **"Frais d'annulation"**.
+4. Cliquer sur **"Exécuter"**.
 
-  - La réservation est marquée comme annulée.
-  - Si la réservation est encore au stade Devis, elle le reste. Si elle a déjà dépassé le stade Devis, son statut passe à "Terminée".
-  - Les financements non payés sont supprimés.
-  - Les groupes sont requalifiés en "Extra" afin de pouvoir être modifiés.
-  - Un groupe supplémentaire est ajouté, contenant le produit d’annulation au tarif saisi dans les "Frais d’annulation".
+##### Conséquences :
 
-Ensuite :
+- Si la réservation est encore au stade **Devis**, elle le reste. Si elle a déjà dépassé le stade **Devis**, son statut passe à **"Terminée"**.
+- Le champ *is_cancelled* de la réservation est défini à **TRUE**.
+- Les financements non payés sont supprimés.
+- Les groupes sont requalifiés en **"Extra"** afin de pouvoir être modifiés.
+- Un groupe supplémentaire est ajouté, contenant le produit d'annulation au tarif saisi dans les **"Frais d'annulation"**.
 
-  - Les groupes "Extra" devenus inutiles peuvent être supprimés.
-  - Les frais d’annulation sont facturés.
-  - La réservation suit ensuite le processus habituel jusqu’au statut "Clôturée".
+##### Étapes suivantes :
 
-#### Annulation avec frais OTA
+- Les groupes **"Extra"** devenus inutiles peuvent être supprimés.
+- Les frais d'annulation sont facturés.
+- La réservation suit ensuite le processus habituel jusqu'au statut **"Clôturée"**.
 
-Annulation d'une réservation avec frais depuis une plateforme externe à Discope.
+#### Annulation OTA avec frais
 
-Conséquences :
+##### Comment procéder :
 
-  - Le statut de la réservation passe à "Terminée".
-  - Les financements non payés sont supprimés.
-  - Les groupes sont requalifiés en "Extra" afin de pouvoir être modifiés.
-  - Un groupe supplémentaire est ajouté, contenant le produit d’annulation au tarif de 0 €.
+1. Annuler la réservation dans Cubilis.
 
-Ensuite :
+##### Conséquences :
 
-  - Les groupes "Extra" devenus inutiles peuvent être supprimés.
-  - Le montant des frais d’annulation doit être modifié de 0 € vers la somme demandée.
-  - Les frais d’annulation sont facturés.
-  - La réservation suit ensuite le processus habituel jusqu’au statut "Clôturée".
+- Le statut de la réservation passe à **"Terminée"** et *is_cancelled* est défini à **TRUE**.
+- Les financements non payés sont supprimés.
+- Les groupes sont requalifiés en **"Extra"** afin de pouvoir être modifiés.
+- Un groupe supplémentaire est ajouté, contenant le produit d'annulation au tarif de 0 €.
 
-#### Annulation sans frais OTA
+##### Étapes suivantes :
 
-Annulation d'une réservation sans frais depuis une plateforme externe à Discope.
+- Les groupes **"Extra"** devenus inutiles peuvent être supprimés.
+- Le montant des frais d'annulation doit être modifié de 0 € vers la somme demandée.
+- Les frais d'annulation sont facturés.
+- La réservation suit ensuite le processus habituel jusqu'au statut **"Clôturée"**.
 
-Conséquences :
+#### Annulation OTA sans frais
 
-  - La réservation est marquée comme annulée et son status passe à "Annulée".
-  - Les financements non payés sont supprimés.
-  - Les groupes sont requalifiés en "Extra" afin de pouvoir être modifiés.
-  - Un groupe supplémentaire est ajouté, contenant le produit d’annulation au tarif de 0 €.
+##### Comment procéder :
 
-Ensuite :
+1. Annuler la réservation dans Cubilis.
 
-  - Utiliser l'action "Annuler sans frais" dans la fiche de réservation :
-    - Le statut de la réservation passe à "Annulée".
-    - Les montants des financements restants sont ajustés au montant déjà payé.
-    - Un financement négatif est créé pour le remboursement du client.
+##### Conséquences :
+
+- Le statut de la réservation passe à **"Terminée"** et *is_cancelled* est défini à **TRUE**.
+- Les financements non payés sont supprimés.
+- Les groupes sont requalifiés en **"Extra"** afin de pouvoir être modifiés.
+- Un groupe supplémentaire est ajouté, contenant le produit d'annulation au tarif de 0 €.
+
+##### Étapes suivantes :
+
+- Utiliser l'action **"Annuler sans frais"** dans la fiche de réservation.
+- Le statut de la réservation passe à **"Annulée"**.
+- Les montants des financements restants sont ajustés au montant déjà payé.
+- Un financement négatif est créé pour le remboursement du client.
 
 ## Système d'alertes
 
