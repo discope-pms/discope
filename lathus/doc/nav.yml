@@ -3,6 +3,8 @@
     - 'Calendrier Animateurs': 'planning/employee_calendar.md'
     - 'Planning activités condensé': 'planning/activities_planning.md'
     - 'Programme de la semaine': 'planning/weekly_program.md'
+- 'Réservations':
+    - 'Documents de réservation': 'reservations/booking-documents.md'
 - 'Camps':
     - 'Vue d''ensemble': 'camps/index.md'
     - 'Modèles': 'camps/models.md'
@@ -17,4 +19,6 @@
     - 'Participants': 'camps/participants.md'
     - 'Suivi opérationnel': 'camps/followup.md'
     - 'Statistiques': 'camps/stats.md'
-
+- 'Technique':
+    - 'Intégrations & exports': 'technical/integrations-exports.md'
+    - 'Modèle spécifique': 'technical/data-model.md'

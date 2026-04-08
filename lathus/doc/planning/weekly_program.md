@@ -23,3 +23,22 @@ Apps dashboard → Réservations → Planning → En cours
 - Liste des SKUs des produits de mise à disposition d'un frigo
 - Clé: `sale.booking.icebox_skus`
 
+## Usage opérationnel
+
+Cette vue sert de synthèse hebdomadaire pour les équipes d'accueil et de coordination.
+
+Elle met en évidence des signaux utiles sans ouvrir chaque réservation :
+
+- présence d'activités planifiées ;
+- besoin de frigo ;
+- répartition dans les unités locatives ;
+- présence d'un participant avec handicap ;
+- repas planifiés.
+
+## Lecture PO
+
+Le programme de la semaine n'est pas un document contractuel. C'est une vue de préparation et de coordination, orientée exécution.
+
+## Lecture DEV
+
+La présence de certains indicateurs dépend du paramétrage ou du contenu des lignes de réservation, notamment le cas du frigo via la clé de configuration `sale.booking.icebox_skus`.

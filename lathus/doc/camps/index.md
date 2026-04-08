@@ -22,3 +22,17 @@ Notes :
 - Les inscriptions de status Brouillon, Confirmée et Validée sont prises en compte.
 - Le site d'un camp est déterminé en fonction de sa tranche d'âge (Criquets 6-9, Coccinelles 10-12, Libellules 13-16).
 
+## Ce que le package ajoute
+
+Le code du package complète ce périmètre avec plusieurs éléments spécifiques :
+
+- un connecteur de récupération d'inscriptions depuis l'API CPA Lathus ;
+- des champs complémentaires sur les tuteurs, institutions et inscriptions ;
+- des exports CSV pour le site web ;
+- un certificat annuel de camp par enfant ;
+- une app de statistiques dédiée à la fois aux réservations et aux camps.
+
+## Public cible de cette documentation
+
+- PO : comprendre les règles métier, les documents disponibles et les flux d'exploitation ;
+- DEV : localiser les providers, vues et surcharges qui matérialisent ces règles.

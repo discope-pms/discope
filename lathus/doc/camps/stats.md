@@ -1,5 +1,55 @@
 # Stats camps
 
+Le package Lathus expose une app de statistiques dédiée qui couvre à la fois :
+
+- les réservations et contrats de séjours ;
+- les camps et inscriptions.
+
+## Structure de l'app
+
+Le menu `Statistiques (Lathus)` contient notamment :
+
+- un bloc `Bookings values` ;
+- un bloc `Camps values`.
+
+Dans `Bookings values`, le package ajoute une statistique personnalisée `Contrats & Réservations` basée sur le provider `lathus_booking_stats_stat-contracts`.
+
+Dans `Camps values`, il réutilise surtout des statistiques de camp déjà présentes dans le socle.
+
+## Contrats & Réservations
+
+Cette statistique personnalisée donne une vue consolidée des réservations avec :
+
+- centre et type de centre ;
+- type de réservation ;
+- dates de création et de séjour ;
+- catégorie tarifaire ;
+- type de client ;
+- nombre de personnes, nuitées, unités locatives et activités ;
+- langue et zone géographique du client ;
+- prix HTVA et TVAC.
+
+### Filtres disponibles
+
+La vue de recherche expose notamment :
+
+- centre ;
+- statut ;
+- type de réservation ;
+- intervalle de dates ;
+- type de client ;
+- catégorie tarifaire ;
+- pays et département.
+
+### Notes DEV
+
+Le provider `data/booking/stats/stat-contracts.php` :
+
+- simplifie certains statuts pour la restitution ;
+- calcule les nuitées-personnes et nuitées-chambres ;
+- exclut les réservations annulées ;
+- exploite les centres, types de client et zones géographiques dans ses filtres.
+
 ## Distribution enfants
 
 Liste les camps entre les deux dates données et donne des informations sur les quantités d'enfants participants aux camps.
@@ -87,4 +137,3 @@ Chemin : Apps dashboard → Statistiques (Lathus) -> Stats Camps → Inscription
 Quantités par statut (brouillon, en attente, confirmée, validée, annulée) et total.
 
 Chemin : Apps dashboard → Statistiques (Lathus) -> Stats Camps → Inscriptions → Par mois
-
