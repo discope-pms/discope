@@ -302,10 +302,10 @@ hr {
             <thead style="border: solid 1px black; border-left: 0px; border-right: 0px;">
                 <tr>
                 <th width="65%" style="padding-left: 7px; font-weight: bold; text-align: left;">
-                    {{i18n['product_label']}}
+                    {{ i18n['product_label'] }}
                 </th>
                 <th width="10%" style="font-weight: bold; text-align: center;  border-left: solid 1px black; padding-right: 7px;">
-                    {{i18n['quantity_short']}}
+                    {{ i18n['quantity_short'] }}
                 </th>
                 <!--
                 <th width="8%" style="font-weight: bold; text-align: left;  border-left: solid 1px black; padding-right: 7px;">
@@ -313,7 +313,7 @@ hr {
                 </th>
                 -->
                 <th width="12%" style="font-weight: bold; text-align: right;  border-left: solid 1px black; padding-right: 7px;">
-                    {{i18n['unit_price']}}
+                    {{ i18n['unit_price'] }}
                 </th>
                 <!--
                 <th width="8%" style="font-weight: bold; text-align: right;  border-left: solid 1px black; padding-right: 7px;">
@@ -331,59 +331,61 @@ hr {
                 -->
                 <th width="13%" style="font-weight: bold; text-align: right;  border-left: solid 1px black; padding-right: 7px;">
                     {% if (company_has_vat == false) or (company_vat_number is null) or (company_vat_number == '') %}
-                        {{i18n['price']}}
+                        {{ i18n['price'] }}
                     {% else %}
-                        {{i18n['price_tax_excl']}}
+                        {{ i18n['price_tax_excl'] }}
                     {% endif %}
                 </th>
             </tr>
             </thead>
-            <!-- for each line -->
+            <!-- for each line (except downpayment) -->
             {% for line in lines %}
-                <tr valign="top">
-                    <td width="65%">
-                        {% if line.is_group %}
-                            <b>{{ line.name }}</b> <br />
-                            {{ line.description }}
-                        {% else %}
-                            {{ line.name }}
-                        {% endif %}
-                    </td>
-                    <td width="10%" style="text-align: center;">
-                        {{ line.qty }}
-                    </td>
-                    <!--
-                    <td width="8%" style="text-align: center;">
-                        {% if line.free_qty is not null %}
-                            {{ line.free_qty }}
-                        {% endif %}
-                    </td>
-                    -->
-                    <td width="12%" style="text-align: right;">
-                        {% if line.unit_price is not null %}
-                            {{ line.unit_price | format_money() }}
-                        {% endif %}
-                    </td>
-                    <!--
-                    <td width="8%" style="text-align: right;">
-                        {% if line.discount is not null and line.discount > 0 %}
-                            {{ line.discount | format_number(style='percent') }}
-                        {% endif %}
-                    </td>
-                    -->
-                    <!--
-                    <td width="8%" style="text-align: right;">
-                        {% if line.vat_rate is not null and company_has_vat %}
-                            {{ line.vat_rate | format_number(style='percent') }}
-                        {% endif %}
-                    </td>
-                    -->
-                    <td width="13%" style="text-align: right;">
-                        {% if line.total is not null %}
-                            {{ line.total | format_money() }}
-                        {% endif %}
-                    </td>
-                </tr>
+                {% if line.is_downpayment == false %}
+                    <tr valign="top">
+                        <td width="65%">
+                            {% if line.is_group %}
+                                <b>{{ line.name }}</b> <br />
+                                {{ line.description }}
+                            {% else %}
+                                {{ line.name }}
+                            {% endif %}
+                        </td>
+                        <td width="10%" style="text-align: center;">
+                            {{ line.qty }}
+                        </td>
+                        <!--
+                        <td width="8%" style="text-align: center;">
+                            {% if line.free_qty is not null %}
+                                {{ line.free_qty }}
+                            {% endif %}
+                        </td>
+                        -->
+                        <td width="12%" style="text-align: right;">
+                            {% if line.unit_price is not null %}
+                                {{ line.unit_price | format_money() }}
+                            {% endif %}
+                        </td>
+                        <!--
+                        <td width="8%" style="text-align: right;">
+                            {% if line.discount is not null and line.discount > 0 %}
+                                {{ line.discount | format_number(style='percent') }}
+                            {% endif %}
+                        </td>
+                        -->
+                        <!--
+                        <td width="8%" style="text-align: right;">
+                            {% if line.vat_rate is not null and company_has_vat %}
+                                {{ line.vat_rate | format_number(style='percent') }}
+                            {% endif %}
+                        </td>
+                        -->
+                        <td width="13%" style="text-align: right;">
+                            {% if line.total is not null %}
+                                {{ line.total | format_money() }}
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endif %}
             {% endfor %}
         </table>
     </div>
@@ -394,95 +396,172 @@ hr {
         <table width="100%" style="border: 0px; border-right: solid 1px black;" cellpadding="4" cellspacing="0">
             <tr valign="top">
                 <td width="87%" style="text-align: right; padding-right: 10px;">
-                    {{i18n['total_tax_excl']}}
+                    {{ i18n['total_tax_excl'] }}
                 </td>
                 <td width="13%" style="text-align: right; border-left: solid 1px black; border-bottom: solid 1px black;">
-                    {{ total | format_money() }}
+                    {{ (total - downpayment_amount) | format_money() }}
                 </td>
             </tr>
             {% for tax_label, tax_total in tax_lines %}
-            {% if (tax_total != 0.0) %}
-            <tr>
-                <td style="text-align: right; padding-right: 10px;">
-                    {{ tax_label }}
-                </td>
-                <td style="text-align: right; border-left: solid 1px black; border-bottom: solid 1px black;">
-                    {{ tax_total | format_money() }}
-                </td>
-            </tr>
-            {% endif %}
+                {% if (tax_total != 0.0) %}
+                    <tr>
+                        <td style="text-align: right; padding-right: 10px;">
+                            {{ tax_label }}
+                        </td>
+                        <td style="text-align: right; border-left: solid 1px black; border-bottom: solid 1px black;">
+                            {{ tax_total | format_money() }}
+                        </td>
+                    </tr>
+                {% endif %}
             {% endfor %}
             <tr>
                 <td style="text-align: right; padding-right: 10px;">
-                    <strong>{{i18n['stay_total_tax_incl']}}</strong>
+                    <strong>{{ i18n['stay_total_tax_incl'] }}</strong>
                 </td>
                 <td style="text-align: right; border-left: solid 1px black; border-bottom: solid 1px black;">
-                    <strong>{{ price | format_money() }}</strong>
+                    <strong>{{ (price - downpayment_amount) | format_money() }}</strong>
                 </td>
             </tr>
         </table>
-        <div style="margin-top: 10px; text-align: center;"><small>Association loi 1901, non assujetie à la TVA : (article 261-4-40-a 3ème alinéa et 261-7-1er du code général des impôts)</small></div>
-        <!-- payments history -->
-        {% if fundings_payments | length > 0  and (price > 0.0) %}
-        <div style="margin-top: 5px; page-break-inside: avoid;">
-            <!-- <div style="margin: 0px 0px 20px 0px;"><b><u>{{i18n['payments_history']}} ({{date_fundings_update}}):</u></b></div> -->
-            <table width="100%" cellpadding="4" cellspacing="0" style="border: solid 1px black; border-collapse: collapse; page-break-inside: avoid;">
-                <tr valign="top">
-                    <th width="25%" style="text-align: left;">
-                        <b style="text-transform: uppercase;">{{i18n['date']}}</b>
-                    </th>
-                    <th width="20%">
-                        <b style="text-transform: uppercase;">{{i18n['origin']}}</b>
-                    </th>
-                    <th width="65%" style="text-align: right;">
-                        <b style="text-transform: uppercase;">{{i18n['received']}}</b>
-                    </th>
-                </tr>
+    </div>
+</div>
 
-                <!-- for each line -->
-                {% for payment in fundings_payments %}
-                    <tr valign="top">
-                        <td width="25%">
-                            {{ payment.receipt_date }}
-                        </td>
-                        <td width="20%" style="text-align: center;">
-                            {{ payment.payment_origin }}
-                        </td>
-                        <td width="65%" style="text-align: right;">
-                            {{ payment.amount | format_money() }}
-                        </td>
-                    </tr>
+{% if downpayment_amount < 0.0 %}
+    <div class="inner" style="margin-top: 10px;">
+        <div class="wrapper" style="margin-top: -1px;">
+            <table width="100%" cellpadding="4" cellspacing="0">
+                <!-- for each downpayment line -->
+                {% for line in lines %}
+                    {% if line.is_downpayment == true %}
+                        <tr valign="top">
+                            <td width="65%">
+                                {% if line.is_group %}
+                                    <b>{{ line.name }}</b> <br />
+                                    {{ line.description }}
+                                {% else %}
+                                    {{ line.name }}
+                                {% endif %}
+                            </td>
+                            <td width="10%" style="text-align: center;">
+                                {{ line.qty }}
+                            </td>
+                            <!--
+                            <td width="8%" style="text-align: center;">
+                                {% if line.free_qty is not null %}
+                                    {{ line.free_qty }}
+                                {% endif %}
+                            </td>
+                            -->
+                            <td width="12%" style="text-align: right;">
+                                {% if line.unit_price is not null %}
+                                    {{ line.unit_price | format_money() }}
+                                {% endif %}
+                            </td>
+                            <!--
+                            <td width="8%" style="text-align: right;">
+                                {% if line.discount is not null and line.discount > 0 %}
+                                    {{ line.discount | format_number(style='percent') }}
+                                {% endif %}
+                            </td>
+                            -->
+                            <!--
+                            <td width="8%" style="text-align: right;">
+                                {% if line.vat_rate is not null and company_has_vat %}
+                                    {{ line.vat_rate | format_number(style='percent') }}
+                                {% endif %}
+                            </td>
+                            -->
+                            <td width="13%" style="text-align: right;">
+                                {% if line.total is not null %}
+                                    {{ line.total | format_money() }}
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endif %}
                 {% endfor %}
             </table>
         </div>
-        {% endif %}
-
-        <!--
-        {% if type != 'credit_note' and ( not has_orders)%}
-        <table width="100%" style="border-right: 1px solid white; border: 0px; margin-top: 20px;" cellpadding="4" cellspacing="0">
-            {% if (total_remaining < 0.0) %}
-            <tr valign="top">
-                <td width="87%" style="text-align: right; padding-right: 10px;">
-                    <strong>{{i18n['amount_to_be_refunded']}}:</strong>
-                </td>
-                <td width="13%" style="text-align: right; border: 0px;">
-                    <strong>{{ total_remaining | abs | format_money() }}</strong>
-                </td>
-            </tr>
-            {% elseif (total_remaining > 0.0) %}
-            <tr valign="top">
-                <td width="87%" style="text-align: right; padding-right: 10px;">
-                    <strong>{{i18n['left_to_pay']}}:</strong>
-                </td>
-                <td width="13%" style="text-align: right; border: 0px;">
-                    <strong>{{ total_remaining | format_money() }}</strong>
-                </td>
-            </tr>
-            {% endif %}
-        </table>
-        {% endif %}
-        -->
     </div>
+
+    <div class="trailer">
+        <div class="wrapper" style="margin-top: -1px;">
+            <table width="100%" style="border: 0px; border-right: solid 1px black;" cellpadding="4" cellspacing="0">
+                <tr valign="top">
+                    <td width="87%" style="text-align: right; padding-right: 10px;">
+                        <strong>SOLDE</strong>
+                    </td>
+                    <td width="13%" style="text-align: right; border-left: solid 1px black; border-bottom: solid 1px black;">
+                        <strong>{{ price | format_money() }}</strong>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+{% endif %}
+
+<div class="trailer">
+    <div style="margin-top: 10px; text-align: center;"><small>Association loi 1901, non assujetie à la TVA : (article 261-4-40-a 3ème alinéa et 261-7-1er du code général des impôts)</small></div>
+
+    <!-- payments history -->
+    {% if fundings_payments | length > 0  and (price > 0.0) %}
+    <div style="margin-top: 5px; page-break-inside: avoid;">
+        <!-- <div style="margin: 0px 0px 20px 0px;"><b><u>{{i18n['payments_history']}} ({{date_fundings_update}}):</u></b></div> -->
+        <table width="100%" cellpadding="4" cellspacing="0" style="border: solid 1px black; border-collapse: collapse; page-break-inside: avoid;">
+            <tr valign="top">
+                <th width="25%" style="text-align: left;">
+                    <b style="text-transform: uppercase;">{{ i18n['date'] }}</b>
+                </th>
+                <th width="20%">
+                    <b style="text-transform: uppercase;">{{ i18n['origin'] }}</b>
+                </th>
+                <th width="65%" style="text-align: right;">
+                    <b style="text-transform: uppercase;">{{ i18n['received'] }}</b>
+                </th>
+            </tr>
+
+            <!-- for each line -->
+            {% for payment in fundings_payments %}
+                <tr valign="top">
+                    <td width="25%">
+                        {{ payment.receipt_date }}
+                    </td>
+                    <td width="20%" style="text-align: center;">
+                        {{ payment.payment_origin }}
+                    </td>
+                    <td width="65%" style="text-align: right;">
+                        {{ payment.amount | format_money() }}
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+    {% endif %}
+
+    <!--
+    {% if type != 'credit_note' and ( not has_orders)%}
+    <table width="100%" style="border-right: 1px solid white; border: 0px; margin-top: 20px;" cellpadding="4" cellspacing="0">
+        {% if (total_remaining < 0.0) %}
+        <tr valign="top">
+            <td width="87%" style="text-align: right; padding-right: 10px;">
+                <strong>{{i18n['amount_to_be_refunded']}}:</strong>
+            </td>
+            <td width="13%" style="text-align: right; border: 0px;">
+                <strong>{{ total_remaining | abs | format_money() }}</strong>
+            </td>
+        </tr>
+        {% elseif (total_remaining > 0.0) %}
+        <tr valign="top">
+            <td width="87%" style="text-align: right; padding-right: 10px;">
+                <strong>{{i18n['left_to_pay']}}:</strong>
+            </td>
+            <td width="13%" style="text-align: right; border: 0px;">
+                <strong>{{ total_remaining | format_money() }}</strong>
+            </td>
+        </tr>
+        {% endif %}
+    </table>
+    {% endif %}
+    -->
 </div>
 
 

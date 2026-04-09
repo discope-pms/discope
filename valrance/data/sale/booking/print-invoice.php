@@ -9,6 +9,7 @@
 use Dompdf\Dompdf;
 use Dompdf\Options as DompdfOptions;
 use sale\booking\InvoiceLine;
+use sale\catalog\Product;
 use Twig\Environment as TwigEnvironment;
 use Twig\Loader\FilesystemLoader as TwigFilesystemLoader;
 use Twig\Extra\Intl\IntlExtension;
@@ -583,6 +584,19 @@ if($template_part) {
     6) feed lines
 */
 
+$downpayment_product_id = 0;
+if(!$invoice['is_deposit']) {
+    // #memo - only separate referenced downpayments from prior deposit invoices
+    $downpayment_sku = Setting::get_value('sale', 'organization', 'sku.downpayment.'.$invoice['organisation_id']['id']);
+    if($downpayment_sku) {
+        $products_ids = Product::search(['sku', '=', $downpayment_sku])->ids();
+        if($products_ids) {
+            $downpayment_product_id = reset($products_ids);
+        }
+    }
+}
+
+
 $invoice_lines = InvoiceLine::search(['invoice_id', '=', $invoice['id']])
     ->read([
         'product_id' => [
@@ -680,8 +694,17 @@ foreach($invoice_lines as $line) {
     $map_groupings_lines[$grouping_name][] = $line;
 }
 
+$downpayment_amount = 0.0;
 $lines = [];
 foreach($map_groupings_lines as $grouping_name => $grouping_lines) {
+    // #memo - if it is referencing a downpayment from another invoice, then separate it form other products
+    $is_downpayment = !$invoice['is_deposit'] && $grouping_lines[0]['product_id']['id'] === $downpayment_product_id;
+    if($is_downpayment) {
+        foreach($grouping_lines as $line) {
+            $downpayment_amount += $line['price'];
+        }
+    }
+
     switch($params['mode']) {
         case 'grouped':
             $total = 0;
@@ -692,38 +715,41 @@ foreach($map_groupings_lines as $grouping_name => $grouping_lines) {
             }
 
             $lines[] = [
-                'name'          => $grouping_name,
-                'qty'           => 1,
-                'free_qty'      => null,
-                'unit_price'    => $total,
-                'vat_rate'      => null,
-                'total'         => $total,
-                'price'         => $price,
-                'is_group'      => true
+                'name'              => $grouping_name,
+                'qty'               => 1,
+                'free_qty'          => null,
+                'unit_price'        => $total,
+                'vat_rate'          => null,
+                'total'             => $total,
+                'price'             => $price,
+                'is_group'          => true,
+                'is_downpayment'    => $is_downpayment
             ];
             break;
         case 'detailed':
             $lines[] = [
-                'name'          => $grouping_name,
-                'qty'           => null,
-                'free_qty'      => null,
-                'unit_price'    => null,
-                'vat_rate'      => null,
-                'total'         => null,
-                'price'         => null,
-                'is_group'      => true
+                'name'              => $grouping_name,
+                'qty'               => null,
+                'free_qty'          => null,
+                'unit_price'        => null,
+                'vat_rate'          => null,
+                'total'             => null,
+                'price'             => null,
+                'is_group'          => true,
+                'is_downpayment'    => $is_downpayment
             ];
 
             foreach($grouping_lines as $line) {
                 $lines[] = [
-                    'name'          => $line['name'],
-                    'qty'           => $line['qty'],
-                    'free_qty'      => $line['free_qty'],
-                    'unit_price'    => $line['unit_price'],
-                    'vat_rate'      => $line['vat_rate'],
-                    'total'         => $line['total'],
-                    'price'         => $line['price'],
-                    'is_group'      => false
+                    'name'              => $line['name'],
+                    'qty'               => $line['qty'],
+                    'free_qty'          => $line['free_qty'],
+                    'unit_price'        => $line['unit_price'],
+                    'vat_rate'          => $line['vat_rate'],
+                    'total'             => $line['total'],
+                    'price'             => $line['price'],
+                    'is_group'          => false,
+                    'is_downpayment'   => $is_downpayment
                 ];
             }
             break;
@@ -731,6 +757,7 @@ foreach($map_groupings_lines as $grouping_name => $grouping_lines) {
 }
 
 $values['lines'] = $lines;
+$values['downpayment_amount'] = $downpayment_amount;
 
 /*
     7) inject expected fundings and find the first installment
