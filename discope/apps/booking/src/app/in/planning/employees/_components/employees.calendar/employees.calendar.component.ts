@@ -263,6 +263,25 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
         return false;
     }
 
+    public hasOverlappingActivity(partner: Partner, day_index: string, time_slot: string): boolean {
+        const activities = this.activities[partner.id]?.[day_index]?.[time_slot] ?? [];
+
+        for(let activityToCompare of activities) {
+            let canCompare = false;
+            for(let activity of activities) {
+                if(activity.id === activityToCompare.id) {
+                    // used to not compare twice
+                    canCompare = true;
+                    continue;
+                }
+                if(canCompare && this.doActivitiesCollide(activity, activityToCompare)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     public hasExclusiveActivity(employee: Employee, day_index: string, time_slot: string) {
         let activities = this.activities[employee.id]?.[day_index]?.[time_slot] ?? [];
 
@@ -272,18 +291,58 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
     }
 
     public hasSpaceBefore(employee: Employee, day: Date, time_slot: 'AM'|'PM'|'EV') {
-        let activities = this.getActivities(employee, day, time_slot);
+        let activities = this.getHorizontalActivities(employee, day, time_slot);
         let timeSlot = this.mapTimeSlot[time_slot];
 
         return activities.length > 0 && activities[0].schedule_from > timeSlot.schedule_from;
     }
 
     public hasSpaceAfter(employee: Employee, day: Date, time_slot: 'AM'|'PM'|'EV') {
-        let activities = this.getActivities(employee, day, time_slot);
+        let activities = this.getHorizontalActivities(employee, day, time_slot);
         let timeSlot = this.mapTimeSlot[time_slot];
 
         return activities.length > 0 && activities[activities.length - 1].schedule_to < timeSlot.schedule_to;
     }
+
+    private getActivityDuration(activity: any) {
+        const [hourFrom, minuteFrom, secondFrom] = activity.schedule_from.split(':');
+        const [hourTo, minuteTo, secondTo] = activity.schedule_to.split(':');
+
+        const secondsFrom = (hourFrom * 60 * 60) + (minuteFrom * 60) + secondFrom;
+        const secondsTo = (hourTo * 60 * 60) + (minuteTo * 60) + secondTo;
+
+        return secondsTo - secondsFrom;
+    }
+
+    private doActivitiesCollide(a: any, b: any): boolean {
+        // overlap at start
+        if (
+            a.schedule_from <= b.schedule_from &&
+            a.schedule_to > b.schedule_from
+        ) {
+            return true;
+        }
+
+        // overlap at end
+        if (
+            a.schedule_from < b.schedule_to &&
+            a.schedule_to >= b.schedule_to
+        ) {
+            return true;
+        }
+
+        // full containment (activity completely inside or outside)
+        if (
+            a.schedule_from >= b.schedule_from &&
+            a.schedule_to <= b.schedule_to
+        ) {
+            return true;
+        }
+
+        return false;
+    }
+
+
 
     public getActivities(partner: Partner, day: Date, time_slot: string): any[] {
         if(!this.activities?.[partner.id]) {
@@ -293,8 +352,48 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
         let date_index = this.calcDateIndex(day);
         const allItems = this.activities[partner.id]?.[date_index]?.[time_slot] ?? [];
 
-        return allItems
-            .filter((a: any) => !a.is_partner_event)
+        return allItems.filter((a: any) => !a.is_partner_event);
+    }
+
+    /**
+     * Returns activities that do not overlap (starting with the shorter one)
+     */
+    public getHorizontalActivities(partner: Partner, day: Date, time_slot: string): any[] {
+        const activities = this.getActivities(partner, day, time_slot);
+
+        const durationAscActivities = activities
+            .sort((a: any, b: any) => {
+                const durationA = this.getActivityDuration(a);
+                const durationB = this.getActivityDuration(b);
+                if(durationA < durationB) {
+                    return -1;
+                }
+                if(durationA > durationB) {
+                    return 1;
+                }
+                return 0;
+            });
+
+        const horizontalActivities: any[] = [];
+        for(let activityToCompare of durationAscActivities) {
+            let collision = false;
+            for(let activity of horizontalActivities) {
+                if(activity.id === activityToCompare.id) {
+                    continue;
+                }
+
+                if(this.doActivitiesCollide(activity, activityToCompare)) {
+                    collision = true;
+                    break;
+                }
+            }
+
+            if(!collision) {
+                horizontalActivities.push(activityToCompare);
+            }
+        }
+
+        return horizontalActivities
             .sort((a: any, b: any) => {
                 if(a.schedule_from < b.schedule_from) {
                     return -1;
@@ -304,6 +403,16 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
                 }
                 return 0;
             });
+    }
+
+    /**
+     * Returns activities that do overlap (all the activities that are not returned by "getHorizontalActivities")
+     */
+    public getVerticalActivities(partner: Partner, day: Date, time_slot: string) {
+        const activities = this.getActivities(partner, day, time_slot);
+        const horizontalActivitiesIds: number[] = this.getHorizontalActivities(partner, day, time_slot).map(a => a.id);
+
+        return activities.filter((a) => !horizontalActivitiesIds.includes(a.id));
     }
 
     public hasPartnerEvent(partner: Partner, day_index: string, time_slot: string): boolean {

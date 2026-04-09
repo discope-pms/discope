@@ -129,7 +129,7 @@
 
                             <!-- activities cell -->
                             <div *ngIf="hasActivity(partner, headers.days_indexes[i], 'AM')" class="cell-activities" [ngClass]="{ 'space-before': hasSpaceBefore(partner, day, 'AM'), 'space-after': hasSpaceAfter(partner, day, 'AM') }">
-                                <ng-container *ngFor="let activity of getActivities(partner, day, 'AM'); let j = index">
+                                <ng-container *ngFor="let activity of getHorizontalActivities(partner, day, 'AM'); let j = index">
                                     <planning-employees-calendar-activity
                                         [height]="rowsHeight"
                                         [width]="cellsWidth"
@@ -144,7 +144,7 @@
                                         (cdkDragStarted)="onDragStart(activity)"
                                     ></planning-employees-calendar-activity>
 
-                                    <div *ngIf="hovered_activity == activity" class="cell-hint" [style]="'transform: translateX(' + ((i === 0 || i < (headers.days.length - 1)) ? -16 : -230) + 'px) translateY(calc(1*(var(--rows_height)) + 10px)'" #vDescription="var" [var]="{value: getActivityDescription(activity)}" (mouseenter)="onhoverActivity(activity)" (mouseleave)="onhoverActivity(null)">
+                                    <span *ngIf="hovered_activity == activity" class="cell-hint" [style]="'transform: translateX(' + ((i === 0 || i < (headers.days.length - 1)) ? -16 : -230) + 'px) translateY(calc(1*(var(--rows_height)) + 10px)'" #vDescription="var" [var]="{value: getActivityDescription(activity)}" (mouseenter)="onhoverActivity(activity)" (mouseleave)="onhoverActivity(null)">
                                         <div class="tooltip" [class]="{'tooltip--with-header': activity.booking_id && (activity.booking_line_group_id.has_person_with_disability || activity.booking_id.date_from === activity.booking_id.date_to) }">
                                             <div class="header" style="color: #514d4d;">
                                                 <mat-icon *ngIf="activity.booking_id && activity.booking_line_group_id.has_person_with_disability" aria-hidden="true">accessible</mat-icon>
@@ -152,7 +152,33 @@
                                             </div>
                                             <div class="content" *ngIf="vDescription?.value?.length" style="margin: 0 !important; font-size: 0.85rem;" [innerHTML]="getSafeHtml(vDescription.value)" (click)="onclickDescription($event)"></div>
                                         </div>
-                                    </div>
+                                    </span>
+                                </ng-container>
+                            </div>
+
+                            <!-- overlapping activities cell -->
+                            <div *ngIf="hasOverlappingActivity(partner, headers.days_indexes[i], 'AM')" class="cell-overlapping-activities">
+                                <ng-container *ngFor="let activity of getVerticalActivities(partner, day, 'AM'); let j = index">
+                                    <planning-employees-calendar-activity
+                                        [height]="rowsHeight"
+                                        [width]="cellsWidth"
+                                        [tableRect]="tableRect"
+                                        [day]="day"
+                                        [activity]="activity"
+                                        (hover)="onhoverActivity($event); onhoverDay(partner, day)"
+                                        (mouseleave)="onhoverActivity(null); onhoverDay(null, null)"
+                                        (selected)="onSelectedActivity($event)"
+                                    ></planning-employees-calendar-activity>
+
+                                    <span *ngIf="hovered_activity == activity" class="cell-hint" [style]="'transform: translateX(' + ((i === 0 || i < (headers.days.length - 1)) ? -16 : -230) + 'px) translateY(calc(1*(var(--rows_height)) + 10px)'" #vDescription="var" [var]="{value: getActivityDescription(activity)}" (mouseenter)="onhoverActivity(activity)" (mouseleave)="onhoverActivity(null)">
+                                        <div class="tooltip" [class]="{'tooltip--with-header': activity.booking_id && (activity.booking_line_group_id.has_person_with_disability || activity.booking_id.date_from === activity.booking_id.date_to) }">
+                                            <div class="header" style="color: #514d4d;">
+                                                <mat-icon *ngIf="activity.booking_id && activity.booking_line_group_id.has_person_with_disability" aria-hidden="true">accessible</mat-icon>
+                                                <mat-icon *ngIf="activity.booking_id && activity.booking_id.date_from === activity.booking_id.date_to" aria-hidden="true">event</mat-icon>
+                                            </div>
+                                            <div class="content" *ngIf="vDescription?.value?.length" style="margin: 0 !important; font-size: 0.85rem;" [innerHTML]="getSafeHtml(vDescription.value)" (click)="onclickDescription($event)"></div>
+                                        </div>
+                                    </span>
                                 </ng-container>
                             </div>
 
@@ -197,7 +223,7 @@
 
                             <!-- activities cell -->
                             <div *ngIf="hasActivity(partner, headers.days_indexes[i], 'PM')" class="cell-activities" [ngClass]="{ 'space-before': hasSpaceBefore(partner, day, 'PM'), 'space-after': hasSpaceAfter(partner, day, 'PM') }">
-                                <ng-container *ngFor="let activity of getActivities(partner, day, 'PM'); let j = index">
+                                <ng-container *ngFor="let activity of getHorizontalActivities(partner, day, 'PM'); let j = index">
 
                                     <planning-employees-calendar-activity
                                         [height]="rowsHeight"
@@ -225,7 +251,33 @@
                                 </ng-container>
                             </div>
 
-                            <!-- partner events -->
+                            <!-- overlapping activities cell -->
+                            <div *ngIf="hasOverlappingActivity(partner, headers.days_indexes[i], 'PM')" class="cell-overlapping-activities">
+                                <ng-container *ngFor="let activity of getVerticalActivities(partner, day, 'PM'); let j = index">
+                                    <planning-employees-calendar-activity
+                                        [height]="rowsHeight"
+                                        [width]="cellsWidth"
+                                        [tableRect]="tableRect"
+                                        [day]="day"
+                                        [activity]="activity"
+                                        (hover)="onhoverActivity($event); onhoverDay(partner, day)"
+                                        (mouseleave)="onhoverActivity(null); onhoverDay(null, null)"
+                                        (selected)="onSelectedActivity($event)"
+                                    ></planning-employees-calendar-activity>
+
+                                    <span *ngIf="hovered_activity == activity" class="cell-hint" [style]="'transform: translateX(' + ((i === 0 || i < (headers.days.length - 1)) ? -16 : -230) + 'px) translateY(calc(1*(var(--rows_height)) + 10px)'" #vDescription="var" [var]="{value: getActivityDescription(activity)}" (mouseenter)="onhoverActivity(activity)" (mouseleave)="onhoverActivity(null)">
+                                        <div class="tooltip" [class]="{'tooltip--with-header': activity.booking_id && (activity.booking_line_group_id.has_person_with_disability || activity.booking_id.date_from === activity.booking_id.date_to) }">
+                                            <div class="header" style="color: #514d4d;">
+                                                <mat-icon *ngIf="activity.booking_id && activity.booking_line_group_id.has_person_with_disability" aria-hidden="true">accessible</mat-icon>
+                                                <mat-icon *ngIf="activity.booking_id && activity.booking_id.date_from === activity.booking_id.date_to" aria-hidden="true">event</mat-icon>
+                                            </div>
+                                            <div class="content" *ngIf="vDescription?.value?.length" style="margin: 0 !important; font-size: 0.85rem;" [innerHTML]="getSafeHtml(vDescription.value)" (click)="onclickDescription($event)"></div>
+                                        </div>
+                                    </span>
+                                </ng-container>
+                            </div>
+
+                            <!-- partner events cell -->
                             <div *ngIf="hasPartnerEvent(partner, headers.days_indexes[i], 'PM')" class="cell-partner-events">
                                 <ng-container *ngFor="let partnerEvent of getPartnerEvents(partner, day, 'PM'); let j = index">
                                     <planning-employees-calendar-activity
@@ -266,7 +318,7 @@
 
                             <!-- activities cell -->
                             <div *ngIf="hasActivity(partner, headers.days_indexes[i], 'EV')" class="cell-activities" [ngClass]="{ 'space-before': hasSpaceBefore(partner, day, 'EV'), 'space-after': hasSpaceAfter(partner, day, 'EV') }">
-                                <ng-container *ngFor="let activity of getActivities(partner, day, 'EV'); let j = index">
+                                <ng-container *ngFor="let activity of getHorizontalActivities(partner, day, 'EV'); let j = index">
 
                                     <planning-employees-calendar-activity
                                         [height]="rowsHeight"
@@ -281,6 +333,32 @@
                                         [cdkDragDisabled]="activity?.is_partner_event"
                                         (cdkDragStarted)="onDragStart(activity)">
                                     </planning-employees-calendar-activity>
+
+                                    <span *ngIf="hovered_activity == activity" class="cell-hint" [style]="'transform: translateX(' + ((i === 0 || i < (headers.days.length - 1)) ? -16 : -230) + 'px) translateY(calc(1*(var(--rows_height)) + 10px)'" #vDescription="var" [var]="{value: getActivityDescription(activity)}" (mouseenter)="onhoverActivity(activity)" (mouseleave)="onhoverActivity(null)">
+                                        <div class="tooltip" [class]="{'tooltip--with-header': activity.booking_id && (activity.booking_line_group_id.has_person_with_disability || activity.booking_id.date_from === activity.booking_id.date_to) }">
+                                            <div class="header" style="color: #514d4d;">
+                                                <mat-icon *ngIf="activity.booking_id && activity.booking_line_group_id.has_person_with_disability" aria-hidden="true">accessible</mat-icon>
+                                                <mat-icon *ngIf="activity.booking_id && activity.booking_id.date_from === activity.booking_id.date_to" aria-hidden="true">event</mat-icon>
+                                            </div>
+                                            <div class="content" *ngIf="vDescription?.value?.length" style="margin: 0 !important; font-size: 0.85rem;" [innerHTML]="getSafeHtml(vDescription.value)" (click)="onclickDescription($event)"></div>
+                                        </div>
+                                    </span>
+                                </ng-container>
+                            </div>
+
+                            <!-- overlapping activities cell -->
+                            <div *ngIf="hasOverlappingActivity(partner, headers.days_indexes[i], 'EV')" class="cell-overlapping-activities">
+                                <ng-container *ngFor="let activity of getVerticalActivities(partner, day, 'EV'); let j = index">
+                                    <planning-employees-calendar-activity
+                                        [height]="rowsHeight"
+                                        [width]="cellsWidth"
+                                        [tableRect]="tableRect"
+                                        [day]="day"
+                                        [activity]="activity"
+                                        (hover)="onhoverActivity($event); onhoverDay(partner, day)"
+                                        (mouseleave)="onhoverActivity(null); onhoverDay(null, null)"
+                                        (selected)="onSelectedActivity($event)"
+                                    ></planning-employees-calendar-activity>
 
                                     <span *ngIf="hovered_activity == activity" class="cell-hint" [style]="'transform: translateX(' + ((i === 0 || i < (headers.days.length - 1)) ? -16 : -230) + 'px) translateY(calc(1*(var(--rows_height)) + 10px)'" #vDescription="var" [var]="{value: getActivityDescription(activity)}" (mouseenter)="onhoverActivity(activity)" (mouseleave)="onhoverActivity(null)">
                                         <div class="tooltip" [class]="{'tooltip--with-header': activity.booking_id && (activity.booking_line_group_id.has_person_with_disability || activity.booking_id.date_from === activity.booking_id.date_to) }">
