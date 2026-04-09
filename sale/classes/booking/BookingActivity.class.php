@@ -688,7 +688,7 @@ class BookingActivity extends Model {
                     }
                 }
             }
-            else {
+            elseif(isset($booking_activity['camp_group_id'])) {
                 // camp group checks
                 $updatable_fields = array_merge($common_fields, $camp_fields);
                 foreach(array_keys($values) as $field) {
