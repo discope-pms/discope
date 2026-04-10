@@ -127,9 +127,11 @@ $invoices = Invoice::search($domain, ['limit' => 100, 'sort' => ['number' => 'as
         'total_vat',
         'price',
         'partner_id' => [
+            '@domain' => ['state', 'in', ['instance', 'archive']],
             'id',
             'name',
             'partner_identity_id' => [
+                '@domain' => ['state', 'in', ['instance', 'archive']],
                 'id',
                 'address_street',
                 'address_dispatch',
