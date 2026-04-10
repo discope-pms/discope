@@ -355,12 +355,15 @@ try {
                                 elseif($reservation['partner_id'] == 5) {
                                     $values['tour_operator_id'] = 18717;
                                 }
-                                // HostelWorld - #todo - to be confirmed
+                                // HostelWorld
                                 elseif($reservation['partner_id'] == 757) {
                                     $values['tour_operator_id'] = 24596;
                                 }
+                                // AirBnB
+                                elseif($reservation['partner_id'] == 699) {
+                                    $values['tour_operator_id'] = 24595;
+                                }
 
-                                // #todo #channelmanager - AirBnB
                                 Booking::id($booking['id'])->update($values);
                             }
                         }
