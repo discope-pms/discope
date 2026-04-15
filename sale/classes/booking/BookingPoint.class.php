@@ -99,7 +99,7 @@ class BookingPoint extends Model {
         ];
     }
 
-    public static function getAction(): array {
+    public static function getActions(): array {
         return [
 
             'refresh_points' => [
