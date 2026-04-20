@@ -82,6 +82,14 @@ class BookingPoint extends Model {
                 'store'             => false
             ],
 
+            'applicable_points_value' => [
+                'type'              => 'computed',
+                'result_type'       => 'float',
+                'description'       => 'Number of points earned from the target booking that are currently applicable.',
+                'store'             => false,
+                'function'          => 'calcApplicablePointsValue'
+            ],
+
             'description' => [
                 'type'              => 'string',
                 'usage'             => 'text/plain',
@@ -158,6 +166,16 @@ class BookingPoint extends Model {
 
             $result[$id] = $is_applicable;
         }
+        return $result;
+    }
+
+    protected static function calcApplicablePointsValue($self): array {
+        $result = [];
+        $self->read(['points_value', 'is_applicable']);
+        foreach($self as $id => $bookingPoint) {
+            $result[$id] = $bookingPoint['is_applicable'] ? $bookingPoint['points_value'] : 0;
+        }
+
         return $result;
     }
 

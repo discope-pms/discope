@@ -6,11 +6,11 @@
     },
     "operations": {
         "total": {
-          "points_value": {
-            "usage": "numeric/float",
-            "operation": "SUM",
-            "suffix": ""
-          }
+            "applicable_points_value": {
+                "usage": "numeric/float",
+                "operation": "SUM",
+                "suffix": ""
+            }
         }
     },
     "layout": {
@@ -53,6 +53,16 @@
             {
                 "type": "field",
                 "value": "booking_apply_id",
+                "width": "10%"
+            },
+            {
+                "type": "field",
+                "value": "is_applicable",
+                "width": "10%"
+            },
+            {
+                "type": "field",
+                "value": "applicable_points_value",
                 "width": "10%"
             }
         ]
