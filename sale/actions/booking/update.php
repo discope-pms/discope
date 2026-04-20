@@ -12,7 +12,7 @@ use sale\booking\Booking;
     'description'   => "Update hook for Booking creation: init values and makes additional checks.",
     'extends'       => 'core_model_update',
     'params'        => [
-       'entity' =>  [
+        'entity' =>  [
             'description'   => 'Full name (including namespace) of the class to return (e.g. \'core\\User\').',
             'type'          => 'string',
             'required'      => true
@@ -60,17 +60,47 @@ use sale\booking\Booking;
  */
 ['context' => $context, 'orm' => $orm] = $providers;
 
+// simple cast to handle null values for many2one fields
+$params_fields = [];
+foreach($params['fields'] as $field => $value) {
+    // relationship fields
+    if(in_array($field, ['id', 'customer_id', 'customer_identity_id', 'organisation_id', 'customer_nature_id', 'customer_rate_class_id', 'center_id', 'center_office_id', 'tour_operator_id'])) {
+        if(in_array($value, ['null', 'NULL'])) {
+            $params_fields[$field] = null;
+        }
+        else {
+            $params_fields[$field] = (int) $value;
+        }
+    }
+    // datetime and date fields
+    elseif(in_array($field, ['modified', 'date_from', 'date_to'])) {
+        $params_fields[$field] = strtotime($value);
+    }
+    // boolean fields
+    elseif($field === 'has_tour_operator') {
+        $params_fields[$field] = $value === 'true';
+    }
+    // other fields (string)
+    else {
+        $params_fields[$field] = $value;
+    }
+}
+
 if(isset($params['id']) && $params['id'] > 0) {
     $booking_id = $params['id'];
 }
 elseif(isset($params['ids']) && count($params['ids'])) {
     $booking_id = $params['ids'][0];
 }
-elseif(isset($params['fields']['id'])) {
-    $booking_id = $params['fields']['id'];
+elseif(isset($params_fields['id'])) {
+    $booking_id = $params_fields['id'];
 }
 else {
-    throw new Exception("missing_object_identifier", QN_ERROR_INVALID_PARAM);
+    throw new Exception("missing_object_identifier", EQ_ERROR_INVALID_PARAM);
+}
+
+if(!isset($params_fields['center_id'])) {
+    throw new Exception("missing_center", EQ_ERROR_INVALID_PARAM);
 }
 
 
@@ -88,14 +118,14 @@ else {
 $orm->disableEvents();
 
 $orm->update(Booking::getType(), $booking_id, [
-        'customer_nature_id'    => $params['fields']['customer_nature_id'],
-        'center_id'             => $params['fields']['center_id'],
-        'organisation_id'       => $params['fields']['organisation_id'],
-        'date_from'             => strtotime($params['fields']['date_from']),
-        'date_to'               => strtotime($params['fields']['date_to']),
-        'has_tour_operator'     => ($params['fields']['has_tour_operator'] ?? '') === 'true',
-        'tour_operator_id'      => $params['fields']['tour_operator_id'] ?? null,
-        'tour_operator_ref'     => $params['fields']['tour_operator_ref'] ?? ''
+        'customer_nature_id'    => $params_fields['customer_nature_id'],
+        'center_id'             => $params_fields['center_id'],
+        'organisation_id'       => $params_fields['organisation_id'],
+        'date_from'             => $params_fields['date_from'],
+        'date_to'               => $params_fields['date_to'],
+        'has_tour_operator'     => $params_fields['has_tour_operator'] ?? false,
+        'tour_operator_id'      => $params_fields['tour_operator_id'] ?? null,
+        'tour_operator_ref'     => $params_fields['tour_operator_ref'] ?? ''
     ]);
 
 
@@ -104,10 +134,10 @@ $orm->enableEvents();
 
 Booking::id($booking_id)
     // assign identity & sync with customer
-       ->update(['customer_identity_id'    => $params['fields']['customer_identity_id']])
-       ->update(['customer_rate_class_id'  => $params['fields']['customer_rate_class_id']])
+   ->update(['customer_identity_id'    => $params_fields['customer_identity_id']])
+   ->update(['customer_rate_class_id'  => $params_fields['customer_rate_class_id']])
     // re-create contacts
-       ->do('import_contacts');
+   ->do('import_contacts');
 
 // 2) check customer history
 
@@ -118,6 +148,6 @@ eQual::run('do', 'sale_booking_check-customer-debtor', ['id' => $booking_id]);
 eQual::run('do', 'sale_booking_check-customer-history', ['id' => $booking_id]);
 
 
-$context->httpResponse()
-        ->body($result)
-        ->send();
+$context
+    ->httpResponse()
+    ->send();
