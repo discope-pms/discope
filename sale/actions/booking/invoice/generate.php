@@ -415,6 +415,10 @@ if($fundings) {
     ]);
 }
 
+// #memo - recalc price to be sure that it's correctly computed
+Invoice::id($invoice['id'])->update(['total' => null])->read(['total']);
+Invoice::id($invoice['id'])->update(['price' => null])->read(['price']);
+
 $context->httpResponse()
         ->status(204)
         ->send();
