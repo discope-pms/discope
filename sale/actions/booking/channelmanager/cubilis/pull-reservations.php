@@ -606,18 +606,33 @@ try {
 
                             foreach($reservation['extra_services'] as $extra_service) {
                                 try {
+                                    $service_product_model_id = null;
+
                                     // search amongst existing extra services for current property
                                     $service = ExtraService::search([ ['extref_inventory_code', '=', $extra_service['inventory_code']], ['property_id', '=', $property['id']] ])
                                         ->read(['id', 'product_model_id'])
                                         ->first(true);
 
-                                    if(!$service) {
-                                        ++$result['errors'];
-                                        $result['logs'][] = "ERR - Service extra inconnu:  {$extra_service['inventory_code']} pour property {$property['id']} ({$extra_service['comments']} {$extra_service['total']['amount']})";
-                                        throw new Exception('unknown_extra_service', QN_ERROR_UNKNOWN_OBJECT);
+                                    if($service) {
+                                        $service_product_model_id = $service['product_model_id'];
+                                    }
+                                    else {
+                                        // search for default "SPEC_OTA" product if service not configured
+                                        $product_spec_ota = Product::search(['sku', '=', 'SPEC_OTA'])
+                                            ->read(['product_model_id'])
+                                            ->first(true);
+
+                                        if($product_spec_ota) {
+                                            $service_product_model_id = $product_spec_ota['product_model_id'];
+                                        }
+                                        else {
+                                            ++$result['errors'];
+                                            $result['logs'][] = "ERR - Service extra inconnu:  {$extra_service['inventory_code']} pour property {$property['id']} ({$extra_service['comments']} {$extra_service['total']['amount']})";
+                                            throw new Exception('unknown_extra_service', QN_ERROR_UNKNOWN_OBJECT);
+                                        }
                                     }
 
-                                    $products_ids = Product::search([ ['product_model_id', '=', $service['product_model_id']], ['can_sell', '=', true] ])->ids();
+                                    $products_ids = Product::search([ ['product_model_id', '=', $service_product_model_id], ['can_sell', '=', true] ])->ids();
 
                                     // retrieve a product matching the service for the current property
                                     $price_lists_ids = PriceList::search([
@@ -657,7 +672,7 @@ try {
                                             'qty'                   => 1,
                                             'price_id'              => $price['id'],
                                             'product_id'            => $price['product_id'],
-                                            'product_model_id'      => $service['product_model_id']
+                                            'product_model_id'      => $service_product_model_id
                                         ])
                                         ->update([
                                             'unit_price'            => $resulting_total,
