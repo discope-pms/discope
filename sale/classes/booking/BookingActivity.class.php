@@ -514,15 +514,15 @@ class BookingActivity extends Model {
     }
 
     public static function doUpdateCounters($self) {
-        $self->read(['activity_booking_line_id', 'camp_id']);
+        $self->read(['booking_id', 'camp_id']);
 
         $booking_activities_ids = [];
         $camp_activities_ids = [];
         foreach($self as $booking_activity) {
-            if(isset($booking_activity['activity_booking_line_id'])) {
+            if(isset($booking_activity['booking_id'])) {
                 $booking_activities_ids[] = $booking_activity['id'];
             }
-            else {
+            elseif(isset($booking_activity['camp_id'])) {
                 $camp_activities_ids[] = $booking_activity['id'];
             }
         }
