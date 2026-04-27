@@ -1097,16 +1097,11 @@ class Enrollment extends Model {
 
     public static function calcPaidAmount($self): array {
         $result = [];
-        $self->read(['fundings_ids' => ['due_amount', 'is_paid', 'paid_amount']]);
+        $self->read(['fundings_ids' => ['paid_amount']]);
         foreach($self as $id => $enrollment) {
             $paid_amount = 0.0;
             foreach($enrollment['fundings_ids'] as $funding) {
-                if($funding['is_paid']) {
-                    $paid_amount += $funding['due_amount'];
-                }
-                elseif($funding['paid_amount'] > 0) {
-                    $paid_amount += $funding['paid_amount'];
-                }
+                $paid_amount += $funding['paid_amount'];
             }
             $result[$id] = $paid_amount;
         }
@@ -2176,6 +2171,7 @@ class Enrollment extends Model {
 
     public static function doGenerateFunding($self) {
         $self->read([
+            'paid_amount',
             'price',
             'price_adapters_ids'    => ['name', 'value', 'origin_type'],
             'fundings_ids'          => ['center_office_id', 'due_amount'],
@@ -2227,21 +2223,11 @@ class Enrollment extends Model {
                 ]);
             }
 
-            $fundings = Funding::search(['enrollment_id', '=', $id])
-                ->read(['due_amount', 'paid_amount'])
-                ->get();
-
-            $to_refund_amount = 0.0;
-            foreach($fundings as $funding) {
-                if($funding['paid_amount'] > $funding['due_amount']) {
-                    $to_refund_amount += $funding['paid_amount'] - $funding['due_amount'];
-                }
-            }
-
-            if($to_refund_amount > 0) {
+            // handle refund funding
+            if($enrollment['paid_amount'] > $enrollment['price']) {
                 Funding::create([
                     'enrollment_id'     => $id,
-                    'due_amount'        => -1 * $to_refund_amount,
+                    'due_amount'        => $enrollment['price'] - $enrollment['paid_amount'],
                     'due_date'          => $enrollment['camp_id']['date_from'],
                     'center_office_id'  => $enrollment['camp_id']['center_id']['center_office_id']
                 ]);
