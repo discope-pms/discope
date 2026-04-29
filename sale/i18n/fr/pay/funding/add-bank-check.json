@@ -21,6 +21,11 @@
             "label": "Montant",
             "description": "La valeur monétaire du chèque bancaire.",
             "help": ""
+        },
+        "instant_payment": {
+            "label": "Paiement instantané",
+            "description": "Si sélectionné, un paiement sera directement ajouté au financement.",
+            "help": ""
         }
     },
     "error": {

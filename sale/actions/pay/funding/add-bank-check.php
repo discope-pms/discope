@@ -44,6 +44,12 @@ use sale\booking\Funding;
 
                 return !is_null($funding) ? (abs($funding['due_amount']) - abs($funding['paid_amount'])) : 0;
             }
+        ],
+
+        'instant_payment' => [
+            'type'              => 'boolean',
+            'description'       => "If selected, a payment will be directly added to the funding.",
+            'default'           => false
         ]
 
     ],
@@ -86,7 +92,7 @@ if($remaining_amount <= 0) {
     throw new Exception("nothing_to_pay", EQ_ERROR_INVALID_PARAM);
 }
 
-BankCheck::create([
+$bank_check = BankCheck::create([
     'funding_id'        => $funding['id'],
     'has_signature'     => $params['has_signature'],
     'bank_check_number' => $params['bank_check_number'],
@@ -94,6 +100,13 @@ BankCheck::create([
 ])
     ->read(['id'])
     ->first(true);
+
+if($params['instant_payment']) {
+    eQual::run('do', 'sale_pay_bankcheck_do-pay', [
+        'id'        => $bank_check['id'],
+        'confirm'   => true
+    ]);
+}
 
 $context->httpResponse()
         ->status(205)
