@@ -25,7 +25,7 @@ export class TasksWaitingComponent implements OnInit, AfterViewInit, OnDestroy {
                 [
                     ['is_done', '=', false],
                     ['entity', '=', 'sale\\camp\\Enrollment'],
-                    ['visible_date', '>=', new Date().toISOString().split('T')[0]]
+                    ['visible_date', '<=', new Date().toISOString().split('T')[0]]
                 ],
                 [
                     ['is_done', '=', false],
