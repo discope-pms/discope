@@ -31,6 +31,11 @@
                                                 "type": "field",
                                                 "value": "payment_reference",
                                                 "width": "25%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "booking_display_name",
+                                                "width": "25%"
                                             }
                                         ]
                                     },
@@ -45,6 +50,11 @@
                                             {
                                                 "type": "field",
                                                 "value": "due_amount_max",
+                                                "width": "25%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "customer_accounting_account",
                                                 "width": "25%"
                                             }
                                         ]

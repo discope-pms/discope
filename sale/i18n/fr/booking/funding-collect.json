@@ -1,10 +1,10 @@
 {
-    "name": "Recherche avancé de finacement",
-    "description": "Contrôleur proposant une recherche avancée de financement..",
+    "name": "Recherche avancé de financement",
+    "description": "Contrôleur proposant une recherche avancée de financement.",
     "model": {
         "booking_id": {
             "label": "Réservation",
-            "description": "La réservation est liéele au financement.",
+            "description": "La réservation liée au financement.",
             "help": ""
         },
         "due_amount_min": {
@@ -19,12 +19,22 @@
         },
         "center_id": {
             "label": "Center",
-            "description": "Le centre qui gère le financement",
+            "description": "Le centre qui gère le financement.",
             "help": ""
         },
         "payment_reference": {
             "label": "Réréference",
-            "description": "Message permettant d'identifier la raison de la transaction"
+            "description": "Message permettant d'identifier la raison de la transaction."
+        },
+        "booking_display_name": {
+            "label": "Réservation",
+            "description": "La réservation liée au financement.",
+            "help": ""
+        },
+        "customer_accounting_account": {
+            "label": "Code comptable client",
+            "description": "Le code comptable du client à l'origine de la réservation lié au financement.",
+            "help": ""
         }
     }
 }
