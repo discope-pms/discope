@@ -8,6 +8,7 @@
 
 use equal\orm\Domain;
 use identity\Center;
+use identity\Identity;
 use sale\booking\Booking;
 
 list($params, $providers) = eQual::announce([
@@ -19,6 +20,9 @@ list($params, $providers) = eQual::announce([
             'type'              => 'string',
             'default'           => 'sale\booking\Funding'
         ],
+        /**
+         * Funding filters
+         */
         'due_amount_min' => [
             'type'              => 'integer',
             'description'       => 'Minimal amount expected for the funding.'
@@ -27,6 +31,13 @@ list($params, $providers) = eQual::announce([
             'type'              => 'integer',
             'description'       => 'Maximum amount expected for funding.'
         ],
+        'payment_reference' => [
+            'type'              => 'string',
+            'description'       => 'Message for identifying the purpose of the transaction.'
+        ],
+        /**
+         * Booking filters
+         */
         'booking_id' => [
             'type'              => 'many2one',
             'foreign_object'    => 'sale\booking\Booking',
@@ -40,9 +51,16 @@ list($params, $providers) = eQual::announce([
                 return ($centers = Center::search())->count() === 1 ? current($centers->ids()) : null;
             }
         ],
-        'payment_reference' => [
+        'booking_display_name' => [
             'type'              => 'string',
-            'description'       => 'Message for identifying the purpose of the transaction.'
+            'description'       => 'Name of the booking of the funding.'
+        ],
+        /**
+         * Customer
+         */
+        'customer_accounting_account' => [
+            'type'              => 'string',
+            'description'       => 'Accounting account of the customer\'s identity.'
         ]
     ],
     'response'      => [
@@ -52,15 +70,19 @@ list($params, $providers) = eQual::announce([
     ],
     'providers'     => [ 'context', 'orm' ]
 ]);
+
 /**
- * @var \equal\php\Context $context
- * @var \equal\orm\ObjectManager $orm
+ * @var \equal\php\Context          $context
+ * @var \equal\orm\ObjectManager    $orm
  */
-list($context, $orm) = [ $providers['context'], $providers['orm'] ];
+['context' => $context, 'orm' => $orm] = $providers;
 
-$domain = $params['domain'];
+// Force domain on fundings linked to bookings
+$domain = Domain::conditionAdd($params['domain'], ['booking_id', '<>', null]);
 
-$domain = Domain::conditionAdd($domain, ['booking_id', '<>', null]);
+/**
+ * Funding filters
+ */
 
 if(isset($params['due_amount_min']) && $params['due_amount_min'] > 0) {
     $domain = Domain::conditionAdd($domain, ['due_amount', '>=', $params['due_amount_min']]);
@@ -70,20 +92,36 @@ if(isset($params['due_amount_max']) && $params['due_amount_max'] > 0) {
     $domain = Domain::conditionAdd($domain, ['due_amount', '<=', $params['due_amount_max']]);
 }
 
-if(isset($params['booking_id']) && $params['booking_id'] > 0) {
-    $domain = Domain::conditionAdd($domain, ['booking_id', '=', $params['booking_id']]);
+if(isset($params['payment_reference']) && strlen($params['payment_reference']) > 0 ) {
+    $domain = Domain::conditionAdd($domain, ['payment_reference', 'like', '%'. $params['payment_reference'].'%']);
 }
 
-if(isset($params['center_id']) && $params['center_id'] > 0) {
-    $bookings_ids = [];
-    $bookings_ids = Booking::search(['center_id', '=', $params['center_id']])->ids();
-    if(count($bookings_ids)) {
-        $domain = Domain::conditionAdd($domain, ['booking_id', 'in', $bookings_ids]);
+/**
+ * Booking filters
+ */
+
+$booking_domain = [];
+if(isset($params['booking_id']) && $params['booking_id'] > 0) {
+    $booking_domain[] = ['booking_id', '=', $params['booking_id']];
+    $domain = Domain::conditionAdd($domain, ['booking_id', '=', $params['booking_id']]);
+}
+else {
+    if(!empty($params['customer_accounting_account'])) {
+        $identities_ids = Identity::search(['accounting_account', 'like', "%{$params['customer_accounting_account']}%"])->ids();
+        $booking_domain[] = ['customer_identity_id', 'in', $identities_ids];
+    }
+
+    if(isset($params['center_id']) && $params['center_id'] > 0) {
+        $booking_domain[] = ['center_id', '=', $params['center_id']];
+    }
+    if(!empty($params['booking_display_name'])) {
+        $booking_domain[] = ['display_name', 'ilike', "%{$params['booking_display_name']}%"];
     }
 }
 
-if(isset($params['payment_reference']) && strlen($params['payment_reference']) > 0 ) {
-    $domain = Domain::conditionAdd($domain, ['payment_reference', 'like', '%'. $params['payment_reference'].'%']);
+if(!empty($booking_domain)) {
+    $booking_ids = Booking::search($booking_domain)->ids();
+    $domain = Domain::conditionAdd($domain, ['booking_id', 'in', $booking_ids]);
 }
 
 $params['domain'] = $domain;

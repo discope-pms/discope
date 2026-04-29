@@ -110,10 +110,6 @@ if(isset($params['payment_reference']) && strlen($params['payment_reference']) >
     $domain = Domain::conditionAdd($domain, ['payment_reference', 'like', '%'. $params['payment_reference'].'%']);
 }
 
-if(isset($params['enrollment_id']) && $params['enrollment_id'] > 0) {
-    $domain = Domain::conditionAdd($domain, ['enrollment_id', '=', $params['enrollment_id']]);
-}
-
 /**
  * Enrollment filters
  */
