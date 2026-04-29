@@ -158,9 +158,9 @@
             "description": "Liste des financements.",
             "layout": {}
         },
-        "list.camp": {
-            "name": "Financements",
-            "description": "Liste des financements liés à des inscriptions à des camps.",
+        "list.sale-camps": {
+            "name": "Financements camps",
+            "description": "Liste des financements liés à des inscriptions de camps.",
             "layout": {}
         }
     },

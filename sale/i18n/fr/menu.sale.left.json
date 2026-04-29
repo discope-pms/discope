@@ -61,16 +61,36 @@
             "label": "Financements",
             "help": ""
         },
-        "item.fundings.all": {
-            "label": "Tous les financements",
+        "item.fundings.bookings": {
+            "label": "Financements réservations",
             "help": ""
         },
-        "item.fundings.waiting": {
-            "label": "Financements en attente",
+        "item.fundings.bookings.all": {
+            "label": "Tous les financements réservations",
             "help": ""
         },
-        "item.fundings.overdue": {
-            "label": "Financements en retard",
+        "item.fundings.bookings.waiting": {
+            "label": "Financements en attente réservations",
+            "help": ""
+        },
+        "item.fundings.bookings.overdue": {
+            "label": "Financements en retard réservations",
+            "help": ""
+        },
+        "item.fundings.camps": {
+            "label": "Financements camps",
+            "help": ""
+        },
+        "item.fundings.camps.all": {
+            "label": "Tous les financements inscriptions",
+            "help": ""
+        },
+        "item.fundings.camps.waiting": {
+            "label": "Financements en attente inscriptions",
+            "help": ""
+        },
+        "item.fundings.camps.overdue": {
+            "label": "Financements en retard inscriptions",
             "help": ""
         },
         "item.payments": {

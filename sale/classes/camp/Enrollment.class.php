@@ -253,6 +253,7 @@ class Enrollment extends Model {
                 'foreign_object'    => 'identity\Center',
                 'description'       => "The center to which the enrollment relates to.",
                 'store'             => true,
+                'instant'           => true,
                 'relation'          => ['camp_id' => 'center_id']
             ],
 
@@ -262,6 +263,7 @@ class Enrollment extends Model {
                 'foreign_object'    => 'identity\CenterOffice',
                 'description'       => "Office the enrollment relates to (for center management).",
                 'store'             => true,
+                'instant'           => true,
                 'relation'          => ['center_id' => 'center_office_id']
             ],
 
