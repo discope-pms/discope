@@ -34,7 +34,7 @@
                                             },
                                             {
                                                 "type": "field",
-                                                "value": "enrollment_external_ref",
+                                                "value": "child_name",
                                                 "width": "25%"
                                             }
                                         ]
@@ -53,13 +53,33 @@
                                                 "width": "25%"
                                             },
                                             {
-                                                "type": "label",
-                                                "value": "",
+                                                "type": "field",
+                                                "value": "enrollment_external_ref",
                                                 "width": "25%"
                                             },
                                             {
                                                 "type": "field",
+                                                "value": "guardian_name",
+                                                "width": "25%"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "width": "100%",
+                                        "items": [
+                                            {
+                                                "type": "label",
+                                                "value": "",
+                                                "width": "50%"
+                                            },
+                                            {
+                                                "type": "field",
                                                 "value": "payment_external_ref",
+                                                "width": "25%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "guardian_email",
                                                 "width": "25%"
                                             }
                                         ]

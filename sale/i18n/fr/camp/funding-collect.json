@@ -33,6 +33,18 @@
         "payment_external_ref": {
             "label": "Réréference ext. paiement",
             "description": "La référence externe du paiement du financement."
+        },
+        "child_name": {
+            "label": "Nom enfant",
+            "description": "Nom de l'enfant inscrit."
+        },
+        "guardian_name": {
+            "label": "Nom responsable",
+            "description": "Nom d'un tuteur de l'enfant inscrit."
+        },
+        "guardian_email": {
+            "label": "E-mail responsable",
+            "description": "E-mail d'un tuteur de l'enfant inscrit."
         }
     }
 }

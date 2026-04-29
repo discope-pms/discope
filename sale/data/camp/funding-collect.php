@@ -8,7 +8,9 @@
 
 use equal\orm\Domain;
 use identity\Center;
+use sale\camp\Child;
 use sale\camp\Enrollment;
+use sale\camp\Guardian;
 use sale\pay\Payment;
 
 list($params, $providers) = eQual::announce([
@@ -54,6 +56,18 @@ list($params, $providers) = eQual::announce([
         'enrollment_external_ref' => [
             'type'              => 'string',
             'description'       => 'The external ref of the funding enrollment.'
+        ],
+        'child_name' => [
+            'type'              => 'string',
+            'description'       => 'The name of the child concerned by the funding enrollment.'
+        ],
+        'guardian_name' => [
+            'type'              => 'string',
+            'description'       => 'The name of the guardian concerned by the funding enrollment.'
+        ],
+        'guardian_email' => [
+            'type'              => 'string',
+            'description'       => 'The email address of the guardian concerned by the funding enrollment.'
         ],
         /**
          * Payment filters
@@ -109,6 +123,33 @@ if(isset($params['enrollment_id']) && $params['enrollment_id'] > 0) {
     $enrollment_domain[] = ['id', '=', $params['enrollment_id']];
 }
 else {
+    $guardian_domain = [];
+    if(!empty($params['guardian_name'])) {
+        $guardian_domain[] = ['name', 'ilike', "%{$params['guardian_name']}%"];
+    }
+    if(!empty($params['guardian_email'])) {
+        $guardian_domain[] = ['email', 'ilike', "%{$params['guardian_email']}%"];
+    }
+    if(!empty($guardian_domain)) {
+        $guardians = Guardian::search($guardian_domain)
+            ->read(['children_ids'])
+            ->get();
+
+        $map_children_ids = [];
+        foreach($guardians as $guardian) {
+            foreach($guardian['children_ids'] as $child_id) {
+                $map_children_ids[$child_id] = $child_id;
+            }
+        }
+
+        $enrollment_domain[] = ['child_id', 'in', array_keys($map_children_ids)];
+    }
+
+    if(!empty($params['child_name'])) {
+        $children_ids = Child::search(['name', 'ilike', "%{$params['child_name']}%"])->ids();
+        $enrollment_domain[] = ['child_id', 'in', $children_ids];
+    }
+    
     if(isset($params['center_id']) && $params['center_id'] > 0) {
         $enrollment_domain[] = ['center_id', '=', $params['center_id']];
     }
