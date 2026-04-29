@@ -213,6 +213,11 @@
 			"name": "Financements",
 			"description": "Liste des financements.",
 			"layout": {}
+		},
+		"list.sale-bookings": {
+			"name": "Financements réservations",
+			"description": "Liste des financements liés à des réservations.",
+			"layout": {}
 		}
 	},
 	"error": {}

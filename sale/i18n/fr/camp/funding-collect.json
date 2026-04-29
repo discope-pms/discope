@@ -1,0 +1,38 @@
+{
+    "name": "Recherche avancé de financement",
+    "description": "Recherche avancé de financement pour les inscriptions des camps.",
+    "model": {
+        "enrollment_id": {
+            "label": "Inscription",
+            "description": "L'inscription liée au financement.",
+            "help": ""
+        },
+        "due_amount_min": {
+            "label": "Montant minimal",
+            "description": "Montant minimal attendu pour le financement.",
+            "help": ""
+        },
+        "due_amount_max": {
+            "label": "Montant maximum",
+            "description": "Montant maximum attendu pour le financement.",
+            "help": ""
+        },
+        "center_id": {
+            "label": "Center",
+            "description": "Le centre qui gère le financement.",
+            "help": ""
+        },
+        "payment_reference": {
+            "label": "Réréference",
+            "description": "Message permettant d'identifier la raison de la transaction."
+        },
+        "enrollment_external_ref": {
+            "label": "Réréference ext. inscription",
+            "description": "La référence externe de l'inscription du financement."
+        },
+        "payment_external_ref": {
+            "label": "Réréference ext. paiement",
+            "description": "La référence externe du paiement du financement."
+        }
+    }
+}

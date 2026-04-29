@@ -160,36 +160,86 @@
                 "type": "parent",
                 "children": [
                     {
-                        "id": "item.fundings.all",
-                        "type": "entry",
-                        "label": "All fundings",
+                        "id": "item.fundings.bookings",
+                        "label": "Bookings",
                         "description": "",
-                        "context": {
-                            "entity": "sale\\booking\\Funding",
-                            "view": "list.sale"
-                        }
+                        "icon": "",
+                        "type": "parent",
+                        "children": [
+                            {
+                                "id": "item.fundings.bookings.all",
+                                "type": "entry",
+                                "label": "All fundings",
+                                "description": "",
+                                "context": {
+                                    "entity": "sale\\booking\\Funding",
+                                    "view": "list.sale-bookings"
+                                }
+                            },
+                            {
+                                "id": "item.fundings.bookings.waiting",
+                                "type": "entry",
+                                "label": "Waiting for payment",
+                                "description": "",
+                                "context": {
+                                    "entity": "sale\\booking\\Funding",
+                                    "view": "list.sale-bookings",
+                                    "domain": [ ["is_paid", "=", false] ]
+                                }
+                            },
+                            {
+                                "id": "item.fundings.bookings.overdue",
+                                "type": "entry",
+                                "label": "Overdue fundings",
+                                "description": "",
+                                "context": {
+                                    "entity": "sale\\booking\\Funding",
+                                    "view": "list.sale-bookings",
+                                    "domain": [ ["due_date", "<=", "date.this.day"],  ["is_paid", "=", false] ]
+                                }
+                            }
+                        ]
                     },
                     {
-                        "id": "item.fundings.waiting",
-                        "type": "entry",
-                        "label": "Waiting for payment",
+                        "id": "item.fundings.camps",
+                        "label": "Camps",
                         "description": "",
-                        "context": {
-                            "entity": "sale\\booking\\Funding",
-                            "view": "list.sale",
-                            "domain": [ ["is_paid", "=", false] ]
-                        }
-                    },
-                    {
-                        "id": "item.fundings.overdue",
-                        "type": "entry",
-                        "label": "Overdue fundings",
-                        "description": "",
-                        "context": {
-                            "entity": "sale\\booking\\Funding",
-                            "view": "list.sale",
-                            "domain": [ ["due_date", "<=", "date.this.day"],  ["is_paid", "=", false] ]
-                        }
+                        "icon": "",
+                        "type": "parent",
+                        "children": [
+                            {
+                                "id": "item.fundings.camps.all",
+                                "type": "entry",
+                                "label": "All fundings",
+                                "description": "",
+                                "context": {
+                                    "entity": "sale\\pay\\Funding",
+                                    "view": "list.sale-camps"
+                                }
+                            },
+                            {
+                                "id": "item.fundings.camps.waiting",
+                                "type": "entry",
+                                "label": "Waiting for payment",
+                                "description": "",
+                                "context": {
+                                    "entity": "sale\\pay\\Funding",
+                                    "view": "list.sale-camps",
+                                    "domain": [ ["is_paid", "=", false] ]
+                                }
+                            },
+                            {
+                                "id": "item.fundings.camps.overdue",
+                                "type": "entry",
+                                "label": "Overdue fundings",
+                                "description": "",
+                                "context": {
+                                    "entity": "sale\\pay\\Funding",
+                                    "view": "list.sale-camps",
+                                    "domain": [ ["due_date", "<=", "date.this.day"],  ["is_paid", "=", false] ]
+                                }
+                            }
+                        ]
                     }
                 ]
             },
