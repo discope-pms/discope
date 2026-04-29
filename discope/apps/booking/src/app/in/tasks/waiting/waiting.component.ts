@@ -22,9 +22,16 @@ export class TasksWaitingComponent implements OnInit, AfterViewInit, OnDestroy {
             entity: 'sale\\booking\\followup\\Task',
             view:   'list.waiting',
             domain: [
-                ['is_done', '=', false],
-                ['entity', '=', 'sale\\booking\\Booking'],
-                ['deadline_date', '<=', new Date().toISOString().split('T')[0]]
+                [
+                    ['is_done', '=', false],
+                    ['entity', '=', 'sale\\booking\\Booking'],
+                    ['visible_date', '<=', new Date().toISOString().split('T')[0]]
+                ],
+                [
+                    ['is_done', '=', false],
+                    ['entity', '=', 'sale\\booking\\Booking'],
+                    ['visible_date', 'is', null]
+                ]
             ]
         }
     };
