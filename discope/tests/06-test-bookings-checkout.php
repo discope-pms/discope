@@ -398,7 +398,8 @@ $tests = [
                     ->read(['id'])
                     ->first(true);
 
-            Invoice::id($invoice['id'])->delete(true);
+            // #memo - emitted invoice cannot be deleted
+            // Invoice::id($invoice['id'])->delete(true);
             Booking::id($booking['id'])->delete(true);
         }
     ]
