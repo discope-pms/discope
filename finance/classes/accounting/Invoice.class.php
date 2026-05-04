@@ -92,11 +92,9 @@ class Invoice extends Model {
             ],
 
             'number' => [
-                'type'              => 'computed',
-                'result_type'       => 'string',
+                'type'              => 'string',
                 'description'       => "Number of the invoice, according to organization logic (@see config/invoicing).",
-                'function'          => 'calcNumber',
-                'store'             => true
+                'default'          => '[proforma]',
             ],
 
             'is_paid' => [
@@ -490,22 +488,6 @@ class Invoice extends Model {
         return $result;
     }
 
-    public static function calcNumber($self): array {
-        $result = [];
-        $self->read(['status']);
-        foreach($self as $id => $invoice) {
-            // no code is generated for proforma
-            if($invoice['status'] == 'proforma') {
-                $result[$id] = '[proforma]';
-                continue;
-            }
-
-            $result[$id] = self::_getAvailableNumber($id);
-        }
-
-        return $result;
-    }
-
     /**
      * #memo - this should not include installment [non-invoiced pre-payments] (we should deal with display_price instead)
      */
@@ -784,7 +766,7 @@ class Invoice extends Model {
 
             foreach($invoices as $oid => $invoice) {
                 // #memo - we don't want to assign a new number to invoiced and cancelled invoices
-                if($invoice['number'] != '[proforma]') {
+                if($invoice['number'] !== '[proforma]') {
                     continue;
                 }
                 // find most recent invoice emitted by the center office
