@@ -331,6 +331,83 @@ class Invoice extends Model {
         ];
     }
 
+    private static function _getAvailableNumber($invoice_id) {
+        $invoice = Invoice::id($invoice_id)
+            ->read([
+                'date',
+                'organisation_id',
+                'journal_id'        => ['type'],
+                'center_office_id'  => ['code']]
+            )
+            ->first();
+
+        if(is_null($invoice['journal_id'])) {
+            throw new \Exception("unknown_journal_id", EQ_ERROR_INVALID_CONFIG);
+        }
+
+        $format = Setting::get_value('sale', 'accounting', 'invoice.sequence_format.'.$invoice['organisation_id']);
+        $has_organisation_format = !is_null($format);
+        if(!$has_organisation_format) {
+            $format = Setting::get_value('sale', 'accounting', 'invoice.sequence_format', '%05d{sequence}');
+        }
+
+        $fiscal_year = Setting::get_value('finance', 'accounting', 'fiscal_year');
+        $fiscal_date_from = Setting::get_value('finance', 'accounting', 'fiscal_year.date_from');
+        $fiscal_date_to = Setting::get_value('finance', 'accounting', 'fiscal_year.date_to');
+
+        // #memo - forces LO, VSG and HVG (has_vat) format for fiscal year 2026
+        // #todo - to remove when fiscal year changed to 2027
+        if(intval($fiscal_year) === 2026 && $has_organisation_format) {
+            switch($invoice['journal_id']['type']) {
+                case 'sales':
+                    $format = '%2d{year}-%02d{office}-%05d{sequence}';
+                    break;
+                case 'sales_peppol':
+                    $format = '%2d{year}-9%02d{office}-%04d{sequence}';
+                    break;
+            }
+        }
+
+        if(!$fiscal_year || !$fiscal_date_from || !$fiscal_date_to) {
+            trigger_error("APP::unable to retrieve sequence for invoice", EQ_REPORT_ERROR);
+            throw new \Exception("missing_mandatory_fiscal_config", EQ_ERROR_INVALID_CONFIG);
+        }
+
+        $date_from = strtotime($fiscal_date_from . ' 00:00:00');
+        $date_to   = strtotime($fiscal_date_to   . ' 23:59:59');
+
+        if($invoice['date'] < $date_from || $invoice['date'] > $date_to) {
+            throw new \Exception("invoice_outside_fiscal_year", EQ_ERROR_INVALID_CONFIG);
+        }
+
+        $sequence_code = 'invoice.sequence.'.$invoice['center_office_id']['code'];
+        if($invoice['journal_id']['type'] === 'sales_peppol') {
+            $sequence_code = 'invoice.peppol.sequence.'.$invoice['center_office_id']['code'];
+        }
+
+        $sequence = Setting::fetch_and_add('sale', 'accounting', $sequence_code);
+        if(!$sequence) {
+            throw new \Exception("APP::unable to retrieve sequence for invoice", EQ_ERROR_INVALID_CONFIG);
+        }
+
+        $map_types = [
+            'sales'         => '0',
+            'sales_peppol'  => '1'
+        ];
+        if(!isset($map_types[$invoice['journal_id']['type']])) {
+            trigger_error("APP::accounting journal type not allowed", EQ_REPORT_ERROR);
+            throw new \Exception("wrong_accounting_journal_type");
+        }
+
+        return Setting::parse_format($format, [
+            'year'      => $fiscal_year,
+            'office'    => $invoice['center_office_id']['code'],
+            'org'       => $invoice['organisation_id'],
+            'type'      => $map_types[$invoice['journal_id']['type']],
+            'sequence'  => $sequence
+        ]);
+    }
+
     public static function calcIsPaid($om, $oids, $lang) {
         $result = [];
         // #memo - fundings_ids targets all fundings relating to invoice: this includes the installments
@@ -415,13 +492,7 @@ class Invoice extends Model {
 
     public static function calcNumber($self): array {
         $result = [];
-        $self->read([
-            'status',
-            'date',
-            'organisation_id',
-            'journal_id'        => ['type'],
-            'center_office_id'  => ['code']
-        ]);
+        $self->read(['status']);
         foreach($self as $id => $invoice) {
             // no code is generated for proforma
             if($invoice['status'] == 'proforma') {
@@ -429,71 +500,7 @@ class Invoice extends Model {
                 continue;
             }
 
-            if(is_null($invoice['journal_id'])) {
-                throw new \Exception("unknown_journal_id", EQ_ERROR_INVALID_CONFIG);
-            }
-
-            $format = Setting::get_value('sale', 'accounting', 'invoice.sequence_format.'.$invoice['organisation_id']);
-            $has_organisation_format = !is_null($format);
-            if(!$has_organisation_format) {
-                $format = Setting::get_value('sale', 'accounting', 'invoice.sequence_format', '%05d{sequence}');
-            }
-
-            $fiscal_year = Setting::get_value('finance', 'accounting', 'fiscal_year');
-            $fiscal_date_from = Setting::get_value('finance', 'accounting', 'fiscal_year.date_from');
-            $fiscal_date_to = Setting::get_value('finance', 'accounting', 'fiscal_year.date_to');
-
-            // #memo - forces LO, VSG and HVG (has_vat) format for fiscal year 2026
-            // #todo - to remove when fiscal year changed to 2027
-            if(intval($fiscal_year) === 2026 && $has_organisation_format) {
-                switch($invoice['journal_id']['type']) {
-                    case 'sales':
-                        $format = '%2d{year}-%02d{office}-%05d{sequence}';
-                        break;
-                    case 'sales_peppol':
-                        $format = '%2d{year}-9%02d{office}-%04d{sequence}';
-                        break;
-                }
-            }
-
-            if(!$fiscal_year || !$fiscal_date_from || !$fiscal_date_to) {
-                trigger_error("APP::unable to retrieve sequence for invoice", EQ_REPORT_ERROR);
-                throw new \Exception("missing_mandatory_fiscal_config", EQ_ERROR_INVALID_CONFIG);
-            }
-
-            $date_from = strtotime($fiscal_date_from . ' 00:00:00');
-            $date_to   = strtotime($fiscal_date_to   . ' 23:59:59');
-
-            if($invoice['date'] < $date_from || $invoice['date'] > $date_to) {
-                throw new \Exception("invoice_outside_fiscal_year", EQ_ERROR_INVALID_CONFIG);
-            }
-
-            $sequence_code = 'invoice.sequence.' . $invoice['center_office_id']['code'];
-            if($invoice['journal_id']['type'] === 'sales_peppol') {
-                $sequence_code = 'invoice.peppol.sequence.' . $invoice['center_office_id']['code'];
-            }
-
-            $sequence = Setting::fetch_and_add('sale', 'accounting', $sequence_code);
-            if(!$sequence) {
-                throw new \Exception("APP::unable to retrieve sequence for invoice", EQ_ERROR_INVALID_CONFIG);
-            }
-
-            $map_types = [
-                'sales'         => '0',
-                'sales_peppol'  => '1'
-            ];
-            if(!isset($map_types[$invoice['journal_id']['type']])) {
-                trigger_error("APP::accounting journal type not allowed", EQ_REPORT_ERROR);
-                throw new \Exception("wrong_accounting_journal_type");
-            }
-
-            $result[$id] = Setting::parse_format($format, [
-                'year'      => $fiscal_year,
-                'office'    => $invoice['center_office_id']['code'],
-                'org'       => $invoice['organisation_id'],
-                'type'      => $map_types[$invoice['journal_id']['type']],
-                'sequence'  => $sequence
-            ]);
+            $result[$id] = self::_getAvailableNumber($id);
         }
 
         return $result;
@@ -793,10 +800,9 @@ class Invoice extends Model {
                         }
                     }
                 }
-                // reset invoice number
-                $om->update(self::getType(), $oid, ['number' => null], $lang);
-                // trigger number assignment
-                $om->read(self::getType(), $oid, ['number'], $lang);
+
+                // assign number to invoice
+                $om->update(self::getType(), $oid, ['number' => self::_getAvailableNumber($oid)], $lang);
             }
 
             // pass-2 - generate accounting entries
