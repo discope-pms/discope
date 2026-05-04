@@ -324,7 +324,7 @@ foreach($invoices as $invoice) {
     $customer_vat = substr(str_replace([' ', '.', '-', '_'], '', $invoice['partner_id']['partner_identity_id']['vat_number']), 0, 12);
     $customer_phone = substr(str_replace([' ', '.', '-', '_'], '', $invoice['partner_id']['partner_identity_id']['phone']), 0, 14);
     $customer_fax = substr(str_replace([' ', '.', '-', '_'], '', $invoice['partner_id']['partner_identity_id']['fax']), 0, 14);
-    $customer_address = substr(strtoupper(TextTransformer::normalize($invoice['partner_id']['partner_identity_id']['address_street'])), 0, 40);
+    $customer_address = substr(strtoupper(TextTransformer::normalize(str_replace(["\n", "\t", "\r"], '', $invoice['partner_id']['partner_identity_id']['address_street']))), 0, 40);
     $customer_zip = substr($invoice['partner_id']['partner_identity_id']['address_zip'], 0, 10);
     $customer_city = substr(strtoupper(TextTransformer::normalize($invoice['partner_id']['partner_identity_id']['address_city'])), 0, 40);
     $customer_country = substr(strtoupper($invoice['partner_id']['partner_identity_id']['address_country']), 0, 2);
