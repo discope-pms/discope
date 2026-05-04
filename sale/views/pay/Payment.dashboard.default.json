@@ -51,16 +51,7 @@
                                                 "width": "50%",
                                                 "entity": "sale\\booking\\Funding",
                                                 "view": "chart.default"
-                                            },
-                                            {
-                                                "id": "item.sale4",
-                                                "label": "CA total Réservations",
-                                                "description": "",
-                                                "width": "50%",
-                                                "entity": "sale\\booking\\Booking",
-                                                "view": "chart.default"
                                             }
-
                                         ]
                                     }
                                 ]
