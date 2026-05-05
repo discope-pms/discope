@@ -51,25 +51,25 @@ $tests = [
             [$center_id, $center_office_id, $booking_type_id, $customer_nature_id, $customer_identity_id] = $data;
 
             $booking = Booking::create([
-                    'date_from'             => strtotime('2023-08-02'),
-                    'date_to'               => strtotime('2023-08-05'),
-                    'center_id'             => $center_id,
-                    'type_id'               => $booking_type_id,
-                    'customer_nature_id'    => $customer_nature_id,
-                    'customer_identity_id'  => $customer_identity_id,
-                    'description'           => 'Booking to test BOB invoice export'
-                ])
+                'date_from'             => strtotime('2023-08-02'),
+                'date_to'               => strtotime('2023-08-05'),
+                'center_id'             => $center_id,
+                'type_id'               => $booking_type_id,
+                'customer_nature_id'    => $customer_nature_id,
+                'customer_identity_id'  => $customer_identity_id,
+                'description'           => 'Booking to test BOB invoice export'
+            ])
                 ->read(['id','date_from','date_to'])
                 ->first(true);
 
             $booking_line_group = BookingLineGroup::create([
-                    'booking_id'        => $booking['id'],
-                    'is_sojourn'        => true,
-                    'group_type'        => 'sojourn',
-                    'rate_class_id'     => 4,
-                    'sojourn_type_id'   => 2,
-                    'nb_pers'           => 4
-                ])
+                'booking_id'        => $booking['id'],
+                'is_sojourn'        => true,
+                'group_type'        => 'sojourn',
+                'rate_class_id'     => 4,
+                'sojourn_type_id'   => 2,
+                'nb_pers'           => 4
+            ])
                 ->read(['id'])
                 ->first(true);
 
@@ -149,10 +149,10 @@ $tests = [
             [$booking_id, $center_office_id] = $data;
 
             $export = Export::search([
-                    ['center_office_id', '=', $center_office_id],
-                    ['export_type', '=', 'invoices'],
-                    ['is_exported', '=', false],
-                ])
+                ['center_office_id', '=', $center_office_id],
+                ['export_type', '=', 'invoices'],
+                ['is_exported', '=', false],
+            ])
                 ->read(['data'])
                 ->first();
 
