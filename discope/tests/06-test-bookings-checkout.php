@@ -5,6 +5,7 @@
     Licensed under GNU GPL 3 license <http://www.gnu.org/licenses/>
 */
 
+use finance\accounting\AccountingJournal;
 use identity\Center;
 use identity\Identity;
 use sale\booking\Booking;
@@ -19,6 +20,10 @@ use sale\booking\SojournProductModelRentalUnitAssignement;
 use sale\catalog\Product;
 use sale\customer\CustomerNature;
 
+$services = eQual::inject(['orm']);
+
+/** @var \equal\orm\ObjectManager    $orm */
+$orm = $services['orm'];
 
 $tests = [
 
@@ -240,10 +245,17 @@ $tests = [
             Validate that the supplements have been included in the reservation.",
 
         'arrange' => function () {
-            $center = Center::id(1)->read(['id'])->first(true);
+            $center = Center::id(1)->read(['center_office_id'])->first(true);
             $booking_type = BookingType::search(['code', '=', 'TP'])->read(['id'])->first(true);
             $customer_nature = CustomerNature::search(['code', '=', 'IN'])->read(['id'])->first(true);
             $customer_identity = Identity::search([['firstname', '=', 'John'], ['lastname', '=', 'Doe']])->read(['id'])->first(true);
+
+            AccountingJournal::create([
+                'name'              => 'Accounting journal to test bookings checkout',
+                'type'              => 'sales',
+                'center_office_id'  => $center['center_office_id']
+            ]);
+
             return [$center['id'], $booking_type['id'], $customer_nature['id'], $customer_identity['id']];
         },
 
@@ -371,7 +383,9 @@ $tests = [
                 $e->getMessage();
             }
 
-            Invoice::search(['booking_id' , '=', $booking['id']])->update(['status' => 'invoice']);
+            Invoice::search(['booking_id', '=', $booking['id']])
+                ->update(['date' => strtotime('2023-01-01')])
+                ->update(['status' => 'invoice']);
 
             try {
                 eQual::run('do', 'sale_booking_do-checkout', ['id' => $booking['id']]);
@@ -388,7 +402,7 @@ $tests = [
             return ($message == "emitted_balance_invoice");
         },
 
-        'rollback' => function () {
+        'rollback' => function () use ($orm) {
             $booking = Booking::search(['description', 'ilike', '%'. 'Ensure reservation cannot check out if invoice is issued'.'%'])
                 ->update(['status' => 'quote'])
                 ->read(['id'])
@@ -398,9 +412,10 @@ $tests = [
                     ->read(['id'])
                     ->first(true);
 
-            // #memo - emitted invoice cannot be deleted
-            // Invoice::id($invoice['id'])->delete(true);
+            $orm->delete(Invoice::getType(), $invoice['id'], true);
             Booking::id($booking['id'])->delete(true);
+
+            AccountingJournal::search(['name', '=', 'Accounting journal to test bookings checkout'])->delete(true);
         }
     ]
 ];

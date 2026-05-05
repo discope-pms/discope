@@ -36,13 +36,19 @@ $tests = [
             $customer_nature = CustomerNature::search(['code', '=', 'IN'])->read(['id'])->first(true);
             $customer_identity = Identity::search([['firstname', '=', 'John'], ['lastname', '=', 'Doe']])->read(['id'])->first(true);
 
+            AccountingJournal::create([
+                'name'              => 'Accounting journal to test BOB invoice export',
+                'type'              => 'sales',
+                'center_office_id'  => $center_vat['center_office_id']['id']
+            ]);
+
             Setting::assert_sequence('sale', 'accounting', 'invoice.sequence.'.$center_vat['center_office_id']['code'], 1);
 
-            return [$center_vat['id'], $booking_type['id'], $customer_nature['id'], $customer_identity['id']];
+            return [$center_vat['id'], $center_vat['center_office_id']['id'], $booking_type['id'], $customer_nature['id'], $customer_identity['id']];
         },
 
         'act' => function ($data) use ($orm) {
-            [$center_id, $booking_type_id, $customer_nature_id, $customer_identity_id] = $data;
+            [$center_id, $center_office_id, $booking_type_id, $customer_nature_id, $customer_identity_id] = $data;
 
             $booking = Booking::create([
                     'date_from'             => strtotime('2023-08-02'),
@@ -116,16 +122,6 @@ $tests = [
                 trigger_error("APP::error while running sale_booking_do-invoice: ".$e->getMessage(), EQ_REPORT_ERROR);
             }
 
-            $center = Center::id($center_id)
-                ->read(['center_office_id'])
-                ->first();
-
-            AccountingJournal::create([
-                'name'              => 'Accounting journal to test BOB invoice export',
-                'type'              => 'sales',
-                'center_office_id'  => $center['center_office_id']
-            ]);
-
             try {
                 $invoice = Invoice::search(['booking_id', '=', $booking['id']])
                     ->read(['status'])
@@ -139,14 +135,14 @@ $tests = [
                 ]);
 
                 eQual::run('do', 'finance_payments_bob_export-invoices', [
-                    'center_office_id' => $center['center_office_id']
+                    'center_office_id' => $center_office_id
                 ]);
             }
             catch(Exception $e) {
                 trigger_error("APP::error while running sale_booking_invoice_do-emit or finance_payments_bob_export-invoices: ".$e->getMessage(), EQ_REPORT_ERROR);
             }
 
-            return [$booking['id'], $center['center_office_id']];
+            return [$booking['id'], $center_office_id];
         },
 
         'assert' => function ($data) {
