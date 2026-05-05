@@ -137,21 +137,24 @@ else if($params['center_id'] && $params['center_id'] > 0) {
     $domain[] = ['center_id', '=', $params['center_id']];
 }
 
+$centers = [];
 $bookings = [];
 
 if(!empty($domain)) {
     $bookings = Booking::search($domain)
-        ->read([
-            'id',
-            'created',
-            'name',
-            'date_from',
-            'date_to',
-            'total',
-            'price',
-            'center_id' => ['id', 'name', 'center_office_id']
-        ])
+        ->read(['created', 'name', 'date_from', 'date_to', 'price', 'center_id'])
         ->get(true);
+
+    $map_centers_ids = [];
+    foreach($bookings as $booking) {
+        $map_centers_ids[$booking['center_id']] = true;
+    }
+
+    if(!empty($map_centers_ids)) {
+        $centers = Center::ids(array_keys($map_centers_ids))
+            ->read(['name', 'center_office_id'])
+            ->get();
+    }
 }
 
 // create map for statistic sections
@@ -167,14 +170,15 @@ foreach($stats as $stat) {
 $map_center_values = [];
 
 foreach($bookings as $booking) {
+    $center = $centers[$booking['center_id']];
     $date_index = date('Ym', $booking['date_from']);
-    if(!isset($map_center_values[$booking['center_id']['name']])) {
-        $map_center_values[$booking['center_id']['name']] = [];
+    if(!isset($map_center_values[$center['name']])) {
+        $map_center_values[$center['name']] = [];
     }
 
-    if(!isset($map_center_values[$booking['center_id']['name']][$date_index])) {
-        $map_center_values[$booking['center_id']['name']][$date_index] = [
-            'center'                => $booking['center_id']['name'],
+    if(!isset($map_center_values[$center['name']][$date_index])) {
+        $map_center_values[$center['name']][$date_index] = [
+            'center'                => $center['name'],
             'aamm'                  => date('Y/m', $booking['date_from']),
             'duration_days'         => 0,
             'nb_pers'               => 0,
@@ -191,30 +195,31 @@ foreach($bookings as $booking) {
 
     $diff = $booking['date_to'] - $booking['date_from'];
     $day_diff = floor($diff / (60 * 60 * 24));
-    $map_center_values[$booking['center_id']['name']][$date_index]['duration_days'] += $day_diff + 1;
+    $map_center_values[$center['name']][$date_index]['duration_days'] += $day_diff + 1;
 
-    $map_center_values[$booking['center_id']['name']][$date_index]['bookings'] += $booking['price'];
+    $map_center_values[$center['name']][$date_index]['bookings'] += $booking['price'];
 
     $groups = BookingLineGroup::search([
         ['booking_id', '=', $booking['id']]
     ])
-        ->read(['id', 'has_pack', 'is_locked', 'date_from', 'date_to', 'vat_rate', 'total', 'price', 'nb_pers', 'pack_id' => ['id', 'product_model_id']])
+        ->read(['nb_pers'])
         ->get(true);
 
     foreach($groups as $group) {
-        $map_center_values[$booking['center_id']['name']][$date_index]['nb_pers'] += $group['nb_pers'];
+        $map_center_values[$center['name']][$date_index]['nb_pers'] += $group['nb_pers'];
 
         $lines = BookingLine::search([
             ['booking_line_group_id', '=', $group['id']]
         ])
             ->read([
-                'id',
                 'qty',
                 'free_qty',
-                'total',
                 'price',
                 'is_accomodation',
-                'product_model_id' => ['id', 'stat_section_id', 'activity_scope']
+                'product_model_id' => [
+                    'stat_section_id',
+                    'activity_scope'
+                ]
             ])
             ->get(true);
 
@@ -227,20 +232,20 @@ foreach($bookings as $booking) {
             switch($code) {
                 case 'GITE':
                 case 'SEJ':
-                    $map_center_values[$booking['center_id']['name']][$date_index]['nights'] += $line['price'];
+                    $map_center_values[$center['name']][$date_index]['nights'] += $line['price'];
                     break;
                 case 'RST':
-                    $map_center_values[$booking['center_id']['name']][$date_index]['meals'] += $line['price'];
+                    $map_center_values[$center['name']][$date_index]['meals'] += $line['price'];
                     break;
                 case 'ANIM':
-                    $map_center_values[$booking['center_id']['name']][$date_index]['animations'] += $line['price'];
-                    $map_center_values[$booking['center_id']['name']][$date_index][$line['product_model_id']['activity_scope'].'_animations'] += $line['price'];
+                    $map_center_values[$center['name']][$date_index]['animations'] += $line['price'];
+                    $map_center_values[$center['name']][$date_index][$line['product_model_id']['activity_scope'].'_animations'] += $line['price'];
                     break;
             }
 
             if($line['is_accomodation']) {
-                $map_center_values[$booking['center_id']['name']][$date_index]['nb_nights'] += $line['qty'];
-                $map_center_values[$booking['center_id']['name']][$date_index]['nb_freebies'] += $line['free_qty'];
+                $map_center_values[$center['name']][$date_index]['nb_nights'] += $line['qty'];
+                $map_center_values[$center['name']][$date_index]['nb_freebies'] += $line['free_qty'];
             }
         }
     }

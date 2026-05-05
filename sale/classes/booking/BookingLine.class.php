@@ -411,6 +411,13 @@ class BookingLine extends Model {
         ];
     }
 
+    public function getIndexes(): array {
+        return [
+            ['booking_id'],
+            ['booking_line_group_id']
+        ];
+    }
+
     public static function getActions(): array {
         return [
 

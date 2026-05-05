@@ -401,6 +401,12 @@ class BookingLineGroup extends Model {
         ];
     }
 
+    public function getIndexes(): array {
+        return [
+            ['booking_id']
+        ];
+    }
+
     public static function calcNbPers($self) {
         $result = [];
         $self->read(['age_range_assignments_ids' => ['qty']]);
