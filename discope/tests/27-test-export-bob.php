@@ -5,6 +5,7 @@
     License: GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 
+use core\setting\Setting;
 use documents\Export;
 use finance\accounting\AccountingJournal;
 use identity\Center;
@@ -30,10 +31,12 @@ $tests = [
             'We need to test that the compatibility works in case the lines vat amounts does not match the subtotals per vat rates.',
 
         'arrange' => function () {
-            $center_vat = Center::id(2)->read(['id'])->first(true);
+            $center_vat = Center::id(2)->read(['center_office_id' => ['code']])->first(true);
             $booking_type = BookingType::search(['code', '=', 'TP'])->read(['id'])->first(true);
             $customer_nature = CustomerNature::search(['code', '=', 'IN'])->read(['id'])->first(true);
             $customer_identity = Identity::search([['firstname', '=', 'John'], ['lastname', '=', 'Doe']])->read(['id'])->first(true);
+
+            Setting::assert_sequence('sale', 'accounting', 'invoice.sequence.'.$center_vat['center_office_id']['code'], 1);
 
             return [$center_vat['id'], $booking_type['id'], $customer_nature['id'], $customer_identity['id']];
         },
@@ -134,9 +137,6 @@ $tests = [
                 eQual::run('do', 'sale_booking_invoice_do-emit', [
                     'id' => $invoice['id']
                 ]);
-
-                // update number to not use sequence and format settings
-                $orm->update(Invoice::getType(), $invoice['id'], ['number' => '23-02-00001']);
 
                 eQual::run('do', 'finance_payments_bob_export-invoices', [
                     'center_office_id' => $center['center_office_id']
