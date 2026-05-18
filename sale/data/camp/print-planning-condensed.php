@@ -113,7 +113,10 @@ $camps = Camp::search($domain)
         'camp_groups_ids' => [
             'activity_group_num',
             'employee_id' => [
-                'partner_identity_id' => ['firstname'],
+                'partner_identity_id' => ['firstname']
+            ],
+            'second_employee_id' => [
+                'partner_identity_id' => ['firstname']
             ],
             'booking_activities_ids' => [
                 'name',
@@ -153,6 +156,7 @@ foreach($camps as $camp) {
 }
 
 $days_names = [];
+$days_indexes = [];
 $date = $date_from;
 while($date <= $date_to) {
     if(in_array(date('l', $date), ['Saturday', 'Sunday'])) {
@@ -161,20 +165,32 @@ while($date <= $date_to) {
     }
 
     $days_names[] = $formatter->format($date);
+    $days_indexes[] = date('Y-m-d', $date);
     $date += 86400;
 }
 
+$map_day_timeslot_mealtype_qty = [];
+
 foreach($camps as $camp) {
     $groups = [];
+    $animators_qty = 0;
     foreach($camp['camp_groups_ids'] as $group) {
         if(isset($params['camp_group_id']) && $group['id'] !== $params['camp_group_id']) {
             continue;
         }
 
         $groups[] = [
-            'num'       => $group['activity_group_num'],
-            'employee'  => $group['employee_id']['partner_identity_id']['firstname']
+            'num'               => $group['activity_group_num'],
+            'employee'          => $group['employee_id']['partner_identity_id']['firstname'] ?? '',
+            'second_employee'   => $group['second_employee_id']['partner_identity_id']['firstname'] ?? ''
         ];
+
+        if(isset($group['employee_id'])) {
+            $animators_qty++;
+        }
+        if(isset($group['second_employee_id'])) {
+            $animators_qty++;
+        }
     }
 
     $days = [];
@@ -216,6 +232,16 @@ foreach($camps as $camp) {
             $day[$meal['time_slot_id']['code']] = $meal;
         }
 
+        $day_index = date('Y-m-d', $date);
+        foreach($camp['booking_meals_ids'] as $meal) {
+            if($meal['date'] !== $date || !in_array($meal['time_slot_id']['code'], ['L', 'D'])) {
+                continue;
+            }
+            if(!isset($map_day_timeslot_mealtype_qty[$day_index][$meal['time_slot_id']['code']][$meal['meal_type_id']['name']])) {
+                $map_day_timeslot_mealtype_qty[$day_index][$meal['time_slot_id']['code']][$meal['meal_type_id']['name']] = 0;
+            }
+            $map_day_timeslot_mealtype_qty[$day_index][$meal['time_slot_id']['code']][$meal['meal_type_id']['name']] += $camp['enrollments_qty'] + $animators_qty;
+        }
         $days[] = $day;
 
         $date += 86400;
@@ -224,7 +250,7 @@ foreach($camps as $camp) {
     $camps_planning[] = [
         'sojourn_number'    => str_pad($camp['sojourn_number'], 3, '0', STR_PAD_LEFT),
         'children_qty'      => $camp['enrollments_qty'],
-        'animators_qty'     => count($camp['camp_groups_ids']),
+        'animators_qty'     => $animators_qty,
         'camp_name'         => $camp['short_name'],
         'groups'            => $groups,
         'groups_qty'        => count($camp['camp_groups_ids']),
@@ -246,7 +272,7 @@ try {
 
     $template = $twig->load("$class_path.{$params['view_id']}.html");
 
-    $html = $template->render(compact('camps_planning', 'days_names'));
+    $html = $template->render(compact('camps_planning', 'days_names', 'days_indexes', 'map_day_timeslot_mealtype_qty'));
 }
 catch(Exception $e) {
     trigger_error("ORM::error while parsing template - ".$e->getMessage(), QN_REPORT_DEBUG);

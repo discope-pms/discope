@@ -7,7 +7,7 @@
 
     <style type="text/css">
         @page {
-            margin: 1cm;
+            margin: 1.5cm 1cm;
         }
 
         body {
@@ -25,7 +25,6 @@
 
         .table-planning {
             width: 100%;
-            margin-top: 20px;
             border-collapse: collapse;
             border: solid 1px black;
             font-size: 0.7rem;
@@ -59,12 +58,21 @@
         .list-activities li {
             margin-bottom: 3px;
         }
+
+        .list-mealtype-totals {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .list-mealtype-totals li {
+            margin-bottom: 3px;
+        }
     </style>
 </head>
 
 <body>
 
-<table class="table-planning">
+<table class="table-planning" style="border: none;">
     <thead>
         <tr>
             <th rowspan="2" style="width: 15px;">N°</th>
@@ -103,7 +111,12 @@
             <td class="text-small">
                 <ul class="list-animators">
                     {% for group in camp_planning.groups %}
-                        <li>{{ group.employee }}</li>
+                        {% if group.employee|length > 0 %}
+                            <li>{{ group.employee }}</li>
+                        {% endif %}
+                        {% if group.second_employee|length > 0 %}
+                            <li>{{ group.second_employee }}</li>
+                        {% endif %}
                     {% endfor %}
                 </ul>
             </td>
@@ -143,6 +156,36 @@
             {% endfor %}
         </tr>
     {% endfor %}
+    <tr style="border: none;">
+        <td colspan="5" style="border: none; font-weight: bold; text-align: right; padding: 5px;">
+            Total MIDI
+        </td>
+        {% for day_index in days_indexes %}
+            <td colspan="4" style="border: none; padding: 3px;">
+                <ul class="list-mealtype-totals">
+                    {% set sorted = map_day_timeslot_mealtype_qty[day_index]['L'] | keys | sort %}
+                    {% for key in sorted %}
+                        <li>{{ key }} : {{ map_day_timeslot_mealtype_qty[day_index]['L'][key] }}</li>
+                    {% endfor %}
+                </ul>
+            </td>
+        {% endfor %}
+    </tr>
+    <tr style="border: none; padding-top: 3px;">
+        <td colspan="5" style="border: none; font-weight: bold; text-align: right; padding: 5px;">
+            Total SOIR
+        </td>
+        {% for day_index in days_indexes %}
+            <td colspan="4" style="border: none; padding: 5px;">
+                <ul class="list-mealtype-totals">
+                    {% set sorted = map_day_timeslot_mealtype_qty[day_index]['D'] | keys | sort %}
+                    {% for key in sorted %}
+                        <li>{{ key }} : {{ map_day_timeslot_mealtype_qty[day_index]['D'][key] }}</li>
+                    {% endfor %}
+                </ul>
+            </td>
+        {% endfor %}
+    </tr>
     </tbody>
 </table>
 
