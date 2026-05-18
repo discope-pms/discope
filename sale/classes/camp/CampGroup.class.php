@@ -59,7 +59,16 @@ class CampGroup extends Model {
                 'type'              => 'many2one',
                 'foreign_object'    => 'hr\employee\Employee',
                 'description'       => "Employee responsible of the group during the camp.",
-                'onupdate'          => 'onupdateEmployeeId'
+                'onupdate'          => 'onupdateEmployeeId',
+                'domain'            => ['relationship', '=', 'employee']
+            ],
+
+            'second_employee_id' => [
+                'type'              => 'many2one',
+                'foreign_object'    => 'hr\employee\Employee',
+                'description'       => "Second employee responsible of the group during the camp.",
+                'onupdate'          => 'onupdateSecondEmployeeId',
+                'domain'            => ['relationship', '=', 'employee']
             ],
 
             'max_children' => [
@@ -132,42 +141,49 @@ class CampGroup extends Model {
         $self->read([
             'name',
             'employee_id',
+            'second_employee_id',
             'booking_activities_ids'    => ['name', 'activity_date', 'time_slot_id'],
             'partner_events_ids'        => ['name', 'description', 'booking_activity_id']
         ]);
         foreach($self as $camp_group) {
             PartnerEvent::search(['camp_group_id', '=', $camp_group['id']])->delete(true);
 
-            if(is_null($camp_group['employee_id'])) {
-                continue;
+            $employees_ids = [];
+            if(!is_null($camp_group['employee_id'])) {
+                $employees_ids[] = $camp_group['employee_id'];
+            }
+            if(!is_null($camp_group['second_employee_id'])) {
+                $employees_ids[] = $camp_group['second_employee_id'];
             }
 
-            foreach($camp_group['booking_activities_ids'] as $booking_activity) {
-                $partner_event = null;
-                foreach($camp_group['partner_events_ids'] as $part_ev) {
-                    if($part_ev['booking_activity_id'] === $booking_activity['id']) {
-                        $partner_event = $part_ev;
+            foreach($employees_ids as $employee_id) {
+                foreach($camp_group['booking_activities_ids'] as $booking_activity) {
+                    $partner_event = null;
+                    foreach($camp_group['partner_events_ids'] as $part_ev) {
+                        if($part_ev['booking_activity_id'] === $booking_activity['id']) {
+                            $partner_event = $part_ev;
+                        }
                     }
-                }
 
-                $name = $camp_group['name'];
-                if(!empty($partner_event['name'])) {
-                    $name = $partner_event['name'];
-                }
-                elseif(!empty($booking_activity['name'])) {
-                    $name = $booking_activity['name'];
-                }
+                    $name = $camp_group['name'];
+                    if(!empty($partner_event['name'])) {
+                        $name = $partner_event['name'];
+                    }
+                    elseif(!empty($booking_activity['name'])) {
+                        $name = $booking_activity['name'];
+                    }
 
-                PartnerEvent::create([
-                    'name'                  => $name,
-                    'description'           => $partner_event['description'] ?? null,
-                    'partner_id'            => $camp_group['employee_id'],
-                    'event_date'            => $booking_activity['activity_date'],
-                    'time_slot_id'          => $booking_activity['time_slot_id'],
-                    'event_type'            => 'camp_activity',
-                    'camp_group_id'         => $camp_group['id'],
-                    'booking_activity_id'   => $booking_activity['id']
-                ]);
+                    PartnerEvent::create([
+                        'name'                  => $name,
+                        'description'           => $partner_event['description'] ?? null,
+                        'partner_id'            => $employee_id,
+                        'event_date'            => $booking_activity['activity_date'],
+                        'time_slot_id'          => $booking_activity['time_slot_id'],
+                        'event_type'            => 'camp_activity',
+                        'camp_group_id'         => $camp_group['id'],
+                        'booking_activity_id'   => $booking_activity['id']
+                    ]);
+                }
             }
         }
     }
@@ -366,15 +382,57 @@ class CampGroup extends Model {
 
                 if(!empty($camps)) {
                     $group = CampGroup::search([
-                        ['camp_id', 'in', $camps_ids],
-                        ['employee_id', '=', $values['employee_id']],
-                        ['id', '<>', $id]
+                        [
+                            ['camp_id', 'in', $camps_ids],
+                            ['employee_id', '=', $values['employee_id']],
+                            ['id', '<>', $id]
+                        ],
+                        [
+                            ['camp_id', 'in', $camps_ids],
+                            ['second_employee_id', '=', $values['employee_id']],
+                            ['id', '<>', $id]
+                        ]
                     ])
                         ->read(['id'])
                         ->first();
 
                     if(!is_null($group)) {
                         return ['employee_id' => ['already_assigned' => "The employee is already assigned to another camp group for this period."]];
+                    }
+                }
+            }
+        }
+        if(isset($values['second_employee_id'])) {
+            $self->read(['camp_id' => ['date_from', 'date_to']]);
+
+            foreach ($self as $id => $camp_group) {
+                $camps = Camp::search([
+                    ['date_to', '>=', $camp_group['camp_id']['date_from']],
+                    ['date_from', '<=', $camp_group['camp_id']['date_to']]
+                ])
+                    ->read(['id'])
+                    ->get(true);
+
+                $camps_ids = array_column($camps, 'id');
+
+                if (!empty($camps)) {
+                    $group = CampGroup::search([
+                        [
+                            ['camp_id', 'in', $camps_ids],
+                            ['employee_id', '=', $values['second_employee_id']],
+                            ['id', '<>', $id]
+                        ],
+                        [
+                            ['camp_id', 'in', $camps_ids],
+                            ['second_employee_id', '=', $values['second_employee_id']],
+                            ['id', '<>', $id]
+                        ]
+                    ])
+                        ->read(['id'])
+                        ->first();
+
+                    if (!is_null($group)) {
+                        return ['second_employee_id' => ['already_assigned' => "The employee is already assigned to another camp group for this period."]];
                     }
                 }
             }
@@ -428,6 +486,10 @@ class CampGroup extends Model {
     }
 
     public static function onupdateEmployeeId($self) {
+        $self->do('refresh-partner-events');
+    }
+
+    public static function onupdateSecondEmployeeId($self) {
         $self->do('refresh-partner-events');
     }
 

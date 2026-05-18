@@ -101,6 +101,13 @@ class Employee extends \identity\Partner {
                 'foreign_object'    => 'sale\camp\CampGroup',
                 'foreign_field'     => 'employee_id',
                 'description'       => "Camps groups the employee is responsible of."
+            ],
+
+            'second_camp_groups_ids' => [
+                'type'              => 'one2many',
+                'foreign_object'    => 'sale\camp\CampGroup',
+                'foreign_field'     => 'second_employee_id',
+                'description'       => "Camps groups the employee is responsible of as a secondary employee."
             ]
 
         ];
