@@ -259,6 +259,15 @@
                                 }
                             },
                             {
+                                "id": "stats.camps.enrollments.by-locations",
+                                "label": "By location",
+                                "description": "",
+                                "context": {
+                                    "entity": "sale\\camp\\stats\\stat-enrollments-by-locations",
+                                    "view": "list.default"
+                                }
+                            },
+                            {
                                 "id": "stats.camps.enrollments.by-ages",
                                 "label": "By age",
                                 "description": "",

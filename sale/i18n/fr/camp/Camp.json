@@ -128,7 +128,7 @@
             "help": ""
         },
         "location": {
-            "label": "Site",
+            "label": "Site de vie",
             "description": "Site d'hébergement du camp.",
             "help": "En fonction de la tranche d'âge. Pas d'hébergement pour les camps CLSH.",
             "selection": {
@@ -149,12 +149,12 @@
         },
         "enrollments_qty": {
             "label": "Qté inscriptions",
-            "description": "La quanitités des inscriptions non annulées ou sur une liste d'attente.",
+            "description": "La quantité des inscriptions non annulées ou sur une liste d'attente.",
             "help": ""
         },
         "camp_group_qty": {
             "label": "Quantité de groupes",
-            "description": "La quanitités des groupes d'enfants du camp.",
+            "description": "La quantité des groupes d'enfants du camp.",
             "help": ""
         },
         "ase_quota": {

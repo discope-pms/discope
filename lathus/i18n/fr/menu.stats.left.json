@@ -94,6 +94,10 @@
             "label": "Par tranches d'âge",
             "help": ""
         },
+        "stats.camps.enrollments.by-locations": {
+            "label": "Par sites de vie",
+            "help": ""
+        },
         "stats.camps.enrollments.by-ages": {
             "label": "Par âges",
             "help": ""
