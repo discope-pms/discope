@@ -119,7 +119,12 @@
                                             {
                                                 "type": "field",
                                                 "value": "age_range",
-                                                "width": "33%"
+                                                "width": "25%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "location",
+                                                "width": "25%"
                                             },
                                             {
                                                 "type": "field",
@@ -134,11 +139,6 @@
                                                 "readonly": true
                                             },
                                             {
-                                                "type": "label",
-                                                "value": "",
-                                                "width": "15%"
-                                            },
-                                            {
                                                 "type": "field",
                                                 "value": "date_from",
                                                 "width": "33%"
@@ -146,11 +146,6 @@
                                             {
                                                 "type": "field",
                                                 "value": "date_to",
-                                                "width": "33%"
-                                            },
-                                            {
-                                                "type": "label",
-                                                "value": "",
                                                 "width": "33%"
                                             },
                                             {
