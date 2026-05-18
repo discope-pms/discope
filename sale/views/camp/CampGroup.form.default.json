@@ -44,6 +44,11 @@
                                                 "type": "field",
                                                 "value": "employee_id",
                                                 "width": "33%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "second_employee_id",
+                                                "width": "33%"
                                             }
                                         ]
                                     },
