@@ -10,7 +10,7 @@
     <div class="activity-container">
         <div *ngIf="!group.is_locked" class="activity-remove">
             <button mat-icon-button
-                    *ngIf="(bookingActivityDay.AM?.activity_booking_line_id && !bookingActivityDay.AM?.is_virtual) || (bookingActivityDay.AM && !bookingActivityDay.AM.activity_booking_line_id)"
+                    *ngIf="(bookingActivityDay.AM?.activity_booking_line_id && !bookingActivityDay.AM?.is_virtual && booking.status === 'quote') || (bookingActivityDay.AM && !bookingActivityDay.AM.activity_booking_line_id)"
                     (click)="ondeleteActivity(bookingActivityDay.AM);">
                 <mat-icon>clear</mat-icon>
             </button>
@@ -34,7 +34,7 @@
     <div class="activity-container">
         <div *ngIf="!group.is_locked" class="activity-remove">
             <button mat-icon-button
-                    *ngIf="(bookingActivityDay.PM?.activity_booking_line_id && !bookingActivityDay.PM?.is_virtual) || (bookingActivityDay.PM  && !bookingActivityDay.PM?.activity_booking_line_id)"
+                    *ngIf="(bookingActivityDay.PM?.activity_booking_line_id && !bookingActivityDay.PM?.is_virtual && booking.status === 'quote') || (bookingActivityDay.PM  && !bookingActivityDay.PM?.activity_booking_line_id)"
                     (click)="ondeleteActivity(bookingActivityDay.PM);">
                 <mat-icon>clear</mat-icon>
             </button>
@@ -58,7 +58,7 @@
     <div class="activity-container">
         <div *ngIf="!group.is_locked" class="activity-remove">
             <button mat-icon-button
-                    *ngIf="(bookingActivityDay.EV?.activity_booking_line_id && !bookingActivityDay.EV?.is_virtual) || (bookingActivityDay.EV && !bookingActivityDay.EV?.activity_booking_line_id)"
+                    *ngIf="(bookingActivityDay.EV?.activity_booking_line_id && !bookingActivityDay.EV?.is_virtual && booking.status === 'quote') || (bookingActivityDay.EV && !bookingActivityDay.EV?.activity_booking_line_id)"
                     (click)="ondeleteActivity(bookingActivityDay.EV);">
                 <mat-icon>clear</mat-icon>
             </button>

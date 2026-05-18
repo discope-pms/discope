@@ -158,13 +158,12 @@ if($is_colliding_bookings) {
     $bookings = Booking::ids($colliding_bookings_ids)->read(['id', 'name'])->get(true);
 
     $links = [];
-
-    foreach($bookings as $booking) {
-        $links[] = "[{$booking['name']}](/booking/#/booking/{$booking['id']})";
-        $result[] = $booking['id'];
+    foreach($bookings as $book) {
+        $links[] = "[{$book['name']}](/booking/#/booking/{$book['id']})";
+        $result[] = $book['id'];
     }
 
-    // by convention we dispatch an alert that relates to the controller itself.
+    // by convention, we dispatch an alert that relates to the controller itself.
     $dispatch->dispatch('lodging.booking.overbooking', 'sale\booking\Booking', $params['id'], 'important', 'sale_booking_check-overbooking', ['id' => $params['id']], $links, null, $booking['center_office_id']);
 
     $httpResponse->status(qn_error_http(QN_ERROR_CONFLICT_OBJECT));

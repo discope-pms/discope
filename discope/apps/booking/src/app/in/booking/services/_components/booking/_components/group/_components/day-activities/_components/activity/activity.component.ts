@@ -140,6 +140,10 @@ export class BookingServicesBookingGroupDayActivitiesActivityComponent implement
             this.vm.rentalUnit.formControl.setValue(this.activity.rental_unit_id);
         }
 
+        if(this.booking.status !== 'quote') {
+            this.vm.rentalUnit.formControl.disable();
+        }
+
         this.ready = true;
     }
 
