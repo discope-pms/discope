@@ -608,6 +608,15 @@
             },
             "layout": {
             }
+        },
+        "list.attending": {
+            "name": "Enfants participants",
+            "description": "",
+            "actions": {
+                "action.print-enrollments-list": {
+                    "label": "Liste inscriptions"
+                }
+            }
         }
     },
     "error": {
