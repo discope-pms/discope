@@ -3,6 +3,7 @@
         [class.less-28]="height < 28"
         [class.less-15]="height < 15"
         [class.less-12]="height < 12"
+        [class.quote-option-booking]="activity.booking_id && ['quote', 'option'].includes(activity.booking_id.status)"
         [style.background-color]="getColor()"
         (mouseenter)="onEnterActivity(activity)"
         (mouseleave)="onLeaveActivity(activity)"
