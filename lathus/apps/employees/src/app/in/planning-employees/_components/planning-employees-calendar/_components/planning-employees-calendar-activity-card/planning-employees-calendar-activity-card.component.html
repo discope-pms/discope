@@ -5,18 +5,18 @@
         <ng-container *ngIf="activity.booking_id">
             <div>
                 <mat-icon *ngIf="activity.booking_line_group_id?.has_person_with_disability" class="disability-icon" aria-hidden="true">accessible</mat-icon>
-                <span>{{ activity.group_num }} - {{ activity.customer_id.name }}</span>
+                <span>{{ activity.line1 }}</span>
             </div>
-            <div>{{ activity.name }}</div>
+            <div>{{ activity.line2 }}</div>
         </ng-container>
 
         <!-- Camp -->
         <ng-container *ngIf="activity.camp_id">
             <div>
-                {{ activity.camp_id.sojourn_number }} - {{ activity.group_num }} - {{ activity.name }}
+                {{ activity.line1 }}
             </div>
             <div>
-                {{ activity.camp_id.short_name }}
+                {{ activity.line2 }}
             </div>
         </ng-container>
 

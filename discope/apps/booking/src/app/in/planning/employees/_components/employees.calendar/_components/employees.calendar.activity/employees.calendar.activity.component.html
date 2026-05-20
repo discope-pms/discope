@@ -17,14 +17,14 @@
                     <div class="first-line">
                         <div class="info">
                             <mat-icon *ngIf="activity.booking_line_group_id.has_person_with_disability" aria-hidden="true" style="height: 12px; width: 12px;">accessible</mat-icon>
-                            <span>{{ activity.group_num }} - {{ activity.customer_id.name }}</span>
+                            <span>{{ activity.line1 }}</span>
                         </div>
                         <div class="icon">
                             <span class="material-icons">{{ getIcon() }}</span>
                         </div>
                     </div>
                     <div class="second-line">
-                        {{ activity.name }}
+                        {{ activity.line2 }}
                     </div>
                 </ng-container>
 
@@ -33,11 +33,11 @@
                     <!-- #memo - first line is discarded if available height is less than 28px -->
                     <div class="first-line">
                         <div class="info">
-                            {{ activity.camp_id.sojourn_number }} - {{ activity.group_num }} - {{ activity.name }}
+                            {{ activity.line1 }}
                         </div>
                     </div>
                     <div class="second-line">
-                        {{ activity.camp_id.short_name }}
+                        {{ activity.line2 }}
                     </div>
                 </ng-container>
 

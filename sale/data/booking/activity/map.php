@@ -162,6 +162,17 @@ $age_range_assignments = $orm->read(BookingLineGroupAgeRangeAssignment::getType(
 
 $date_format = Setting::get_value('core', 'locale', 'date_format', 'm/d/Y');
 
+$map_activity_lines_formats = [
+    'booking' => [
+        'line1' => Setting::get_value('sale', 'features', 'booking.employee_planning.booking_activity_card.line1', '{group_num} - {customer_name}'),
+        'line2' => Setting::get_value('sale', 'features', 'booking.employee_planning.booking_activity_card.line2', '{activity_name}')
+    ],
+    'camp' => [
+        'line1' => Setting::get_value('sale', 'features', 'booking.employee_planning.camp_activity_card.line1', '{sojourn_number} - {group_num} - {activity_name}'),
+        'line2' => Setting::get_value('sale', 'features', 'booking.employee_planning.camp_activity_card.line2', '{short_name}')
+    ]
+];
+
 /** @var equal\data\adapt\DataAdapterJson $adapter */
 $adapter = $dap->get('json');
 
@@ -206,6 +217,9 @@ foreach($activities as $id => $activity) {
     // camp
     $camp = null;
 
+    $line1 = '';
+    $line2 = '';
+
     if(!is_null($activity['booking_id'])) {
         $booking = isset($activity['booking_id'], $bookings[$activity['booking_id']]) ? $bookings[$activity['booking_id']]->toArray() : null;
         if(is_null($booking)) {
@@ -224,11 +238,42 @@ foreach($activities as $id => $activity) {
 
         $customer = isset($booking['customer_id'], $customers[$booking['customer_id']]) ? $customers[$booking['customer_id']]->toArray() : null;
         $identity = isset($customer['partner_identity_id'], $identities[$customer['partner_identity_id']]) ? $identities[$customer['partner_identity_id']]->toArray() : null;
+
+        $map_lines_values = [
+            'group_num'     => $activity['group_num'],
+            'customer_name' => $customer['name'],
+            'activity_name' => $activity['name']
+        ];
+
+        $line1 = $map_activity_lines_formats['booking']['line1'];
+        foreach($map_lines_values as $key => $value) {
+            $line1 = str_replace('{'.$key.'}', $value, $line1);
+        }
+        $line2 = $map_activity_lines_formats['booking']['line2'];
+        foreach($map_lines_values as $key => $value) {
+            $line2 = str_replace('{'.$key.'}', $value, $line2);
+        }
     }
     elseif(!is_null($activity['camp_id'])) {
         $camp = isset($activity['camp_id'], $camps[$activity['camp_id']]) ? $camps[$activity['camp_id']]->toArray() : null;
         $camp['date_from'] = date($date_format, $camp['date_from']);
         $camp['date_to'] = date($date_format, $camp['date_to']);
+
+        $map_lines_values = [
+            'sojourn_number'    => $camp['sojourn_number'],
+            'group_num'         => $activity['group_num'],
+            'activity_name'     => $activity['name'],
+            'short_name'        => $camp['short_name']
+        ];
+
+        $line1 = $map_activity_lines_formats['camp']['line1'];
+        foreach($map_lines_values as $key => $value) {
+            $line1 = str_replace('{'.$key.'}', $value, $line1);
+        }
+        $line2 = $map_activity_lines_formats['camp']['line2'];
+        foreach($map_lines_values as $key => $value) {
+            $line2 = str_replace('{'.$key.'}', $value, $line2);
+        }
     }
 
     $activity_date = $adapter->adaptOut($activity['activity_date'], Field::MAP_TYPE_USAGE['date']);
@@ -248,7 +293,9 @@ foreach($activities as $id => $activity) {
         'customer_id'               => $customer,
         'partner_identity_id'       => $identity,
         'age_range_assignments_ids' => $group_age_range_assignments,
-        'partner_id'                => null
+        'partner_id'                => null,
+        'line1'                     => $line1,
+        'line2'                     => $line2
     ];
 
     if($activity['has_staff_required']) {
@@ -343,6 +390,8 @@ if(!empty($activity_partner_activities_ids)) {
         ]);
     }
 }
+
+file_put_contents(QN_LOG_STORAGE_DIR.'/tmp.log', json_encode($result).PHP_EOL, FILE_APPEND | LOCK_EX);
 
 $context->httpResponse()
         ->body($result)
