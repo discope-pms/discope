@@ -240,9 +240,10 @@ foreach($activities as $id => $activity) {
         $identity = isset($customer['partner_identity_id'], $identities[$customer['partner_identity_id']]) ? $identities[$customer['partner_identity_id']]->toArray() : null;
 
         $map_lines_values = [
-            'group_num'     => $activity['group_num'],
-            'customer_name' => $customer['name'],
-            'activity_name' => $activity['name']
+            'group_num'             => $activity['group_num'],
+            'customer_name'         => $customer['name'],
+            'customer_address_city' => $identity['address_city'],
+            'activity_name'         => $activity['name']
         ];
 
         $line1 = $map_activity_lines_formats['booking']['line1'];
