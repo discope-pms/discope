@@ -377,7 +377,7 @@
                         "icon": "handshake",
                         "description": "",
                         "type": "parent",
-                        "visible": [true, "=", "env.sale.features.booking.employee_planning"],
+                        "visible": [true, "=", "env.sale.features.employee_planning"],
                         "children": [
                             {
                                 "id": "item.planning.partners.employees",

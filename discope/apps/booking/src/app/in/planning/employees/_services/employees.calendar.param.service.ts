@@ -109,7 +109,7 @@ export class PlanningEmployeesCalendarParamService {
                 this.filterEmployees();
 
                 let employees = this._employees;
-                if(this.environment.hasOwnProperty('sale.features.employee.activity_filter') && this.environment['sale.features.employee.activity_filter']) {
+                if(this.environment.hasOwnProperty('sale.features.employee_planning.activity_filter') && this.environment['sale.features.employee_planning.activity_filter']) {
                     if(this._product_model_ids.length === 0) {
                         employees = [];
                     }

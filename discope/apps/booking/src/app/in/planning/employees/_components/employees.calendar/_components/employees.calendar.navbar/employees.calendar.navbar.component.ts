@@ -253,7 +253,7 @@ export class PlanningEmployeesCalendarNavbarComponent implements OnInit, OnChang
 
     private filterPartners() {
         let employees = this.params.employees;
-        if(this.environment.hasOwnProperty('sale.features.employee.activity_filter') && this.environment['sale.features.employee.activity_filter']) {
+        if(this.environment.hasOwnProperty('sale.features.employee_planning.activity_filter') && this.environment['sale.features.employee_planning.activity_filter']) {
             if(this.params.product_model_ids.length === 0) {
                 employees = [];
             }

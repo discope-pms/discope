@@ -820,7 +820,7 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
         }
 
         // Check employee can handle activity
-        if(this.environment.hasOwnProperty('sale.features.employee.activity_filter') && this.environment['sale.features.employee.activity_filter']) {
+        if(this.environment.hasOwnProperty('sale.features.employee_planning.activity_filter') && this.environment['sale.features.employee_planning.activity_filter']) {
             if(!employee.activity_product_models_ids.map(id => +id).includes(activity.product_model_id.id)) {
                 return false;
             }

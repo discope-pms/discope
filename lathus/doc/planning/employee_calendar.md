@@ -61,14 +61,14 @@ Deux paramètres permettent de configurer le calendrier :
 
 1) Activer le Calendrier Animateurs
 - Active ou désactive l'affichage du calendrier.
-- Clé: `sale.features.booking.employee_planning`
+- Clé: `sale.features.employee_planning`
 
 2) Filtrer les activités assignables
 - Restreint l'assignation des activités aux animateurs et prestataires habilités à les accepter.
 - Configuration :
   - Animateurs (employés) → Fiche employé → (Onglet) Modèle de produits
   - Prestataires → Fiche prestataire → (Onglet) Modèle de produits
-- Clé: `sale.features.employee.activity_filter`
+- Clé: `sale.features.employee_planning.activity_filter`
 
 
 

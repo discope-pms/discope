@@ -164,12 +164,12 @@ $date_format = Setting::get_value('core', 'locale', 'date_format', 'm/d/Y');
 
 $map_activity_lines_formats = [
     'booking' => [
-        'line1' => Setting::get_value('sale', 'features', 'booking.employee_planning.booking_activity_card.line1', '{group_num} - {customer_name}'),
-        'line2' => Setting::get_value('sale', 'features', 'booking.employee_planning.booking_activity_card.line2', '{activity_name}')
+        'line1' => Setting::get_value('sale', 'features', 'employee_planning.booking_activity_card.line1', '{group_num} - {customer_name}'),
+        'line2' => Setting::get_value('sale', 'features', 'employee_planning.booking_activity_card.line2', '{activity_name}')
     ],
     'camp' => [
-        'line1' => Setting::get_value('sale', 'features', 'booking.employee_planning.camp_activity_card.line1', '{sojourn_number} - {group_num} - {activity_name}'),
-        'line2' => Setting::get_value('sale', 'features', 'booking.employee_planning.camp_activity_card.line2', '{short_name}')
+        'line1' => Setting::get_value('sale', 'features', 'employee_planning.camp_activity_card.line1', '{sojourn_number} - {group_num} - {activity_name}'),
+        'line2' => Setting::get_value('sale', 'features', 'employee_planning.camp_activity_card.line2', '{short_name}')
     ]
 ];
 

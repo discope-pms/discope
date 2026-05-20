@@ -724,7 +724,7 @@ class BookingActivity extends Model {
 
             if(!is_null($employee_id)) {
                 // check employee qualification for the given activity
-                $activity_filter = Setting::get_value('sale', 'features', 'employee.activity_filter', false);
+                $activity_filter = Setting::get_value('sale', 'features', 'employee_planning.activity_filter', false);
                 if($activity_filter) {
                     $employee = Employee::id($employee_id)
                         ->read(['activity_product_models_ids'])
