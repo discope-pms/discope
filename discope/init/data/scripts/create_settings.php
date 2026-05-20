@@ -24,6 +24,7 @@ Setting::assert_value('sale', 'features', 'employee_planning.booking_activity_ca
 Setting::assert_value('sale', 'features', 'employee_planning.booking_activity_card.line2', '{activity_name}');
 Setting::assert_value('sale', 'features', 'employee_planning.camp_activity_card.line1', '{sojourn_number} - {group_num} - {activity_name}');
 Setting::assert_value('sale', 'features', 'employee_planning.camp_activity_card.line2', '{short_name}');
+Setting::assert_value('sale', 'features', 'employee_planning.mobile.show_all_activities', false);
 Setting::assert_value('sale', 'features', 'quote.validity_delay', 10);
 Setting::assert_value('sale', 'features', 'quote.remind_auto', false);
 Setting::assert_value('sale', 'features', 'quote.remind_delay', 7);

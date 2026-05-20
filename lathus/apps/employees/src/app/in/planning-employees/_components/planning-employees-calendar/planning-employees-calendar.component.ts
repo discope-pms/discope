@@ -31,6 +31,8 @@ export class PlanningEmployeesCalendarComponent implements OnInit, AfterViewInit
     private currentY = 0;
     private startOnTop = false;
 
+    public fixedHeight = true;
+
     private destroy$ = new Subject<void>();
 
     private onTouchStart = (event: TouchEvent) => {
@@ -174,6 +176,10 @@ export class PlanningEmployeesCalendarComponent implements OnInit, AfterViewInit
 
         this.env.getEnv().then((env: any) => {
             this.locale = env.locale;
+
+            if(env['sale.features.employee_planning.mobile.show_all_activities']) {
+                this.fixedHeight = false;
+            }
         });
     }
 

@@ -88,12 +88,15 @@
 
     .row {
         display: flex;
-        height: 70px;
-        min-height: 70px;
-        max-height: 70px;
+
+        &.fixed-height {
+            height: 70px;
+            max-height: 70px;
+        }
 
         .employee-col,
         .moment-col {
+            min-height: 70px;
             padding: 1px;
             border: 1px solid #f1f1f1;
         }

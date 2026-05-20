@@ -18,7 +18,7 @@
     </ng-container>
 </div>
 
-<div class="row" *ngFor="let employee of employeeList">
+<div class="row" *ngFor="let employee of employeeList" [class.fixed-height]="fixedHeight">
     <div class="employee-col">{{ employee.name }}</div>
     <ng-container *ngFor="let dayIndex of daysIndexes">
         <div class="moment-col" (click)="openMoment(employee.id, dayIndex, 'AM')">
