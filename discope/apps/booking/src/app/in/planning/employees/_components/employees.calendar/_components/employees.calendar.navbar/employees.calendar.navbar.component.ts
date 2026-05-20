@@ -101,6 +101,9 @@ export class PlanningEmployeesCalendarNavbarComponent implements OnInit, OnChang
                 if(this.productModelCategories.length > 0) {
                     this.selectedProductCategory = this.productModelCategories.find((cat) => cat.id === this.params.product_category_id);
                 }
+
+                this.refreshPartners();
+                this.selected_partners_ids = this.params.partners_ids;
             });
 
         // use user centers_ids to filter displayed employees
@@ -111,18 +114,7 @@ export class PlanningEmployeesCalendarNavbarComponent implements OnInit, OnChang
                 }
 
                 await this.params.loadPartners(user.centers_ids);
-
-                const partners = this.params.partners;
-                if(partners.length === 0) {
-                    return;
-                }
-
-                this.partners = partners.sort((a: any, b: any) => {
-                    if (a.relationship !== b.relationship) {
-                        return a.relationship < b.relationship ? -1 : 1;
-                    }
-                    return a.name.localeCompare(b.name);
-                });
+                this.refreshPartners();
             });
 
         this.vm.product_model_code.valueChanges.subscribe((value: string) => {
@@ -153,6 +145,20 @@ export class PlanningEmployeesCalendarNavbarComponent implements OnInit, OnChang
         this.refreshDisplayedProductModels();
 
         this.environment = await this.env.getEnv();
+    }
+
+    private refreshPartners() {
+        const partners = this.params.partners;
+        if(partners.length === 0) {
+            return;
+        }
+
+        this.partners = partners.sort((a: any, b: any) => {
+            if (a.relationship !== b.relationship) {
+                return a.relationship < b.relationship ? -1 : 1;
+            }
+            return a.name.localeCompare(b.name);
+        });
     }
 
     public refreshDisplayedProductModels() {

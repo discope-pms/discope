@@ -113,6 +113,7 @@
                     <ng-container *ngFor="let day of headers.days; let i = index">
                         <td     class="cell-AM cell-days cdk-drag-disabled"
                                 [class.is-weekend]="isWeekEnd(day)"
+                                [class.not-active]="!isPartnerActive(partner, headers.days_indexes[i])"
                                 (dragstart)="preventDrag($event)"
                                 (mouseenter)="onmouseenterTableCell($event, index, partner, headers.days_indexes[i], 'AM')"
                                 (mouseleave)="onmouseleaveTableCell($event)"
@@ -207,6 +208,7 @@
 
                         <td     class="cell-PM cell-days cdk-drag-disabled"
                                 [class.is-weekend]="isWeekEnd(day)"
+                                [class.not-active]="!isPartnerActive(partner, headers.days_indexes[i])"
                                 (dragstart)="preventDrag($event)"
                                 (mouseenter)="onmouseenterTableCell($event, index, partner, headers.days_indexes[i], 'PM')"
                                 (mouseleave)="onmouseleaveTableCell($event)"
@@ -302,6 +304,7 @@
 
                         <td     class="cell-EV cell-days cdk-drag-disabled"
                                 [class.is-weekend]="isWeekEnd(day)"
+                                [class.not-active]="!isPartnerActive(partner, headers.days_indexes[i])"
                                 (dragstart)="preventDrag($event)"
                                 (mouseenter)="onmouseenterTableCell($event, index, partner, headers.days_indexes[i], 'EV')"
                                 (mouseleave)="onmouseleaveTableCell($event)"

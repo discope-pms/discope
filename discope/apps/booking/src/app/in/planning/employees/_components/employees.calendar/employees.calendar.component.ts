@@ -252,6 +252,19 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
         return (day.getDay() == 0 || day.getDay() == 6);
     }
 
+    public isPartnerActive(partner: Partner, day_index: string) {
+        if(partner.relationship === 'employee') {
+            const employee = partner as Employee;
+
+            const start = employee.date_start.toISOString().slice(0, 10);
+            const end = employee.date_end ? employee.date_end.toISOString().slice(0, 10) : null;
+
+            return start <= day_index && (!end || end >= day_index);
+        }
+
+        return true;
+    }
+
     public hasActivity(partner: Partner, day_index: string, time_slot: string): boolean {
         const activities = this.activities[partner.id]?.[day_index]?.[time_slot] ?? [];
 
@@ -797,6 +810,13 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
         // Check drop and activity moment match
         if(date_index !== activity_date_index || time_slot !== activity.time_slot) {
             return false;
+        }
+
+        // Check if drop in employee date_start to date_end interval
+        const start = employee.date_start.toISOString().slice(0, 10);
+        const end = employee.date_end ? employee.date_end.toISOString().slice(0, 10) : null;
+        if(date_index < start || (end && date_index > end)) {
+            return false
         }
 
         // Check employee can handle activity
