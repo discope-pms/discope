@@ -338,7 +338,7 @@
                 }
             }
 
-            &:hover > td:not(.status)  {
+            &:hover > td:not(.status,.not-active)  {
                 background-color: #e0e0e0a0 !important;
             }
 
@@ -386,6 +386,12 @@
 
                     &.is-weekend {
                         background-color: rgba(0,0,0,0.05);
+                    }
+                    &.not-active {
+                        background-color: rgba(0, 0, 0, 0.33);
+                        cursor: not-allowed;
+                        user-select: none;
+                        text-decoration: line-through;
                     }
 
                     &.small {
