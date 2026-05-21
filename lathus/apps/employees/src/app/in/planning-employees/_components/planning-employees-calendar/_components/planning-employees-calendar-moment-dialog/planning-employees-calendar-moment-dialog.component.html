@@ -6,8 +6,10 @@
     <div *ngIf="activities.length > 0" class="activities">
         <app-planning-employees-calendar-activity-card
             *ngFor="let activity of activities"
-            [activity]="activity" class="activity-card"
+            class="activity-card"
+            [activity]="activity"
             [padding]="'15px'"
+            [displayTimes]="true"
             (click)="openActivity(activity)"
         ></app-planning-employees-calendar-activity-card>
     </div>

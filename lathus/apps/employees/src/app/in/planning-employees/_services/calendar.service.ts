@@ -36,6 +36,10 @@ export class CalendarService implements OnDestroy {
     private employeeListSubject = new BehaviorSubject<Employee[]>([]);
     public employeeList$ = this.employeeListSubject.asObservable();
 
+    // employees that are working for the company between selected values of dateFrom and dateTo filters
+    private activeEmployeeListSubject = new BehaviorSubject<Employee[]>([]);
+    public activeEmployeeList$ = this.activeEmployeeListSubject.asObservable();
+
     private productModelListSubject = new BehaviorSubject<ProductModel[]>([]);
     public productModelList$ = this.productModelListSubject.asObservable();
 
@@ -163,6 +167,26 @@ export class CalendarService implements OnDestroy {
                 }
             });
 
+        combineLatest([
+            this.employeeList$,
+            this.dateFrom$,
+            this.dateTo$
+        ])
+            .pipe(takeUntil(this.destroy$),)
+            .subscribe(([employeeList, dateFrom, dateTo]) => {
+                const from = dateFrom.toISOString().slice(0, 10);
+                const to = dateTo.toISOString().slice(0, 10);
+
+                const activeEmployeeList = employeeList.filter(employee => {
+                    const start = employee.date_start.slice(0, 10);
+                    const end = employee.date_end ? employee.date_end.slice(0, 10) : null;
+
+                    return start <= to && (!end || end >= from);
+                });
+
+                this.activeEmployeeListSubject.next(activeEmployeeList);
+            });
+
         // Listen to filter changes to modify the product models and employees to display
         combineLatest([
             this.userGroup$,
@@ -172,69 +196,64 @@ export class CalendarService implements OnDestroy {
             this.categoryList$,
             this.productModelList$
         ])
-            .pipe(
-                takeUntil(this.destroy$),
-                switchMap(([userGroup, employeeRole, selectedCategoryCode, employeeList, categoryList, productModelList]) => {
-                    if(!userGroup || !employeeRole || !employeeList.length || !categoryList.length || !productModelList.length) {
-                        return EMPTY;
+            .pipe(takeUntil(this.destroy$))
+            .subscribe(([userGroup, employeeRole, selectedCategoryCode, employeeList, categoryList, productModelList]) => {
+                if(!userGroup || !employeeRole || !employeeList.length || !categoryList.length || !productModelList.length) {
+                    return;
+                }
+
+                let productModelsIds: number[] = [];
+                let employeesIds: number[] = [];
+
+                if(userGroup === 'organizer') {
+                    // Load all
+                    if(selectedCategoryCode === 'ALL') {
+                        employeesIds = employeeList.map(e => e.id);
+                        productModelsIds = productModelList.map(pm => pm.id);
                     }
-
-                    let productModelsIds: number[] = [];
-                    let employeesIds: number[] = [];
-
-                    if(userGroup === 'organizer') {
-                        // Load all
-                        if(selectedCategoryCode === 'ALL') {
-                            employeesIds = employeeList.map(e => e.id);
-                            productModelsIds = productModelList.map(pm => pm.id);
-                        }
-                        // Load all employees with a product model of the selected category
-                        else {
-                            const category = categoryList.find(c => c.code === selectedCategoryCode);
-                            if(category) {
-                                productModelsIds = category.product_models_ids;
-                                for(let employee of employeeList) {
-                                    for(let productModelId of productModelsIds) {
-                                        if(employee.activity_product_models_ids.includes(productModelId)) {
-                                            employeesIds.push(employee.id);
-                                            break;
-                                        }
+                    // Load all employees with a product model of the selected category
+                    else {
+                        const category = categoryList.find(c => c.code === selectedCategoryCode);
+                        if(category) {
+                            productModelsIds = category.product_models_ids;
+                            for(let employee of employeeList) {
+                                for(let productModelId of productModelsIds) {
+                                    if(employee.activity_product_models_ids.includes(productModelId)) {
+                                        employeesIds.push(employee.id);
+                                        break;
                                     }
                                 }
                             }
-                            else {
-                                employeesIds = employeeList.map(e => e.id);
-                                productModelsIds = productModelList.map(pm => pm.id);
-                            }
                         }
-                    }
-                    else {
-                        // Load all employees of authenticated user role
-                        const employee = employeeList.find(e => e.partner_identity_id === this.user.identity_id.id);
-                        if(employee) {
-                            employeeList = employeeList.filter(e => e.id === employee.id || (e.role_id && e.role_id.code === employee.role_id.code));
-                            const mapProductModelIds: { [key: number]: boolean } = {};
-                            for(let employee of employeeList) {
-                                for(let productModelId of employee.activity_product_models_ids) {
-                                    mapProductModelIds[productModelId] = true;
-                                }
-                            }
-
+                        else {
                             employeesIds = employeeList.map(e => e.id);
-                            productModelsIds = Object.keys(mapProductModelIds).map(pmId => +pmId);
+                            productModelsIds = productModelList.map(pm => pm.id);
                         }
                     }
+                }
+                else {
+                    // Load all employees of authenticated user role
+                    const employee = employeeList.find(e => e.partner_identity_id === this.user.identity_id.id);
+                    if(employee) {
+                        employeeList = employeeList.filter(e => e.id === employee.id || (e.role_id && e.role_id.code === employee.role_id.code));
+                        const mapProductModelIds: { [key: number]: boolean } = {};
+                        for(let employee of employeeList) {
+                            for(let productModelId of employee.activity_product_models_ids) {
+                                mapProductModelIds[productModelId] = true;
+                            }
+                        }
 
-                    this.selectedProductModelsIdsSubject.next(productModelsIds);
-                    this.productModelsIdsToDisplaySubject.next(productModelsIds);
+                        employeesIds = employeeList.map(e => e.id);
+                        productModelsIds = Object.keys(mapProductModelIds).map(pmId => +pmId);
+                    }
+                }
 
-                    this.selectedEmployeesIdsSubject.next(employeesIds);
-                    this.employeesIdsToDisplaySubject.next(employeesIds);
+                this.selectedProductModelsIdsSubject.next(productModelsIds);
+                this.productModelsIdsToDisplaySubject.next(productModelsIds);
 
-                    return EMPTY;
-                })
-            )
-            .subscribe();
+                this.selectedEmployeesIdsSubject.next(employeesIds);
+                this.employeesIdsToDisplaySubject.next(employeesIds);
+            });
 
         // Wait for user and product categories data to be loaded, then load the product models accordingly
         combineLatest([
@@ -317,10 +336,7 @@ export class CalendarService implements OnDestroy {
     }
 
     private loadEmployeeList(): Observable<any> {
-        return this.api.fetchEmployees({
-            dateStart: this.dateFromSubject.value.toISOString().split('T')[0],
-            dateEnd: this.dateToSubject.value.toISOString().split('T')[0]
-        })
+        return this.api.fetchEmployees()
             .pipe(
                 takeUntil(this.destroy$),
                 tap(employees => {

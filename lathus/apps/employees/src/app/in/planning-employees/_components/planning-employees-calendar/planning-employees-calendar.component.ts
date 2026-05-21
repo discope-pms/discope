@@ -1,11 +1,17 @@
 import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit } from '@angular/core';
 import { ActivityMap, ActivityMapActivity, Employee } from '../../../../../type';
 import { EnvService } from 'sb-shared-lib';
-import {combineLatest, Subject} from 'rxjs';
+import { combineLatest, Subject } from 'rxjs';
 import { CalendarService } from '../../_services/calendar.service';
 import { MomentDialogOpenData, PlanningEmployeesCalendarMomentDialogComponent } from './_components/planning-employees-calendar-moment-dialog/planning-employees-calendar-moment-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
 import { takeUntil } from 'rxjs/operators';
+
+export interface ActiveEmployeesDaysMap {
+    [index: number]: {
+        [date: string]: boolean;
+    };
+}
 
 @Component({
     selector: 'app-planning-employees-calendar',
@@ -14,7 +20,11 @@ import { takeUntil } from 'rxjs/operators';
 })
 export class PlanningEmployeesCalendarComponent implements OnInit, AfterViewInit, OnDestroy {
 
+    private dateFrom = new Date();
+    private dateTo = new Date();
+
     public employeeList: Employee[] = [];
+    public activeEmployeesDaysMap: ActiveEmployeesDaysMap = {};
     public activityMap: ActivityMap = {};
     public daysIndexes: string[] = [];
 
@@ -107,16 +117,27 @@ export class PlanningEmployeesCalendarComponent implements OnInit, AfterViewInit
     }
 
     ngOnInit() {
+        this.calendar.dateFrom$.subscribe((dateFrom) => {
+            this.dateFrom = dateFrom;
+            this.refreshActiveEmployeesDaysMap(this.employeeList, dateFrom, this.dateTo);
+        });
+
+        this.calendar.dateTo$.subscribe((dateTo) => {
+            this.dateTo = dateTo;
+            this.refreshActiveEmployeesDaysMap(this.employeeList, this.dateFrom, dateTo);
+        });
+
         combineLatest([this.calendar.dateFrom$, this.calendar.daysDisplayedQty$])
             .pipe(takeUntil(this.destroy$))
             .subscribe(([dateFrom, daysDisplayedQty]) => {
                 this.refreshDaysIndexes(dateFrom, daysDisplayedQty);
             });
 
-        combineLatest([this.calendar.employeeList$, this.calendar.employeesIdsToDisplay$])
+        combineLatest([this.calendar.activeEmployeeList$, this.calendar.employeesIdsToDisplay$])
             .pipe(takeUntil(this.destroy$))
             .subscribe(([employeeList, employeesIdsToDisplay]) => {
                 this.employeeList = employeeList.filter(e => employeesIdsToDisplay.includes(e.id));
+                this.refreshActiveEmployeesDaysMap(employeeList, this.dateFrom, this.dateTo);
             }
         );
 
@@ -199,6 +220,27 @@ export class PlanningEmployeesCalendarComponent implements OnInit, AfterViewInit
         }
 
         this.daysIndexes = daysIndexes;
+    }
+
+    private refreshActiveEmployeesDaysMap(employeeList: Employee[], dateFrom: Date, dateTo: Date) {
+        const activeEmployeesDaysMap: ActiveEmployeesDaysMap = {};
+        for(let employee of employeeList) {
+            activeEmployeesDaysMap[employee.id] = {};
+
+            const start = employee.date_start.slice(0, 10);
+            const end = employee.date_end ? employee.date_end.slice(0, 10) : null;
+
+            const date = new Date(dateFrom.getTime());
+            while(date <= dateTo) {
+                const dateIndex = date.toISOString().slice(0, 10);
+
+                activeEmployeesDaysMap[employee.id][dateIndex] = dateIndex >= start && (!end || dateIndex <= end);
+
+                date.setDate(date.getDate() + 1);
+            }
+        }
+
+        this.activeEmployeesDaysMap = activeEmployeesDaysMap;
     }
 
     public formatDate(dateIndex: string): string {

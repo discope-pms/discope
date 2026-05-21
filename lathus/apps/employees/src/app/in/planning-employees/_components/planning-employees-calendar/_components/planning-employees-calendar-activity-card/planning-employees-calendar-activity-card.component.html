@@ -8,6 +8,7 @@
                 <span>{{ activity.line1 }}</span>
             </div>
             <div>{{ activity.line2 }}</div>
+            <div *ngIf="displayTimes" class="times">{{ activity.schedule_from.slice(0, 5) }} - {{ activity.schedule_to.slice(0, 5) }}</div>
         </ng-container>
 
         <!-- Camp -->
@@ -18,6 +19,7 @@
             <div>
                 {{ activity.line2 }}
             </div>
+            <div *ngIf="displayTimes" class="times">{{ activity.schedule_from.slice(0, 5) }} - {{ activity.schedule_to.slice(0, 5) }}</div>
         </ng-container>
 
         <!-- Other -->

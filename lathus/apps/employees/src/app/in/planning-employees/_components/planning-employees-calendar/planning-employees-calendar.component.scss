@@ -45,6 +45,11 @@
             flex-basis: 0;
             min-width: 0;
             overflow: hidden;
+            cursor: pointer;
+        }
+
+        .moment-col:hover {
+            opacity: 0.9;
         }
     }
 
@@ -94,6 +99,10 @@
             max-height: 70px;
         }
 
+        &:hover {
+            background-color: #f4f4f4 !important;
+        }
+
         .employee-col,
         .moment-col {
             min-height: 70px;
@@ -110,6 +119,14 @@
             display: flex;
             flex-direction: column;
             gap: 1px;
+
+            &.not-active {
+                background-color: rgba(0, 0, 0, 0.33);
+
+                &:hover {
+                    opacity: 1;
+                }
+            }
 
             .activity-card {
                 width: 100%;

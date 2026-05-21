@@ -22,7 +22,7 @@
             <div class="label">{{ 'ACTIVITY_DIALOG_DATE_LABEL' | translate }}</div>
             <div class="value">
                 <div>{{ dateFormated }}</div>
-                <div *ngIf="activity.schedule_from">{{ activity.schedule_from }} - {{ activity.schedule_to }}</div>
+                <div *ngIf="activity.schedule_from">{{ activity.schedule_from.slice(0, 5) }} - {{ activity.schedule_to.slice(0, 5) }}</div>
             </div>
         </div>
 
