@@ -9,6 +9,7 @@ export class PlanningEmployeesCalendarActivityCardComponent {
 
     @Input() activity: any;
     @Input() padding = '5px';
+    @Input() displayTimes = false;
 
     constructor() {
     }

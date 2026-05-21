@@ -8,6 +8,7 @@
             *ngFor="let activity of activities"
             [activity]="activity" class="activity-card"
             [padding]="'15px'"
+            [displayTimes]="true"
             (click)="openActivity(activity)"
         ></app-planning-employees-calendar-activity-card>
     </div>
