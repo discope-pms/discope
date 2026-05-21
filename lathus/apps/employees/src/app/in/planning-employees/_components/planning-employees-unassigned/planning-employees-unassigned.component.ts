@@ -20,6 +20,8 @@ export class PlanningEmployeesUnassignedComponent implements OnInit, OnDestroy  
 
     public daysIndexes: string[] = [];
 
+    public loading = true;
+
     public unassignedActivityMap: ActivityMap;
 
     private destroy$ = new Subject<void>();
@@ -31,6 +33,10 @@ export class PlanningEmployeesUnassignedComponent implements OnInit, OnDestroy  
     }
 
     ngOnInit() {
+        this.calendar.loading$.subscribe(loading => {
+            this.loading = loading;
+        });
+
         combineLatest([this.calendar.dateFrom$, this.calendar.daysDisplayedQty$])
             .pipe(takeUntil(this.destroy$))
             .subscribe(([dateFrom, daysDisplayedQty]) => {
