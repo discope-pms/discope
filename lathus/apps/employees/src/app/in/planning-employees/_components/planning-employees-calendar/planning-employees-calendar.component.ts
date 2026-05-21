@@ -230,14 +230,8 @@ export class PlanningEmployeesCalendarComponent implements OnInit, AfterViewInit
             const start = employee.date_start.slice(0, 10);
             const end = employee.date_end ? employee.date_end.slice(0, 10) : null;
 
-            // enhance ux by computing one day after (when click on date next button)
-            const until = new Date(dateTo.getTime());
-            until.setDate(until.getDate() + 1);
-
-            // enhance ux by computing one day before (when click on date previous button)
             const date = new Date(dateFrom.getTime());
-            date.setDate(date.getDate() - 1);
-            while(date <= until) {
+            while(date <= dateTo) {
                 const dateIndex = date.toISOString().slice(0, 10);
 
                 activeEmployeesDaysMap[employee.id][dateIndex] = dateIndex >= start && (!end || dateIndex <= end);
