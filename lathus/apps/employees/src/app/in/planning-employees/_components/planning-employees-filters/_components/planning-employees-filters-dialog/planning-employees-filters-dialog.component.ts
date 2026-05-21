@@ -101,7 +101,7 @@ export class PlanningEmployeesFiltersDialogComponent implements OnInit, OnDestro
 
         combineLatest([
             this.calendar.employeeRoleList$,
-            this.calendar.employeeList$,
+            this.calendar.activeEmployeeList$,
             this.calendar.userGroup$
         ])
             .pipe(takeUntil(this.destroy$))

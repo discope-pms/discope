@@ -36,7 +36,9 @@ export interface Employee extends Partner {
         name: string,
         code: 'EQUI'|'ENV'|'SP'|'CAMPS'
     },
-    partner_identity_id: number
+    partner_identity_id: number,
+    date_start: string,
+    date_end: string|null
 }
 
 export interface Provider extends Partner {

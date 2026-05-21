@@ -113,7 +113,7 @@ export class PlanningEmployeesCalendarComponent implements OnInit, AfterViewInit
                 this.refreshDaysIndexes(dateFrom, daysDisplayedQty);
             });
 
-        combineLatest([this.calendar.employeeList$, this.calendar.employeesIdsToDisplay$])
+        combineLatest([this.calendar.activeEmployeeList$, this.calendar.employeesIdsToDisplay$])
             .pipe(takeUntil(this.destroy$))
             .subscribe(([employeeList, employeesIdsToDisplay]) => {
                 this.employeeList = employeeList.filter(e => employeesIdsToDisplay.includes(e.id));
