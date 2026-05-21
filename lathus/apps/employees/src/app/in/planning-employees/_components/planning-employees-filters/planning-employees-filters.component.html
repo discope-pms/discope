@@ -5,7 +5,7 @@
 <div class="dates-wrapper">
     <div class="space"></div>
 
-    <app-icon-button [icon]="'chevron_left'" (click)="onPreviousDate()" [fillInverse]="true"></app-icon-button>
+    <app-icon-button class="prev-button" [icon]="'chevron_left'" (click)="onPreviousDate()" [fillInverse]="true"></app-icon-button>
 
     <div class="date" (click)="onOpenPicker()">
         <div>{{ dateFromFormatted }}</div>
@@ -19,7 +19,7 @@
         </div>
     </div>
 
-    <app-icon-button [icon]="'chevron_right'" (click)="onNextDate()" [fillInverse]="true"></app-icon-button>
+    <app-icon-button class="next-button" [icon]="'chevron_right'" (click)="onNextDate()" [fillInverse]="true"></app-icon-button>
 
     <div class="space"></div>
 </div>

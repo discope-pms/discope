@@ -45,6 +45,11 @@
             flex-basis: 0;
             min-width: 0;
             overflow: hidden;
+            cursor: pointer;
+        }
+
+        .moment-col:hover {
+            opacity: 0.9;
         }
     }
 
@@ -92,6 +97,10 @@
         &.fixed-height {
             height: 70px;
             max-height: 70px;
+        }
+
+        &:hover {
+            background-color: #f4f4f4 !important;
         }
 
         .employee-col,
