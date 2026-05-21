@@ -127,7 +127,8 @@ $children = Child::ids($ids)
                 'payments_ids' => [
                     'amount',
                     'payment_origin',
-                    'payment_method'
+                    'payment_method',
+                    'description'
                 ]
             ],
             'price_adapters_ids' => [

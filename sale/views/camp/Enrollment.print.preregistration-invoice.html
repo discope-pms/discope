@@ -257,7 +257,7 @@
                             <tr>
                                 <td>
                                     {% if payment.payment_method == 'camp_financial_help' %}
-                                        Aide financière
+                                        {{ payment.description }}
                                     {% elseif payment.payment_method == 'bank_check' %}
                                         Chèque bancaire
                                     {% elseif payment.payment_method == 'bank_card' and payment.payment_origin == 'online' %}
