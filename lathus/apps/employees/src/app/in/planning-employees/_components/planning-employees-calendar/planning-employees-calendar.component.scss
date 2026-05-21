@@ -120,6 +120,14 @@
             flex-direction: column;
             gap: 1px;
 
+            &.not-active {
+                background-color: rgba(0, 0, 0, 0.33);
+
+                &:hover {
+                    opacity: 1;
+                }
+            }
+
             .activity-card {
                 width: 100%;
                 padding: 5px;
