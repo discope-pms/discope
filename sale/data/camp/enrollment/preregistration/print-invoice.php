@@ -123,11 +123,18 @@ $children = Child::ids($ids)
                 'product_id' => ['label']
             ],
             'fundings_ids' => [
-                'paid_amount'
+                'paid_amount',
+                'payments_ids' => [
+                    'amount',
+                    'payment_origin',
+                    'payment_method',
+                    'description'
+                ]
             ],
             'price_adapters_ids' => [
                 'name',
                 'price_adapter_type',
+                'origin_type',
                 'value'
             ]
         ]
@@ -234,6 +241,10 @@ foreach($enrollments as &$enrollment) {
     }
 
     foreach($enrollment['price_adapters_ids'] as &$price_adapter) {
+        if(in_array($price_adapter['origin_type'], ['commune', 'community-of-communes', 'department-caf', 'department-msa'])) {
+            continue;
+        }
+
         if($price_adapter['price_adapter_type'] === 'percent') {
             $price_adapter['value'] = round($camp_product_line['price'] * ($price_adapter['value'] / 100), 2);
         }

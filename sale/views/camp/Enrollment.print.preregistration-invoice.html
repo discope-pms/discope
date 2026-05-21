@@ -206,16 +206,16 @@
                         <td colspan="2"></td>
                     </tr>
                     <tr>
-                        <td>concernant <span style="margin-left: 10px;">{{ enrollment.child_id.firstname }} {{ enrollment.child_id.lastname|upper }}</span></td>
-                        <td>..............................................................................................</td>
+                        <td style="text-align: right">concernant <span style="margin-left: 10px;">{{ enrollment.child_id.firstname }} {{ enrollment.child_id.lastname|upper }}</span></td>
+                        <td> .............................................................................................</td>
                         <td style="width: 60px; text-align: right;">
                             <span>{{ enrollment_line.price|format_money() }}</span>
                         </td>
                     </tr>
                 {% else %}
                     <tr>
-                        <td><span style="margin-left: 30px">{{ enrollment_line.product_id.label }}</span></td>
-                        <td>..............................................................................................</td>
+                        <td style="text-align: right"><span style="margin-left: 30px">{{ enrollment_line.product_id.label }}</span></td>
+                        <td> .............................................................................................</td>
                         <td style="width: 60px; text-align: right;">
                             <span>{{ enrollment_line.price|format_money() }}</span>
                         </td>
@@ -223,13 +223,15 @@
                 {% endif %}
             {% endfor %}
             {% for price_adapter in enrollment.price_adapters_ids %}
-                <tr>
-                    <td><span style="margin-left: 30px">{{ price_adapter.name }}</span></td>
-                    <td>..............................................................................................</td>
-                    <td style="width: 60px; text-align: right;">
-                        <span>{{ price_adapter.value|format_money() }}</span>
-                    </td>
-                </tr>
+                {% if price_adapter.origin_type not in ['commune', 'community-of-communes', 'department-caf', 'department-msa'] %}
+                    <tr>
+                        <td style="text-align: right"><span style="margin-left: 30px">{{ price_adapter.name }}</span></td>
+                        <td> .............................................................................................</td>
+                        <td style="width: 60px; text-align: right;">
+                            <span>{{ price_adapter.value|format_money() }}</span>
+                        </td>
+                    </tr>
+                {% endif %}
             {% endfor %}
         {% endfor %}
     </table>
@@ -249,6 +251,29 @@
                         <td style="text-align: right;">{{ total_amount|format_money() }}</td>
                     </tr>
 
+                    {% for enrollment in enrollments %}
+                        {% for funding in enrollment.fundings_ids %}
+                            {% for payment in funding.payments_ids %}
+                            <tr>
+                                <td>
+                                    {% if payment.payment_method == 'camp_financial_help' %}
+                                        {{ payment.description }}
+                                    {% elseif payment.payment_method == 'bank_check' %}
+                                        Chèque bancaire
+                                    {% elseif payment.payment_method == 'bank_card' and payment.payment_origin == 'online' %}
+                                        Carte bancaire (en ligne)
+                                    {% elseif payment.payment_method == 'bank_card' %}
+                                        Carte bancaire
+                                    {% elseif payment.payment_method == 'wire_transfer' %}
+                                        Versement bancaire
+                                    {% endif %}
+                                </td>
+                                <td style="text-align: right;">{{ payment.amount|format_money() }}</td>
+                            </tr>
+                            {% endfor %}
+                        {% endfor %}
+                    {% endfor %}
+
                     <tr style="background-color: #cfcfcf;">
                         <td style="width: 70%;">Reste total à payer</td>
                         <td style="text-align: right;">{{ remaining_amount|format_money() }}</td>
@@ -265,7 +290,7 @@
         {% else %}
             <tr>
                 <td style="padding-top: 5px;" colspan="2">
-                    <i style="margin-left: 170px;">Aucun escompte ne sera accordé pour paiememnt anticipé</i>
+                    <i style="margin-left: 170px;">Aucun escompte ne sera accordé pour paiement anticipé</i>
                 </td>
             </tr>
         {% endif %}
