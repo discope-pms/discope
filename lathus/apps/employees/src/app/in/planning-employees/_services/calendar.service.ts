@@ -170,14 +170,20 @@ export class CalendarService implements OnDestroy {
         combineLatest([
             this.employeeList$,
             this.dateFrom$,
-            this.dateTo$
+            this.dateTo$,
+            this.activityMap$
         ])
             .pipe(takeUntil(this.destroy$),)
-            .subscribe(([employeeList, dateFrom, dateTo]) => {
+            .subscribe(([employeeList, dateFrom, dateTo, activityMap]) => {
                 const from = dateFrom.toISOString().slice(0, 10);
                 const to = dateTo.toISOString().slice(0, 10);
 
                 const activeEmployeeList = employeeList.filter(employee => {
+                    if(activityMap[employee.id] !== undefined && Object.values(activityMap[employee.id]).length > 0) {
+                        // always show the employee if an activity is assigned to it
+                        return true;
+                    }
+
                     const start = employee.date_start.slice(0, 10);
                     const end = employee.date_end ? employee.date_end.slice(0, 10) : null;
 
