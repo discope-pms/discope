@@ -392,8 +392,6 @@ if(!empty($activity_partner_activities_ids)) {
     }
 }
 
-file_put_contents(QN_LOG_STORAGE_DIR.'/tmp.log', json_encode($result).PHP_EOL, FILE_APPEND | LOCK_EX);
-
 $context->httpResponse()
         ->body($result)
         ->send();
