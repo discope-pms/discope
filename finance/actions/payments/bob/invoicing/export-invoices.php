@@ -1,0 +1,775 @@
+<?php
+/*
+    This file is part of the Discope property management software.
+    Author: Yesbabylon SRL, 2020-2026
+    License: GNU AGPL 3 license <http://www.gnu.org/licenses/>
+*/
+
+use core\setting\Setting;
+use documents\Export;
+use equal\text\TextTransformer;
+use identity\CenterOffice;
+use finance\accounting\AccountingJournal;
+use sale\booking\Invoice;
+use sale\catalog\Product;
+
+[$params, $providers] = eQual::announce([
+    'description'   => "Creates an export archive containing all emitted invoices that haven't been exported yet (for external invoicing software).",
+    'params'        => [
+
+        'center_office_id' => [
+            'type'              => 'many2one',
+            'foreign_object'    => 'identity\CenterOffice',
+            'description'       => 'Management Group to which the center belongs.',
+            'required'          => true
+        ],
+
+        'journal_type' => [
+            'type'              => 'string',
+            'description'       => "The type of journal to export for the center office.",
+            'selection'         => [
+                'sales',
+                'sales_peppol'
+            ],
+            'default'           => 'sales'
+        ]
+
+    ],
+    'access'        => [
+        'groups'        => ['finance.default.user'],
+    ],
+    'response'      => [
+        'charset'       => 'utf-8',
+        'accept-origin' => '*'
+    ],
+    'providers'     => ['context', 'orm', 'auth', 'dispatch']
+]);
+
+/**
+ * @var \equal\php\Context                  $context
+ * @var \equal\orm\ObjectManager            $orm
+ * @var \equal\auth\AuthenticationManager   $auth
+ * @var \equal\dispatch\Dispatcher          $dispatch
+ */
+['context' => $context, 'orm' => $orm, 'auth' => $auth, 'dispatch' => $dispatch] = $providers;
+
+$office = CenterOffice::id($params['center_office_id'])
+    ->read(['id'])
+    ->first();
+
+if(!$office) {
+    throw new Exception("unknown_center_office", QN_ERROR_UNKNOWN_OBJECT);
+}
+
+$journal = AccountingJournal::search([
+    ['center_office_id', '=', $office['id']],
+    ['type', '=', $params['journal_type']]
+])
+    ->read(['code', 'type'])
+    ->first(true);
+
+if(!$journal) {
+    throw new Exception("unknown_accounting_journal", QN_ERROR_UNKNOWN_OBJECT);
+}
+
+$domain = [
+    [
+        ['journal_id', '=', $journal['id']],
+        ['is_exported', '=', false],
+        ['center_office_id', '=', $params['center_office_id']],
+        ['booking_id', '>', 0],
+        ['status', '<>', 'proforma'],
+    ],
+    [
+        ['journal_id', '=', $journal['id']],
+        ['is_exported', '=', false],
+        ['center_office_id', '=', $params['center_office_id']],
+        ['has_orders', '=', true],
+        ['status', '<>', 'proforma'],
+    ]
+];
+
+$invoices = Invoice::search($domain, ['limit' => 100, 'sort' => ['number' => 'asc']])
+    ->read([
+        'id',
+        'name',
+        'date',
+        'due_date',
+        'type',
+        'status',
+        // #memo - accounting price is the amount to be recorded in accountancy (does not include installment payments)
+        'accounting_price',
+        'is_deposit',
+        'organisation_id',
+        'subtotals_vat',
+        'total',
+        'total_vat',
+        'price',
+        'partner_id' => [
+            '@domain' => ['state', 'in', ['instance', 'archive']],
+            'id',
+            'name',
+            'partner_identity_id' => [
+                '@domain' => ['state', 'in', ['instance', 'archive']],
+                'id',
+                'address_street',
+                'address_dispatch',
+                'address_city',
+                'address_zip',
+                'address_country',
+                'vat_number',
+                'phone',
+                'fax',
+                'lang_id' => [
+                    'code'
+                ]
+            ]
+        ],
+        'has_orders',
+        'center_office_id' => [
+            'analytic_section_id' => [
+                'code'
+            ]
+        ],
+        'booking_id' => [
+            'name',
+            'date_from',
+            'date_to',
+            'center_id' => [
+                'analytic_section_id' => [
+                    'code'
+                ]
+            ]
+        ],
+        'funding_id' => ['payment_reference', 'due_date'],
+        'invoice_lines_ids' => [
+            'id',
+            'name',
+            'total',
+            'price',
+            'product_id',
+            'downpayment_invoice_id' => ['id', 'status'],
+            'price_id' => [
+                'id',
+                'vat_rate',
+                'accounting_rule_id' => [
+                    'accounting_rule_line_ids' => [
+                        'account_id' => [
+                            'code'
+                        ],
+                        'share'
+                    ]
+                ]
+            ]
+        ]
+    ])
+    ->get(true);
+
+if(count($invoices) == 0) {
+    // exit with no error
+    throw new Exception("no_match");
+}
+
+ob_start();
+echo "[CLIENTS_FACT]
+FileType = Fixed
+CharSet = ascii
+Field1=CID,Char,10,00,00
+Field2=CCUSTYPE,Char,01,00,10
+Field3=CSUPTYPE,Char,01,00,11
+Field4=CNAME1,Char,40,00,12
+Field5=CNAME2,Char,40,00,52
+Field6=CADDRESS1,Char,40,00,92
+Field7=CADDRESS2,Char,40,00,132
+Field8=CZIPCODE,Char,10,00,172
+Field9=CLOCALITY,Char,40,00,182
+Field10=CLANGUAGE,Char,02,00,222
+Field11=CISPERS,Bool,01,00,224
+Field12=CCUSCAT,Char,03,00,225
+Field13=CCURRENCY,Char,03,00,228
+Field14=CVATCAT,Char,01,00,231
+Field15=CVATREF,Char,02,00,232
+Field16=CVATNO,Char,12,00,234
+Field17=CTELNO,Char,14,00,246
+Field18=CFAXNO,Char,14,00,260
+Field19=CCUSVNAT1,Char,03,00,274
+Field20=CCUSVNAT2,Char,03,00,277
+Field21=CCUSVATCMP,Float,20,02,280
+Field22=CCUSCTRACC,Char,10,00,300
+Field23=CCUSIMPUTA,Char,10,00,310
+Field24=CCTRYCODE,Char,02,00,320
+Field25=CBANKCODE,Char,06,00,322
+Field26=CBANKNO,Char,19,00,328
+Field27=CISWARNING,Bool,01,00,347
+Field28=CISREADONL,Bool,01,00,348
+Field29=CISBLOCK,Bool,01,00,349
+Field30=CISSECRET,Bool,01,00,350
+Field31=CCUSPAYDELAY,Char,06,00,351
+Field32=CREMCAT,Char,05,00,357
+Field33=CREMSTATUS,Char,01,00,362
+Field34=CREATEDATE,TimeStamp,30,00,363
+Field35=MODIFYDATE,TimeStamp,30,00,393
+Field36=AUTHOR,Char,10,00,423
+Field37=CNATREGISTRYID,Char,15,00,433
+Field38=CCUSPDISCDEL,Long Integer,11,00,448
+Field39=CCUSTEMPLID,Char,10,00,459
+Field40=CMEMO,Char,200,00,469
+";
+$customers_schema = ob_get_clean();
+
+// export file holding the schema for invoices: IHDDOC_FACT.sch
+ob_start();
+echo "[IHDDOC_FACT]
+FileType = Fixed
+Charset = ascii
+Field1=DBK,Char,04,00,00
+Field2=FYEAR,Char,05,00,04
+Field3=DOCNO,Long Integer,11,00,09
+Field4=YEAR,Long Integer,11,00,20
+Field5=MONTH,Long Integer,11,00,31
+Field6=DBKTYPE,Char,03,00,42
+Field7=DOCDATE,Date,11,00,45
+Field8=DUEDATE,Date,11,00,56
+Field9=CPID,Char,12,00,67
+Field10=CPTYPE,Char,01,00,79
+Field11=INTREM,Char,30,00,80
+Field12=VCS,Char,17,00,110
+Field13=TOTLINE,Float,21,02,127
+Field14=BASEVATAMN,Float,21,02,148
+Field15=PAYAMN,Float,21,02,169
+";
+$invoices_header_schema = ob_get_clean();
+
+ob_start();
+// export file holding the schema for lines: IHISTO_FACT.sch
+echo "[IHISTO_FACT]
+FileType = Fixed
+Charset = ascii
+Field1=DBK,Char,04,00,00
+Field2=FYEAR,Char,05,00,04
+Field3=DOCNO,Long Integer,11,00,09
+Field4=DOCLINE,Long Integer,11,00,20
+Field5=YEAR,Long Integer,11,00,31
+Field6=MONTH,Long Integer,11,00,42
+Field7=DOCDATE,Date,11,00,53
+Field8=CPID,Char,10,00,64
+Field9=DBKTYPE,Char,04,00,74
+Field9=LINETYPE,Char,01,00,78
+Field10=ARTREF,Char,21,00,79
+Field10=IMPUT,Char,10,00,100
+Field11=QYMVT,Float,21,02,110
+Field12=COMMENT,Char,120,00,133
+Field13=VSTORED,Char,10,00,253
+Field13=TVATTYPE,Char,1,00,263
+Field14=TVANAT1,Char,3,00,264
+Field15=WAREHOUSE,Char,21,00,267
+Field16=PU,Float,21,02,288
+Field17=BASEAMN,Float,21,02,309
+Field18=PAYAMN,Float,21,02,330
+Field19=CPTYPE,Char,01,00,351
+Field20=VATAMN,Float,21,02,352
+Field21=NETPU,Float,21,02,373
+Field22=DISCAMN,Float,21,02,394
+Field23=PURPRICE,Float,21,02,415
+";
+$invoices_lines_schema = ob_get_clean();
+
+/*
+    Check invoices consistency : discard invalid invoices and emit a warning.
+*/
+
+foreach($invoices as $index => $invoice) {
+    if( !isset($invoice['partner_id']) ||
+        !isset($invoice['partner_id']['partner_identity_id'])
+    ) {
+        ob_start();
+        print_r($invoice);
+        $out = ob_get_clean();
+        trigger_error("APP::Ignoring invalid invoice : missing partner info for invoice {$invoice['name']} [{$invoice['id']}] - $out", QN_REPORT_WARNING);
+        unset($invoices[$index]);
+    }
+    elseif(!$invoice['has_orders'] && !isset($invoice['booking_id'])) {
+        trigger_error("APP::Ignoring invalid invoice : missing booking info for invoice {$invoice['name']} [{$invoice['id']}]", QN_REPORT_WARNING);
+        unset($invoices[$index]);
+    }
+    // #memo - for cancelled invoices and orders invoices, it is ok not to have funding
+}
+
+/*
+    Generate headers: CLIENTS_FACT.txt
+*/
+
+$result = [];
+
+foreach($invoices as $invoice) {
+
+    $customer_name = substr(strtoupper(TextTransformer::normalize($invoice['partner_id']['name'])), 0, 40);
+    $customer_vat = substr(str_replace([' ', '.', '-', '_'], '', $invoice['partner_id']['partner_identity_id']['vat_number']), 0, 12);
+    $customer_phone = substr(str_replace([' ', '.', '-', '_'], '', $invoice['partner_id']['partner_identity_id']['phone']), 0, 14);
+    $customer_fax = substr(str_replace([' ', '.', '-', '_'], '', $invoice['partner_id']['partner_identity_id']['fax']), 0, 14);
+    $customer_address = substr(strtoupper(TextTransformer::normalize(str_replace(["\n", "\t", "\r"], '', $invoice['partner_id']['partner_identity_id']['address_street']))), 0, 40);
+    $customer_zip = substr($invoice['partner_id']['partner_identity_id']['address_zip'], 0, 10);
+    $customer_city = substr(strtoupper(TextTransformer::normalize($invoice['partner_id']['partner_identity_id']['address_city'])), 0, 40);
+    $customer_country = substr(strtoupper($invoice['partner_id']['partner_identity_id']['address_country']), 0, 2);
+    $customer_lang = 'F';
+    if(isset($invoice['partner_id']['partner_identity_id']['lang_id']['code']) && is_string($invoice['partner_id']['partner_identity_id']['lang_id']['code']) && strlen($invoice['partner_id']['partner_identity_id']['lang_id']['code']) >= 1) {
+        // #memo - BOB uses a single letter
+        $customer_lang = strtoupper(substr($invoice['partner_id']['partner_identity_id']['lang_id']['code'], 0, 1));
+    }
+
+    $values = [
+        // Field1=CID,Char,10,00,00
+        str_pad('C'.$invoice['partner_id']['partner_identity_id']['id'], 10, ' ', STR_PAD_RIGHT),
+        // Field2=CCUSTYPE,Char,01,00,10
+        str_pad('C', 1,' ',STR_PAD_LEFT),
+        // Field3=CSUPTYPE,Char,01,00,11
+        str_pad('U', 1,' ',STR_PAD_LEFT),
+        // Field4=CNAME1,Char,40,00,12
+        str_pad($customer_name, 40, ' ', STR_PAD_RIGHT),
+        // Field5=CNAME2,Char,40,00,52
+        str_pad('', 40, ' ', STR_PAD_RIGHT),
+        // Field6=CADDRESS1,Char,40,00,92
+        str_pad('', 40, ' ', STR_PAD_RIGHT),
+        // Field7=CADDRESS2,Char,40,00,132
+        str_pad($customer_address, 40, ' ', STR_PAD_RIGHT),
+        // Field8=CZIPCODE,Char,10,00,172
+        str_pad($customer_zip, 10, ' ', STR_PAD_RIGHT),
+        // Field9=CLOCALITY,Char,40,00,182
+        str_pad($customer_city, 40, ' ', STR_PAD_RIGHT),
+        // Field10=CLANGUAGE,Char,02,00,222
+        str_pad($customer_lang, 2, ' ', STR_PAD_RIGHT),
+        // Field11=CISPERS,Bool,01,00,224
+        str_pad('0', 1, ' ', STR_PAD_RIGHT),
+        // Field12=CCUSCAT,Char,03,00,225
+        str_pad('', 3, ' ', STR_PAD_RIGHT),
+        // Field13=CCURRENCY,Char,03,00,228
+        str_pad('EUR', 3, ' ', STR_PAD_RIGHT),
+        // Field14=CVATCAT,Char,01,00,231
+        str_pad('', 1, ' ', STR_PAD_RIGHT),
+        // Field15=CVATREF,Char,02,00,232
+        str_pad($customer_country, 2, ' ', STR_PAD_RIGHT),
+        // Field16=CVATNO,Char,12,00,234
+        str_pad($customer_vat, 12, ' ', STR_PAD_RIGHT),
+        // Field17=CTELNO,Char,14,00,246
+        str_pad($customer_phone, 14, ' ', STR_PAD_RIGHT),
+        // Field18=CFAXNO,Char,14,00,260
+        str_pad($customer_fax, 14, ' ', STR_PAD_RIGHT),
+        // Field19=CCUSVNAT1,Char,03,00,274
+        str_pad('', 3, ' ', STR_PAD_RIGHT),
+        // Field20=CCUSVNAT2,Char,03,00,277
+        str_pad('', 3, ' ', STR_PAD_RIGHT),
+        // Field21=CCUSVATCMP,Float,20,02,280
+        str_pad('', 20, ' ', STR_PAD_RIGHT),
+        // Field22=CCUSCTRACC,Char,10,00,300
+        str_pad('', 10, ' ', STR_PAD_RIGHT),
+        // Field23=CCUSIMPUTA,Char,10,00,310
+        str_pad('', 10, ' ', STR_PAD_RIGHT),
+        // Field24=CCTRYCODE,Char,02,00,320
+        str_pad($customer_country, 2, ' ', STR_PAD_RIGHT),
+        // Field25=CBANKCODE,Char,06,00,322
+        str_pad('', 6, ' ', STR_PAD_RIGHT),
+        // Field26=CBANKNO,Char,19,00,328
+        str_pad('', 19, ' ', STR_PAD_RIGHT),
+        // Field27=CISWARNING,Bool,01,00,347
+        str_pad('0', 1, ' ', STR_PAD_RIGHT),
+        // Field28=CISREADONL,Bool,01,00,348
+        str_pad('0', 1, ' ', STR_PAD_RIGHT),
+        // Field29=CISBLOCK,Bool,01,00,349
+        str_pad('0', 1, ' ', STR_PAD_RIGHT),
+        // Field30=CISSECRET,Bool,01,00,350
+        str_pad('0', 1, ' ', STR_PAD_RIGHT),
+        // Field31=CCUSPAYDELAY,Char,06,00,351
+        str_pad('', 6, ' ', STR_PAD_RIGHT),
+        // Field32=CREMCAT,Char,05,00,357
+        str_pad('', 5, ' ', STR_PAD_RIGHT),
+        // Field33=CREMSTATUS,Char,01,00,362
+        str_pad('', 1, ' ', STR_PAD_RIGHT),
+        // Field34=CREATEDATE,TimeStamp,30,00,363
+        str_pad('', 30, ' ', STR_PAD_RIGHT),
+        // Field35=MODIFYDATE,TimeStamp,30,00,393
+        str_pad('', 30, ' ', STR_PAD_RIGHT),
+        // Field36=AUTHOR,Char,10,00,423
+        str_pad('', 10, ' ', STR_PAD_RIGHT),
+        // Field37=CNATREGISTRYID,Char,15,00,433
+        str_pad('', 15, ' ', STR_PAD_RIGHT),
+        // Field38=CCUSPDISCDEL,Long Integer,11,00,448
+        str_pad('', 11, ' ', STR_PAD_RIGHT),
+        // Field39=CCUSTEMPLID,Char,10,00,459
+        str_pad('', 10, ' ', STR_PAD_RIGHT),
+        // Field40=CMEMO,Char,200,00,469
+        str_pad('', 200, ' ', STR_PAD_RIGHT),
+    ];
+
+    $result[] = implode('', $values);
+}
+
+$customers_data = implode("\r\n", $result)."\r\n";
+
+/*
+    Generate headers: IHDDOC_FACT.txt
+*/
+
+$invoices_header_data = [];
+
+foreach($invoices as $invoice) {
+    // when invoice is a credit note, PAYAMN must be inverted (in most cases should be negative)
+    if($invoice['type'] == 'credit_note') {
+        $invoice['accounting_price'] = -$invoice['accounting_price'];
+    }
+    // for orders, use static memo as internal comments
+    if($invoice['has_orders']) {
+        $comments = 'VENTES COMPTOIR';
+    }
+    // for bookings, use as internal comments
+    else {
+        $comments = $invoice['booking_id']['name'].' '.date('d/m/Y', $invoice['booking_id']['date_from']).'-'.date('d/m/Y', $invoice['booking_id']['date_to']);
+    }
+
+    $values = [
+        // Field1=DBK,Char,04,00,00
+        str_pad($journal['code'], 4, ' ', STR_PAD_RIGHT),
+        // Field2=FYEAR,Char,05,00,04
+        str_pad(date('Y', $invoice['date']), 5,' ', STR_PAD_RIGHT),
+        // Field3=DOCNO,Long Integer,11,00,09
+        str_pad(str_replace('-', '', $invoice['name']), 11,' ', STR_PAD_RIGHT),
+        // Field4=YEAR,Long Integer,11,00,20
+        str_pad(date('Y', $invoice['date']), 11,' ', STR_PAD_RIGHT),
+        // Field5=MONTH,Long Integer,11,00,31
+        str_pad(date('m', $invoice['date']), 11,' ', STR_PAD_RIGHT),
+        // Field6=DBKTYPE,Char,03,00,42
+        str_pad($params['journal_type'] === 'sales' ? '1' : '2', 3,' ', STR_PAD_RIGHT),
+        // Field7=DOCDATE,Date,11,00,45
+        str_pad(date('d/m/Y', $invoice['date']), 11,' ', STR_PAD_RIGHT),
+        // Field8=DUEDATE,Date,11,00,56
+        str_pad(date('d/m/Y', $invoice['due_date']), 11,' ', STR_PAD_RIGHT),
+        // Field9=CPID,Char,12,00,67
+        str_pad('C'.$invoice['partner_id']['partner_identity_id']['id'], 12, ' ', STR_PAD_RIGHT),
+        // Field10=CPTYPE,Char,01,00,79
+        str_pad('C', 1,' ',STR_PAD_LEFT),
+        // Field11=INTREM,Char,30,00,80
+        str_pad($comments, 30,' ', STR_PAD_RIGHT),
+        // Field12=VCS,Char,17,00,110
+        str_pad(isset($invoice['funding_id']['payment_reference'])?(substr($invoice['funding_id']['payment_reference'], 0, 17)):'', 17, ' ', STR_PAD_RIGHT),
+        // Field13=TOTLINE,Float,21,02,127
+        str_pad(str_replace('.', ',', sprintf('%.02f', $invoice['total'])), 21,' ', STR_PAD_LEFT),
+        // Field14=BASEVATAMN,Float,21,02,148
+        str_pad(str_replace('.', ',', sprintf('%.02f', $invoice['total_vat'])), 21,' ', STR_PAD_LEFT),
+        // Field15=PAYAMN,Float,21,02,169
+        str_pad(str_replace('.', ',', sprintf('%.02f', $invoice['accounting_price'])), 21,' ', STR_PAD_LEFT)
+    ];
+
+    $invoices_header_data[$invoice['id']] = implode('', $values);
+}
+
+/*
+    Generate headers: IHISTO_FACT.txt
+*/
+
+// #todo #settings - adapt to new conventions
+$account_sales = Setting::get_value('finance', 'accounting', 'account.sales', '7000000');
+$account_downpayment = Setting::get_value('sale', 'accounting', 'invoice.downpayment_account', '4460000');
+$account_discount = Setting::get_value('finance', 'accounting', 'account.discount', '7080000');
+
+// #todo #settings #catalog - store this value in the settings
+// discount product is the same for all organisations: KA-Remise-A [65]
+$discount_product_id = 65;
+
+$invoices_lines_data = [];
+
+foreach($invoices as $invoice) {
+    $invoice_lines_accounts = [];
+
+    // retrieve downpayment product
+    $downpayment_product_id = 0;
+    $downpayment_sku = Setting::get_value('sale', 'organization', 'sku.downpayment.'.$invoice['organisation_id']);
+    if($downpayment_sku) {
+        $products_ids = Product::search(['sku', '=', $downpayment_sku])->ids();
+        if($products_ids) {
+            $downpayment_product_id = reset($products_ids);
+        }
+    }
+
+    $subtotals_vat_lines = [];
+
+    // pass-1 : group all lines by account_id
+    foreach($invoice['invoice_lines_ids'] as $lid => $line) {
+        $vat = round($line['price'] - round($line['total'], 2), 2);
+        $amount = $line['price'] - $vat;
+        // when invoice is a credit note, TAMOUNT and TVATOTAMN must be inverted (#memo - not necessarily negative)
+        if($invoice['type'] == 'credit_note') {
+            $amount = -$amount;
+            $vat = -$vat;
+        }
+        // #memo - Sage BOB will reject invoices with no line and lines with nul amount, so the situation of an invoice with a single nul line is invalid / should not occur (discount without distinct product ?)
+        if($amount == 0.0) {
+            continue;
+        }
+        // #memo - we don't use $line['price_id']['vat_rate'] since VAT rate can be set manually
+        // #memo - this might lead to incorrect values if distinct VAT rates have been applied on distinct products relating to a same account id (in such case, the accounting software will mark the import as invalid)
+        // #memo - for small amounts (< 1 $) `price-total` may lead to a rounding issue, so we must make sure applied VTA rate is amongst a predefined list
+        // #todo - use VAT rates from config
+        $allowed_rates = [0.0, 0.06, 0.12, 0.21];
+
+        $raw_rate = ($amount != 0.0) ? abs(round($vat / $amount, 2)) : 0.0;
+        $vat_rate = array_reduce($allowed_rates, function ($c, $r) use ($raw_rate) {
+            return (abs($r - $raw_rate) < abs($c - $raw_rate)) ? $r : $c;
+        },
+            0.0);
+
+        $accounting_rule_lines_ids = [];
+        if($line['product_id'] == $downpayment_product_id) {
+            // deposit invoice or credit note
+            if($invoice['is_deposit'] || $invoice['type'] == 'credit_note') {
+                $accounting_rule_lines_ids = [
+                    ['account_id' => ['code' => $account_downpayment], 'share' => 1.0]
+                ];
+            }
+            // balance invoice
+            elseif($invoice['type'] == 'invoice') {
+                // if the line refers to an invoiced downpayment and if the related downpayment invoice hasn't been cancelled
+                // #memo - we perform this test because some invoices include lines that incorrectly state non-deposit downpayments (that shouldn't be on the invoice)
+                if(isset($line['downpayment_invoice_id']) && $line['downpayment_invoice_id'] && isset($line['downpayment_invoice_id']['status']) && $line['downpayment_invoice_id']['status'] == 'invoice') {
+                    // add a writing symmetrical to the deposit invoice
+                    // #memo - price should be a negative value
+                    $accounting_rule_lines_ids = [
+                        ['account_id' => ['code' => $account_downpayment], 'share' => 1.0]
+                    ];
+                }
+            }
+        }
+        elseif($line['product_id'] == $discount_product_id) {
+            $accounting_rule_lines_ids = [
+                ['account_id' => ['code' => $account_discount], 'share' => 1.0]
+            ];
+        }
+        elseif(isset($line['price_id']['accounting_rule_id']['accounting_rule_line_ids'])) {
+            $accounting_rule_lines_ids = $line['price_id']['accounting_rule_id']['accounting_rule_line_ids'];
+        }
+        elseif($line['price'] != 0.0) {
+            // #memo - this should not occur! - products shouldn't be embedded to invoices if there is no accounting rule
+            trigger_error("APP::No related price found for non-null amount for line {$line['name']} [{$line['product_id']}] with price [{$line['price_id']}] of invoice {$invoice['name']} [{$invoice['id']}]", QN_REPORT_WARNING);
+            // remove invoice from processed invoices, and skip all lines
+            unset($invoices_header_data[$invoice['id']]);
+            // #todo - dispatch an alert that relates to a dedicated controller
+            $dispatch->dispatch('lodging.accounting.invoice.invalid', 'sale\booking\Invoice', $invoice['id'], 'important', null, [], [], null, $params['center_office_id']);
+            continue 2;
+        }
+
+        $amount_remaining = $amount;
+        $vat_remaining = $vat;
+
+        $i = 0;
+        $n = count($accounting_rule_lines_ids);
+
+        foreach($accounting_rule_lines_ids as $rlid => $rline) {
+            // if there is no entry yet, create one
+            if(!isset($invoice_lines_accounts[$rline['account_id']['code']])) {
+                $invoice_lines_accounts[$rline['account_id']['code']] = [
+                    'vat_rate'  => $vat_rate,
+                    'vat'       => 0.0,
+                    'amount'    => 0.0
+                ];
+            }
+
+            if($i == $n-1) {
+                $line_amount = round($amount_remaining, 2);
+                $line_vat = round($vat_remaining, 2);
+            }
+            else {
+                $line_amount = round($amount * $rline['share'], 2);
+                $line_vat = round($line_amount * $vat_rate, 2);
+            }
+
+            // add vat and amount to the entry, according to share
+            $invoice_lines_accounts[$rline['account_id']['code']]['vat'] += $line_vat;
+            $invoice_lines_accounts[$rline['account_id']['code']]['amount'] += $line_amount;
+
+            // update vat subtotals map that will be used to adapt the vats amount later (to match Peppol style calculation of vat)
+            $vat_rate_index = number_format($vat_rate * 100, 2, '.', '');
+            if(!isset($subtotals_vat_lines[$vat_rate_index])) {
+                $subtotals_vat_lines[$vat_rate_index] = 0.0;
+            }
+            $subtotals_vat_lines[$vat_rate_index] = round($subtotals_vat_lines[$vat_rate_index] + $line_vat, 2);
+
+            $amount_remaining -= $line_amount;
+            $vat_remaining -= $line_vat;
+
+            ++$i;
+        }
+    }
+
+    // the check $invoice['price'] === $new_calculation_price can be removed when the new vat calculation price (peppol compatible) is the only used (no more old invoice to export)
+    $new_calculation_price = round($invoice['total_vat'] + $invoice['total'], 2);
+    if($invoice['price'] === $new_calculation_price) {
+        // #memo - if result of vat "calculation per line" is different from result of vat "calculation per vat_rate" (BE: 6%, 12% and 21%), then adapt it to match Invoices data
+        foreach($subtotals_vat_lines as $vat_rate_index => $subtotal_vat) {
+            $invoice_subtotals_vat = json_decode($invoice['subtotals_vat'], true);
+            $diff = $invoice_subtotals_vat[$vat_rate_index] - abs($subtotal_vat);
+            if(round(abs($diff), 2) == 0.0) {
+                continue;
+            }
+            foreach($invoice_lines_accounts as &$account_values) {
+                $vat_rate = ((float) $vat_rate_index) / 100;
+                if($account_values['vat_rate'] === $vat_rate) {
+                    // adapt here
+                    $account_values['vat'] = round($account_values['vat'] + $diff, 2);
+                    unset($account_values);
+                    continue 2;
+                }
+            }
+            unset($account_values);
+        }
+    }
+
+    // pass-2 : generate lines based on account entries
+    $index = 1;
+    foreach($invoice_lines_accounts as $account_code => $account_values) {
+        // #memo - Sage BOB will reject lines with an amount of 0.0
+        if($account_values['amount'] == 0.0) {
+            // skip line
+            continue;
+        }
+
+        $analytic_section = '';
+
+        // downpayments are not part of the analytic accounting
+        if($account_code != $account_downpayment) {
+            if($invoice['has_orders']) {
+                $analytic_section = $invoice['center_office_id']['analytic_section_id']['code'];
+            }
+            else {
+                $analytic_section = $invoice['booking_id']['center_id']['analytic_section_id']['code'];
+            }
+        }
+
+        // #memo - remove any '_' and trailing chars (since that notation is not supported by Sage BOB)
+        $pos = strpos($account_code, '_');
+        $account_code = ($pos !== false)?substr($account_code, 0, $pos):$account_code;
+        // for orders, use static memo as internal comments
+        if($invoice['has_orders']) {
+            $comments = (($invoice['type'] == 'invoice')?'F. ':'NC.').'VENTES COMPTOIR';
+        }
+        // for bookings, use invoice type, customer name and booking number
+        else {
+            $comments = (($invoice['type'] == 'invoice')?'F. ':'NC.').strtoupper( substr(TextTransformer::normalize($invoice['partner_id']['name']), 0, 30) ).'/'.$invoice['booking_id']['name'];
+        }
+
+        $values = [
+            // Field1=DBK,Char,04,00,00
+            str_pad($journal['code'], 4, ' ', STR_PAD_RIGHT),
+            // Field2=FYEAR,Char,05,00,04
+            str_pad(date('Y', $invoice['date']), 5,' ', STR_PAD_RIGHT),
+            // Field3=DOCNO,Long Integer,11,00,09
+            str_pad(str_replace('-', '', $invoice['name']), 11,' ', STR_PAD_RIGHT),
+            // Field4=DOCLINE,Long Integer,11,00,20
+            str_pad($index, 11,' ', STR_PAD_RIGHT),
+            // Field5=YEAR,Long Integer,11,00,31
+            str_pad(date('Y', $invoice['date']), 11,' ', STR_PAD_RIGHT),
+            // Field6=MONTH,Long Integer,11,00,42
+            str_pad(date('m', $invoice['date']), 11,' ', STR_PAD_RIGHT),
+            // Field7=DOCDATE,Date,11,00,53
+            str_pad(date('d/m/Y', $invoice['date']), 11,' ', STR_PAD_RIGHT),
+            // Field8=CPID,Char,10,00,64
+            str_pad('C'.$invoice['partner_id']['partner_identity_id']['id'], 10, ' ', STR_PAD_RIGHT),
+            // Field9=DBKTYPE,Char,04,00,74
+            str_pad($params['journal_type'] === 'sales' ? '1' : '2', 4,' ', STR_PAD_RIGHT),
+            // Field9=LINETYPE,Char,01,00,78
+            str_pad('S', 1,' ',STR_PAD_LEFT),
+            // Field10=ARTREF,Char,21,00,79
+            str_pad('', 21,' ',STR_PAD_LEFT),
+            // Field10=IMPUT,Char,10,00,100
+            str_pad($account_code, 10,' ', STR_PAD_RIGHT),
+            // Field11=QYMVT,Float,21,02,110
+            str_pad(str_replace('.', ',', sprintf('%.02f', 1)), 21,' ', STR_PAD_LEFT),
+            // Field12=COMMENT,Char,120,00,133
+            str_pad($comments, 120,' ', STR_PAD_RIGHT),
+            // Field13=VSTORED,Char,10,00,253
+            str_pad('NSS  '.intval($account_values['vat_rate'] * 100), 10,' ', STR_PAD_RIGHT),
+            // Field13=TVATTYPE,Char,1,00,263
+            str_pad($account_values['vat_rate'] > 0 ? 'N' : 'E', 1,' ', STR_PAD_RIGHT),
+            // Field14=TVANAT1,Char,3,00,264
+            str_pad($account_values['vat_rate'] > 0 ? 'NOR' : 'EXO', 3,' ', STR_PAD_RIGHT),
+            // Field15=WAREHOUSE,Char,21,00,267
+            str_pad('', 21,' ',STR_PAD_LEFT),
+            // Field16=PU,Float,21,02,288
+            str_pad(str_replace('.', ',', sprintf('%.02f', $account_values['amount'])), 21,' ', STR_PAD_LEFT),
+            // Field17=BASEAMN,Float,21,02,309
+            str_pad(str_replace('.', ',', sprintf('%.02f', $account_values['amount'])), 21,' ', STR_PAD_LEFT),
+            // Field18=PAYAMN,Float,21,02,330
+            str_pad(str_replace('.', ',', sprintf('%.02f', $account_values['amount'])), 21,' ', STR_PAD_LEFT),
+            // Field19=CPTYPE,Char,01,00,351
+            str_pad('C', 1,' ',STR_PAD_LEFT),
+            // Field20=VATAMN,Float,21,02,352
+            str_pad(str_replace('.', ',', sprintf('%.02f', $account_values['vat'])), 21,' ', STR_PAD_LEFT),
+            // Field21=NETPU,Float,21,02,373
+            str_pad(str_replace('.', ',', sprintf('%.02f', $account_values['amount'])), 21,' ', STR_PAD_LEFT),
+            // Field22=DISCAMN,Float,21,02,394
+            str_pad(str_replace('.', ',', sprintf('%.02f', 0)), 21,' ', STR_PAD_LEFT),
+            // Field23=PURPRICE,Float,21,02,415
+            str_pad(str_replace('.', ',', sprintf('%.02f', 0)), 21,' ', STR_PAD_LEFT)
+        ];
+
+        ++$index;
+        $invoices_lines_data[] = implode('', $values);
+    }
+}
+
+// #memo - prevent generating empty archives (can occur when all processed invoices were faulty)
+if(count($invoices_header_data)) {
+    // generate the zip archive
+    $tmpfile = tempnam(sys_get_temp_dir(), "zip");
+    $zip = new ZipArchive();
+    if($zip->open($tmpfile, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true) {
+        // could not create the ZIP archive
+        throw new Exception('Unable to create a ZIP file.', QN_ERROR_UNKNOWN);
+    }
+
+    // embed schema files
+    $zip->addFromString('CLIENTS_FACT.sch', $customers_schema);
+    $zip->addFromString('IHDDOC_FACT.sch', $invoices_header_schema);
+    $zip->addFromString('IHISTO_FACT.sch', $invoices_lines_schema);
+    // embed data files
+    $zip->addFromString('CLIENTS_FACT.txt', $customers_data);
+    $zip->addFromString('IHDDOC_FACT.txt', implode("\r\n", array_values($invoices_header_data))."\r\n");
+    $zip->addFromString('IHISTO_FACT.txt', implode("\r\n", $invoices_lines_data)."\r\n");
+
+    $zip->close();
+
+    // read raw data
+    $data = file_get_contents($tmpfile);
+    unlink($tmpfile);
+
+    if($data === false) {
+        throw new Exception('Unable to retrieve ZIP file content.', QN_ERROR_UNKNOWN);
+    }
+
+    // switch to root user
+    $auth->su();
+
+    // create the export archive
+    $export = Export::create([
+        'center_office_id'      => $params['center_office_id'],
+        'export_type'           => $journal['type'] === 'sales' ? 'invoices' : 'invoices_peppol',
+        'data'                  => $data,
+        'object_class'          => Invoice::getType(),
+        'object_ids'            => json_encode(array_column($invoices, 'id'))
+    ])
+        ->read(['id'])
+        ->first();
+
+    try {
+        // mark processed invoices as exported
+        // TODO: uncomment line below
+        // Invoice::ids(array_keys($invoices_header_data))->update(['is_exported' => true]);
+    }
+    catch(Exception $e) {
+        // remove export if error triggered while flagging invoices as exported
+        Export::id($export['id'])->delete();
+        throw $e;
+    }
+}
+
+$context->httpResponse()
+        ->status(201)
+        ->send();
+
