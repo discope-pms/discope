@@ -1,6 +1,6 @@
 {
-    "name": "Booking Activities",
-    "description": "This view is intended for displaying the list of booking activities related to a camp.",
+    "name": "Alert messages",
+    "description": "This view is intended for displaying the list of alert messages related to a camp.",
     "access": {
         "groups": ["booking.default.user"]
     },

@@ -1,0 +1,460 @@
+{
+    "name": "Camp",
+    "header": {
+        "actions": {
+            "ACTION.EDIT": {
+                "visible": ["camp.default.administrator", "in", "user.groups"]
+            },
+            "ACTION.SAVE": [
+                { "id": "SAVE_AND_CONTINUE" },
+                { "id": "SAVE_AND_VIEW" },
+                { "id": "SAVE_AND_CLOSE" }
+            ]
+        }
+    },
+    "actions": [
+        {
+            "id": "action.transition.publish",
+            "label": "Publish",
+            "controller": "model_transition",
+            "params": {
+                "entity": "sale\\camp\\Camp",
+                "transition": "publish",
+                "ids": []
+            },
+            "visible": [
+                ["status", "=", "draft"],
+                ["camp.default.administrator", "in", "user.groups"]
+            ]
+        },
+        {
+            "id": "action.transition.cancel",
+            "label": "Cancel",
+            "controller": "model_transition",
+            "params": {
+                "entity": "sale\\camp\\Camp",
+                "transition": "cancel",
+                "ids": []
+            },
+            "visible": [
+                ["status", "in", ["draft", "published"]],
+                ["camp.default.administrator", "in", "user.groups"]
+            ]
+        },
+        {
+            "id": "action.add-group",
+            "label": "Ajouter group",
+            "controller": "sale_camp_add-group",
+            "params": {
+                "id": "object.id"
+            },
+            "visible": [
+                ["status", "in", ["draft", "published"]],
+                ["camp_group_qty", ">", 0],
+                ["camp.default.administrator", "in", "user.groups"]
+            ]
+        }
+    ],
+    "routes": [
+        {
+            "id": "route.camp.planning-condensed",
+            "label": "Planning condensed",
+            "description": "",
+            "icon": "list_alt",
+            "route": "/?get=sale_camp_print-planning-condensed&camp_id=object.id",
+            "target": "_blank",
+            "absolute": true
+        },
+        {
+            "id": "route.camp.planning",
+            "label": "Planning",
+            "description": "",
+            "icon": "list_alt",
+            "route": "/?get=sale_camp_print-planning&camp_id=object.id",
+            "target": "_blank",
+            "absolute": true
+        }
+    ],
+    "layout": {
+        "groups": [
+            {
+                "sections": [
+                    {
+                        "rows": [
+                            {
+                                "columns": [
+                                    {
+                                        "width": "50%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "short_name",
+                                                "label": "Name",
+                                                "width": "50%",
+                                                "widget": {
+                                                    "heading": true
+                                                }
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "sojourn_number",
+                                                "width": "25%",
+                                                "readonly": true
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "status",
+                                                "visible": false
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "camp_group_qty",
+                                                "visible": false
+                                            },
+                                            {
+                                                "type": "label",
+                                                "value": "",
+                                                "width": "25%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "age_range",
+                                                "width": "25%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "location",
+                                                "width": "25%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "enrollments_qty",
+                                                "width": "25%",
+                                                "readonly": true
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "max_children",
+                                                "width": "25%",
+                                                "readonly": true
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "date_from",
+                                                "width": "33%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "date_to",
+                                                "width": "33%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "accounting_code",
+                                                "width": "25%"
+                                            },
+                                            {
+                                                "type": "label",
+                                                "value": "",
+                                                "width": "10%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "is_clsh",
+                                                "width": "20%",
+                                                "readonly": true
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "clsh_type",
+                                                "width": "20%"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "width": "50%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "camp_model_id",
+                                                "width": "50%"
+                                            },
+                                            {
+                                                "type": "label",
+                                                "value": "",
+                                                "width": "50%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "product_id",
+                                                "width": "50%",
+                                                "visible": false
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "day_product_id",
+                                                "width": "50%",
+                                                "visible":  false
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "weekend_product_id",
+                                                "width": "50%",
+                                                "visible":  false
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "saturday_morning_product_id",
+                                                "width": "50%",
+                                                "visible":  false
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "camp_type",
+                                                "width": "33%",
+                                                "readonly": true
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "employee_ratio",
+                                                "width": "33%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "ase_quota",
+                                                "width": "33%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "need_license_ffe",
+                                                "width": "50%",
+                                                "readonly": true
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "sections": [
+                    {
+                        "id": "section.descriptions",
+                        "label": "Descriptions",
+                        "rows": [
+                            {
+                                "columns": [
+                                    {
+                                        "width": "50%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "remarks",
+                                                "width": "100%"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "width": "50%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "public_description",
+                                                "width": "100%"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "section.camp-groups",
+                        "label": "Groups",
+                        "visible": ["state", "<>", "draft"],
+                        "rows": [
+                            {
+                                "columns": [
+                                    {
+                                        "width": "100%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "camp_groups_ids",
+                                                "width": "100%",
+                                                "widget": {
+                                                    "header": {
+                                                        "actions": {
+                                                            "ACTION.CREATE": false
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "section.camp-activities",
+                        "label": "Activities",
+                        "visible": ["state", "<>", "draft"],
+                        "rows": [
+                            {
+                                "columns": [
+                                    {
+                                        "width": "100%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "booking_activities_ids",
+                                                "width": "100%",
+                                                "widget": {
+                                                    "view": "list.camp",
+                                                    "header": {
+                                                        "actions": {
+                                                            "ACTION.CREATE": false,
+                                                            "ACTION.CREATE_INLINE": false
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "section.enrollments",
+                        "label": "Enrollments",
+                        "visible": ["state", "<>", "draft"],
+                        "rows": [
+                            {
+                                "columns": [
+                                    {
+                                        "width": "100%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "enrollments_ids",
+                                                "width": "100%",
+                                                "widget": {
+                                                    "view": "list.camp"
+                                                }
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "section.presences",
+                        "label": "Presences",
+                        "visible": ["state", "<>", "draft"],
+                        "rows": [
+                            {
+                                "columns": [
+                                    {
+                                        "width": "100%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "presences_ids",
+                                                "width": "100%",
+                                                "widget": {
+                                                    "view": "list.camp",
+                                                    "header": {
+                                                        "selection": {
+                                                            "default": false
+                                                        },
+                                                        "actions": {
+                                                            "ACTION.CREATE": false,
+                                                            "ACTION.EDIT": false
+                                                        }
+                                                    }
+                                                },
+                                                "actions": false
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "section.meals",
+                        "label": "Meals",
+                        "visible": ["state", "<>", "draft"],
+                        "rows": [
+                            {
+                                "columns": [
+                                    {
+                                        "width": "100%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "booking_meals_ids",
+                                                "width": "100%",
+                                                "widget": {
+                                                    "view": "list.camp",
+                                                    "limit": "50"
+                                                }
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "section.required-skills",
+                        "label": "Required skills",
+                        "visible": ["state", "<>", "draft"],
+                        "rows": [
+                            {
+                                "columns": [
+                                    {
+                                        "width": "100%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "required_skills_ids",
+                                                "width": "100%"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "section.required-documents",
+                        "label": "Required documents",
+                        "visible": ["state", "<>", "draft"],
+                        "rows": [
+                            {
+                                "columns": [
+                                    {
+                                        "width": "100%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "required_documents_ids",
+                                                "width": "100%"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+}
