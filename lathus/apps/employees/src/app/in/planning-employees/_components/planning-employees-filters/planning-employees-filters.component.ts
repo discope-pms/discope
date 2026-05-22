@@ -101,6 +101,9 @@ export class PlanningEmployeesFiltersComponent implements OnInit, OnDestroy  {
     }
 
     public onChangeDate(event: any) {
-        this.calendar.setDate(event.value);
+        const date = event.value;
+        date.setHours(12, 0, 0, 0);
+
+        this.calendar.setDate(date);
     }
 }
