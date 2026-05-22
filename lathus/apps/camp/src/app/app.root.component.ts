@@ -5,9 +5,6 @@ import { Router } from '@angular/router';
 import { ContextService, ApiService, AuthService, EnvService} from 'sb-shared-lib';
 import { UserClass } from 'sb-shared-lib/lib/classes/user.class';
 
-import * as $ from 'jquery';
-import { type } from 'jquery';
-
 
 /*
 This is the component bootstrapped by app.module.ts
@@ -76,11 +73,11 @@ export class AppRootComponent implements OnInit {
         });
 
         // load menus from server
-        const left_menu:any = await this.api.getMenu('discope', 'camp.left');
+        const left_menu:any = await this.api.getMenu('lathus', 'camp.left');
         this.navMenuItems = left_menu.items;
         this.translationsMenuLeft = left_menu.translation;
 
-        const top_menu:any = await this.api.getMenu('discope', 'camp.top');
+        const top_menu:any = await this.api.getMenu('lathus', 'camp.top');
         this.topMenuItems = top_menu.items;
         this.translationsMenuTop = top_menu.translation;
 
