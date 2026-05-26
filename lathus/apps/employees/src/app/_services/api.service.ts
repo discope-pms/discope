@@ -140,7 +140,7 @@ export class ApiService {
             'hr\\employee\\Employee',
             ['id', 'name', 'relationship', 'is_active', 'activity_product_models_ids', 'role_id.code', 'role_id.name', 'partner_identity_id', 'date_start', 'date_end'],
             domain,
-            { order: 'name', sort: 'asc' }
+            { order: 'name', sort: 'asc', limit: 500 }
         );
     }
 
