@@ -6,9 +6,9 @@
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 
-namespace lathus\sale\camp;
+namespace sale\camp;
 
-class Guardian extends \sale\camp\Guardian {
+class GuardianImported extends Guardian {
 
     public static function getDescription(): string {
         return "Override of camp Guardian to add data fetched from CPA Lathus API.";

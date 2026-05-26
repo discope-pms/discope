@@ -6,9 +6,9 @@
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 
-namespace lathus\sale\camp;
+namespace sale\camp;
 
-class Institution extends \sale\camp\Institution {
+class InstitutionImported extends Institution {
 
     public static function getDescription(): string {
         return "Override of camp Institution to add data fetched from CPA Lathus API.";

@@ -6,9 +6,9 @@
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 
-namespace lathus\sale\camp;
+namespace sale\camp;
 
-class Enrollment extends \sale\camp\Enrollment {
+class EnrollmentImported extends Enrollment {
 
     public static function getDescription(): string {
         return "Override of camp Enrollment to add data fetched from CPA Lathus API.";

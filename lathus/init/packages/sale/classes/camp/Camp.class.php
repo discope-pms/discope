@@ -10,7 +10,6 @@ namespace sale\camp;
 
 use core\setting\Setting;
 use equal\orm\Model;
-use sale\booking\BookingActivity;
 use sale\booking\BookingMeal;
 use sale\booking\TimeSlot;
 

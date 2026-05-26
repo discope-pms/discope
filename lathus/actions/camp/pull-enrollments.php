@@ -9,9 +9,9 @@
 use core\Mail;
 use core\setting\Setting;
 use equal\email\Email;
-use lathus\sale\camp\Enrollment as LathusEnrollment;
-use lathus\sale\camp\Guardian as LathusGuardian;
-use lathus\sale\camp\Institution as LathusInstitution;
+use sale\camp\EnrollmentImported;
+use sale\camp\GuardianImported;
+use sale\camp\InstitutionImported;
 use sale\camp\Camp;
 use sale\camp\Child;
 use sale\camp\Enrollment;
@@ -169,7 +169,7 @@ $findOrCreateGuardian = function($ext_guardian, $ext_child, $child_id) use($sani
             $guardian_data['work_phone'] = $sanitizePhoneNumber($ext_guardian_phones['work_phone']);
         }
 
-        $guardian = LathusGuardian::create($guardian_data)
+        $guardian = GuardianImported::create($guardian_data)
             ->read(['id'])
             ->first();
     }
@@ -189,7 +189,7 @@ $findOrCreateGuardian = function($ext_guardian, $ext_child, $child_id) use($sani
         }
 
         if(!empty($guardian_data)) {
-            LathusGuardian::id($guardian['id'])->update($guardian_data);
+            GuardianImported::id($guardian['id'])->update($guardian_data);
         }
     }
 
@@ -216,7 +216,7 @@ $findOrCreateInstitution = function($ext_institution) use($sanitizePhoneNumber, 
     }
 
     if(is_null($institution)) {
-        $institution = LathusInstitution::create([
+        $institution = InstitutionImported::create([
             'name'              => !empty($ext_institution['nom']) ? $ext_institution['nom'] : 'N/A',
             'address_street'    => $ext_institution['adresse1'],
             'address_dispatch'  => $ext_institution['adresse2'],
@@ -456,7 +456,7 @@ try {
                 }
             }
 
-            $enrollment = LathusEnrollment::create([
+            $enrollment = EnrollmentImported::create([
                     'date_created'      => $ext_enrollment_created,
                     'camp_id'           => $camp['id'],
                     'child_id'          => $child['id'],
