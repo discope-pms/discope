@@ -10,6 +10,7 @@ export class BookingLineGroup {
         public has_person_with_disability: boolean = false,
         public person_disability_description: string = '',
         public age_range_assignments_ids: number[] = [],
-        public rate_class_id: number|null = null
+        public rate_class_id: number|null = null,
+        public booking_lines_ids: number[] = []
     ) {}
 }

@@ -43,6 +43,10 @@
                     ></booking-activities-planning-activity-details>
                 </div>
             </div>
+
+            <div class="no-edition-allowed-msg" *ngIf="selectedGroup && selectedGroup.booking_lines_ids.length > 0">
+                Groupe « <i>{{ selectedGroup.name }}</i> » non modifiable, car il contient des produits.
+            </div>
         </div>
 
         <booking-activities-planning-week-activities
