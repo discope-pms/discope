@@ -198,6 +198,20 @@
                 "label": "Tâche inscription en attente",
                 "description": "La date limite de la tâche d'inscription est dépassée.",
                 "type": "camp"
+            },
+            {
+                "id": 35,
+                "name": "lodging.booking.option.expired.reverted_to_quote",
+                "label": "Option expirée",
+                "description": "L'option est expirée. La réservation est repassée en devis.",
+                "type": "booking"
+            },
+            {
+                "id": 36,
+                "name": "lodging.booking.option.expired.expired_only",
+                "label": "Option expirée",
+                "description": "L'option est expirée.",
+                "type": "booking"
             }
         ]
     }

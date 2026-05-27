@@ -5,6 +5,8 @@
     Original author(s): Yesbabylon SRL
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
+
+use core\setting\Setting;
 use sale\booking\Booking;
 
 // announce script and fetch parameters values
@@ -56,21 +58,32 @@ if($booking['status'] != 'option') {
 
 
 if($booking['is_noexpiry']) {
-    // do nothing (remain as option) - we shouldn't have reached this code!
+    // do nothing (remain as option and no alert dispatched) - we shouldn't have reached this code!
 }
 else {
-    // revert to quote
-    eQual::run('do', 'sale_booking_do-quote', [
-        'id'                    => $params['id'],
-        'free_rental_units'     => $params['free_rental_units']
-    ]);
-    if($params['free_rental_units']) {
-        // send an alert saying that option has expired and reverted to quote
-        $dispatch->dispatch('lodging.booking.option.expired', 'sale\booking\Booking', $params['id'], 'important');
+    $back_to_quote = Setting::get_value('sale', 'features', 'booking.expired_option.revert_to_quote', true);
+    if($back_to_quote) {
+        // revert to quote
+        eQual::run('do', 'sale_booking_do-quote', [
+            'id'                    => $params['id'],
+            'free_rental_units'     => $params['free_rental_units']
+        ]);
+
+        if($params['free_rental_units']) {
+            // send an alert saying that the option has expired and the booking was reverted to quote with a release of the blocked rental units
+            $dispatch->dispatch('lodging.booking.option.expired', 'sale\booking\Booking', $params['id'], 'important');
+        }
+        else {
+            // send an alert saying that the option has expired and the booking was reverted to quote
+            $dispatch->dispatch('lodging.booking.option.expired.reverted_to_quote', 'sale\booking\Booking', $params['id'], 'important');
+
+            // check quote for blocked rental units (might raise alert lodging.booking.quote.blocking)
+            eQual::run('do', 'sale_booking_check-quote', ['id' => $params['id']]);
+        }
     }
     else {
-        // check quote for blocked rental units (might raise alert lodging.booking.quote.blocking)
-        eQual::run('do', 'sale_booking_check-quote', ['id' => $params['id']]);
+        // send an alert saying that the option has expired
+        $dispatch->dispatch('lodging.booking.option.expired.expired_only', 'sale\booking\Booking', $params['id'], 'important');
     }
 }
 
