@@ -19,6 +19,14 @@
             "label": "Au",
             "description": "Date fin de l'interval."
         },
+        "confirmed": {
+            "label": "Confirmées",
+            "description": "Afficher les inscriptions confirmées."
+        },
+        "validated": {
+            "label": "Validées",
+            "description": "Afficher les inscriptions validées."
+        },
         "by_age": {
             "label": "Par âge",
             "description": "Séparation par âge."

@@ -28,6 +28,14 @@
             "description": "Date de fin du séjour.",
             "help": ""
         },
+        "confirmed": {
+            "label": "Confirmées",
+            "description": "Afficher les inscriptions confirmées."
+        },
+        "validated": {
+            "label": "Validées",
+            "description": "Afficher les inscriptions validées."
+        },
         "aamm": {
             "label": "mois",
             "description": "Index de la période.",
