@@ -50,56 +50,68 @@
                 display: flex;
                 flex-direction: column;
 
-                .group-activity {
-                    cursor: pointer;
-                    white-space: nowrap;
-                    text-overflow: ellipsis;
-                    width: 100%;
-                    overflow: hidden;
+                .group-activity-wrapper {
+                    display: flex;
+                    align-items: center;
 
-                    &.group-selected {
-                        font-weight: bold;
-
-                        .activity-name::after {
-                            content: '';
-                            position: absolute;
-                            bottom: -3px;
-                            left: 0;
-                            width: 100%;
-                            height: 4px;
-                            background-color: #ff4081;
-                            opacity: 0.5;
-                        }
-
-                        .group-num::after {
-                            content: '';
-                            position: absolute;
-                            bottom: -3px;
-                            left: 0;
-                            width: 100%;
-                            height: 4px;
-                            background-color: #ff4081;
-                            opacity: 0.5;
-                        }
-                    }
-
-                    &.group-disabled {
-                        cursor: auto;
-                        opacity: 0.5;
-                    }
-
-                    .group-num {
-                        position: relative;
-                    }
-
-                    .activity-name {
-                        position: relative;
+                    .group-activity {
+                        width: 100%;
                         margin-left: 10px;
-                        color: initial;
-                        text-decoration: initial;
-                        background: linear-gradient(to bottom, transparent 50%, #ff4081 50%);
-                        -webkit-background-clip: text;
-                        background-clip: text;
+                        padding: 0 5px;
+                        cursor: pointer;
+                        white-space: nowrap;
+                        text-overflow: ellipsis;
+                        overflow: hidden;
+
+                        &.group-selected {
+                            font-weight: bold;
+
+                            .activity-name::after {
+                                content: '';
+                                position: absolute;
+                                bottom: -3px;
+                                left: 0;
+                                width: 100%;
+                                height: 4px;
+                                background-color: #ff4081;
+                                opacity: 0.5;
+                            }
+
+                            .group-num::after {
+                                content: '';
+                                position: absolute;
+                                bottom: -3px;
+                                left: 0;
+                                width: 100%;
+                                height: 4px;
+                                background-color: #ff4081;
+                                opacity: 0.5;
+                            }
+                        }
+
+                        &:hover {
+                            background-color: #f8f8f8;
+                            border-radius: 5px;
+                        }
+
+                        &.group-disabled {
+                            cursor: auto;
+                            opacity: 0.5;
+                        }
+
+                        .group-num {
+                            position: relative;
+                        }
+
+                        .activity-name {
+                            position: relative;
+                            margin-left: 10px;
+                            color: initial;
+                            text-decoration: initial;
+                            background: linear-gradient(to bottom, transparent 50%, #ff4081 50%);
+                            -webkit-background-clip: text;
+                            background-clip: text;
+                        }
                     }
                 }
             }

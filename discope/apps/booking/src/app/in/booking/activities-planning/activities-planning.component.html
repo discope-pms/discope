@@ -16,6 +16,15 @@
                         (scheduleFromChanged)="onScheduleFromChanged($event)"
                         (scheduleToChanged)="onScheduleToChanged($event)"
                     ></booking-activities-planning-activity-schedule>
+                    <div style="flex-grow: 1;"></div>
+                    <div *ngIf="areMomentChecked()" style="display: flex; width: 100%; padding-bottom: 35px; text-align: right;">
+                        <button  mat-raised-button color="primary" style="float: right;" (click)="onOpenMultiAssignDialog()">
+                            Assigner <span style="font-size: 1rem">({{ checkedMomentQty() }})</span>
+                        </button>
+                        <button mat-icon-button (click)="selectedItemsMap = {}">
+                            <mat-icon>clear</mat-icon>
+                        </button>
+                    </div>
                 </div>
 
                 <div class="group-activity-details">
@@ -59,10 +68,12 @@
             [selectedTimeSlot]="selectedTimeSlot"
             [selectedGroup]="selectedGroup"
             [selectedActivity]="selectedActivity"
+            [selectedItemsMap]="selectedItemsMap"
             (daySelected)="onDaySelected($event)"
             (timeSlotSelected)="onTimeSlotSelected($event)"
             (groupSelected)="onGroupSelected($event)"
             (activitySelected)="onActivitySelected($event)"
+            (momentChecked)="onMomentChecked($event)"
         ></booking-activities-planning-week-activities>
 
         <div class="week-navigations">

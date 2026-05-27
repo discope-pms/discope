@@ -1,0 +1,15 @@
+:host {
+    .product-wrapper {
+        display: flex;
+        align-items: center;
+        width: 420px;
+
+        .product-form-field {
+            width: 400px;
+        }
+
+        .delete-activity {
+            margin-left: 5px;
+        }
+    }
+}
