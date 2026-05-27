@@ -40,6 +40,7 @@ import { BookingActivitiesPlanningBookingGroupDetailsComponent } from './activit
 import { BookingActivitiesPlanningBookingGroupDetailDialogParticipantsOptionsComponent } from './activities-planning/_components/booking-group-details/_components/dialog-participants-options/dialog-participants-options.component';
 import { BookingActivitiesPlanningWeekActivitiesComponent } from './activities-planning/_components/week-activities/week-activities.component';
 import { BookingActivitiesPlanningActivityScheduleComponent } from './activities-planning/_components/activity-schedule/activity-schedule.component';
+import { BookingActivitiesPlanningActivityMultiAssignDialogComponent } from './activities-planning/_components/activity-multi-assign-dialog/activity-multi-assign-dialog.component'
 
 import { BookingServicesBookingGroupDayMealsComponent } from './services/_components/booking/_components/group/_components/day-meals/day-meals.component';
 import { BookingServicesBookingGroupDayMealsMealComponent } from './services/_components/booking/_components/group/_components/day-meals/_components/meal/meal.component';
@@ -77,6 +78,7 @@ import { BookingServicesBookingGroupDialogParticipantsOptionsComponent } from '.
     BookingActivitiesPlanningComponent,
     BookingActivitiesPlanningActivityDetailsComponent,
     BookingActivitiesPlanningActivityScheduleComponent,
+    BookingActivitiesPlanningActivityMultiAssignDialogComponent,
     BookingActivitiesPlanningBookingGroupDetailsComponent,
     BookingActivitiesPlanningBookingGroupDetailDialogParticipantsOptionsComponent,
     BookingActivitiesPlanningWeekActivitiesComponent,

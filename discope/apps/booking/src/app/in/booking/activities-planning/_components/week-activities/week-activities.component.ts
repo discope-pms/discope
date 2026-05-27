@@ -19,11 +19,13 @@ export class BookingActivitiesPlanningWeekActivitiesComponent implements OnInit,
     @Input() selectedTimeSlot: 'AM'|'PM'|'EV'|null;
     @Input() selectedGroup: BookingLineGroup|null;
     @Input() selectedActivity: Activity|null;
+    @Input() selectedItemsMap: {[day: string]: {[timeSlot: string]: {[groupNum: number]: boolean}}};
 
     @Output() daySelected = new EventEmitter<string>();
     @Output() timeSlotSelected = new EventEmitter<'AM'|'PM'|'EV'>();
     @Output() groupSelected = new EventEmitter<BookingLineGroup>();
     @Output() activitySelected = new EventEmitter<Activity>();
+    @Output() momentChecked = new EventEmitter<{ checked: boolean, dateString: string, timeSlotCode: 'AM'|'PM'|'EV', group: BookingLineGroup }>();
 
     public days: string[] = [];
 
@@ -120,5 +122,11 @@ export class BookingActivitiesPlanningWeekActivitiesComponent implements OnInit,
         else {
             this.activitySelected.emit(null);
         }
+    }
+
+    public selectGroupMoment(checked: boolean, dateString: string, timeSlotCode: string, group: BookingLineGroup) {
+        const tmCode = timeSlotCode as 'AM'|'PM'|'EV';
+
+        this.momentChecked.emit({ checked, dateString, timeSlotCode: tmCode, group: group });
     }
 }

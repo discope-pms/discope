@@ -1,0 +1,49 @@
+<h2 mat-dialog-title>
+    Assignation multiple d'activités
+</h2>
+
+<mat-dialog-content>
+    <div class="product-wrapper">
+        <mat-form-field *ngIf="!product" class="product-form-field">
+            <mat-label>Activité</mat-label>
+            <input matInput
+                   #inputField
+                   type="text"
+                   [matAutocomplete]="productAutocomplete"
+                   [(ngModel)]="vm.product.name"
+                   (keyup)="vm.product.inputChange($event)"
+                   (focus)="vm.product.focus()"
+                   (blur)="vm.product.restore()"
+                   placeholder="Commencez à taper le nom" />
+            <mat-autocomplete #productAutocomplete="matAutocomplete"
+                              [displayWith]="vm.product.display"
+                              (optionSelected)="onchangeProduct($event)">
+                <div *ngIf="vm.product.filteredList | async; let productsList">
+                    <mat-option *ngFor="let product of productsList" [value]="product">
+                        <span title="{{product.sku}}">{{product.name}}</span>
+                    </mat-option>
+                    <mat-option *ngIf="productsList.length == 0"><i>pas de résultat</i></mat-option>
+                </div>
+            </mat-autocomplete>
+        </mat-form-field>
+
+        <ng-container *ngIf="product">
+            <mat-form-field class="product-form-field">
+                <mat-label>Activité</mat-label>
+                <input matInput type="text" [value]="vm.product.name" readonly="readonly" />
+            </mat-form-field>
+
+            <button mat-icon-button
+                    class="delete-activity"
+                    (click)="clear()"
+            >
+                <mat-icon>clear</mat-icon>
+            </button>
+        </ng-container>
+    </div>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+    <button mat-button (click)="close()">Annuler</button>
+    <button mat-button color="primary" (click)="closeAndSave()">Assigner</button>
+</mat-dialog-actions>

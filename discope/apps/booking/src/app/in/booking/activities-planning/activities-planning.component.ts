@@ -14,12 +14,14 @@ import { AgeRangeAssignment } from './_models/age-range-assignment.model';
 import { Partner } from './_models/partner.model';
 import { BookingLine } from './_models/booking-line.model';
 import { FormControl } from '@angular/forms';
+import { MatDialog } from '@angular/material/dialog';
+import { BookingActivitiesPlanningActivityMultiAssignDialogComponent, BookingActivitiesPlanningActivityMultiAssignDialogData } from './_components/activity-multi-assign-dialog/activity-multi-assign-dialog.component';
 
 type PlanningTimeSlot = {
     [groupNum: number]: Activity;
 }
 
-type Planning = {
+export type Planning = {
     [dateIndex: string]: {
         AM?: PlanningTimeSlot;
         PM?: PlanningTimeSlot;
@@ -64,6 +66,8 @@ export class BookingActivitiesPlanningComponent implements OnInit {
     public selectedGroup: BookingLineGroup = null;
     public selectedItem$ = new BehaviorSubject<string>(null);
 
+    public selectedItemsMap: {[day: string]: {[timeSlot: string]: {[groupNum: number]: boolean}}} = {};
+
     public activityGroups: BookingLineGroup[] = [];
     public mapGroupAgeRangeAssignment: {[groupId: number]: AgeRangeAssignment} = {};
 
@@ -76,7 +80,8 @@ export class BookingActivitiesPlanningComponent implements OnInit {
     constructor(
         private api: BookingApiService,
         private context: ContextService,
-        private route: ActivatedRoute
+        private route: ActivatedRoute,
+        private dialog: MatDialog
     ) {
         this.weekDescriptionFormControl = new FormControl('');
     }
@@ -567,7 +572,7 @@ export class BookingActivitiesPlanningComponent implements OnInit {
 
             await this.loadWeekActivities();
 
-            if(this.planning[this.selectedDay][this.selectedTimeSlot][this.selectedGroup.activity_group_num]) {
+            if(this.planning?.[this.selectedDay]?.[this.selectedTimeSlot]?.[this.selectedGroup.activity_group_num]) {
                 this.selectedActivity = this.planning[this.selectedDay][this.selectedTimeSlot][this.selectedGroup.activity_group_num];
             }
         }
@@ -598,6 +603,44 @@ export class BookingActivitiesPlanningComponent implements OnInit {
         }
 
         this.loading = false;
+    }
+
+    public onOpenMultiAssignDialog() {
+        let group: BookingLineGroup;
+        for(let dayIndex in this.selectedItemsMap) {
+            for(let timeSlotCode in this.selectedItemsMap[dayIndex]) {
+                for(let groupNum in this.selectedItemsMap[dayIndex][timeSlotCode]) {
+                    if(this.selectedItemsMap[dayIndex][timeSlotCode][groupNum]) {
+                        group = this.activityGroups.find(g => g.activity_group_num === +groupNum);
+                    }
+                }
+            }
+        }
+
+        const data: BookingActivitiesPlanningActivityMultiAssignDialogData = {
+            center_id: this.booking.center_id,
+            rate_class_id: group.rate_class_id,
+            booking: this.booking,
+            groups: this.activityGroups,
+            planning: this.planning,
+            selectedItemsMap: this.selectedItemsMap,
+            mapTimeSlotIdCode: this.mapTimeSlotIdCode
+        };
+
+        const dialogRef = this.dialog.open(BookingActivitiesPlanningActivityMultiAssignDialogComponent, { data });
+
+        dialogRef.afterClosed().subscribe(result => {
+            if(result?.reload) {
+                this.loadWeekActivities().then(() => {
+                    if(this.planning?.[this.selectedDay]?.[this.selectedTimeSlot]?.[this.selectedGroup.activity_group_num]) {
+                        this.selectedActivity = this.planning[this.selectedDay][this.selectedTimeSlot][this.selectedGroup.activity_group_num];
+                    }
+                    else {
+                        this.selectedActivity = null;
+                    }
+                });
+            }
+        });
     }
 
     public async onEmployeeChanged({employeeId, onFail}: {employeeId: number, onFail: () => void}) {
@@ -690,6 +733,35 @@ export class BookingActivitiesPlanningComponent implements OnInit {
         }[timeSlotCode];
     }
 
+    public areMomentChecked() {
+        for(let dayIndex in this.selectedItemsMap) {
+            for(let timeSlotCode in this.selectedItemsMap[dayIndex]) {
+                for(let groupNum in this.selectedItemsMap[dayIndex][timeSlotCode]) {
+                    if(this.selectedItemsMap[dayIndex][timeSlotCode][groupNum]) {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
+
+    public checkedMomentQty() {
+        let checkedMomentQty = 0;
+        for(let dayIndex in this.selectedItemsMap) {
+            for(let timeSlotCode in this.selectedItemsMap[dayIndex]) {
+                for(let groupNum in this.selectedItemsMap[dayIndex][timeSlotCode]) {
+                    if(this.selectedItemsMap[dayIndex][timeSlotCode][groupNum]) {
+                        checkedMomentQty++;
+                    }
+                }
+            }
+        }
+
+        return checkedMomentQty;
+    }
+
     public onDaySelected(dateString: string) {
         this.selectedDay = dateString;
         this.selectedItem$.next(`${dateString}_${this.selectedTimeSlot}_${this.selectedGroup.activity_group_num}`);
@@ -703,9 +775,22 @@ export class BookingActivitiesPlanningComponent implements OnInit {
     public onGroupSelected(group: BookingLineGroup) {
         this.selectedGroup = group;
         this.selectedItem$.next(`${this.selectedDay}_${this.selectedTimeSlot}_${group.activity_group_num}`);
+
+        this.selectedItemsMap = {};
     }
 
     public onActivitySelected(activity: Activity|null) {
         this.selectedActivity = activity;
+    }
+
+    public onMomentChecked({ checked, dateString, timeSlotCode, group}: { checked: boolean, dateString: string, timeSlotCode: 'AM'|'PM'|'EV', group: BookingLineGroup }) {
+        if(!this.selectedItemsMap[dateString]) {
+            this.selectedItemsMap[dateString] = {};
+        }
+        if(!this.selectedItemsMap[dateString][timeSlotCode]) {
+            this.selectedItemsMap[dateString][timeSlotCode] = {};
+        }
+
+        this.selectedItemsMap[dateString][timeSlotCode][group.activity_group_num] = checked;
     }
 }
