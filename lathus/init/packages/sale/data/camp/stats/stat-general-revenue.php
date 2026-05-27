@@ -38,6 +38,16 @@ use sale\camp\Camp;
             'description'       => 'Output: Day of departure / Input: Date interval upper limit (defaults to last day of year).',
             'default'           => strtotime('last day of december this year')
         ],
+        'confirmed' => [
+            'type'              => 'boolean',
+            'description'       => "Display enrollments with confirmed status.",
+            'default'           => true
+        ],
+        'validated' => [
+            'type'              => 'boolean',
+            'description'       => "Display enrollments with validated status.",
+            'default'           => true
+        ],
 
         /* parameters used as properties of virtual entity */
 
@@ -121,6 +131,14 @@ else if($params['center_id'] && $params['center_id'] > 0) {
     $domain[] = ['center_id', '=', $params['center_id']];
 }
 
+$enrollment_statuses = [];
+if($params['confirmed']) {
+    $enrollment_statuses[] = 'confirmed';
+}
+if($params['validated']) {
+    $enrollment_statuses[] = 'validated';
+}
+
 $camps = [];
 
 if(!empty($domain)) {
@@ -133,7 +151,7 @@ if(!empty($domain)) {
                 'center_office_id'
             ],
             'enrollments_ids' => [
-                'status',
+                '@domain' => ['status', 'in', $enrollment_statuses],
                 'price',
                 'enrollment_lines_ids' => [
                     'price',
@@ -167,10 +185,6 @@ foreach($camps as $camp) {
     }
 
     foreach($camp['enrollments_ids'] as $enrollment) {
-        if(in_array($enrollment['status'], ['pending', 'waitlisted', 'cancelled'])) {
-            continue;
-        }
-
         if(!isset($map_center_values[$camp['center_id']['name']][$date_index])) {
             $map_center_values[$camp['center_id']['name']][$date_index] = [
                 'center'            => $camp['center_id']['name'],

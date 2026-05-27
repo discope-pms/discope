@@ -35,7 +35,20 @@ use Twig\Loader\FilesystemLoader as TwigFilesystemLoader;
             'type'              => 'date',
             'description'       => "Date interval upper limit (defaults to last day of the current week).",
             'default'           => fn() => strtotime('Saturday this week')
+        ],
+
+        'confirmed' => [
+            'type'              => 'boolean',
+            'description'       => "Display enrollments with confirmed status.",
+            'default'           => true
+        ],
+
+        'validated' => [
+            'type'              => 'boolean',
+            'description'       => "Display enrollments with validated status.",
+            'default'           => true
         ]
+
 
     ],
     'response'      => [
@@ -70,6 +83,14 @@ if(!file_exists($file)) {
     Prepare values for template
 */
 
+$enrollment_statuses = [];
+if($params['confirmed']) {
+    $enrollment_statuses[] = 'confirmed';
+}
+if($params['validated']) {
+    $enrollment_statuses[] = 'validated';
+}
+
 $camps = Camp::search([
     ['date_from', '>=', $params['date_from']],
     ['date_from', '<=', $params['date_to']]
@@ -87,7 +108,7 @@ $camps = Camp::search([
             ]
         ],
         'enrollments_ids' => [
-            '@domain' => ['status', '=', 'validated'],
+            '@domain' => ['status', 'in', $enrollment_statuses],
             'child_lastname',
             'child_firstname',
             'child_gender',

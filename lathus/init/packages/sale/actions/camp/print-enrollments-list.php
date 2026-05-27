@@ -36,6 +36,8 @@ $adapter = $dap->get('json');
 
 $date_from = strtotime('last Sunday');
 $date_to = strtotime('Saturday this week');
+$confirmed = true;
+$validated = true;
 
 if(!empty($params['params'])) {
     if(isset($params['params']['date_from'])) {
@@ -44,9 +46,15 @@ if(!empty($params['params'])) {
     if(isset($params['params']['date_to'])) {
         $date_to = $adapter->adaptIn($params['params']['date_to'], 'datetime');
     }
+    if(isset($params['params']['confirmed'])) {
+        $confirmed = $params['params']['confirmed'];
+    }
+    if(isset($params['params']['validated'])) {
+        $validated = $params['params']['validated'];
+    }
 }
 
-$output = eQual::run('get', 'sale_camp_print-enrollments-list', compact('date_from', 'date_to'));
+$output = eQual::run('get', 'sale_camp_print-enrollments-list', compact('date_from', 'date_to', 'confirmed', 'validated'));
 
 $context->httpResponse()
         ->header('Content-Disposition', 'inline; filename="enrollments-list.pdf"')

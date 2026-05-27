@@ -15,6 +15,14 @@
             "label": "Année",
             "description": "Année concernée."
         },
+        "confirmed": {
+            "label": "Confirmées",
+            "description": "Afficher les inscriptions confirmées."
+        },
+        "validated": {
+            "label": "Validées",
+            "description": "Afficher les inscriptions validées."
+        },
         "center": {
             "label": "Centre",
             "description": "",

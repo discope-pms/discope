@@ -27,6 +27,14 @@
             "label": "Anniversaire",
             "description": "",
             "help": ""
+        },
+        "confirmed": {
+            "label": "Confirmées",
+            "description": "Afficher les inscriptions confirmées."
+        },
+        "validated": {
+            "label": "Validées",
+            "description": "Afficher les inscriptions validées."
         }
     },
     "view": {

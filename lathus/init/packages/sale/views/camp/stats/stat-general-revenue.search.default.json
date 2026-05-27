@@ -42,6 +42,21 @@
                                                 "width": "100%"
                                             }
                                         ]
+                                    },
+                                    {
+                                        "width": "25%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "confirmed",
+                                                "width": "100%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "validated",
+                                                "width": "100%"
+                                            }
+                                        ]
                                     }
                                 ]
                             }

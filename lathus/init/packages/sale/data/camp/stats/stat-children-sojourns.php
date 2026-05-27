@@ -30,6 +30,16 @@ use sale\camp\Camp;
             'selection'         => range('2025', date('Y', time())),
             'default'           => fn() => date('Y', time())
         ],
+        'confirmed' => [
+            'type'              => 'boolean',
+            'description'       => "Display enrollments with confirmed status.",
+            'default'           => true
+        ],
+        'validated' => [
+            'type'              => 'boolean',
+            'description'       => "Display enrollments with validated status.",
+            'default'           => true
+        ],
 
         /* parameters used as properties of virtual entity */
         'center' => [
@@ -85,6 +95,14 @@ elseif(isset($params['center_id']) && $params['center_id'] > 0) {
     $domain[] = ['center_id', '=', $params['center_id']];
 }
 
+$enrollment_statuses = [];
+if($params['confirmed']) {
+    $enrollment_statuses[] = 'confirmed';
+}
+if($params['validated']) {
+    $enrollment_statuses[] = 'validated';
+}
+
 $result = [];
 
 $camps = Camp::search($domain)
@@ -93,7 +111,7 @@ $camps = Camp::search($domain)
         'date_from',
         'clsh_type',
         'enrollments_ids' => [
-            'status',
+            '@domain' => ['status', 'in', $enrollment_statuses],
             'child_id' => [
                 'name'
             ]
@@ -105,10 +123,6 @@ $map_centers_children = [];
 
 foreach($camps as $camp) {
     foreach($camp['enrollments_ids'] as $enrollment) {
-        if($enrollment['status'] !== 'validated') {
-            continue;
-        }
-
         $center_id = $camp['center_id'];
         $child_id = $enrollment['child_id']['id'];
 

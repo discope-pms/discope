@@ -35,6 +35,16 @@ use sale\camp\Sponsor;
             'description'       => "Date interval upper limit (defaults to last day of the current month).",
             'default'           => fn() => strtotime('last day of this month')
         ],
+        'confirmed' => [
+            'type'              => 'boolean',
+            'description'       => "Display enrollments with confirmed status.",
+            'default'           => true
+        ],
+        'validated' => [
+            'type'              => 'boolean',
+            'description'       => "Display enrollments with validated status.",
+            'default'           => true
+        ],
 
         /* parameters used as properties of virtual entity */
         'center' => [
@@ -93,6 +103,14 @@ elseif(isset($params['center_id']) && $params['center_id'] > 0) {
     $domain[] = ['center_id', '=', $params['center_id']];
 }
 
+$enrollment_statuses = [];
+if($params['confirmed']) {
+    $enrollment_statuses[] = 'confirmed';
+}
+if($params['validated']) {
+    $enrollment_statuses[] = 'validated';
+}
+
 $result = [];
 
 $camps = Camp::search($domain)
@@ -100,7 +118,7 @@ $camps = Camp::search($domain)
         'center_id',
         'date_from',
         'enrollments_ids' => [
-            'status',
+            '@domain' => ['status', 'in', $enrollment_statuses],
             'weekend_extra'
         ]
     ])
@@ -110,10 +128,6 @@ $map_center_weeks_children_qty = [];
 
 foreach($camps as $camp) {
     foreach($camp['enrollments_ids'] as $enrollment) {
-        if($enrollment['status'] !== 'validated') {
-            continue;
-        }
-
         if(!isset($map_center_weeks_children_qty[$camp['center_id']])) {
             $map_center_weeks_children_qty[$camp['center_id']] = [];
         }

@@ -39,6 +39,16 @@ use sale\camp\Enrollment;
             'description'       => "Date interval upper limit (defaults to last day of the current week).",
             'default'           => fn() => strtotime('Sunday this week')
         ],
+        'confirmed' => [
+            'type'              => 'boolean',
+            'description'       => "Display enrollments with confirmed status.",
+            'default'           => true
+        ],
+        'validated' => [
+            'type'              => 'boolean',
+            'description'       => "Display enrollments with validated status.",
+            'default'           => true
+        ],
 
         /* parameters used as properties of virtual entity */
         'center' => [
@@ -127,6 +137,14 @@ elseif(isset($params['center_id']) && $params['center_id'] > 0) {
     $domain[] = ['center_id', '=', $params['center_id']];
 }
 
+$enrollment_statuses = [];
+if($params['confirmed']) {
+    $enrollment_statuses[] = 'confirmed';
+}
+if($params['validated']) {
+    $enrollment_statuses[] = 'validated';
+}
+
 $result = [];
 
 $camps = Camp::search($domain, ['sort' => ['date_from' => 'asc']])
@@ -139,7 +157,7 @@ $camps = Camp::search($domain, ['sort' => ['date_from' => 'asc']])
             'name'
         ],
         'enrollments_ids' => [
-            'status',
+            '@domain' => ['status', 'in', $enrollment_statuses],
             'is_ase',
             'child_age',
             'child_id' => [
@@ -197,9 +215,6 @@ foreach($camps as $camp) {
     }
 
     foreach($camp['enrollments_ids'] as $enrollment) {
-        if($enrollment['status'] !== 'validated') {
-            continue;
-        }
         if(!isset($map_age_data[$enrollment['child_age']])) {
             $map_age_data[$enrollment['child_age']] = [
                 'center'        => $camp['center_id']['name'],
