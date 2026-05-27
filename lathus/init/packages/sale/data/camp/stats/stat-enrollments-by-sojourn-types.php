@@ -45,12 +45,13 @@ use sale\camp\WorksCouncil;
             'description'       => "The status of the enrollments.",
             'selection'         => [
                 'all',
+                'confirmed_validated',
                 'validated',
-                'pending',
+                'confirmed',
                 'waitlisted',
                 'cancelled'
             ],
-            'default'           => 'validated'
+            'default'           => 'confirmed_validated'
         ],
 
         /* parameters used as properties of virtual entity */
@@ -134,7 +135,8 @@ foreach($camps as $camp) {
     }
 
     foreach($camp['enrollments_ids'] as $enrollment) {
-        if($params['status'] !== 'all' && $enrollment['status'] !== $params['status']) {
+        $statuses = explode('_', $params['status']);
+        if($params['status'] !== 'all' && !in_array($enrollment['status'], $statuses)) {
             continue;
         }
 

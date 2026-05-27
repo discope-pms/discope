@@ -38,6 +38,7 @@
             "label": "Status",
             "selection": {
                 "all": "Toutes",
+                "confirmed_validated": "Confirmées et validées",
                 "validated": "Validées",
                 "confirmed": "Confirmées",
                 "pending": "Brouillons",

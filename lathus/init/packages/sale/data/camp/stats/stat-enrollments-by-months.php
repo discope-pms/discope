@@ -34,18 +34,6 @@ use sale\camp\Camp;
             'description'       => "Date interval upper limit (defaults to last day of the current month).",
             'default'           => fn() => strtotime('last day of this month')
         ],
-        'status' => [
-            'type'              => 'string',
-            'description'       => "The status of the enrollments.",
-            'selection'         => [
-                'all',
-                'validated',
-                'pending',
-                'waitlisted',
-                'cancelled'
-            ],
-            'default'           => 'validated'
-        ],
 
         /* parameters used as properties of virtual entity */
         'center' => [
