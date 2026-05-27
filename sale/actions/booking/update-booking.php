@@ -45,7 +45,7 @@ list($params, $providers) = eQual::announce([
 
 // read booking object
 $booking = Booking::id($params['id'])
-                  ->read(['id', 'name', 'status', 'is_noexpiry'])
+                  ->read(['id', 'name', 'status', 'is_noexpiry', 'center_office_id'])
                   ->first(true);
 
 if(!$booking) {
@@ -71,11 +71,11 @@ else {
 
         if($params['free_rental_units']) {
             // send an alert saying that the option has expired and the booking was reverted to quote with a release of the blocked rental units
-            $dispatch->dispatch('lodging.booking.option.expired', 'sale\booking\Booking', $params['id'], 'important');
+            $dispatch->dispatch('lodging.booking.option.expired', 'sale\booking\Booking', $params['id'], 'important', null, [], [], null, $booking['center_office_id']);
         }
         else {
             // send an alert saying that the option has expired and the booking was reverted to quote
-            $dispatch->dispatch('lodging.booking.option.expired.reverted_to_quote', 'sale\booking\Booking', $params['id'], 'important');
+            $dispatch->dispatch('lodging.booking.option.expired.reverted_to_quote', 'sale\booking\Booking', $params['id'], 'important', null, [], [], null, $booking['center_office_id']);
 
             // check quote for blocked rental units (might raise alert lodging.booking.quote.blocking)
             eQual::run('do', 'sale_booking_check-quote', ['id' => $params['id']]);
@@ -83,7 +83,7 @@ else {
     }
     else {
         // send an alert saying that the option has expired
-        $dispatch->dispatch('lodging.booking.option.expired.expired_only', 'sale\booking\Booking', $params['id'], 'important');
+        $dispatch->dispatch('lodging.booking.option.expired.expired_only', 'sale\booking\Booking', $params['id'], 'important', null, [], [], null, $booking['center_office_id']);
     }
 }
 
