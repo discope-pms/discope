@@ -21,37 +21,72 @@
                             {
                                 "columns": [
                                     {
-                                        "width": "100%",
+                                        "width": "15%",
                                         "items": [
                                             {
                                                 "type": "field",
                                                 "value": "date_from",
-                                                "width": "15%"
-                                            },
+                                                "width": "100%"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "width": "15%",
+                                        "items": [
                                             {
                                                 "type": "field",
                                                 "value": "date_to",
-                                                "width": "15%"
-                                            },
+                                                "width": "100%"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "width": "15%",
+                                        "items": [
                                             {
                                                 "type": "label",
                                                 "value": "",
-                                                "width": "15%"
-                                            },
+                                                "width": "100%"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "width": "15%",
+                                        "items": [
                                             {
                                                 "type": "field",
                                                 "value": "only_saturday",
-                                                "width": "15%"
+                                                "width": "100%"
                                             },
                                             {
                                                 "type": "field",
                                                 "value": "only_weekend",
-                                                "width": "15%"
-                                            },
+                                                "width": "100%"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "width": "15%",
+                                        "items": [
                                             {
                                                 "type": "field",
                                                 "value": "only_birthday",
-                                                "width": "15%"
+                                                "width": "100%"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "width": "15%",
+                                        "items": [
+                                            {
+                                                "type": "field",
+                                                "value": "confirmed",
+                                                "width": "100%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "validated",
+                                                "width": "100%"
                                             }
                                         ]
                                     }

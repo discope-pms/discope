@@ -42,6 +42,18 @@ use sale\camp\Camp;
             'default'           => false
         ],
 
+        'confirmed' => [
+            'type'              => 'boolean',
+            'description'       => "Display enrollments with confirmed status.",
+            'default'           => true
+        ],
+
+        'validated' => [
+            'type'              => 'boolean',
+            'description'       => "Display enrollments with validated status.",
+            'default'           => true
+        ],
+
         'params' => [
             'description'   => 'Additional params to relay to the data controller.',
             'type'          => 'array',
@@ -85,6 +97,14 @@ $sortResult = function($a, $b, $order, $sort) {
  * Data controller
  */
 
+$enrollment_statuses = [];
+if($params['confirmed']) {
+    $enrollment_statuses[] = 'confirmed';
+}
+if($params['validated']) {
+    $enrollment_statuses[] = 'validated';
+}
+
 $camps = Camp::search(
     [
         ['date_from', '>=', $params['date_from']],
@@ -96,12 +116,12 @@ $camps = Camp::search(
         'date_from',
         'date_to',
         'enrollments_ids' => [
+            '@domain' => ['status', 'in', $enrollment_statuses],
             'child_firstname',
             'child_lastname',
             'child_gender',
             'child_birthdate',
             'is_foster',
-            'status',
             'weekend_extra',
             'is_ase',
             'child_remarks',
@@ -119,10 +139,6 @@ $result = [];
 
 foreach($camps as $camp) {
     foreach($camp['enrollments_ids'] as $enrollment) {
-        if($enrollment['status'] !== 'validated') {
-            continue;
-        }
-
         $result[] = $enrollment;
     }
 }
