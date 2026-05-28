@@ -9,6 +9,8 @@
 use core\setting\Setting;
 use Dompdf\Dompdf;
 use Dompdf\Options as DompdfOptions;
+use equal\orm\Domain;
+use equal\orm\DomainCondition;
 use sale\camp\Camp;
 use Twig\Environment as TwigEnvironment;
 use Twig\Extension\ExtensionInterface;
@@ -31,10 +33,9 @@ use Twig\Loader\FilesystemLoader as TwigFilesystemLoader;
             'default'           => fn() => strtotime('last Sunday')
         ],
 
-        'date_to' => [
-            'type'              => 'date',
-            'description'       => "Date interval upper limit (defaults to last day of the current week).",
-            'default'           => fn() => strtotime('Saturday this week')
+        'sojourn_number' => [
+            'type'              => 'string',
+            'description'       => "Sojourn number."
         ],
 
         'confirmed' => [
@@ -83,6 +84,26 @@ if(!file_exists($file)) {
     Prepare values for template
 */
 
+$domain = new Domain($params['domain']);
+
+$domain->addCondition(new DomainCondition('status', '=', 'published'));
+
+if(!empty($params['sojourn_number'])) {
+    $domain->addCondition(new DomainCondition('sojourn_number', 'like', "%{$params['sojourn_number']}%"));
+}
+elseif(isset($params['date_from'])) {
+    $day_of_week = date('w', $params['date_from']);
+
+    // find previous Sunday
+    $sunday = $params['date_from'] - ($day_of_week * 86400);
+
+    // next Friday (+5 days)
+    $friday = $sunday + (5 * 86400);
+
+    $domain->addCondition(new DomainCondition('date_from', '>=', $sunday));
+    $domain->addCondition(new DomainCondition('date_from', '<=', $friday));
+}
+
 $enrollment_statuses = [];
 if($params['confirmed']) {
     $enrollment_statuses[] = 'confirmed';
@@ -91,10 +112,7 @@ if($params['validated']) {
     $enrollment_statuses[] = 'validated';
 }
 
-$camps = Camp::search([
-    ['date_from', '>=', $params['date_from']],
-    ['date_from', '<=', $params['date_to']]
-])
+$camps = Camp::search($domain->toArray())
     ->read([
         'short_name',
         'sojourn_number',
@@ -177,6 +195,9 @@ $today = date($date_format);
 $date_from = date($date_format, $params['date_from']);
 $date_to = date($date_format, $params['date_to']);
 
+$title = 'Inscriptions par ordre alphabétique';
+$subtitle = '(dossier complet ou non)';
+
 /*
     Inject all values into the template
 */
@@ -191,7 +212,7 @@ try {
 
     $template = $twig->load("$class_path.{$params['view_id']}.html");
 
-    $html = $template->render(compact('enrollments', 'today', 'date_from', 'date_to'));
+    $html = $template->render(compact('enrollments', 'today', 'date_from', 'date_to', 'title', 'subtitle'));
 }
 catch(Exception $e) {
     trigger_error("ORM::error while parsing template - ".$e->getMessage(), QN_REPORT_DEBUG);

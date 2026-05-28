@@ -4,14 +4,13 @@
     "description": "Enfants participants à des camps.",
     "model": {
         "date_from": {
-            "label": "Du",
+            "label": "Semaine du",
             "description": "",
             "help": ""
         },
-        "date_to": {
-            "label": "Au",
-            "description": "",
-            "help": ""
+        "sojourn_number": {
+            "label": "N° séjour",
+            "description": "Numéro de séjour."
         },
         "only_weekend": {
             "label": "Weekend",

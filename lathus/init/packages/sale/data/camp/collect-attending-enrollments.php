@@ -6,6 +6,8 @@
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 
+use equal\orm\Domain;
+use equal\orm\DomainCondition;
 use sale\camp\Camp;
 
 [$params, $providers] = eQual::announce([
@@ -18,10 +20,9 @@ use sale\camp\Camp;
             'default'           => fn() => strtotime('last Sunday')
         ],
 
-        'date_to' => [
-            'type'              => 'date',
-            'description'       => "Date interval upper limit (defaults to last day of the current week).",
-            'default'           => fn() => strtotime('Saturday this week')
+        'sojourn_number' => [
+            'type'              => 'string',
+            'description'       => "Sojourn number."
         ],
 
         'only_weekend' => [
@@ -32,7 +33,7 @@ use sale\camp\Camp;
 
         'only_saturday' => [
             'type'              => 'boolean',
-            'description'       => "Show only the children present during the saturday morning.",
+            'description'       => "Show only the children present during the Saturday morning.",
             'default'           => false
         ],
 
@@ -97,6 +98,26 @@ $sortResult = function($a, $b, $order, $sort) {
  * Data controller
  */
 
+$domain = new Domain($params['domain']);
+
+$domain->addCondition(new DomainCondition('status', '=', 'published'));
+
+if(!empty($params['sojourn_number'])) {
+    $domain->addCondition(new DomainCondition('sojourn_number', 'like', "%{$params['sojourn_number']}%"));
+}
+elseif(isset($params['date_from'])) {
+    $day_of_week = date('w', $params['date_from']);
+
+    // find previous Sunday
+    $sunday = $params['date_from'] - ($day_of_week * 86400);
+
+    // next Friday (+5 days)
+    $friday = $sunday + (5 * 86400);
+
+    $domain->addCondition(new DomainCondition('date_from', '>=', $sunday));
+    $domain->addCondition(new DomainCondition('date_from', '<=', $friday));
+}
+
 $enrollment_statuses = [];
 if($params['confirmed']) {
     $enrollment_statuses[] = 'confirmed';
@@ -105,12 +126,7 @@ if($params['validated']) {
     $enrollment_statuses[] = 'validated';
 }
 
-$camps = Camp::search(
-    [
-        ['date_from', '>=', $params['date_from']],
-        ['date_from', '<=', $params['date_to']]
-    ]
-)
+$camps = Camp::search($domain->toArray())
     ->read([
         'short_name',
         'date_from',
