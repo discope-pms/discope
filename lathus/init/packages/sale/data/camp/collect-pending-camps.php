@@ -40,13 +40,14 @@ use equal\orm\DomainCondition;
  */
 ['context' => $context] = $providers;
 
-$result = [];
-
 $domain = new Domain($params['domain']);
 
 $domain->addCondition(new DomainCondition('status', '=', 'published'));
 
-if(isset($params['date_from'])) {
+if(!empty($params['sojourn_number'])) {
+    $domain->addCondition(new DomainCondition('sojourn_number', 'like', "%{$params['sojourn_number']}%"));
+}
+elseif(isset($params['date_from'])) {
     $day_of_week = date('w', $params['date_from']);
 
     // find previous Sunday
@@ -57,10 +58,6 @@ if(isset($params['date_from'])) {
 
     $domain->addCondition(new DomainCondition('date_from', '>=', $sunday));
     $domain->addCondition(new DomainCondition('date_from', '<=', $friday));
-}
-
-if(!empty($params['sojourn_number'])) {
-    $domain->addCondition(new DomainCondition('sojourn_number', 'like', "%{$params['sojourn_number']}%"));
 }
 
 $params['domain'] = $domain->toArray();
