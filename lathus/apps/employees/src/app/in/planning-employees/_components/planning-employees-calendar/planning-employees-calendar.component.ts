@@ -296,9 +296,5 @@ export class PlanningEmployeesCalendarComponent implements OnInit, AfterViewInit
             panelClass: 'full-screen-dialog',
             data: data
         });
-
-        dialog.afterClosed().subscribe(() => {
-            this.calendar.refresh();
-        });
     }
 }

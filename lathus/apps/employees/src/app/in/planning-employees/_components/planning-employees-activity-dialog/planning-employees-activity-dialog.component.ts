@@ -1,13 +1,14 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { ActivityMapActivity } from '../../../../../type';
-import { from } from 'rxjs';
+import { from, Subject } from 'rxjs';
 import { EnvService } from 'sb-shared-lib';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { CalendarService } from '../../_services/calendar.service';
 import { ApiService } from '../../../../_services/api.service';
 import { TranslationService } from "../../../../_services/translation.service";
 import { PlanningEmployeesUpdatePartnerEventDialogComponent, UpdatePartnerEventDialogData } from '../planning-employees-update-partner-event-dialog/planning-employees-update-partner-event-dialog.component';
+import { takeUntil } from 'rxjs/operators';
 
 export interface ActivityDialogData {
     calendar: CalendarService,
@@ -19,7 +20,7 @@ export interface ActivityDialogData {
     templateUrl: 'planning-employees-activity-dialog.component.html',
     styleUrls: ['planning-employees-activity-dialog.component.scss']
 })
-export class PlanningEmployeesActivityDialogComponent implements OnInit {
+export class PlanningEmployeesActivityDialogComponent implements OnInit, OnDestroy {
 
     private calendar: CalendarService;
 
@@ -31,6 +32,8 @@ export class PlanningEmployeesActivityDialogComponent implements OnInit {
     public userGroup: 'animator' | 'manager' | 'organizer' = 'animator';
 
     public form: FormGroup;
+
+    private destroy$ = new Subject<void>();
 
     public eventTypeMap = {
         camp_activity: this.translateService.translate('PARTNER_EVENT_TYPE_CAMP_ACTIVITY'),
@@ -67,33 +70,43 @@ export class PlanningEmployeesActivityDialogComponent implements OnInit {
 
         this.form.get('employee')?.disable();
 
-        from(this.env.getEnv()).subscribe((env: any) => {
-            if(!this.activity?.is_partner_event) {
-                this.dateFormated = this.formatDate(new Date(this.activity.activity_date.split('T')[0]), env.locale);
-            }
-            else {
-                this.dateFormated = this.formatDate(new Date(this.activity.event_date.split('T')[0]), env.locale);
-            }
-        });
+        from(this.env.getEnv())
+            .subscribe((env: any) => {
+                if(!this.activity?.is_partner_event) {
+                    this.dateFormated = this.formatDate(new Date(this.activity.activity_date.split('T')[0]), env.locale);
+                }
+                else {
+                    this.dateFormated = this.formatDate(new Date(this.activity.event_date.split('T')[0]), env.locale);
+                }
+            });
 
-        this.calendar.employeeList$.subscribe(employeeList => {
-            if(!this.activity?.is_partner_event) {
-                this.employees = [
-                    { id: 0, name: this.translateService.translate('ACTIVITY_DIALOG_NOT_ASSIGNED') },
-                    ...employeeList.filter(e => e.activity_product_models_ids.includes(this.activity.product_model_id.id))
-                        .map(e => { return { id: e.id, name: e.name }; })
-                ];
-            }
-        });
+        this.calendar.employeeList$
+            .pipe(takeUntil(this.destroy$))
+            .subscribe(employeeList => {
+                if(!this.activity?.is_partner_event) {
+                    this.employees = [
+                        { id: 0, name: this.translateService.translate('ACTIVITY_DIALOG_NOT_ASSIGNED') },
+                        ...employeeList.filter(e => e.activity_product_models_ids.includes(this.activity.product_model_id.id))
+                            .map(e => { return { id: e.id, name: e.name }; })
+                    ];
+                }
+            });
 
-        this.calendar.userGroup$.subscribe(userGroup => {
-            if(userGroup) {
-                this.userGroup = userGroup;
-            }
-            if(userGroup !== 'animator') {
-                this.form.get('employee')?.enable();
-            }
-        });
+        this.calendar.userGroup$
+            .pipe(takeUntil(this.destroy$))
+            .subscribe(userGroup => {
+                if(userGroup) {
+                    this.userGroup = userGroup;
+                }
+                if(userGroup !== 'animator') {
+                    this.form.get('employee')?.enable();
+                }
+            });
+    }
+
+    ngOnDestroy() {
+        this.destroy$.next();
+        this.destroy$.complete();
     }
 
     private formatDate(date: Date, locale: string): string {
