@@ -134,7 +134,8 @@
             "selection": {
                 "cricket": "Criquets",
                 "ladybug": "Coccinelles",
-                "dragonfly": "Libellules"
+                "dragonfly": "Libellules",
+                "butterfly": "Papillon"
             }
         },
         "employee_ratio": {

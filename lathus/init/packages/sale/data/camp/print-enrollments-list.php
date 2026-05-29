@@ -145,7 +145,8 @@ $date_format = Setting::get_value('core', 'locale', 'date_format', 'm/d/Y');
 $map_location = [
     'cricket'   => 'Criquets',
     'ladybug'   => 'Coccinelles',
-    'dragonfly' => 'Libellules'
+    'dragonfly' => 'Libellules',
+    'butterfly' => 'Papillon'
 ];
 
 $enrollments = [];

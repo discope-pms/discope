@@ -243,7 +243,8 @@ foreach($camps as $camp) {
     $map_location = [
         'cricket'   => 'Criquets',
         'ladybug'   => 'Coccinelles',
-        'dragonfly' => 'Libellules'
+        'dragonfly' => 'Libellules',
+        'butterfly' => 'Papillon'
     ];
 
     $camps_planning[] = [

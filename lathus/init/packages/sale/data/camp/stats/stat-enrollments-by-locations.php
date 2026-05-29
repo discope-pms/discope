@@ -144,7 +144,8 @@ $centers = Center::search(['id', 'in', $center_ids])
 $map_location = [
     'cricket'   => 'Criquets',
     'ladybug'   => 'Coccinelles',
-    'dragonfly' => 'Libellules'
+    'dragonfly' => 'Libellules',
+    'butterfly' => 'Papillon'
 ];
 
 foreach($map_center_locations_enrollments_qty as $center_id => $map_locations_qty) {

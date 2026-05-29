@@ -215,7 +215,8 @@ class Enrollment extends Model {
                 'selection'         => [
                     'cricket',
                     'ladybug',
-                    'dragonfly'
+                    'dragonfly',
+                    'butterfly'
                 ],
                 'description'       => "Location of the camp.",
                 'store'             => false,

@@ -305,7 +305,8 @@ class Camp extends Model {
                 'selection'         => [
                     'cricket',
                     'ladybug',
-                    'dragonfly'
+                    'dragonfly',
+                    'butterfly'
                 ],
                 'description'       => "Location of the accommodation for the camp.",
                 'help'              => "Depends on the age range of the camp. No accommodation for CLSH camp.",
