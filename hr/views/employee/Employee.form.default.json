@@ -39,12 +39,14 @@
                                             {
                                                 "type": "field",
                                                 "value": "date_start",
-                                                "width": "33%"
+                                                "width": "33%",
+                                                "readonly": true
                                             },
                                             {
                                                 "type": "field",
                                                 "value": "date_end",
-                                                "width": "33%"
+                                                "width": "33%",
+                                                "readonly": true
                                             },
                                             {
                                                 "type": "label",
