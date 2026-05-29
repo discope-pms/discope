@@ -1,7 +1,7 @@
 <?php
 /*
     This file is part of the Discope property management software <https://github.com/discope-pms/discope>
-    Some Rights Reserved, Discope PMS, 2020-2024
+    Some Rights Reserved, Discope PMS, 2020-2026
     Original author(s): Yesbabylon SRL
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
@@ -13,6 +13,11 @@
             'type'          => 'array',
             'description'   => "Additional params to relay to the data controller.",
             'default'       => []
+        ],
+        'by_sojourn' => [
+            'type'          => 'boolean',
+            'description'   => 'Separate the enrollments by sojourn.',
+            'default'       => false
         ]
     ],
     'access' => [
@@ -36,6 +41,8 @@ $adapter = $dap->get('json');
 
 $date_from = strtotime('last Sunday');
 $sojourn_number = '';
+$only_saturday = false;
+$only_weekend = false;
 $confirmed = true;
 $validated = true;
 
@@ -46,6 +53,12 @@ if(!empty($params['params'])) {
     if(!empty($params['params']['sojourn_number'])) {
         $sojourn_number = $params['params']['sojourn_number'];
     }
+    if(isset($params['params']['only_saturday'])) {
+        $only_saturday = $params['params']['only_saturday'];
+    }
+    if(isset($params['params']['only_weekend'])) {
+        $only_weekend = $params['params']['only_weekend'];
+    }
     if(isset($params['params']['confirmed'])) {
         $confirmed = $params['params']['confirmed'];
     }
@@ -54,7 +67,13 @@ if(!empty($params['params'])) {
     }
 }
 
-$output = eQual::run('get', 'sale_camp_print-enrollments-list', compact('date_from', 'sojourn_number', 'confirmed', 'validated'));
+$values = compact('date_from', 'sojourn_number', 'only_saturday', 'only_weekend', 'confirmed', 'validated');
+if($params['by_sojourn']) {
+    $output = eQual::run('get', 'sale_camp_print-enrollments-list-by-sojourn', $values);
+}
+else {
+    $output = eQual::run('get', 'sale_camp_print-enrollments-list', $values);
+}
 
 $context->httpResponse()
         ->header('Content-Disposition', 'inline; filename="enrollments-list.pdf"')

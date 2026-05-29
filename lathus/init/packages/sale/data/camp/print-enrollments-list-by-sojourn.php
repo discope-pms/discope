@@ -24,7 +24,7 @@ use Twig\Loader\FilesystemLoader as TwigFilesystemLoader;
         'view_id' =>  [
             'description'   => 'The identifier of the view <type.name>.',
             'type'          => 'string',
-            'default'       => 'print.enrollments-list'
+            'default'       => 'print.enrollments-list-by-sojourn'
         ],
 
         'date_from' => [
@@ -174,7 +174,7 @@ $map_location = [
     'butterfly' => 'Papillon'
 ];
 
-$enrollments = [];
+$map_sojourns_enrollments = [];
 foreach($camps as $camp) {
     $animators = '';
     foreach($camp['camp_groups_ids'] as $group) {
@@ -193,7 +193,7 @@ foreach($camps as $camp) {
     }
 
     foreach($camp['enrollments_ids'] as $enrollment) {
-        $enrollments[] = [
+        $map_sojourns_enrollments[$camp['sojourn_number'].' - '.$camp['short_name']][] = [
             'child_lastname'                => $enrollment['child_lastname'],
             'child_firstname'               => $enrollment['child_firstname'],
             'child_gender'                  => $enrollment['child_gender'],
@@ -202,7 +202,6 @@ foreach($camps as $camp) {
             'child_remarks'                 => $enrollment['child_remarks'],
             'all_documents_received'        => $enrollment['all_documents_received'],
             'doc_aquatic_skills_received'   => $enrollment['doc_aquatic_skills_received'],
-            'camp_name'                     => $camp['sojourn_number'].' '.$camp['short_name'],
             'camp_animators'                => $animators,
             'camp_location'                 => $map_location[$camp['location']],
             'description'                   => $enrollment['description']
@@ -210,12 +209,14 @@ foreach($camps as $camp) {
     }
 }
 
-usort($enrollments, function($a, $b) {
-    if($a['child_lastname'] === $b['child_lastname']) {
-        return $a['child_firstname'] <=> $b['child_firstname'];
-    }
-    return $a['child_lastname'] <=> $b['child_lastname'];
-});
+foreach(array_keys($map_sojourns_enrollments) as $key) {
+    usort($map_sojourns_enrollments[$key], function($a, $b) {
+        if($a['child_lastname'] === $b['child_lastname']) {
+            return $a['child_firstname'] <=> $b['child_firstname'];
+        }
+        return $a['child_lastname'] <=> $b['child_lastname'];
+    });
+}
 
 $today = date($date_format);
 
@@ -247,7 +248,7 @@ try {
 
     $template = $twig->load("$class_path.{$params['view_id']}.html");
 
-    $html = $template->render(compact('enrollments', 'today', 'date_from', 'date_to', 'title', 'subtitle'));
+    $html = $template->render(compact('map_sojourns_enrollments', 'today', 'date_from', 'date_to', 'title', 'subtitle'));
 }
 catch(Exception $e) {
     trigger_error("ORM::error while parsing template - ".$e->getMessage(), QN_REPORT_DEBUG);

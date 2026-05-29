@@ -20,8 +20,18 @@
             "label": "Enrollments list",
             "description": "Print the enrollments list.",
             "controller": "sale_camp_print-enrollments-list"
+        },
+        {
+            "id": "action.print-enrollments-list-by-sojourn",
+            "label": "Enrollments list par séjour",
+            "description": "Print the enrollments list by sojourn.",
+            "controller": "sale_camp_print-enrollments-list",
+            "params": {
+                "by_sojourn": true
+            }
         }
     ],
+    "limit": 500,
     "layout": {
         "items": [
             {

@@ -17,7 +17,29 @@ use sale\camp\Camp;
         'date_from' => [
             'type'              => 'date',
             'description'       => "Date interval lower limit (defaults to first day of the current week).",
-            'default'           => fn() => strtotime('last Sunday')
+            'default'           => function() {
+                $date_from = strtotime('last Sunday');
+
+                $first_camp = Camp::search(
+                    [
+                        ['date_from', '>=', strtotime('last Sunday')],
+                        ['date_from', '<', strtotime('last day of December this year')],
+                        ['status', '=', 'published']
+                    ],
+                    ['sort' => ['date_from' => 'asc']]
+                )
+                    ->read(['date_from'])
+                    ->first();
+
+                if($first_camp) {
+                    $date_from = $first_camp['date_from'];
+                    if(date("l", $date_from) === 'Sunday') {
+                        $date_from += 86400;
+                    }
+                }
+
+                return $date_from;
+            }
         ],
 
         'sojourn_number' => [
@@ -118,6 +140,17 @@ elseif(isset($params['date_from'])) {
     $domain->addCondition(new DomainCondition('date_from', '<=', $friday));
 }
 
+$enrollment_weekend_extras = ['none', 'saturday-morning', 'full'];
+if($params['only_saturday'] || $params['only_weekend']) {
+    $enrollment_weekend_extras = [];
+    if($params['only_saturday']) {
+        $enrollment_weekend_extras[] = 'saturday-morning';
+    }
+    if($params['only_weekend']) {
+        $enrollment_weekend_extras[] = 'full';
+    }
+}
+
 $enrollment_statuses = [];
 if($params['confirmed']) {
     $enrollment_statuses[] = 'confirmed';
@@ -132,7 +165,10 @@ $camps = Camp::search($domain->toArray())
         'date_from',
         'date_to',
         'enrollments_ids' => [
-            '@domain' => ['status', 'in', $enrollment_statuses],
+            '@domain' => [
+                ['status', 'in', $enrollment_statuses],
+                ['weekend_extra', 'in', $enrollment_weekend_extras]
+            ],
             'child_firstname',
             'child_lastname',
             'child_gender',
@@ -157,19 +193,6 @@ foreach($camps as $camp) {
     foreach($camp['enrollments_ids'] as $enrollment) {
         $result[] = $enrollment;
     }
-}
-
-if($params['only_saturday']) {
-    $result = array_filter(
-        $result,
-        fn($item) => $item['weekend_extra'] === 'saturday-morning'
-    );
-}
-elseif($params['only_weekend']) {
-    $result = array_filter(
-        $result,
-        fn($item) => $item['weekend_extra'] === 'full'
-    );
 }
 
 if($params['only_birthday']) {

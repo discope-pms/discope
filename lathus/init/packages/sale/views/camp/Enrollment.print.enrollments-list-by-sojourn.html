@@ -1,0 +1,159 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xml:lang="en" xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+
+    <title>Programme d'activités</title>
+    <style type="text/css">
+        @page {
+            margin: 1cm;
+        }
+        body {
+            margin: 90px 0 40px 0;
+            padding: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 0.7em;
+            text-align: justify;
+            width: 100%;
+        }
+
+        h2 {
+            margin-top: 8px;
+            margin-bottom: 0;
+            font-size: 21px;
+        }
+
+        h3 {
+            margin-top: 0;
+            margin-bottom: 0;
+            font-size: 15px;
+        }
+
+        div, table, table tr td {
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        div.header,
+        div.footer {
+            box-sizing: border-box;
+            border: 0;
+            margin: 0;
+            padding: 0;
+            position: fixed;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        div.header {
+            top: 0;
+            left: 0;
+            height: 80px;
+        }
+
+        div.header .title {
+            width: 100%;
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        div.header .subtitle {
+            width: 100%;
+            margin-top: 10px;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+
+        div.footer {
+            bottom: 0;
+            left: 0;
+            height: 30px;
+            overflow: visible;
+            z-index: 200;
+            font-size: 0.75rem !important;
+        }
+
+        .table-enrollments {
+            width: 100%;
+            margin-top: 10px;
+            border: 2px solid black;
+            border-collapse: collapse;
+        }
+
+        .table-enrollments th, .table-enrollments td {
+            width: 15%;
+            padding: 2px;
+            border: 1px solid black;
+        }
+
+        .table-enrollments td.col-center {
+            text-align: center;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div class="header">
+    <div class="title">{{ title }}</div>
+    <div class="title">{{ subtitle }}</div>
+
+    <div class="subtitle">Du {{ date_from }} au {{ date_to }}</div>
+</div>
+
+<div class="footer">
+    <table style="width: 80%; margin: 0 10%;">
+        <tr>
+            <td style="width: 50%">Centre de Plein-Air de Lathus</td>
+            <td style="width: 50%; text-align: right">{{ today }}</td>
+        </tr>
+    </table>
+</div>
+
+{% for camp_name, enrollments in map_sojourns_enrollments %}
+    <h3>{{ camp_name }}</h3>
+
+    <table class="table-enrollments">
+        <thead>
+        <tr>
+            <th style="width: 50px;">Nom</th>
+            <th style="width: 50px;">Prénom</th>
+            <th style="width: 10px;"><div style="width: 10px; transform: rotate(-90deg);">Sexe</div></th>
+            <th style="width: 35px;">Né le</th>
+            <th style="width: 25px;">Age</th>
+            <th style="width: 100px;">Remarques</th>
+            <th style="width: 35px; font-size: 0.5rem;">Dossier complet</th>
+            <th style="width: 40px; font-size: 0.5rem;">Manque test. aqua</th>
+            <th>Anim.</th>
+            <th>Site</th>
+            <th style="width: 100px;">Remarques weekend</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for enrollment in enrollments %}
+            <tr>
+                <td>{{ enrollment.child_lastname }}</td>
+                <td>{{ enrollment.child_firstname }}</td>
+                <td class="col-center">{{ enrollment.child_gender }}</td>
+                <td class="col-center">{{ enrollment.child_birthdate }}</td>
+                <td class="col-center">{{ enrollment.child_age }}</td>
+                <td style="font-size: 0.5rem;">{{ enrollment.child_remarks }}</td>
+                <td class="col-center">{% if enrollment.all_documents_received %}X{% endif %}</td>
+                <td class="col-center">{% if not enrollment.doc_aquatic_skills_received %}X{% endif %}</td>
+                <td>{{ enrollment.camp_animators }}</td>
+                <td>{{ enrollment.camp_location }}</td>
+                <td style="font-size: 0.5rem;">{{ enrollment.description }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    {% if not loop.last %}
+        <div style="page-break-after: always;"></div>
+    {% endif %}
+{% endfor %}
+
+</body>
+</html>

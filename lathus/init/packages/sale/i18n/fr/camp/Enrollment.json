@@ -616,6 +616,9 @@
             "actions": {
                 "action.print-enrollments-list": {
                     "label": "Liste inscriptions"
+                },
+                "action.print-enrollments-list-by-sojourn": {
+                    "label": "Liste inscriptions par séjour"
                 }
             }
         }

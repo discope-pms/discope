@@ -8,6 +8,7 @@
 
 use equal\orm\Domain;
 use equal\orm\DomainCondition;
+use sale\camp\Camp;
 
 [$params, $providers] = eQual::announce([
     'extends'       => 'core_model_collect',
@@ -20,7 +21,29 @@ use equal\orm\DomainCondition;
         'date_from' => [
             'type'              => 'date',
             'description'       => "Date interval lower limit.",
-            'default'           => fn() => strtotime('last Sunday')
+            'default'           => function() {
+                $date_from = strtotime('last Sunday');
+
+                $first_camp = Camp::search(
+                    [
+                        ['date_from', '>=', strtotime('last Sunday')],
+                        ['date_from', '<', strtotime('last day of December this year')],
+                        ['status', '=', 'published']
+                    ],
+                    ['sort' => ['date_from' => 'asc']]
+                )
+                    ->read(['date_from'])
+                    ->first();
+
+                if($first_camp) {
+                    $date_from = $first_camp['date_from'];
+                    if(date("l", $date_from) === 'Sunday') {
+                        $date_from += 86400;
+                    }
+                }
+
+                return $date_from;
+            }
         ],
         'sojourn_number' => [
             'type'              => 'string',
