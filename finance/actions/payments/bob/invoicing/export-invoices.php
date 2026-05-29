@@ -515,7 +515,8 @@ foreach($invoices as $invoice) {
 
         $account_code = '';
         foreach($line['price_id']['accounting_rule_id']['accounting_rule_line_ids'] as $rule_line) {
-            $account_code = $rule_line['account_id']['code'];
+            $pos = strpos($rule_line['account_id']['code'], '_');
+            $account_code = ($pos !== false) ? substr($rule_line['account_id']['code'], 0, $pos) : $rule_line['account_id']['code'];
             break;
         }
 
