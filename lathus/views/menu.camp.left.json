@@ -299,15 +299,15 @@
                 ]
             },
             {
-                "id": "financial-helps",
-                "label": "Financial helps",
-                "description": "Manage pending given financial helps.",
+                "id": "financial-discounts-and-financial-helps",
+                "label": "Discounts/financial helps",
+                "description": "Manage pending given discounts and financial helps.",
                 "icon": "money",
                 "type": "parent",
                 "visible": ["camp.default.administrator", "in", "user.groups"],
                 "children": [
                     {
-                        "id": "financial-helps.price-adapters",
+                        "id": "financial-helps.price-adapters-sponsor",
                         "type": "entry",
                         "label": "Price adapters",
                         "description": "",
@@ -316,6 +316,18 @@
                         "context": {
                             "entity": "sale\\camp\\price\\PriceAdapter",
                             "view": "list.sponsor-search"
+                        }
+                    },
+                    {
+                        "id": "financial-helps.price-adapters-discount",
+                        "type": "entry",
+                        "label": "Price adapters",
+                        "description": "",
+                        "icon": "",
+                        "route": "/camps",
+                        "context": {
+                            "entity": "sale\\camp\\price\\PriceAdapter",
+                            "view": "list.discount-search"
                         }
                     },
                     {

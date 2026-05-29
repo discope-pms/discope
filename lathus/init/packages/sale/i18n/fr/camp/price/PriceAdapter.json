@@ -58,13 +58,18 @@
             "layout": {}
         },
         "list.sponsor-search": {
-            "name": "Réductions",
+            "name": "Aides financières",
             "description": "",
-            "header": {
-                "action.invoice-sponsor": {
-                    "label": "Facturer Aidant"
+            "actions": {
+                "action.print-list": {
+                    "label": "Imprimer aides communes"
                 }
             },
+            "layout": {}
+        },
+        "list.discount-search": {
+            "name": "Réductions",
+            "description": "",
             "layout": {}
         }
     },

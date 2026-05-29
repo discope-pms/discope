@@ -94,12 +94,16 @@
             "label": "Gestion dossiers",
             "help": "Toutes les inscription avec information à propos de la complétion du dossier."
         },
-        "financial-helps": {
-            "label": "Aides financières",
+        "financial-discounts-and-financial-helps": {
+            "label": "Réductions/aides",
             "help": ""
         },
-        "financial-helps.price-adapters": {
-            "label": "Réductions aides",
+        "financial-helps.price-adapters-sponsor": {
+            "label": "Aides",
+            "help": ""
+        },
+        "financial-helps.price-adapters-discount": {
+            "label": "Réductions",
             "help": ""
         },
         "financial-helps.ce-enrollments": {

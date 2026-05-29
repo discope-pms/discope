@@ -1,20 +1,8 @@
 {
     "name": "Price adapters",
-    "description": "This view is intended for displaying the list of sponsors' price adapters.",
+    "description": "This view is intended for displaying the list of discounts' price adapters.",
     "controller": "sale_camp_price_collect-price-adapters",
     "header": {
-        "selection": {
-            "default" : false,
-            "actions" : [
-                {
-                    "id": "action.invoice-sponsor",
-                    "label": "Facturer Aidant",
-                    "description": "Invoice price adapters to sponsors.",
-                    "controller": "sale_camp_price_invoice-sponsor",
-                    "visible": ["camp.default.administrator", "in", "user.groups"]
-                }
-            ]
-        },
         "advanced_search": {
             "open": true
         }
@@ -27,17 +15,8 @@
             }
         }
     },
-    "group_by": [{"field": "sponsor_id", "operation": ["SUM", "object.value"]}],
-    "domain": ["origin_type", "in", ["commune", "community-of-communes", "department-caf", "department-msa"]],
+    "domain": ["origin_type", "in", ["other", "loyalty-discount"]],
     "limit": 500,
-    "actions": [
-        {
-            "id": "action.print-list",
-            "label": "Print commune helps",
-            "controller": "sale_camp_price_print-price-adapters",
-            "visible": ["camp.default.administrator", "in", "user.groups"]
-        }
-    ],
     "layout": {
         "items": [
             {
