@@ -230,9 +230,12 @@ export class PlanningEmployeesCalendarComponent implements OnInit, AfterViewInit
             const start = employee.date_start.slice(0, 10);
             const end = employee.date_end ? employee.date_end.slice(0, 10) : null;
 
+            const toLocalDateString = (date: Date) =>
+                `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+
             const date = new Date(dateFrom.getTime());
             while(date <= dateTo) {
-                const dateIndex = date.toISOString().slice(0, 10);
+                const dateIndex = toLocalDateString(date);
 
                 activeEmployeesDaysMap[employee.id][dateIndex] = dateIndex >= start && (!end || dateIndex <= end);
 

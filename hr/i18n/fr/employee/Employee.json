@@ -14,8 +14,28 @@
             "help": ""
         },
         "partner_events_ids": {
-            "label": "Evénements planning",
-            "description": "Evénements planning comme: formation, absence, congé ou récupération.",
+            "label": "Événements planning",
+            "description": "Événements planning comme: formation, absence, congé ou récupération.",
+            "help": ""
+        },
+        "date_start": {
+            "label": "Début contrat",
+            "description": "Date de début du contrat actuel.",
+            "help": ""
+        },
+        "date_end": {
+            "label": "Fin contrat",
+            "description": "Date de fin du contrat actuel.",
+            "help": ""
+        },
+        "is_active": {
+            "label": "Actif",
+            "description": "Est-ce que l'employé est actif actuellement.",
+            "help": ""
+        },
+        "role_id": {
+            "label": "Rôle",
+            "description": "Le rôle de l'employé.",
             "help": ""
         }
     },
@@ -23,6 +43,11 @@
         "form.default": {
             "name": "Employé",
             "description": "Les employés sont les collaborateurs d'une entreprise.",
+            "actions": {
+                "action.modify-dates": {
+                    "label": "Modifier dates contrat"
+                }
+            },
             "layout": {
                 "template.content": {
                     "label": "Contenu"

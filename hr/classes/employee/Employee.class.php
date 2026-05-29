@@ -7,6 +7,8 @@
 
 namespace hr\employee;
 
+use sale\booking\BookingActivity;
+
 class Employee extends \identity\Partner {
 
     public static function getName() {
@@ -117,5 +119,45 @@ class Employee extends \identity\Partner {
         return [
             ['owner_identity_id', 'partner_identity_id', 'role_id']
         ];
+    }
+
+    protected static function doUnassignActivities($self) {
+        $self->read(['date_start', 'date_end']);
+        foreach($self as $id => $employee) {
+            $today = strtotime('today midnight');
+
+            $activity_domain = [];
+            if($employee['date_start'] > $today) {
+                $activity_domain[] = [
+                    ['employee_id', '=', $id],
+                    ['activity_date', '>=', strtotime('today midnight')],
+                    ['activity_date', '<', $employee['date_start']]
+                ];
+            }
+            if($employee['date_end']) {
+                $activity_domain[] = [
+                    ['employee_id', '=', $id],
+                    ['activity_date', '>', max($employee['date_end'], $today)]
+                ];
+            }
+
+            if(!empty($activity_domain)) {
+                BookingActivity::search($activity_domain)
+                    ->update(['employee_id' => null]);
+            }
+        }
+    }
+
+    public static function getActions() {
+        return array_merge(parent::getActions(), [
+
+                'unassign_activities' => [
+                    'description'   => "Unassign future activities that are outside the employee's contract dates interval.",
+                    'policies'      => [],
+                    'function'      => 'doUnassignActivities'
+                ]
+
+            ]
+        );
     }
 }

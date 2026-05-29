@@ -48,11 +48,6 @@ export class ApiService {
             .set('Pragma', 'no-cache');
     }
 
-    private unixTimestampToISO(timestamp: number) {
-        const date = new Date(timestamp * 1000);
-        return date.toISOString();
-    }
-
     private getBackendUrl(): Observable<string> {
         return from(this.env.getEnv()).pipe(
             map((environment: any) => environment.backend_url)

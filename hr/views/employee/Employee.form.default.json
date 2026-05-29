@@ -1,6 +1,14 @@
 {
     "name": "Employee",
     "description": "",
+    "actions": [
+        {
+            "id": "action.modify-dates",
+            "label": "Modify dates",
+            "description": "Modify the current contract dates.",
+            "controller": "hr_employee_modify-dates"
+        }
+    ],
     "layout": {
         "groups": [
             {

@@ -1,0 +1,27 @@
+{
+    "name": "Employé",
+    "plural": "Employés",
+    "description": "Modifier les dates du contrat de l'employé",
+    "model": {
+        "date_start": {
+            "label": "Date début",
+            "description": "Nouvelle date de début de contrat.",
+            "help": ""
+        },
+        "has_date_end": {
+            "label": "A une date de fin?",
+            "description": "Faut-il appliquer une date de fin?",
+            "help": ""
+        },
+        "date_end": {
+            "label": "Date fin",
+            "description": "Nouvelle date de fin de contrat.",
+            "help": ""
+        },
+        "unassign_activities": {
+            "label": "Désaffecter les activités",
+            "description": "Désaffecter les activités futures hors des dates du contrat.",
+            "help": ""
+        }
+    }
+}

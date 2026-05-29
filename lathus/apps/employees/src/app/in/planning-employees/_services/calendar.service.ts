@@ -175,8 +175,11 @@ export class CalendarService implements OnDestroy {
         ])
             .pipe(takeUntil(this.destroy$),)
             .subscribe(([employeeList, dateFrom, dateTo, activityMap]) => {
-                const from = dateFrom.toISOString().slice(0, 10);
-                const to = dateTo.toISOString().slice(0, 10);
+                const toLocalDateString = (date: Date) =>
+                    `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+
+                const from = toLocalDateString(dateFrom);
+                const to = toLocalDateString(dateTo);
 
                 const activeEmployeeList = employeeList.filter(employee => {
                     if(activityMap[employee.id] !== undefined && Object.values(activityMap[employee.id]).length > 0) {
