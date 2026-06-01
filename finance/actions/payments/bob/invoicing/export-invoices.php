@@ -491,7 +491,6 @@ $invoices_lines_fields_conf = [
     'BASEAMN'       => ['type' => 'Float',          'length' => 21,     'decimals' => 2],
     'PAYAMN'        => ['type' => 'Float',          'length' => 21,     'decimals' => 2],
     'CPTYPE'        => ['type' => 'Char',           'length' => 1,      'decimals' => 0],
-    'VATAMN'        => ['type' => 'Float',          'length' => 21,     'decimals' => 2],
     'NETPU'         => ['type' => 'Float',          'length' => 21,     'decimals' => 2],
     'DISCAMN'       => ['type' => 'Float',          'length' => 21,     'decimals' => 2],
     'PURPRICE'      => ['type' => 'Float',          'length' => 21,     'decimals' => 2]
