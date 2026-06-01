@@ -548,7 +548,7 @@ foreach($invoices as $invoice) {
             'IMPUT'     => str_pad($account_code, 10,' ', STR_PAD_RIGHT),
             'QTYMVT'    => str_pad('', 21,' ', STR_PAD_LEFT),
             'QTYORDER'  => str_pad('1', 21,' ', STR_PAD_LEFT),
-            'QTYDELIV'  => str_pad(sprintf('%.02f', $line['qty']), 21,' ', STR_PAD_LEFT),
+            'QTYDELIV'  => str_pad(str_replace('.', ',', sprintf('%.02f', $line['qty'])), 21,' ', STR_PAD_LEFT),
             'COMMENT'   => str_pad($name, 120, ' ', STR_PAD_RIGHT),
             'VSTORED'   => str_pad('NSS  '.intval($line['price_id']['vat_rate'] * 100), 10,' ', STR_PAD_RIGHT),
             'TVATTYPE'  => str_pad('N', 1,' ', STR_PAD_RIGHT),
