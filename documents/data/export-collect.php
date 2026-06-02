@@ -28,7 +28,7 @@ list($params, $providers) = eQual::announce([
         'date_to' => [
             'type'              => 'date',
             'description'       => "Last date of the time interval.",
-            'default'           => time()
+            'default'           => strtotime('tomorrow')
         ],
         'center_office_id' => [
             'type'              => 'many2one',
