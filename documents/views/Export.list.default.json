@@ -9,7 +9,10 @@
     "domain": ["center_office_id", "in", "user.center_offices_ids"],
     "header": {
         "actions": {
-            "ACTION.CREATE" : false
+            "ACTION.CREATE": false
+        },
+        "selection": {
+            "default": false
         }
     },
     "controller": "documents_export-collect",
