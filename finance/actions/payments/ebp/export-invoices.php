@@ -188,6 +188,9 @@ if(!empty($invoices)) {
     foreach($invoices as $invoice) {
         $added = 0;
 
+        $direction = $invoice['type'] === 'invoice' ? 'D' : 'C';
+        $inverse_direction = $direction === 'C' ? 'D' : 'C';
+
         $data[] = [
             $entry_num,
             date('dmY', $invoice['date']),
@@ -197,7 +200,7 @@ if(!empty($invoices)) {
             TextTransformer::toAscii($invoice['partner_id']['name']),
             $invoice['name'],
             number_format($invoice['price'], 2, '.', ''),
-            $invoice['type'] === 'invoice' ? 'D' : 'C',
+            $direction,
             '',
             ''
         ];
@@ -226,7 +229,7 @@ if(!empty($invoices)) {
                     TextTransformer::toAscii($invoice['partner_id']['name']),
                     $invoice['name'],
                     number_format(abs($line['price']), 2, '.', ''),
-                    $invoice['type'] === 'invoice' && $line['price'] >= 0 ? 'C' : 'D',
+                    $direction,
                     '',
                     ''
                 ];
@@ -250,7 +253,7 @@ if(!empty($invoices)) {
                         TextTransformer::toAscii($invoice['partner_id']['name']),
                         $invoice['name'],
                         number_format(abs($line['price']), 2, '.', ''),
-                        $invoice['type'] === 'invoice' && $line['price'] >= 0 ? 'C' : 'D',
+                        $line['price'] >= 0 ? $inverse_direction : $direction,
                         '',
                         ''
                     ];
