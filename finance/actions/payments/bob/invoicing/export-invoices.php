@@ -153,6 +153,7 @@ $invoices = Invoice::search($domain, ['limit' => 100, 'sort' => ['number' => 'as
         'due_date',
         'type',
         'status',
+        'is_paid',
         // #memo - accounting price is the amount to be recorded in accountancy (does not include installment payments)
         'accounting_price',
         'is_deposit',
@@ -203,6 +204,7 @@ $invoices = Invoice::search($domain, ['limit' => 100, 'sort' => ['number' => 'as
             'total',
             'price',
             'product_id',
+            'vat_rate',
             'price_id' => [
                 'vat_rate',
                 'accounting_rule_id' => [
@@ -433,6 +435,32 @@ foreach($invoices as $invoice) {
 
     $payment_reference = isset($invoice['funding_id']['payment_reference']) ? (substr($invoice['funding_id']['payment_reference'], 0, 17)) : '';
 
+    $total_paid = 0;
+    $internal_note = $payment_reference;
+    if($invoice['is_paid']) {
+        $internal_note = 'PAYE';
+        $total_paid = $invoice['price'];
+    }
+    elseif($invoice['booking_id']) {
+        if($invoice['type'] === 'invoice') {
+            $fundings = Funding::search(['invoice_id', '=', $invoice['id']])
+                ->read(['paid_amount'])
+                ->get();
+
+            foreach($fundings as $funding) {
+                $total_paid += $funding['paid_amount'];
+            }
+        }
+        elseif($invoice['type'] == 'credit_note') {
+            $total_paid = $invoice['funding_id']['paid_amount'];
+        }
+
+        if(round($total_paid, 2) >= round($invoice['price'], 2)) {
+            // #todo - Fix problem is_paid of booking Invoice not true even if fundings paid (maybe because is_paid is calc from finance\accounting\Invoice and not sale\booking\Invoice ?)
+            $internal_note = 'PAYE';
+        }
+    }
+
     $map_values = [
         'DBK'           => str_pad($journal['code'], 4, ' ', STR_PAD_RIGHT),
         'FYEAR'         => str_pad(date('Y', $invoice['date']), 5,' ', STR_PAD_RIGHT),
@@ -444,13 +472,13 @@ foreach($invoices as $invoice) {
         'DUEDATE'       => str_pad(date('d/m/Y', $invoice['due_date']), 11,' ', STR_PAD_RIGHT),
         'CPID'          => str_pad('C'.$invoice['partner_id']['partner_identity_id']['id'], 12, ' ', STR_PAD_RIGHT),
         'CPTYPE'        => str_pad('C', 1,' ',STR_PAD_LEFT),
-        'INTREM'        => str_pad($payment_reference, 30, ' ', STR_PAD_RIGHT),
+        'INTREM'        => str_pad($internal_note, 30, ' ', STR_PAD_RIGHT),
         'EXTREM'        => str_pad($comments, 30,' ', STR_PAD_RIGHT),
         'VCS'           => str_pad($payment_reference, 17, ' ', STR_PAD_RIGHT),
         'TOTLINE'       => str_pad(str_replace('.', ',', sprintf('%.02f', $invoice['total'])), 21,' ', STR_PAD_LEFT),
         'BASEVATAMN'    => str_pad(str_replace('.', ',', sprintf('%.02f', $invoice['total_vat'])), 21,' ', STR_PAD_LEFT),
-        'PAYAMN'        => str_pad(str_replace('.', ',', sprintf('%.02f', $invoice['accounting_price'])), 21,' ', STR_PAD_LEFT),
-        'XUSRACOMPTE'   => str_pad(str_replace('.', ',', sprintf('%.02f', $invoice['funding_id']['paid_amount'])), 21,' ', STR_PAD_LEFT)
+        'PAYAMN'        => str_pad(str_replace('.', ',', sprintf('%.02f', $invoice['price'])), 21,' ', STR_PAD_LEFT),
+        'XUSRACOMPTE'   => str_pad(str_replace('.', ',', sprintf('%.02f', $total_paid)), 21,' ', STR_PAD_LEFT)
     ];
 
     $values = [];
@@ -464,6 +492,8 @@ foreach($invoices as $invoice) {
 /*
     Generate headers: IHISTO_FACT.txt
 */
+
+$allowed_rates = [0.0, 0.06, 0.12, 0.21];
 
 $invoices_lines_fields_conf = [
     'DBK'           => ['type' => 'Char',           'length' => 4,      'decimals' => 0],
@@ -486,7 +516,7 @@ $invoices_lines_fields_conf = [
     'TVATTYPE'      => ['type' => 'Char',           'length' => 1,      'decimals' => 0],
     'TVANAT1'       => ['type' => 'Char',           'length' => 3,      'decimals' => 0],
     'WAREHOUSE'     => ['type' => 'Char',           'length' => 21,     'decimals' => 0],
-    'PU'            => ['type' => 'Float',          'length' => 21,     'decimals' => 2],
+    'PU'            => ['type' => 'Float',          'length' => 21,     'decimals' => 4],
     'PRCDISC'       => ['type' => 'Long Integer',   'length' => 11,     'decimals' => 0],
     'BASEAMN'       => ['type' => 'Float',          'length' => 21,     'decimals' => 2],
     'PAYAMN'        => ['type' => 'Float',          'length' => 21,     'decimals' => 2],
@@ -511,6 +541,13 @@ foreach($invoices as $invoice) {
         else {
             $comments = ($invoice['type'] === 'invoice' ? 'F. ' : 'NC.').strtoupper( substr(TextTransformer::normalize($invoice['partner_id']['name']), 0, 30) ).'/'.$invoice['booking_id']['name'];
         }
+
+        $raw_rate = $line['vat_rate'];
+        $vat_rate = array_reduce($allowed_rates, function ($c, $r) use ($raw_rate) {
+                return (abs($r - $raw_rate) < abs($c - $raw_rate)) ? $r : $c;
+            },
+            0.0
+        );
 
         $account_code = '';
         foreach($line['price_id']['accounting_rule_id']['accounting_rule_line_ids'] as $rule_line) {
@@ -549,11 +586,11 @@ foreach($invoices as $invoice) {
             'QTYORDER'  => str_pad('1', 21,' ', STR_PAD_LEFT),
             'QTYDELIV'  => str_pad(str_replace('.', ',', sprintf('%.02f', $line['qty'])), 21,' ', STR_PAD_LEFT),
             'COMMENT'   => str_pad($name, 120, ' ', STR_PAD_RIGHT),
-            'VSTORED'   => str_pad('NSS  '.intval($line['price_id']['vat_rate'] * 100), 10,' ', STR_PAD_RIGHT),
+            'VSTORED'   => str_pad('NSS  '.intval($vat_rate * 100), 10,' ', STR_PAD_RIGHT),
             'TVATTYPE'  => str_pad('N', 1,' ', STR_PAD_RIGHT),
             'TVANAT1'   => str_pad('V', 3,' ', STR_PAD_RIGHT),
             'WAREHOUSE' => str_pad('', 21,' ',STR_PAD_LEFT),
-            'PU'        => str_pad(str_replace('.', ',', sprintf('%.02f', $line['unit_price'])), 21,' ', STR_PAD_LEFT),
+            'PU'        => str_pad(str_replace('.', ',', sprintf('%.04f', $line['unit_price'])), 21,' ', STR_PAD_LEFT),
             'PRCDISC'   => str_pad($discount, 11,' ', STR_PAD_RIGHT),
             'BASEAMN'   => str_pad(str_replace('.', ',', sprintf('%.02f', $line['total'])), 21,' ', STR_PAD_LEFT),
             'PAYAMN'    => str_pad(str_replace('.', ',', sprintf('%.02f', $line['price'])), 21,' ', STR_PAD_LEFT),
