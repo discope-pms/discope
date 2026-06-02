@@ -54,14 +54,19 @@ foreach($center_office_ids as $center_office_id) {
 
 
     foreach($accounting_journals as $accounting_journal) {
+        $export_invoice_ctrl = 'finance_payments_bob_export-invoices';
+        if($accounting_journal['journal_type'] === 'sales_peppol') {
+            $export_invoice_ctrl = 'finance_payments_bob_invoicing_export-invoices';
+        }
+
         try {
-            eQual::run('do', 'finance_payments_bob_export-invoices', [
+            eQual::run('do', $export_invoice_ctrl, [
                 'center_office_id'  => $center_office_id,
                 'journal_type'      => $accounting_journal['type']
             ]);
         }
         catch(Exception $e) {
-            trigger_error("APP::error while processing invoices (journal type: {$accounting_journal['type']}) for center office $center_office_id", EQ_REPORT_WARNING);
+            trigger_error("APP::error while processing invoices (journal type: {$accounting_journal['type']}) for center office $center_office_id (action: $export_invoice_ctrl)", EQ_REPORT_WARNING);
         }
     }
 
