@@ -52,10 +52,9 @@ foreach($center_office_ids as $center_office_id) {
         ->read(['type'])
         ->get();
 
-
     foreach($accounting_journals as $accounting_journal) {
         $export_invoice_ctrl = 'finance_payments_bob_export-invoices';
-        if($accounting_journal['journal_type'] === 'sales_peppol') {
+        if($accounting_journal['type'] === 'sales_peppol') {
             $export_invoice_ctrl = 'finance_payments_bob_invoicing_export-invoices';
         }
 
