@@ -419,6 +419,7 @@ $invoices_fields_conf = [
 $invoices_schema = implode("\r\n", ['[IHDDOC_FACT]', 'FileType=Fixed', 'CharSet=ascii'])."\r\n".$createFieldsSchema($invoices_fields_conf);
 
 $invoices_data = [];
+$handled_invoices_ids = [];
 foreach($invoices as $invoice) {
     // when invoice is a credit note, PAYAMN must be inverted (in most cases should be negative)
     if($invoice['type'] == 'credit_note') {
@@ -487,6 +488,7 @@ foreach($invoices as $invoice) {
     }
 
     $invoices_data[] = implode('', $values);
+    $handled_invoices_ids[] = $invoice['id'];
 }
 
 /*
@@ -655,8 +657,7 @@ $export = Export::create([
 
 try {
     // mark processed invoices as exported
-    // TODO: uncomment line below
-    // Invoice::ids(array_keys($invoices_header_data))->update(['is_exported' => true]);
+    Invoice::ids($handled_invoices_ids)->update(['is_exported' => true]);
 }
 catch(Exception $e) {
     // remove export if error triggered while flagging invoices as exported
