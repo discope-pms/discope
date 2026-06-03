@@ -30,7 +30,7 @@ use sale\booking\Funding;
                 'sales',
                 'sales_peppol'
             ],
-            'default'           => 'sales'
+            'default'           => 'sales_peppol'
         ]
 
     ],
