@@ -11,13 +11,31 @@ use equal\text\TextTransformer;
 use identity\Partner;
 
 [$params, $providers] = eQual::announce([
-    'description'   => "Returns BOB customers export files 'CLIENTS_FACT.sch' and 'CLIENTS_FACT.txt'.",
+    'description'   => "Returns files 'CLIENTS_FACT.sch' and 'CLIENTS_FACT.txt' to import customers data in BOB software.",
     'params'        => [
 
         'domain' => [
-            'description'   => "Domain to filter the partners.",
             'type'          => 'array',
+            'description'   => "Domain to filter the partners.",
             'default'       => []
+        ],
+
+        'file_name' => [
+            'type'          => 'string',
+            'description'   => "Name of the file.",
+            'default'       => 'CLIENTS_FACT'
+        ],
+
+        'file_type' => [
+            'type'          => 'string',
+            'description'   => "Import file type.",
+            'default'       => 'Fixed'
+        ],
+
+        'char_set' => [
+            'type'          => 'string',
+            'description'   => "Import file character set.",
+            'default'       => 'ascii'
         ]
 
     ],
@@ -222,12 +240,8 @@ foreach($partners as $partner) {
     $data[] = implode('', $values);
 }
 
-$file_name = 'CLIENTS_FACT';
-$file_type = 'Fixed';
-$char_set = 'ascii';
-
 $result = [
-    'schema'    => implode("\r\n", ["[$file_name]", "FileType=$file_type", "CharSet=$char_set"])."\r\n".$createFieldsSchema($fields_conf),
+    'schema'    => implode("\r\n", ["[{$params['file_name']}]", "FileType={$params['file_type']}", "CharSet={$params['char_set']}"])."\r\n".$createFieldsSchema($fields_conf),
     'data'      => implode("\r\n", $data)."\r\n"
 ];
 

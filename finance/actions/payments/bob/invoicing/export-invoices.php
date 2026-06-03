@@ -455,7 +455,7 @@ foreach($invoices as $invoice) {
     Generate: CLIENTS_FACT.txt
 */
 
-$customers_files_data = eQual::run('get', 'finance_payments_bob_client-fact', [
+$customers_files_data = eQual::run('get', 'finance_payments_bob_customers-files', [
     'domain' => ['id', 'in', array_keys($map_partners_ids)]
 ]);
 

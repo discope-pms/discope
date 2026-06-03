@@ -132,18 +132,7 @@ $invoices = Invoice::search($domain, ['limit' => 100, 'sort' => ['number' => 'as
             'name',
             'partner_identity_id' => [
                 '@domain' => ['state', 'in', ['instance', 'archive']],
-                'id',
-                'address_street',
-                'address_dispatch',
-                'address_city',
-                'address_zip',
-                'address_country',
-                'vat_number',
-                'phone',
-                'fax',
-                'lang_id' => [
-                    'code'
-                ]
+                'id'
             ]
         ],
         'has_orders',
@@ -191,53 +180,6 @@ if(count($invoices) == 0) {
     throw new Exception('no match', 0);
 }
 
-
-ob_start();
-echo "[CLIENTS_FACT]
-FileType = Fixed
-CharSet = ascii
-Field1=CID,Char,10,00,00
-Field2=CCUSTYPE,Char,01,00,10
-Field3=CSUPTYPE,Char,01,00,11
-Field4=CNAME1,Char,40,00,12
-Field5=CNAME2,Char,40,00,52
-Field6=CADDRESS1,Char,40,00,92
-Field7=CADDRESS2,Char,40,00,132
-Field8=CZIPCODE,Char,10,00,172
-Field9=CLOCALITY,Char,40,00,182
-Field10=CLANGUAGE,Char,02,00,222
-Field11=CISPERS,Bool,01,00,224
-Field12=CCUSCAT,Char,03,00,225
-Field13=CCURRENCY,Char,03,00,228
-Field14=CVATCAT,Char,01,00,231
-Field15=CVATREF,Char,02,00,232
-Field16=CVATNO,Char,12,00,234
-Field17=CTELNO,Char,14,00,246
-Field18=CFAXNO,Char,14,00,260
-Field19=CCUSVNAT1,Char,03,00,274
-Field20=CCUSVNAT2,Char,03,00,277
-Field21=CCUSVATCMP,Float,20,02,280
-Field22=CCUSCTRACC,Char,10,00,300
-Field23=CCUSIMPUTA,Char,10,00,310
-Field24=CCTRYCODE,Char,02,00,320
-Field25=CBANKCODE,Char,06,00,322
-Field26=CBANKNO,Char,19,00,328
-Field27=CISWARNING,Bool,01,00,347
-Field28=CISREADONL,Bool,01,00,348
-Field29=CISBLOCK,Bool,01,00,349
-Field30=CISSECRET,Bool,01,00,350
-Field31=CCUSPAYDELAY,Char,06,00,351
-Field32=CREMCAT,Char,05,00,357
-Field33=CREMSTATUS,Char,01,00,362
-Field34=CREATEDATE,TimeStamp,30,00,363
-Field35=MODIFYDATE,TimeStamp,30,00,393
-Field36=AUTHOR,Char,10,00,423
-Field37=CNATREGISTRYID,Char,15,00,433
-Field38=CCUSPDISCDEL,Long Integer,11,00,448
-Field39=CCUSTEMPLID,Char,10,00,459
-Field40=CMEMO,Char,200,00,469
-";
-$customers_schema = ob_get_clean();
 
 // export file holding the schema for invoices: HOPDIV_FACT.sch
 ob_start();
@@ -309,119 +251,6 @@ foreach($invoices as $index => $invoice) {
     }
     // #memo - for cancelled invoices and orders invoices, it is ok not to have funding
 }
-
-
-/*
-    Generate headers: CLIENTS_FACT.txt
-*/
-
-
-$result = [];
-
-foreach($invoices as $invoice) {
-
-    $customer_name = substr(strtoupper(TextTransformer::normalize($invoice['partner_id']['name'])), 0, 40);
-    $customer_vat = substr(str_replace([' ', '.', '-', '_'], '', $invoice['partner_id']['partner_identity_id']['vat_number']), 0, 12);
-    $customer_phone = substr(str_replace([' ', '.', '-', '_'], '', $invoice['partner_id']['partner_identity_id']['phone']), 0, 14);
-    $customer_fax = substr(str_replace([' ', '.', '-', '_'], '', $invoice['partner_id']['partner_identity_id']['fax']), 0, 14);
-    $customer_address = substr(strtoupper(TextTransformer::normalize(str_replace(["\n", "\t", "\r"], '', $invoice['partner_id']['partner_identity_id']['address_street']))), 0, 40);
-    $customer_zip = substr($invoice['partner_id']['partner_identity_id']['address_zip'], 0, 10);
-    $customer_city = substr(strtoupper(TextTransformer::normalize($invoice['partner_id']['partner_identity_id']['address_city'])), 0, 40);
-    $customer_country = substr(strtoupper($invoice['partner_id']['partner_identity_id']['address_country']), 0, 2);
-    $customer_lang = 'F';
-    if(isset($invoice['partner_id']['partner_identity_id']['lang_id']['code']) && is_string($invoice['partner_id']['partner_identity_id']['lang_id']['code']) && strlen($invoice['partner_id']['partner_identity_id']['lang_id']['code']) >= 1) {
-        // #memo - BOB uses a single letter
-        $customer_lang = strtoupper(substr($invoice['partner_id']['partner_identity_id']['lang_id']['code'], 0, 1));
-    }
-
-    $values = [
-        // Field1=CID,Char,10,00,00
-        str_pad('C'.$invoice['partner_id']['partner_identity_id']['id'], 10, ' ', STR_PAD_RIGHT),
-        // Field2=CCUSTYPE,Char,01,00,10
-        str_pad('C', 1,' ',STR_PAD_LEFT),
-        // Field3=CSUPTYPE,Char,01,00,11
-        str_pad('U', 1,' ',STR_PAD_LEFT),
-        // Field4=CNAME1,Char,40,00,12
-        str_pad($customer_name, 40, ' ', STR_PAD_RIGHT),
-        // Field5=CNAME2,Char,40,00,52
-        str_pad('', 40, ' ', STR_PAD_RIGHT),
-        // Field6=CADDRESS1,Char,40,00,92
-        str_pad('', 40, ' ', STR_PAD_RIGHT),
-        // Field7=CADDRESS2,Char,40,00,132
-        str_pad($customer_address, 40, ' ', STR_PAD_RIGHT),
-        // Field8=CZIPCODE,Char,10,00,172
-        str_pad($customer_zip, 10, ' ', STR_PAD_RIGHT),
-        // Field9=CLOCALITY,Char,40,00,182
-        str_pad($customer_city, 40, ' ', STR_PAD_RIGHT),
-        // Field10=CLANGUAGE,Char,02,00,222
-        str_pad($customer_lang, 2, ' ', STR_PAD_RIGHT),
-        // Field11=CISPERS,Bool,01,00,224
-        str_pad('0', 1, ' ', STR_PAD_RIGHT),
-        // Field12=CCUSCAT,Char,03,00,225
-        str_pad('', 3, ' ', STR_PAD_RIGHT),
-        // Field13=CCURRENCY,Char,03,00,228
-        str_pad('EUR', 3, ' ', STR_PAD_RIGHT),
-        // Field14=CVATCAT,Char,01,00,231
-        str_pad('', 1, ' ', STR_PAD_RIGHT),
-        // Field15=CVATREF,Char,02,00,232
-        str_pad($customer_country, 2, ' ', STR_PAD_RIGHT),
-        // Field16=CVATNO,Char,12,00,234
-        str_pad($customer_vat, 12, ' ', STR_PAD_RIGHT),
-        // Field17=CTELNO,Char,14,00,246
-        str_pad($customer_phone, 14, ' ', STR_PAD_RIGHT),
-        // Field18=CFAXNO,Char,14,00,260
-        str_pad($customer_fax, 14, ' ', STR_PAD_RIGHT),
-        // Field19=CCUSVNAT1,Char,03,00,274
-        str_pad('', 3, ' ', STR_PAD_RIGHT),
-        // Field20=CCUSVNAT2,Char,03,00,277
-        str_pad('', 3, ' ', STR_PAD_RIGHT),
-        // Field21=CCUSVATCMP,Float,20,02,280
-        str_pad('', 20, ' ', STR_PAD_RIGHT),
-        // Field22=CCUSCTRACC,Char,10,00,300
-        str_pad('', 10, ' ', STR_PAD_RIGHT),
-        // Field23=CCUSIMPUTA,Char,10,00,310
-        str_pad('', 10, ' ', STR_PAD_RIGHT),
-        // Field24=CCTRYCODE,Char,02,00,320
-        str_pad($customer_country, 2, ' ', STR_PAD_RIGHT),
-        // Field25=CBANKCODE,Char,06,00,322
-        str_pad('', 6, ' ', STR_PAD_RIGHT),
-        // Field26=CBANKNO,Char,19,00,328
-        str_pad('', 19, ' ', STR_PAD_RIGHT),
-        // Field27=CISWARNING,Bool,01,00,347
-        str_pad('0', 1, ' ', STR_PAD_RIGHT),
-        // Field28=CISREADONL,Bool,01,00,348
-        str_pad('0', 1, ' ', STR_PAD_RIGHT),
-        // Field29=CISBLOCK,Bool,01,00,349
-        str_pad('0', 1, ' ', STR_PAD_RIGHT),
-        // Field30=CISSECRET,Bool,01,00,350
-        str_pad('0', 1, ' ', STR_PAD_RIGHT),
-        // Field31=CCUSPAYDELAY,Char,06,00,351
-        str_pad('', 6, ' ', STR_PAD_RIGHT),
-        // Field32=CREMCAT,Char,05,00,357
-        str_pad('', 5, ' ', STR_PAD_RIGHT),
-        // Field33=CREMSTATUS,Char,01,00,362
-        str_pad('', 1, ' ', STR_PAD_RIGHT),
-        // Field34=CREATEDATE,TimeStamp,30,00,363
-        str_pad('', 30, ' ', STR_PAD_RIGHT),
-        // Field35=MODIFYDATE,TimeStamp,30,00,393
-        str_pad('', 30, ' ', STR_PAD_RIGHT),
-        // Field36=AUTHOR,Char,10,00,423
-        str_pad('', 10, ' ', STR_PAD_RIGHT),
-        // Field37=CNATREGISTRYID,Char,15,00,433
-        str_pad('', 15, ' ', STR_PAD_RIGHT),
-        // Field38=CCUSPDISCDEL,Long Integer,11,00,448
-        str_pad('', 11, ' ', STR_PAD_RIGHT),
-        // Field39=CCUSTEMPLID,Char,10,00,459
-        str_pad('', 10, ' ', STR_PAD_RIGHT),
-        // Field40=CMEMO,Char,200,00,469
-        str_pad('', 200, ' ', STR_PAD_RIGHT),
-    ];
-
-
-    $result[] = implode('', $values);
-}
-
-$customers_data = implode("\r\n", $result)."\r\n";
 
 
 /*
@@ -717,6 +546,25 @@ foreach($invoices as $invoice) {
 
 }
 
+/*
+    Generate: CLIENTS_FACT.txt
+*/
+
+$map_partners_ids = [];
+foreach($invoices as $invoice) {
+    if(isset($invoices_header_data[$invoice['id']])) {
+        $map_partners_ids[$invoice['partner_id']['id']] = true;
+    }
+}
+
+$customers_files_data = eQual::run('get', 'finance_payments_bob_customers-files', [
+    'domain' => ['id', 'in', array_keys($map_partners_ids)]
+]);
+
+
+/*
+    Create Export
+*/
 
 // #memo - prevent generating empty archives (can occur when all processed invoices were faulty)
 if(count($invoices_header_data)) {
@@ -730,11 +578,12 @@ if(count($invoices_header_data)) {
     }
 
     // embed schema files
-    $zip->addFromString('CLIENTS_FACT.sch', $customers_schema);
+    $zip->addFromString('CLIENTS_FACT.sch', $customers_files_data['schema']);
     $zip->addFromString('HOPDIV_FACT.sch', $invoices_header_schema);
     $zip->addFromString('LOPDIV_FACT.sch', $invoices_lines_schema);
+
     // embed data files
-    $zip->addFromString('CLIENTS_FACT.txt', $customers_data);
+    $zip->addFromString('CLIENTS_FACT.txt', $customers_files_data['data']);
     $zip->addFromString('HOPDIV_FACT.txt', implode("\r\n", array_values($invoices_header_data))."\r\n");
     $zip->addFromString('LOPDIV_FACT.txt', implode("\r\n", $invoices_lines_data)."\r\n");
 
