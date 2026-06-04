@@ -2090,7 +2090,6 @@ class Booking extends Model {
             'id',
             'is_sojourn',
             'nb_pers',
-            'nb_adults',
             'nb_children',
             'rate_class_id',
             'sojourn_type_id',
@@ -2108,6 +2107,11 @@ class Booking extends Model {
         }
 
         // Second, use the attributions' conditions
+        foreach($groups as &$g) {
+            // calc nb_adults because not in saved in group
+            $g['nb_adults'] = $g['nb_pers'] - $g['nb_children'];
+        }
+
         $default_booking_type_id = 1;
         $matched_attribution = null;
         foreach($attributions as $attribution) {
