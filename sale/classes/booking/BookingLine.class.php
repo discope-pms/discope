@@ -1303,8 +1303,16 @@ class BookingLine extends Model {
             $booking_line_groups_ids = array_map(function ($a) { return $a['booking_line_group_id']; }, array_values($lines));
             $om->callonce(\sale\booking\BookingLineGroup::getType(), '_resetPrices', $booking_line_groups_ids, [], $lang);
 
-            $booking_activities_ids = array_map(function ($a) { return $a['booking_activity_id']; }, array_values($lines));
-            BookingActivity::ids($booking_activities_ids)->do('reset-prices');
+
+            $booking_activities_ids = [];
+            foreach($lines as $line) {
+                if($line['booking_activity_id']) {
+                    $booking_activities_ids[] = $line['booking_activity_id'];
+                }
+            }
+            if(!empty($booking_activities_ids)) {
+                BookingActivity::ids($booking_activities_ids)->do('reset-prices');
+            }
         }
     }
 
@@ -1595,12 +1603,15 @@ class BookingLine extends Model {
      * For BookingLines the display name is the name of the product it relates to.
      *
      */
-    public static function calcName($om, $oids, $lang) {
+    public static function calcName($self) {
         $result = [];
-        $res = $om->read(get_called_class(), $oids, ['product_id.name'], $lang);
-        foreach($res as $oid => $odata) {
-            $result[$oid] = $odata['product_id.name'];
+        $self->read(['product_id' => 'name']);
+        foreach($self as $id => $line) {
+            if(isset($line['product_id']['name'])) {
+                $result[$id] = $line['product_id']['name'];
+            }
         }
+
         return $result;
     }
 
@@ -1795,10 +1806,25 @@ class BookingLine extends Model {
      */
     public static function calcTotal($self): array {
         $result = [];
-        $self->read(['total_no_discount', 'discount']);
+        $self->read(['qty', 'free_qty', 'unit_price', 'discount']);
         foreach($self as $id => $line) {
+            $total_no_discount = round(($line['qty'] - $line['free_qty']) * $line['unit_price'], 2);
+
             // #memo - total of a line must be rounded to 2 decimals
-            $result[$id] = round($line['total_no_discount'] * (1.0 - $line['discount']), 2);
+            $result[$id] = round($total_no_discount * (1.0 - $line['discount']), 2);
+        }
+
+        return $result;
+    }
+
+    /**
+     * Get the vat rate of the line from the price of the product
+     */
+    public static function calcVatRate($self): array {
+        $result = [];
+        $self->read(['price_id' => ['accounting_rule_id' => ['vat_rule_id' => ['rate']]]]);
+        foreach($self as $id => $line) {
+            $result[$id] = floatval($line['price_id']['accounting_rule_id']['vat_rule_id']['rate']);
         }
 
         return $result;
@@ -1809,20 +1835,15 @@ class BookingLine extends Model {
      */
     public static function calcPrice($self): array {
         $result = [];
-        $self->read(['total', 'vat_rate']);
+        $self->read(['qty', 'free_qty', 'unit_price', 'discount', 'vat_rate']);
         foreach($self as $id => $line) {
-            $result[$id] = round($line['total'] * (1.0 + $line['vat_rate']), 2);
+            $total_no_discount = round(($line['qty'] - $line['free_qty']) * $line['unit_price'], 2);
+            $total = round($total_no_discount * (1.0 - $line['discount']), 2);
+
+            // #memo - price of a line must be rounded to 2 decimals
+            $result[$id] = round($total * (1.0 + $line['vat_rate']), 2);
         }
 
-        return $result;
-    }
-
-    public static function calcVatRate($om, $oids, $lang) {
-        $result = [];
-        $lines = $om->read(self::getType(), $oids, ['price_id.accounting_rule_id.vat_rule_id.rate']);
-        foreach($lines as $oid => $odata) {
-            $result[$oid] = floatval($odata['price_id.accounting_rule_id.vat_rule_id.rate']);
-        }
         return $result;
     }
 
