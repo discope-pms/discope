@@ -8,6 +8,7 @@
 
 namespace sale\booking;
 
+use core\alert\Message;
 use core\setting\Setting;
 use equal\data\DataFormatter;
 use equal\orm\Model;
@@ -662,30 +663,35 @@ class Booking extends Model {
         $self->do('import_contacts');
     }
 
-    public static function calcName($om, $ids, $lang) {
+    public static function calcName($self) {
         $result = [];
-
-        $bookings = $om->read(self::getType(), $ids, ['center_id.center_office_id.code'], $lang);
         $format = Setting::get_value('sale', 'organization', 'booking.sequence_format', '%05d{sequence}');
-
-        foreach($bookings as $id => $booking) {
-            $sequence_name = 'booking.sequence.'.$booking['center_id.center_office_id.code'];
-            $sequence_value = Setting::get_value('sale', 'organization', $sequence_name);
-
-            if($sequence_value) {
-                Setting::set_value('sale', 'organization', $sequence_name, $sequence_value + 1);
-                $booking_name = Setting::parse_format($format, [
-                    'center'    => $booking['center_id.center_office_id.code'],
-                    'sequence'  => $sequence_value
-                ]);
-                // #kaleo - remove leading zero if present
-                if(substr($booking_name, 0, 1) === '0') {
-                    $booking_name = substr($booking_name, 1);
-                }
-                $result[$id] = $booking_name;
+        $self->read(['center_id' => ['center_office_id' => ['code']]]);
+        foreach($self as $id => $booking) {
+            $center_office_code = $booking['center_id']['center_office_id']['code'] ?? null;
+            if(!$center_office_code) {
+                continue;
             }
 
+            $sequence_name = 'booking.sequence.'.$center_office_code;
+            $sequence_value = Setting::get_value('sale', 'organization', $sequence_name);
+            if(!$sequence_value) {
+                continue;
+            }
+
+            Setting::set_value('sale', 'organization', $sequence_name, $sequence_value + 1);
+            $booking_name = Setting::parse_format($format, [
+                'center'    => $center_office_code,
+                'sequence'  => $sequence_value
+            ]);
+
+            // #kaleo - remove leading zero if present
+            if(substr($booking_name, 0, 1) === '0') {
+                $booking_name = substr($booking_name, 1);
+            }
+            $result[$id] = $booking_name;
         }
+
         return $result;
     }
 
@@ -710,89 +716,101 @@ class Booking extends Model {
         return $result;
     }
 
-    public static function calcDateFrom($om, $oids, $lang) {
+    public static function calcDateFrom($self) {
         $result = [];
-        $bookings = $om->read(self::getType(), $oids, ['booking_lines_groups_ids']);
-
-        foreach($bookings as $bid => $booking) {
+        $self->read([
+            'booking_lines_groups_ids' => [
+                'date_from',
+                'is_sojourn',
+                'is_event'
+            ]
+        ]);
+        foreach($self as $id => $booking) {
             $min_date = PHP_INT_MAX;
-            $booking_line_groups = $om->read('sale\booking\BookingLineGroup', $booking['booking_lines_groups_ids'], ['date_from', 'is_sojourn', 'is_event']);
-            if($booking_line_groups > 0 && count($booking_line_groups)) {
-                foreach($booking_line_groups as $gid => $group) {
-                    if( ($group['is_sojourn']  || $group['is_event'] ) && $group['date_from'] < $min_date) {
-                        $min_date = $group['date_from'];
-                    }
+            foreach($booking['booking_lines_groups_ids'] as $group) {
+                if( ($group['is_sojourn']  || $group['is_event']) && $group['date_from'] < $min_date) {
+                    $min_date = $group['date_from'];
                 }
-                $result[$bid] = ($min_date == PHP_INT_MAX) ? time() : $min_date;
             }
+
+            $result[$id] = ($min_date == PHP_INT_MAX) ? time() : $min_date;
         }
 
         return $result;
     }
 
-    public static function calcDateTo($om, $oids, $lang) {
+    public static function calcDateTo($self) {
         $result = [];
-        $bookings = $om->read(self::getType(), $oids, ['booking_lines_groups_ids']);
-
-        if($bookings > 0) {
-            foreach($bookings as $bid => $booking) {
-                $max_date = 0;
-                $booking_line_groups = $om->read('sale\booking\BookingLineGroup', $booking['booking_lines_groups_ids'], ['date_to', 'is_sojourn', 'is_event']);
-                if($booking_line_groups > 0 && count($booking_line_groups)) {
-                    foreach($booking_line_groups as $gid => $group) {
-                        if( ($group['is_sojourn']  || $group['is_event'] ) && $group['date_to'] > $max_date) {
-                            $max_date = $group['date_to'];
-                        }
-                    }
-                    $result[$bid] = ($max_date == 0) ? time() : $max_date;
+        $self->read([
+            'booking_lines_groups_ids' => [
+                'date_to',
+                'is_sojourn',
+                'is_event'
+            ]
+        ]);
+        foreach($self as $id => $booking) {
+            $max_date = 0;
+            foreach($booking['booking_lines_groups_ids'] as $group) {
+                if( ($group['is_sojourn']  || $group['is_event']) && $group['date_to'] > $max_date) {
+                    $max_date = $group['date_to'];
                 }
             }
+
+            $result[$id] = ($max_date == 0) ? time() : $max_date;
         }
 
         return $result;
     }
 
-    public static function calcTimeFrom($om, $oids, $lang) {
+    public static function calcTimeFrom($self) {
         $result = [];
-        $bookings = $om->read(__CLASS__, $oids, ['booking_lines_groups_ids']);
-
-        foreach($bookings as $bid => $booking) {
+        $self->read([
+            'booking_lines_groups_ids' => [
+                'date_from',
+                'time_from',
+                'is_sojourn',
+                'is_event'
+            ]
+        ]);
+        foreach($self as $id => $booking) {
             $min_date = PHP_INT_MAX;
             $time_from = Setting::get_value('sale', 'features',  'booking.checkin.default', 14 * 3600);
-            $booking_line_groups = $om->read('sale\booking\BookingLineGroup', $booking['booking_lines_groups_ids'], ['date_from', 'time_from', 'is_sojourn', 'is_event']);
-            if($booking_line_groups > 0 && count($booking_line_groups)) {
-                foreach($booking_line_groups as $gid => $group) {
-                    if(($group['is_sojourn']  || $group['is_event'] ) && $group['date_from'] < $min_date) {
-                        $min_date = $group['date_from'];
-                        $time_from = $group['time_from'];
-                    }
+
+            foreach($booking['booking_lines_groups_ids'] as $group) {
+                if( ($group['is_sojourn']  || $group['is_event']) && $group['date_from'] < $min_date) {
+                    $min_date = $group['date_from'];
+                    $time_from = $group['time_from'];
                 }
             }
-            $result[$bid] = $time_from;
+
+            $result[$id] = $time_from;
         }
 
         return $result;
     }
 
-    public static function calcTimeTo($om, $oids, $lang) {
+    public static function calcTimeTo($self) {
         $result = [];
-        $bookings = $om->read(__CLASS__, $oids, ['booking_lines_groups_ids']);
+        $self->read([
+            'booking_lines_groups_ids' => [
+                'date_to',
+                'time_to',
+                'is_sojourn',
+                'is_event'
+            ]
+        ]);
+        foreach($self as $id => $booking) {
+            $max_date = 0;
+            $time_to =  Setting::get_value('sale', 'features',  'booking.checkout.default' ,  10 * 3600);
 
-        if($bookings > 0) {
-            foreach($bookings as $bid => $booking) {
-                $max_date = 0;
-                $time_to =  Setting::get_value('sale', 'features',  'booking.checkout.default' ,  10 * 3600);
-                $booking_line_groups = $om->read('sale\booking\BookingLineGroup', $booking['booking_lines_groups_ids'], ['date_to', 'time_to', 'is_sojourn', 'is_event']);
-                if($booking_line_groups > 0 && count($booking_line_groups)) {
-                    foreach($booking_line_groups as $gid => $group) {
-                        if(($group['is_sojourn']  || $group['is_event'] ) && $group['date_to'] > $max_date) {
-                            $max_date = $group['date_to'];
-                            $time_to = $group['time_to'];
-                        }
-                    }
+            foreach($booking['booking_lines_groups_ids'] as $group) {
+                if(($group['is_sojourn']  || $group['is_event'] ) && $group['date_to'] > $max_date) {
+                    $max_date = $group['date_to'];
+                    $time_to = $group['time_to'];
                 }
-                $result[$bid] = $time_to;
             }
+
+            $result[$id] = $time_to;
         }
 
         return $result;
@@ -859,55 +877,55 @@ class Booking extends Model {
      * Computes the paid_amount property based on the bookings fundings.
      *
      */
-    public static function calcPaidAmount($om, $oids, $lang) {
+    public static function calcPaidAmount($self) {
         $result = [];
-        $bookings = $om->read(self::getType(), $oids, ['fundings_ids'], $lang);
-
-        if($bookings > 0) {
-            foreach($bookings as $oid => $booking) {
-                $fundings = $om->read(\sale\booking\Funding::getType(), $booking['fundings_ids'], ['due_amount', 'is_paid', 'paid_amount'], $lang);
-                $paid_amount = 0.0;
-                if($fundings > 0) {
-                    foreach($fundings as $fid => $funding) {
-                        if($funding['is_paid']) {
-                            $paid_amount += $funding['due_amount'];
-                        }
-                        elseif($funding['paid_amount'] > 0) {
-                            $paid_amount += $funding['paid_amount'];
-                        }
-                    }
+        $self->read([
+            'fundings_ids' => [
+                'due_amount',
+                'is_paid',
+                'paid_amount'
+            ]
+        ]);
+        foreach($self as $id => $booking) {
+            $paid_amount = 0.0;
+            foreach($booking['fundings_ids'] as $funding) {
+                if($funding['is_paid']) {
+                    $paid_amount += $funding['due_amount'];
                 }
-                $result[$oid] = $paid_amount;
+                elseif($funding['paid_amount'] > 0) {
+                    $paid_amount += $funding['paid_amount'];
+                }
             }
+
+            $result[$id] = $paid_amount;
         }
+
         return $result;
     }
 
     /**
      * Payment status tells if a given booking is currently expecting money.
      */
-    public static function calcPaymentStatus($om, $ids, $lang) {
+    public static function calcPaymentStatus($self) {
         $result = [];
-        $bookings = $om->read(self::getType(), $ids, ['status', 'fundings_ids', 'contracts_ids'], $lang);
-        if($bookings > 0 && count($bookings)) {
-            foreach($bookings as $id => $booking) {
-                $result[$id] = 'paid';
-                $fundings = $om->read(\sale\booking\Funding::getType(), $booking['fundings_ids'], ['due_date', 'is_paid'], $lang);
-                // if there is at least one overdue funding : a payment is 'due', otherwise booking is 'paid'
-                if($fundings > 0 && count($fundings)) {
-                    $has_one_paid = false;
-                    foreach($fundings as $funding) {
-                        if($funding['is_paid']) {
-                            $has_one_paid = true;
-                        }
-                        if(!$funding['is_paid'] && $funding['due_date'] > time()) {
-                            $result[$id] = 'due';
-                            break;
-                        }
-                    }
+        $self->read([
+            'fundings_ids' => [
+                'due_date',
+                'is_paid'
+            ]
+        ]);
+        foreach($self as $id => $booking) {
+            $payment_status = 'paid';
+            foreach($booking['fundings_ids'] as $funding) {
+                if(!$funding['is_paid'] && $funding['due_date'] > time()) {
+                    $payment_status = 'due';
+                    break;
                 }
             }
+
+            $result[$id] = $payment_status;
         }
+
         return $result;
     }
 
@@ -1098,44 +1116,57 @@ class Booking extends Model {
         return $result;
     }
 
-    public static function calcDisplayPaymentReference($om, $ids, $lang) {
+    public static function calcDisplayPaymentReference($self) {
         $result = [];
-        $bookings = $om->read(self::getType(), $ids, ['payment_reference'], $lang);
         $reference_type = Setting::get_value('sale', 'organization', 'booking.reference.type', 'VCS');
-        foreach($bookings as $id => $booking) {
+        $self->read(['payment_reference']);
+        foreach($self as $id => $booking) {
             $reference = $booking['payment_reference'];
             if(in_array($reference_type, ['RN', 'RF', 'VCS'])) {
                 DataFormatter::format($booking['payment_reference'], $reference_type);
             }
             $result[$id] = $reference;
         }
+
         return $result;
     }
 
-    public static function calcIsLocked($om, $oids, $lang) {
+    public static function calcIsLocked($self) {
         $result = [];
-        $bookings = $om->read(self::getType(), $oids, ['contracts_ids'], $lang);
-        foreach($bookings as $oid => $booking) {
-            $result[$oid] = false;
-            if(count($booking['contracts_ids'])) {
-                $contracts = $om->read(Contract::getType(), $booking['contracts_ids'], ['is_locked', 'status'], $lang);
-                foreach($contracts as $contract) {
-                    if($contract['status'] != 'cancelled' && $contract['is_locked']) {
-                        $result[$oid] = true;
-                    }
+        $self->read([
+            'contracts_ids' => [
+                'is_locked',
+                'status'
+            ]
+        ]);
+        foreach($self as $id => $booking) {
+            $is_locked = false;
+            foreach($booking['contracts_ids'] as $contract) {
+                if($contract['status'] != 'cancelled' && $contract['is_locked']) {
+                    $is_locked = true;
+                    break;
                 }
             }
+
+            $result[$id] = $is_locked;
         }
+
         return $result;
     }
 
-    public static function calcAlert($om, $oids, $lang) {
+    public static function calcAlert($self) {
         $result = [];
-        $bookings = $om->read(self::getType(), $oids, ['contracts_ids'], $lang);
-        foreach($bookings as $oid => $booking) {
+        $self->read(['contracts_ids']);
+        foreach($self as $id => $booking) {
+            $messages = Message::search([
+                ['object_class', '=', 'sale\booking\Booking'],
+                ['object_id', '=', $id]
+            ])
+                ->read(['severity'])
+                ->get();
 
-            $messages_ids = $om->search('core\alert\Message',[ ['object_class', '=', 'sale\booking\Booking'], ['object_id', '=', $oid]]);
-            if($messages_ids > 0 && count($messages_ids)) {
+            $alert = 'success';
+            if(!empty($messages)) {
                 $max_alert = 0;
                 $map_alert = array_flip([
                     'notice',           // weight = 1, might lead to a warning
@@ -1143,33 +1174,34 @@ class Booking extends Model {
                     'important',        // weight = 3, requires an action
                     'error'             // weight = 4, requires immediate action
                 ]);
-                $messages = $om->read(\core\alert\Message::getType(), $messages_ids, ['severity']);
-                foreach($messages as $mid => $message){
+
+                foreach($messages as $message) {
                     $weight = $map_alert[$message['severity']];
                     if($weight > $max_alert) {
                         $max_alert = $weight;
                     }
                 }
+
                 switch($max_alert) {
                     case 0:
-                        $result[$oid] = 'info';
+                        $alert = 'info';
                         break;
                     case 1:
-                        $result[$oid] = 'warn';
+                        $alert = 'warn';
                         break;
                     case 2:
-                        $result[$oid] = 'major';
+                        $alert = 'major';
                         break;
                     case 3:
                     default:
-                        $result[$oid] = 'error';
+                        $alert = 'error';
                         break;
                 }
             }
-            else {
-                $result[$oid] = 'success';
-            }
+
+            $result[$id] = $alert;
         }
+
         return $result;
     }
 
@@ -1933,10 +1965,12 @@ class Booking extends Model {
         $booking = reset($bookings);
 
         $has_sojourn = false;
-        foreach($booking['booking_lines_groups_ids.group_type'] as $gid => $group) {
-            if($group['group_type'] !== 'simple') {
-                $has_sojourn = true;
-                break;
+        if($booking['booking_lines_groups_ids.group_type']) {
+            foreach($booking['booking_lines_groups_ids.group_type'] as $gid => $group) {
+                if($group['group_type'] !== 'simple') {
+                    $has_sojourn = true;
+                    break;
+                }
             }
         }
 
