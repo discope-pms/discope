@@ -9,6 +9,7 @@
 namespace sale\booking;
 
 use core\setting\Setting;
+use equal\orm\Collection;
 use equal\orm\Model;
 use equal\orm\ObjectManager;
 use identity\Center;
@@ -852,12 +853,8 @@ class BookingLineGroup extends Model {
     /**
      * Calculate the quantity of children in the groups
      *
-     * @param \equal\orm\ObjectManager  $om
-     * @param int[]                     $oids
-     * @param string                    $lang
-     * @return array
+     * @param \equal\orm\Collection $self
      */
-
     public static function calcNbPers($self) {
         $result = [];
         $self->read(['age_range_assignments_ids' => ['qty']]);
