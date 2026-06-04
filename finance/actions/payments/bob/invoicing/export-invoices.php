@@ -456,7 +456,8 @@ foreach($invoices as $invoice) {
 */
 
 $customers_files_data = eQual::run('get', 'finance_payments_bob_customers-files', [
-    'domain' => ['id', 'in', array_keys($map_partners_ids)]
+    'domain'    => ['id', 'in', array_keys($map_partners_ids)],
+    'file_name' => 'CLIENTS_FACT_PEPPOL'
 ]);
 
 /*
@@ -472,12 +473,12 @@ if($zip->open($tmp_file, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true) {
 }
 
 // embed schema files
-$zip->addFromString('CLIENTS_FACT.sch', $customers_files_data['schema']);
+$zip->addFromString('CLIENTS_FACT_PEPPOL.sch', $customers_files_data['schema']);
 $zip->addFromString('IHDDOC_FACT.sch', $invoices_schema);
 $zip->addFromString('IHISTO_FACT.sch', $invoices_lines_schema);
 
 // embed data files
-$zip->addFromString('CLIENTS_FACT.txt', $customers_files_data['data']);
+$zip->addFromString('CLIENTS_FACT_PEPPOL.txt', $customers_files_data['data']);
 $zip->addFromString('IHDDOC_FACT.txt', implode("\r\n", $invoices_data)."\r\n");
 $zip->addFromString('IHISTO_FACT.txt', implode("\r\n", $invoices_lines_data)."\r\n");
 
