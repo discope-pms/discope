@@ -241,7 +241,7 @@ foreach($partners as $partner) {
 }
 
 $result = [
-    'schema'    => implode("\r\n", ["[{$params['file_name']}]", "FileType={$params['file_type']}", "CharSet={$params['char_set']}"])."\r\n".$createFieldsSchema($fields_conf),
+    'schema'    => implode("\r\n", ["[{$params['file_name']}]", "FileType={$params['file_type']}", "CharSet={$params['char_set']}"])."\r\n".$createFieldsSchema($fields_conf)."\r\n",
     'data'      => implode("\r\n", $data)."\r\n"
 ];
 
