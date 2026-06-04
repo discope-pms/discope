@@ -407,18 +407,6 @@ class BookingLineGroup extends Model {
         ];
     }
 
-    public static function calcNbPers($self) {
-        $result = [];
-        $self->read(['age_range_assignments_ids' => ['qty']]);
-        foreach($self as $id => $bookingLineGroup) {
-            $result[$id] = 0;
-            foreach($bookingLineGroup['age_range_assignments_ids'] as $ageRangeAssignment) {
-                $result[$id] += $ageRangeAssignment['qty'];
-            }
-        }
-        return $result;
-    }
-
     /**
      * @param \equal\orm\ObjectManager  $om
      */
@@ -869,57 +857,79 @@ class BookingLineGroup extends Model {
      * @param string                    $lang
      * @return array
      */
-    public static function calcNbChildren($om, $oids, $lang) {
-        $result = [];
-        $groups = $om->read(self::getType(), $oids, ['age_range_assignments_ids'], $lang);
-        if($groups > 0) {
-            foreach($groups as $gid => $group) {
-                $children_qty = 0;
-                $assignments = $om->read(BookingLineGroupAgeRangeAssignment::getType(), $group['age_range_assignments_ids'], ['qty', 'age_range_id.age_from'], $lang);
-                foreach($assignments as $assignment) {
-                    if($assignment['age_range_id.age_from'] >= 3 && $assignment['age_range_id.age_from'] < 18) {
-                        $children_qty += $assignment['qty'];
-                    }
-                }
 
-                $result[$gid] = $children_qty;
+    public static function calcNbPers($self) {
+        $result = [];
+        $self->read(['age_range_assignments_ids' => ['qty']]);
+        foreach($self as $id => $bookingLineGroup) {
+            $result[$id] = 0;
+            foreach($bookingLineGroup['age_range_assignments_ids'] as $ageRangeAssignment) {
+                $result[$id] += $ageRangeAssignment['qty'];
             }
         }
-
         return $result;
     }
 
-    public static function calcVatRate($om, $oids, $lang) {
+    public static function calcNbChildren($self) {
         $result = [];
-        $lines = $om->read(self::getType(), $oids, ['price_id.accounting_rule_id.vat_rule_id.rate']);
-        foreach($lines as $oid => $odata) {
-            $result[$oid] = floatval($odata['price_id.accounting_rule_id.vat_rule_id.rate']);
+        $self->read([
+            'age_range_assignments_ids' => [
+                'qty',
+                'age_range_id' => [
+                    'age_from'
+                ]
+            ]
+        ]);
+        foreach($self as $id => $group) {
+            $children_qty = 0;
+            foreach($group['age_range_assignments_ids'] as $assignment) {
+                if($assignment['age_range_id']['age_from'] >= 3 && $assignment['age_range_id']['age_from'] < 18) {
+                    $children_qty += $assignment['qty'];
+                }
+            }
+
+            $result[$id] = $children_qty;
         }
+
         return $result;
     }
 
-    public static function calcQty($om, $oids, $lang) {
+    public static function calcVatRate($self) {
         $result = [];
-        $groups = $om->read(self::getType(), $oids, [
+        $self->read(['price_id' => ['accounting_rule_id' => ['vat_rule_id' => ['rate']]]]);
+        foreach($self as $id => $group) {
+            $result[$id] = floatval($group['price_id']['accounting_rule_id']['vat_rule_id']['rate'] ?? 0);
+        }
+
+        return $result;
+    }
+
+    public static function calcQty($self) {
+        $result = [];
+        $self->read([
             'has_pack',
             'is_locked',
             'is_sojourn',
             'is_event',
-            'pack_id.product_model_id.qty_accounting_method',
-            'pack_id.product_model_id.has_duration',
-            'pack_id.product_model_id.duration',
             'nb_pers',
-            'nb_nights'
+            'nb_nights',
+            'pack_id' => [
+                'product_model_id' => [
+                    'qty_accounting_method',
+                    'has_duration',
+                    'duration'
+                ]
+            ]
         ]);
-        foreach($groups as $gid => $group) {
-            $result[$gid] = 1;
+        foreach($self as $id => $group) {
+            $qty = 1;
             // #memo - locked groups have a qty of 1
             if($group['has_pack'] && !$group['is_locked']) {
                 // find the repetition factor
                 $nb_repeat = 1;
                 // #todo - we should test is_repeatable here
-                if($group['pack_id.product_model_id.has_duration']) {
-                    $nb_repeat = $group['pack_id.product_model_id.duration'];
+                if($group['pack_id']['product_model_id']['has_duration']) {
+                    $nb_repeat = $group['pack_id']['product_model_id']['duration'];
                 }
                 elseif($group['is_sojourn']) {
                     $nb_repeat = $group['nb_nights'];
@@ -927,43 +937,62 @@ class BookingLineGroup extends Model {
                 elseif($group['is_event']) {
                     $nb_repeat = $group['nb_nights'] + 1;
                 }
+
                 // default to nb_repeat
                 $qty = $nb_repeat;
                 // apply accounting method
-                if(in_array($group['pack_id.product_model_id.qty_accounting_method'], ['unit', 'accomodation'])) {
+                if(in_array($group['pack_id']['product_model_id']['qty_accounting_method'], ['unit', 'accomodation'])) {
                     $qty = $nb_repeat;
                 }
-                elseif($group['pack_id.product_model_id.qty_accounting_method'] == 'person') {
+                elseif($group['pack_id']['product_model_id']['qty_accounting_method'] == 'person') {
                     $qty =  $nb_repeat * $group['nb_pers'];
                 }
-                $result[$gid] = intval($qty);
             }
+
+            $result[$id] = $qty;
         }
+
         return $result;
     }
 
-    public static function calcHasSchedulableServices($om, $oids, $lang) {
+    public static function calcHasSchedulableServices($self) {
         $result = [];
-        $groups = $om->read(self::gettype(), $oids, ['booking_lines_ids']);
-        foreach($groups as $gid => $group) {
-            $result[$gid] = false;
-            $lines = $om->read(BookingLine::gettype(), $group['booking_lines_ids'], ['product_id.product_model_id.type', 'product_id.product_model_id.service_type']);
-            foreach($lines as $lid => $line) {
-                if($line['product_id.product_model_id.type'] == 'service' && $line['product_id.product_model_id.service_type'] == 'schedulable') {
-                    $result[$gid] = true;
+        $self->read([
+            'booking_lines_ids' => [
+                'product_id' => [
+                    'product_model_id' => [
+                        'type',
+                        'service_type'
+                    ]
+                ]
+            ]
+        ]);
+        foreach($self as $id => $group) {
+            $has_schedulable_service = false;
+            foreach($group['booking_lines_ids'] as $line) {
+                if(!isset($line['product_id']['product_model_id'])) {
+                    continue;
+                }
+
+                if($line['product_id']['product_model_id']['type'] == 'service' && $line['product_id']['product_model_id']['service_type'] == 'schedulable') {
+                    $has_schedulable_service = true;
                     break;
                 }
             }
+
+            $result[$id] = $has_schedulable_service;
         }
+
         return $result;
     }
 
-    public static function calcNbNights($om, $oids, $lang) {
+    public static function calcNbNights($self) {
         $result = [];
-        $groups = $om->read(self::gettype(), $oids, ['date_from', 'date_to']);
-        foreach($groups as $gid => $group) {
-            $result[$gid] = round( ($group['date_to'] - $group['date_from']) / (60*60*24) );
+        $self->read(['date_from', 'date_to']);
+        foreach($self as $id => $group) {
+            $result[$id] = round( ($group['date_to'] - $group['date_from']) / (60*60*24) );
         }
+
         return $result;
     }
 
@@ -971,46 +1000,50 @@ class BookingLineGroup extends Model {
      * Compute the VAT excl. unit price of the group, with automated discounts applied.
      *
      */
-    public static function calcUnitPrice($om, $oids, $lang) {
+    public static function calcUnitPrice($self) {
         $result = [];
+        $self->read(['price_id' => ['price']]);
+        foreach($self as $id => $group) {
+            if(!$group['price_id']) {
+                $result[$id] = 0.0;
+                continue;
+            }
 
-        $groups = $om->read(self::getType(), $oids, ['price_id.price']);
+            $price_adapters = BookingPriceAdapter::search([
+                ['booking_line_group_id', '=', $id],
+                ['booking_line_id','=', 0],
+                ['is_manual_discount', '=', false]
+            ])
+                ->read([
+                    'type',
+                    'value',
+                    'discount_id' => [
+                        'discount_list_id' => [
+                            'rate_max'
+                        ]
+                    ]
+                ])
+                ->get();
 
-        if($groups > 0 && count($groups)) {
-            foreach($groups as $gid => $group) {
-
-                $price_adapters_ids = $om->search(BookingPriceAdapter::getType(), [
-                    ['booking_line_group_id', '=', $gid],
-                    ['booking_line_id','=', 0],
-                    ['is_manual_discount', '=', false]
-                ]);
-
-                $disc_value = 0.0;
-                $disc_percent = 0.0;
-
-                if($price_adapters_ids > 0) {
-                    $adapters = $om->read(BookingPriceAdapter::getType(), $price_adapters_ids, ['type', 'value', 'discount_id.discount_list_id.rate_max']);
-
-                    if($adapters > 0) {
-                        foreach($adapters as $aid => $adata) {
-                            if($adata['type'] == 'amount') {
-                                $disc_value += $adata['value'];
-                            }
-                            else if($adata['type'] == 'percent') {
-                                if($adata['discount_id.discount_list_id.rate_max'] && ($disc_percent + $adata['value']) > $adata['discount_id.discount_list_id.rate_max']) {
-                                    $disc_percent = $adata['discount_id.discount_list_id.rate_max'];
-                                }
-                                else {
-                                    $disc_percent += $adata['value'];
-                                }
-                            }
-                        }
+            $disc_value = 0.0;
+            $disc_percent = 0.0;
+            foreach($price_adapters as $adapter) {
+                if($adapter['type'] == 'amount') {
+                    $disc_value += $adapter['value'];
+                }
+                else if($adapter['type'] == 'percent') {
+                    if(isset($adapter['discount_id']['discount_list_id']['rate_max']) && ($disc_percent + $adapter['value']) > $adapter['discount_id']['discount_list_id']['rate_max']) {
+                        $disc_percent = $adapter['discount_id']['discount_list_id']['rate_max'];
+                    }
+                    else {
+                        $disc_percent += $adapter['value'];
                     }
                 }
-
-                $result[$gid] = round(($group['price_id.price'] * (1-$disc_percent)) - $disc_value, 2);
             }
+
+            $result[$id] = round(($group['price_id']['price'] * (1 - $disc_percent)) - $disc_value, 2);
         }
+
         return $result;
     }
 
@@ -1064,18 +1097,16 @@ class BookingLineGroup extends Model {
      * Retrieve sum of fare benefits granted on booking lines.
      *
      */
-    public static function calcFareBenefit($om, $oids, $lang) {
+    public static function calcFareBenefit($self) {
         $result = [];
-
-        $groups = $om->read(get_called_class(), $oids, ['booking_lines_ids.fare_benefit']);
-
-        foreach($groups as $oid => $group) {
-            $result[$oid] = 0.0;
-            if(count((array) $group['booking_lines_ids.fare_benefit'])) {
-                $result[$oid] = array_reduce($group['booking_lines_ids.fare_benefit'], function ($c, $a) {
-                        return $c + $a['fare_benefit'];
-                    }, 0.0);
+        $self->read(['booking_lines_ids' => ['fare_benefit']]);
+        foreach($self as $id => $group) {
+            $fare_benefit = 0.0;
+            foreach($group['booking_lines_ids'] as $line) {
+                $fare_benefit += $line['fare_benefit'];
             }
+
+            $result[$id] = $fare_benefit;
         }
 
         return $result;
