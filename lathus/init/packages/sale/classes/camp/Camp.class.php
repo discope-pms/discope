@@ -901,7 +901,7 @@ class Camp extends Model {
 
             $allowed_fields = [
                 'status', 'remarks', 'public_description', 'employee_ratio', 'max_children',
-                'enrollments_qty', 'camp_group_qty', 'ase_quota', 'camp_groups_ids',
+                'enrollments_qty', 'camp_group_qty', 'ase_quota', 'location', 'camp_groups_ids',
                 'enrollments_ids', 'booking_activities_ids', 'presences_ids', 'booking_meals_ids',
                 'required_skills_ids'
             ];
