@@ -38,6 +38,12 @@
                                                 "label": "Complete name",
                                                 "value": "display_name",
                                                 "width": "100%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "label": "Email contact",
+                                                "value": "email",
+                                                "width": "100%"
                                             }
                                         ]
                                     },

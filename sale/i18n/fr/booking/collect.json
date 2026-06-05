@@ -61,6 +61,11 @@
             "label": "Code comptable client",
             "description": "Libellé complet de la réservation.",
             "help": ""
+        },
+        "email": {
+            "label": "Adresse email",
+            "description": "Adresse email d'un contact de la réservation.",
+            "help": ""
         }
     },
     "error": {

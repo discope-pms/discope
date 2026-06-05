@@ -125,6 +125,11 @@ use sale\booking\SojournProductModelRentalUnitAssignement;
         'extref_reservation_id' => [
             'type'              => 'string',
             'description'       => 'Identifier of the reservation at Channel Manager side.'
+        ],
+
+        'email' => [
+            'type'              => 'string',
+            'description'       => 'Email of the contacts of the booking.'
         ]
 
     ],
@@ -321,6 +326,28 @@ if(isset($params['rental_unit_id']) && $params['rental_unit_id'] > 0) {
         }
     }
     else {
+        // add a constraint to void the result set
+        $bookings_ids = [0];
+    }
+}
+
+if(!empty($params['email'])) {
+    $contacts = Contact::search([
+        ['email', 'like', "%{$params['email']}%"],
+        ['relationship', '=', 'contact']
+    ])
+        ->read(['booking_id'])
+        ->get(true);
+
+    $contact_bookings_ids = array_column($contacts, 'booking_id');
+
+    if(!empty($bookings_ids)) {
+        $bookings_ids = array_intersect($bookings_ids, $contact_bookings_ids);
+    }
+    else {
+        $bookings_ids = $contact_bookings_ids;
+    }
+    if(empty($bookings_ids)) {
         // add a constraint to void the result set
         $bookings_ids = [0];
     }
