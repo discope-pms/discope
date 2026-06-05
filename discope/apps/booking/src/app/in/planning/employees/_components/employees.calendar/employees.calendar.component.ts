@@ -82,12 +82,15 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
     // count of rental units taken under account (not necessarily equal to `rental_units.length`)
     public count_rental_units: number = 0;
 
-    public hovered_activity: any;
-    private hoveredActivityTimeout: any = null;
+    public hovered_activity: any;                        // the activity that must be displayed in tooltip to show its details
+    private hoveredActivityTimeout: any = null;          // timeout to allow time to move mouse from activity to tooltip without closing it
+    public displayActivityTooltip = false;      // if true the hovered activity tooltip is displayed
+    private displayActivityTooltipTimeout: any = null;   // timeout to display a tooltip only 1sec after activity hovered
 
-    public hovered_partner: any;
-    private hoveredPartnerTimeout: any = null;
-    public hovered_activity_partner: any;
+    public hovered_partner: any;                         // the partner that must be displayed in tooltip to show its details
+    private hoveredPartnerTimeout: any = null;           // timeout to allow time to move mouse from partner to tooltip without closing it (to scroll all activities or the partner)
+
+    public hovered_activity_partner: any;                // partner of the hovered activity to show its details in the navbar
 
     public tooltipPosition: 'bottom'|'top' = 'bottom';
 
@@ -715,6 +718,7 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
         }
 
         if(activity) {
+            // handle tooltip position top or bottom
             const containerBody = this.containerBody?.nativeElement as HTMLElement;
 
             const height = containerBody.getBoundingClientRect().height;
@@ -732,8 +736,24 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
             }
         }
 
+        const displayActivityWithTimeout = () => {
+            clearTimeout(this.displayActivityTooltipTimeout);
+            this.displayActivityTooltipTimeout = setTimeout(() => {
+                this.displayActivityTooltip = true;
+                this.displayActivityTooltipTimeout = null;
+                this.cd.detectChanges();
+            }, 1000);
+        };
+
+        const hideActivity = () => {
+            this.displayActivityTooltip = false;
+            clearTimeout(this.displayActivityTooltipTimeout);
+            this.displayActivityTooltipTimeout = null;
+        }
+
         if(this.hoveredActivityTimeout === null && activity) {
             this.hovered_activity = activity;
+            displayActivityWithTimeout();
         }
         else {
             clearTimeout(this.hoveredActivityTimeout);
@@ -741,6 +761,13 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
                 this.hovered_activity = activity;
                 this.hoveredActivityTimeout = null;
                 this.cd.detectChanges();
+
+                if(activity) {
+                    displayActivityWithTimeout();
+                }
+                else {
+                    hideActivity();
+                }
             }, 100);
         }
     }

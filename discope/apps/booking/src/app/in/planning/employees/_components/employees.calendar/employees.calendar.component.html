@@ -146,7 +146,7 @@
                                         (cdkDragStarted)="onDragStart(activity)"
                                     ></planning-employees-calendar-activity>
 
-                                    <span *ngIf="hovered_activity == activity"
+                                    <span *ngIf="displayActivityTooltip && hovered_activity == activity"
                                           class="cell-hint"
                                           [style]="'transform: translateX(' + ((i === 0 || i < (headers.days.length - 1)) ? -16 : -230) + 'px) translateY(' + (tooltipPosition === 'bottom' ? 'calc(1*(var(--rows_height)) + 10px)' : '-260px') + ')'"
                                           #vDescription="var"
@@ -180,7 +180,7 @@
                                         (selected)="onSelectedActivity($event)"
                                     ></planning-employees-calendar-activity>
 
-                                    <span *ngIf="hovered_activity == activity"
+                                    <span *ngIf="displayActivityTooltip && hovered_activity == activity"
                                           class="cell-hint"
                                           [style]="'transform: translateX(' + ((i === 0 || i < (headers.days.length - 1)) ? -16 : -230) + 'px) translateY(' + (tooltipPosition === 'bottom' ? 'calc(1*(var(--rows_height)) + 10px)' : '-260px') + ')'"
                                           #vDescription="var"
@@ -214,7 +214,7 @@
                                         (selected)="onSelectedActivity($event)"
                                     ></planning-employees-calendar-activity>
 
-                                    <div *ngIf="hovered_activity == partnerEvent"
+                                    <div *ngIf="displayActivityTooltip && hovered_activity == partnerEvent"
                                          class="cell-hint"
                                          [style]="'transform: translateX(' + ((i === 0 || i < (headers.days.length - 1)) ? -16 : -230) + 'px) translateY('+ (tooltipPosition === 'bottom' ? 'calc(' + (j+1) + '*(var(--rows_height)) + 10px)' : 'calc(' + (j) + '*(var(--rows_height)) - 260px)') +')'"
                                          #vDescription="var"
@@ -266,7 +266,7 @@
                                         (cdkDragStarted)="onDragStart(activity)">
                                     </planning-employees-calendar-activity>
 
-                                    <span *ngIf="hovered_activity == activity"
+                                    <span *ngIf="displayActivityTooltip && hovered_activity == activity"
                                           class="cell-hint"
                                           [style]="'transform: translateX(' + ((i === 0 || i < (headers.days.length - 1)) ? -16 : -230) + 'px) translateY(' + (tooltipPosition === 'bottom' ? 'calc(1*(var(--rows_height)) + 10px)' : '-260px') + ')'"
                                           #vDescription="var"
@@ -300,7 +300,7 @@
                                         (selected)="onSelectedActivity($event)"
                                     ></planning-employees-calendar-activity>
 
-                                    <span *ngIf="hovered_activity == activity"
+                                    <span *ngIf="displayActivityTooltip && hovered_activity == activity"
                                           class="cell-hint"
                                           [style]="'transform: translateX(' + ((i === 0 || i < (headers.days.length - 1)) ? -16 : -230) + 'px) translateY(' + (tooltipPosition === 'bottom' ? 'calc(1*(var(--rows_height)) + 10px)' : '-260px') + ')'"
                                           #vDescription="var"
@@ -334,7 +334,7 @@
                                         (selected)="onSelectedActivity($event)"
                                     ></planning-employees-calendar-activity>
 
-                                    <div *ngIf="hovered_activity == partnerEvent"
+                                    <div *ngIf="displayActivityTooltip && hovered_activity == partnerEvent"
                                          class="cell-hint"
                                          [style]="'transform: translateX(' + ((i === 0 || i < (headers.days.length - 1)) ? -16 : -230) + 'px) translateY('+ (tooltipPosition === 'bottom' ? 'calc(' + (j+1) + '*(var(--rows_height)) + 10px)' : 'calc(' + (j) + '*(var(--rows_height)) - 260px)') +')'"
                                          #vDescription="var"
@@ -386,7 +386,7 @@
                                         (cdkDragStarted)="onDragStart(activity)">
                                     </planning-employees-calendar-activity>
 
-                                    <span *ngIf="hovered_activity == activity"
+                                    <span *ngIf="displayActivityTooltip && hovered_activity == activity"
                                           class="cell-hint"
                                           [style]="'transform: translateX(' + ((i === 0 || i < (headers.days.length - 1)) ? -16 : -230) + 'px) translateY(' + (tooltipPosition === 'bottom' ? 'calc(1*(var(--rows_height)) + 10px)' : '-260px') + ')'"
                                           #vDescription="var"
@@ -420,7 +420,7 @@
                                         (selected)="onSelectedActivity($event)"
                                     ></planning-employees-calendar-activity>
 
-                                    <span *ngIf="hovered_activity == activity"
+                                    <span *ngIf="displayActivityTooltip && hovered_activity == activity"
                                           class="cell-hint"
                                           [style]="'transform: translateX(' + ((i === 0 || i < (headers.days.length - 1)) ? -16 : -230) + 'px) translateY(' + (tooltipPosition === 'bottom' ? 'calc(1*(var(--rows_height)) + 10px)' : '-260px') + ')'"
                                           #vDescription="var"
@@ -454,7 +454,7 @@
                                         (selected)="onSelectedActivity($event)"
                                     ></planning-employees-calendar-activity>
 
-                                    <div *ngIf="hovered_activity == partnerEvent"
+                                    <div *ngIf="displayActivityTooltip && hovered_activity == partnerEvent"
                                          class="cell-hint"
                                          [style]="'transform: translateX(' + ((i === 0 || i < (headers.days.length - 1)) ? -16 : -230) + 'px) translateY('+ (tooltipPosition === 'bottom' ? 'calc(' + (j+1) + '*(var(--rows_height)) + 10px)' : 'calc(' + (j) + '*(var(--rows_height)) - 260px)') +')'"
                                          #vDescription="var"
