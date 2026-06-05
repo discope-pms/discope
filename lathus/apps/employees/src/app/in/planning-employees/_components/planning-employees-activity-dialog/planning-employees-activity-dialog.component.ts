@@ -1,6 +1,6 @@
 import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
-import { ActivityMapActivity } from '../../../../../type';
+import { ActivityMapActivity, Employee } from '../../../../../type';
 import { from, Subject } from 'rxjs';
 import { EnvService } from 'sb-shared-lib';
 import { FormBuilder, FormGroup } from '@angular/forms';
@@ -9,6 +9,7 @@ import { ApiService } from '../../../../_services/api.service';
 import { TranslationService } from "../../../../_services/translation.service";
 import { PlanningEmployeesUpdatePartnerEventDialogComponent, UpdatePartnerEventDialogData } from '../planning-employees-update-partner-event-dialog/planning-employees-update-partner-event-dialog.component';
 import { takeUntil } from 'rxjs/operators';
+import { AppService } from '../../../../_services/app.service';
 
 export interface ActivityDialogData {
     calendar: CalendarService,
@@ -25,10 +26,12 @@ export class PlanningEmployeesActivityDialogComponent implements OnInit, OnDestr
     private calendar: CalendarService;
 
     public activity: ActivityMapActivity;
+    public activityPartnerId: number = 0;
     public dateFormated = '';
 
     public employees: { id: number, name: string }[] = [];
 
+    public userEmployee: Employee;
     public userGroup: 'animator' | 'manager' | 'organizer' = 'animator';
 
     public form: FormGroup;
@@ -48,6 +51,7 @@ export class PlanningEmployeesActivityDialogComponent implements OnInit, OnDestr
     constructor(
         private api: ApiService,
         private env: EnvService,
+        private app: AppService,
         private dialog: MatDialog,
         private translateService: TranslationService,
         private formBuilder: FormBuilder,
@@ -56,6 +60,13 @@ export class PlanningEmployeesActivityDialogComponent implements OnInit, OnDestr
     ) {
         this.calendar = data.calendar;
         this.activity = data.activity;
+
+        if(typeof data.activity.partner_id === 'object' && data.activity.partner_id?.id) {
+            this.activityPartnerId = this.data.activity.id;
+        }
+        else if(typeof this.activity.partner_id === 'number') {
+            this.activityPartnerId = this.data.activity.partner_id as number;
+        }
     }
 
     ngOnInit() {
@@ -92,6 +103,10 @@ export class PlanningEmployeesActivityDialogComponent implements OnInit, OnDestr
                 }
             });
 
+        this.app.employee$.subscribe(employee => {
+            this.userEmployee = employee;
+        });
+
         this.calendar.userGroup$
             .pipe(takeUntil(this.destroy$))
             .subscribe(userGroup => {
@@ -124,15 +139,8 @@ export class PlanningEmployeesActivityDialogComponent implements OnInit, OnDestr
             description: this.activity.description || '',
             eventDate: new Date(this.activity.event_date),
             timeSlotId: this.activity.time_slot_id,
-            partnerId: 0
+            partnerId: this.activityPartnerId
         };
-
-        if(typeof this.activity.partner_id === 'object' && this.activity.partner_id?.id) {
-            data.partnerId = this.activity.partner_id.id;
-        }
-        else if(typeof this.activity.partner_id === 'number') {
-            data.partnerId = this.activity.partner_id;
-        }
 
         const dialog = this.dialog.open(PlanningEmployeesUpdatePartnerEventDialogComponent, {
             panelClass: 'full-screen-dialog',

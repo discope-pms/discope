@@ -292,7 +292,7 @@ export class PlanningEmployeesCalendarComponent implements OnInit, AfterViewInit
 
         const data: MomentDialogOpenData = { calendar: this.calendar, employee, dayIndex, timeSlotCode };
 
-        const dialog = this.dialog.open(PlanningEmployeesCalendarMomentDialogComponent, {
+        this.dialog.open(PlanningEmployeesCalendarMomentDialogComponent, {
             panelClass: 'full-screen-dialog',
             data: data
         });

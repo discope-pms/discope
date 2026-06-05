@@ -8,6 +8,7 @@ import { takeUntil } from 'rxjs/operators';
 import { ActivityDialogData,  PlanningEmployeesActivityDialogComponent } from '../../../planning-employees-activity-dialog/planning-employees-activity-dialog.component';
 import { CreatePartnerEventDialogData, PlanningEmployeesCreatePartnerEventDialogComponent } from '../../../planning-employees-create-partner-event-dialog/planning-employees-create-partner-event-dialog.component';
 import { CreatePartnerEventSetDialogData, PlanningEmployeesCreatePartnerEventSetDialogComponent } from '../../../planning-employees-create-partner-event-set-dialog/planning-employees-create-partner-event-set-dialog.component';
+import { AppService } from '../../../../../../_services/app.service';
 
 export interface MomentDialogOpenData {
     calendar: CalendarService,
@@ -31,16 +32,18 @@ export class PlanningEmployeesCalendarMomentDialogComponent implements OnInit, O
     private readonly timeSlotCode: 'AM'|'PM'|'EV';
     private timeSlotId = 0;
 
-    public userGroup: 'animator' | 'manager' | 'organizer' = 'animator';
-
     public timeDetailsText = '';
 
     public activities: any[] = [];
+
+    public userEmployee: Employee;
+    public userGroup: 'animator'|'manager'|'organizer' = 'animator';
 
     private destroy$ = new Subject<void>();
 
     constructor(
         private env: EnvService,
+        private app: AppService,
         private dialog: MatDialog,
         private dialogRef: MatDialogRef<PlanningEmployeesCalendarMomentDialogComponent>,
         @Inject(MAT_DIALOG_DATA) public data: MomentDialogOpenData
@@ -91,6 +94,10 @@ export class PlanningEmployeesCalendarMomentDialogComponent implements OnInit, O
                 ...allActivities,
                 ...allPartnerEvents
             ];
+        });
+
+        this.app.employee$.subscribe(employee => {
+            this.userEmployee = employee;
         });
 
         this.calendar.userGroup$.subscribe(userGroup => {
