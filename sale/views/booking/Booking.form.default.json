@@ -239,6 +239,22 @@
             "description": "Unarchive the booking.",
             "controller": "sale_booking_do-unarchive",
             "visible": ["state", "=", "archive"]
+        },
+        {
+            "id": "action.archive",
+            "label": "Archive",
+            "description": "Archive the booking.",
+            "controller": "sale_booking_do-archive",
+            "visible": [
+                [
+                    ["state", "<>", "archive"],
+                    ["status", "=", "quote"]
+                ],
+                [
+                    ["state", "<>", "archive"],
+                    ["is_cancelled", "=", true]
+                ]
+            ]
         }
     ],
     "routes": [

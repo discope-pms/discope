@@ -342,6 +342,10 @@
                 "action.unarchive": {
                     "label": "Désarchiver",
                     "description": "Désarchiver la réservation."
+                },
+                "action.archive": {
+                    "label": "Archiver",
+                    "description": "Archiver la réservation."
                 }
             },
             "routes": {
@@ -848,6 +852,10 @@
                 "action.unarchive": {
                     "label": "Désarchiver",
                     "description": "Désarchiver la réservation."
+                },
+                "action.archive": {
+                    "label": "Archiver",
+                    "description": "Archiver la réservation."
                 }
             },
             "routes": {
