@@ -26,9 +26,6 @@ export class PlanningEmployeesCalendarMomentDialogComponent implements OnInit, O
 
     private readonly calendar: CalendarService;
 
-    public userEmployee: Employee;
-    public userGroup: 'animator' | 'manager' | 'organizer' = 'animator';
-
     public readonly employee: Employee;
     public dayIndex: string;
     public date: Date;
@@ -38,6 +35,9 @@ export class PlanningEmployeesCalendarMomentDialogComponent implements OnInit, O
     public timeDetailsText = '';
 
     public activities: any[] = [];
+
+    public userEmployee: Employee;
+    public userGroup: 'animator'|'manager'|'organizer' = 'animator';
 
     private destroy$ = new Subject<void>();
 
@@ -71,10 +71,6 @@ export class PlanningEmployeesCalendarMomentDialogComponent implements OnInit, O
                 }
             });
 
-        this.app.employee$.subscribe(employee => {
-            this.userEmployee = employee;
-        });
-
         this.calendar.activityMap$.subscribe(activityMap => {
             let allItems: any[] = [];
             if(activityMap?.[this.employee.id]?.[this.dayIndex]?.[this.timeSlotCode]?.length) {
@@ -98,6 +94,10 @@ export class PlanningEmployeesCalendarMomentDialogComponent implements OnInit, O
                 ...allActivities,
                 ...allPartnerEvents
             ];
+        });
+
+        this.app.employee$.subscribe(employee => {
+            this.userEmployee = employee;
         });
 
         this.calendar.userGroup$.subscribe(userGroup => {
