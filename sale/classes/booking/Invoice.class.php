@@ -82,67 +82,68 @@ class Invoice extends \finance\accounting\Invoice {
                 'type'              => 'string',
                 'usage'             => 'text/html',
                 'description'       => "Additional notes to display on the final invoice (html)."
-            ],
+            ]
 
         ];
     }
 
-    public static function calcIsPaid($om, $ids, $lang) {
+    public static function calcIsPaid($self) {
         $result = [];
-        // #memo - fundings_ids targets all fundings relating to invoice: this includes the installments
-        // we need to limit the check to the direct funding, if any
-        $invoices = $om->read(self::getType(), $ids, ['status', 'fundings_ids', 'type', 'price', 'funding_id.is_paid'], $lang);
-        if($invoices > 0) {
-            foreach($invoices as $id => $invoice) {
-                $result[$id] = false;
-                if($invoice['status'] != 'invoice') {
-                    // proforma invoices cannot be marked as paid
-                    continue;
+        $self->read([
+            'status',
+            'type',
+            'price',
+            'funding_id' => ['is_paid'],
+            'fundings_ids' => ['paid_amount']
+        ]);
+
+        foreach($self as $id => $invoice) {
+            if($invoice['status'] != 'invoice') {
+                // proforma invoices cannot be marked as paid
+                continue;
+            }
+
+            $is_paid = false;
+            if($invoice['price'] == 0) {
+                // mark the invoice as paid, whatever its funding
+                $is_paid = true;
+            }
+            elseif($invoice['type'] === 'invoice') {
+                $total_paid = 0;
+                foreach($invoice['fundings_ids'] as $funding) {
+                    $total_paid += $funding['paid_amount'];
                 }
-                if($invoice['price'] == 0) {
-                    // mark the invoice as paid, whatever its funding
-                    $result[$id] = true;
-                    continue;
-                }
-                if($invoice['type'] == 'invoice') {
-                    $fundings = $om->read(Funding::getType(), $invoice['fundings_ids'], ['paid_amount'], $lang);
-                    if($fundings > 0) {
-                        $total_paid = 0;
-                        foreach($fundings as $funding) {
-                            $total_paid += $funding['paid_amount'];
-                        }
-                        if(round($total_paid, 2) >= round($invoice['price'], 2)) {
-                            $result[$id] = true;
-                        }
-                    }
-                }
-                elseif($invoice['type'] == 'credit_note') {
-                    // #memo - marking arbitrary a funding as paid is accepted for an emitted credit note
-                    if($invoice['funding_id.is_paid']) {
-                        $result[$id] = true;
-                    }
+                if(round($total_paid, 2) >= round($invoice['price'], 2)) {
+                    $is_paid = true;
                 }
             }
+            elseif($invoice['type'] === 'credit_note') {
+                // #memo - marking arbitrary a funding as paid is accepted for an emitted credit note
+                if($invoice['funding_id'] && $invoice['funding_id']['is_paid']) {
+                    $is_paid = true;
+                }
+            }
+
+            $result[$id] = $is_paid;
         }
+
         return $result;
     }
 
-    public static function calcPaymentReference($om, $ids, $lang) {
+    public static function calcPaymentReference($self) {
         $result = [];
-        $invoices = $om->read(self::getType(), $ids, ['booking_id.payment_reference']);
-        foreach($invoices as $id => $invoice) {
-            $result[$id] = $invoice['booking_id.payment_reference'];
+        $self->read(['booking_id' => ['payment_reference']]);
+        foreach($self as $id => $invoice) {
+            $result[$id] = $invoice['booking_id']['payment_reference'];
         }
+
         return $result;
     }
 
-    public static function onupdatePartnerId($orm, $ids, $values, $lang) {
-        $invoices = $orm->read(self::getType(), $ids, ['partner_id.partner_identity_id'], $lang);
-
-        if($invoices > 0 && count($invoices)) {
-            foreach($invoices as $id => $invoice) {
-                $orm->update(self::getType(), $id, ['customer_identity_id' => $invoice['partner_id.partner_identity_id']]);
-            }
+    public static function onupdatePartnerId($self) {
+        $self->read(['partner_id' => ['partner_identity_id']]);
+        foreach($self as $id => $invoice) {
+            $self->update(['customer_identity_id' => $invoice['partner_id']['partner_identity_id'] ?? null]);
         }
     }
 
