@@ -8,6 +8,7 @@ import { takeUntil } from 'rxjs/operators';
 import { ActivityDialogData,  PlanningEmployeesActivityDialogComponent } from '../../../planning-employees-activity-dialog/planning-employees-activity-dialog.component';
 import { CreatePartnerEventDialogData, PlanningEmployeesCreatePartnerEventDialogComponent } from '../../../planning-employees-create-partner-event-dialog/planning-employees-create-partner-event-dialog.component';
 import { CreatePartnerEventSetDialogData, PlanningEmployeesCreatePartnerEventSetDialogComponent } from '../../../planning-employees-create-partner-event-set-dialog/planning-employees-create-partner-event-set-dialog.component';
+import { AppService } from '../../../../../../_services/app.service';
 
 export interface MomentDialogOpenData {
     calendar: CalendarService,
@@ -25,13 +26,14 @@ export class PlanningEmployeesCalendarMomentDialogComponent implements OnInit, O
 
     private readonly calendar: CalendarService;
 
+    public userEmployee: Employee;
+    public userGroup: 'animator' | 'manager' | 'organizer' = 'animator';
+
     public readonly employee: Employee;
     public dayIndex: string;
     public date: Date;
     private readonly timeSlotCode: 'AM'|'PM'|'EV';
     private timeSlotId = 0;
-
-    public userGroup: 'animator' | 'manager' | 'organizer' = 'animator';
 
     public timeDetailsText = '';
 
@@ -41,6 +43,7 @@ export class PlanningEmployeesCalendarMomentDialogComponent implements OnInit, O
 
     constructor(
         private env: EnvService,
+        private app: AppService,
         private dialog: MatDialog,
         private dialogRef: MatDialogRef<PlanningEmployeesCalendarMomentDialogComponent>,
         @Inject(MAT_DIALOG_DATA) public data: MomentDialogOpenData
@@ -67,6 +70,10 @@ export class PlanningEmployeesCalendarMomentDialogComponent implements OnInit, O
                     this.timeDetailsText = this.formatDate(this.date, env.locale) + ' - ' + timeSlot.name.toLowerCase();
                 }
             });
+
+        this.app.employee$.subscribe(employee => {
+            this.userEmployee = employee;
+        });
 
         this.calendar.activityMap$.subscribe(activityMap => {
             let allItems: any[] = [];
