@@ -406,40 +406,42 @@ class Invoice extends Model {
         ]);
     }
 
-    public static function calcIsPaid($om, $oids, $lang) {
+    public static function calcIsPaid($self) {
         $result = [];
         // #memo - fundings_ids targets all fundings relating to invoice: this includes the installments
         // we need to limit the check to the direct funding, if any
-        $invoices = $om->read(get_called_class(), $oids, ['status', 'price', 'funding_id.paid_amount'], $lang);
-        if($invoices > 0) {
-            foreach($invoices as $oid => $invoice) {
-                $result[$oid] = false;
-                if($invoice['status'] != 'invoice') {
-                    // proforma invoices cannot be marked as paid
-                    continue;
-                }
-                if($invoice['price'] == 0) {
-                    // mark the invoice as paid, whatever its funding
-                    $result[$oid] = true;
-                    continue;
-                }
-                if($invoice['funding_id.paid_amount'] && $invoice['funding_id.paid_amount'] == $invoice['price']) {
-                    $result[$oid] = true;
-                }
+        $self->read(['status', 'price', 'funding_id' => ['paid_amount']]);
+        foreach($self as $id => $invoice) {
+            if($invoice['status'] != 'invoice') {
+                // proforma invoices cannot be marked as paid
+                continue;
             }
+
+            $is_paid = false;
+            if($invoice['price'] == 0) {
+                // mark the invoice as paid, whatever its funding
+                $is_paid = true;
+            }
+            elseif(isset($invoice['funding_id']['paid_amount']) && $invoice['funding_id']['paid_amount'] == $invoice['price']) {
+                $is_paid = true;
+            }
+
+            $result[$id] = $is_paid;
         }
+
         return $result;
     }
 
-    public static function calcPaymentReference($om, $oids, $lang) {
+    public static function calcPaymentReference($self) {
         $result = [];
-        $invoices = $om->read(get_called_class(), $oids, ['number']);
-        foreach($invoices as $oid => $invoice) {
+        $self->read(['number']);
+        foreach($self as $id => $invoice) {
             $number = intval($invoice['number']);
             // arbitrary value : 155 for balance (final) invoice
             $code_ref = 155;
-            $result[$oid] = self::_get_payment_reference($code_ref, $number);
+            $result[$id] = self::_get_payment_reference($code_ref, $number);
         }
+
         return $result;
     }
 
@@ -638,27 +640,34 @@ class Invoice extends Model {
         return $result;
     }
 
-    public static function calcDueDate($om, $oids, $lang) {
+    public static function calcDueDate($self) {
         $result = [];
+        $self->read([
+            'created',
+            'payment_terms_id' => [
+                'delay_from',
+                'delay_count'
+            ]
+        ]);
+        foreach($self as $id => $invoice) {
+            $from = $invoice['payment_terms_id']['delay_from'] ?? '';
+            $delay = $invoice['payment_terms_id']['delay_count'] ?? '';
 
-        $invoices = $om->read(get_called_class(), $oids, ['created', 'payment_terms_id.delay_from', 'payment_terms_id.delay_count'], $lang);
-        if($invoices > 0) {
-            foreach($invoices as $oid => $invoice) {
-                $from = $invoice['payment_terms_id.delay_from'];
-                $delay = $invoice['payment_terms_id.delay_count'];
-                $origin = $invoice['created'];
-                switch($from) {
-                    case 'created':
-                        $due_date = $origin + ($delay*24*3600);
-                        break;
-                    case 'next_month':
-                    default:
-                        $due_date = strtotime(date("Y-m-t", $origin)) + ($delay*24*3600);
-                        break;
-                }
-                $result[$oid] = $due_date;
+            $origin = $invoice['created'];
+
+            switch($from) {
+                case 'created':
+                    $due_date = $origin + ($delay*24*3600);
+                    break;
+                case 'next_month':
+                default:
+                    $due_date = strtotime(date("Y-m-t", $origin)) + ($delay*24*3600);
+                    break;
             }
+
+            $result[$id] = $due_date;
         }
+
         return $result;
     }
 
