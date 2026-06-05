@@ -5,6 +5,8 @@
     Original author(s): Yesbabylon SRL
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
+
+use core\alert\Message;
 use sale\booking\Booking;
 
 use core\setting\Setting;
@@ -59,7 +61,6 @@ if($booking['status'] == 'quote') {
     Booking::id($booking['id'])->update(['state' => 'archive']);
 }
 elseif($booking['status'] == 'checkedout') {
-
     if(!$booking['is_cancelled']) {
         throw new Exception("non_cancelled_booking", QN_ERROR_INVALID_PARAM);
     }
@@ -74,6 +75,13 @@ elseif($booking['status'] === 'cancelled') {
 else {
     throw new Exception("invalid_status_booking", QN_ERROR_INVALID_PARAM);
 }
+
+// remove any pending alert
+Message::search([
+    ['object_class', '=', 'sale\booking\Booking'],
+    ['object_id', '=', $booking['id']]
+])
+    ->delete(true);
 
 $context->httpResponse()
         ->status(204)
