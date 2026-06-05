@@ -1,69 +1,68 @@
 <div class="reservedBox">
     <div class="booking-details"
-        [class.less-28]="height < 28"
-        [class.less-15]="height < 15"
-        [class.less-12]="height < 12"
-        [class.quote-option-booking]="activity.booking_id && ['quote', 'option'].includes(activity.booking_id.status)"
-        [style.background-color]="getColor()"
-        (mouseenter)="onEnterActivity(activity)"
-        (mouseleave)="onLeaveActivity(activity)"
+         [class.less-28]="height < 28"
+         [class.less-15]="height < 15"
+         [class.less-12]="height < 12"
+         [class.quote-option-booking]="activity.booking_id && ['quote', 'option'].includes(activity.booking_id.status)"
+         [style.background-color]="getColor()"
+         (mouseenter)="onEnterActivity(activity)"
+         (mouseleave)="onLeaveActivity(activity)"
+         (click)="onShowBooking(activity)"
     >
-        <div (click)="onShowBooking(activity)" >
-            <!-- Activity -->
-            <ng-container *ngIf="!activity?.is_partner_event">
-                <!-- Booking -->
-                <ng-container *ngIf="activity.booking_id">
-                    <!-- #memo - first line is discarded if available height is less than 28px -->
-                    <div class="first-line">
-                        <div class="info">
-                            <mat-icon *ngIf="activity.booking_line_group_id.has_person_with_disability" aria-hidden="true" style="height: 12px; width: 12px;">accessible</mat-icon>
-                            <span>{{ activity.line1 }}</span>
-                        </div>
-                        <div class="icon">
-                            <span class="material-icons">{{ getIcon() }}</span>
-                        </div>
+        <!-- Activity -->
+        <ng-container *ngIf="!activity?.is_partner_event">
+            <!-- Booking -->
+            <ng-container *ngIf="activity.booking_id">
+                <!-- #memo - first line is discarded if available height is less than 28px -->
+                <div class="first-line">
+                    <div class="info">
+                        <mat-icon *ngIf="activity.booking_line_group_id.has_person_with_disability" aria-hidden="true" style="height: 12px; width: 12px;">accessible</mat-icon>
+                        <span>{{ activity.line1 }}</span>
                     </div>
-                    <div class="second-line">
-                        {{ activity.line2 }}
+                    <div class="icon">
+                        <span class="material-icons">{{ getIcon() }}</span>
                     </div>
-                </ng-container>
-
-                <!-- Camp -->
-                <ng-container *ngIf="activity.camp_id">
-                    <!-- #memo - first line is discarded if available height is less than 28px -->
-                    <div class="first-line">
-                        <div class="info">
-                            {{ activity.line1 }}
-                        </div>
-                    </div>
-                    <div class="second-line">
-                        {{ activity.line2 }}
-                    </div>
-                </ng-container>
-
-                <!-- Other -->
-                <ng-container *ngIf="!activity.booking_id && !activity.camp_id">
-                    <div>{{ activity.name }}</div>
-                </ng-container>
+                </div>
+                <div class="second-line">
+                    {{ activity.line2 }}
+                </div>
             </ng-container>
 
-            <!-- Partner event -->
-            <ng-container *ngIf="activity?.is_partner_event">
-                <!-- Camp -->
-                <ng-container *ngIf="activity.camp_id">
-                    <div class="first-line">
-                        {{ activity.camp_id.sojourn_number }} - {{ activity.group_num }} - Resp.
+            <!-- Camp -->
+            <ng-container *ngIf="activity.camp_id">
+                <!-- #memo - first line is discarded if available height is less than 28px -->
+                <div class="first-line">
+                    <div class="info">
+                        {{ activity.line1 }}
                     </div>
-                    <div class="second-line">
-                        {{ activity.camp_id.short_name }}
-                    </div>
-                </ng-container>
-
-                <!-- Other -->
-                <ng-container *ngIf="!activity.camp_id">
-                    <div>{{ activity.name }}</div>
-                </ng-container>
+                </div>
+                <div class="second-line">
+                    {{ activity.line2 }}
+                </div>
             </ng-container>
-        </div>
+
+            <!-- Other -->
+            <ng-container *ngIf="!activity.booking_id && !activity.camp_id">
+                <div>{{ activity.name }}</div>
+            </ng-container>
+        </ng-container>
+
+        <!-- Partner event -->
+        <ng-container *ngIf="activity?.is_partner_event">
+            <!-- Camp -->
+            <ng-container *ngIf="activity.camp_id">
+                <div class="first-line">
+                    {{ activity.camp_id.sojourn_number }} - {{ activity.group_num }} - Resp.
+                </div>
+                <div class="second-line">
+                    {{ activity.camp_id.short_name }}
+                </div>
+            </ng-container>
+
+            <!-- Other -->
+            <ng-container *ngIf="!activity.camp_id">
+                <div>{{ activity.name }}</div>
+            </ng-container>
+        </ng-container>
     </div>
 </div>

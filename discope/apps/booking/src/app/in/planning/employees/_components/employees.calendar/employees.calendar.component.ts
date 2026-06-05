@@ -60,6 +60,7 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
     @Output() fullScreen = new EventEmitter();
 
     // attach DOM element to compute the cells width
+    @ViewChild('containerBody') containerBody: any;
     @ViewChild('calTable') calTable: any;
     @ViewChild('actTable') actTable: any;
     @ViewChild('calTableRefColumn') calTableRefColumn: any;
@@ -87,6 +88,8 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
     public hovered_partner: any;
     private hoveredPartnerTimeout: any = null;
     public hovered_activity_partner: any;
+
+    public tooltipPosition: 'bottom'|'top' = 'bottom';
 
     public hovered_holidays: any;
 
@@ -711,6 +714,24 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
             return;
         }
 
+        if(activity) {
+            const containerBody = this.containerBody?.nativeElement as HTMLElement;
+
+            const height = containerBody.getBoundingClientRect().height;
+
+            const elementId = (activity.is_partner_event ? 'partner-event-' : 'activity-') + activity.id;
+            const element = document.getElementById(elementId);
+            const elementRect = element.getBoundingClientRect();
+            const elementBottomPosition = elementRect.y + elementRect.height;
+
+            if(elementBottomPosition + 100 > height) {
+                this.tooltipPosition = 'top';
+            }
+            else {
+                this.tooltipPosition = 'bottom';
+            }
+        }
+
         if(this.hoveredActivityTimeout === null && activity) {
             this.hovered_activity = activity;
         }
@@ -769,6 +790,24 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
     }
 
     public onhoverPartner(employee: any) {
+        if(employee) {
+            const containerBody = this.containerBody?.nativeElement as HTMLElement;
+
+            const height = containerBody.getBoundingClientRect().height;
+
+            const elementId = 'partner-' + employee.id;
+            const element = document.getElementById(elementId);
+            const elementRect = element.getBoundingClientRect();
+            const elementBottomPosition = elementRect.y + elementRect.height;
+
+            if(elementBottomPosition + 150 > height) {
+                this.tooltipPosition = 'top';
+            }
+            else {
+                this.tooltipPosition = 'bottom';
+            }
+        }
+
         if(this.hoveredPartnerTimeout === null && employee) {
             this.hovered_partner = employee;
             this.hovered_activity_partner = employee;
