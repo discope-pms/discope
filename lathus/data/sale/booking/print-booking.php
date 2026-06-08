@@ -173,10 +173,18 @@ $booking['time_arrival'] = $formatTime($booking['time_arrival']);
 $booking['time_departure'] = $formatTime($booking['time_departure']);
 
 // nb_pers are used to inject in GroupingCode name
+$has_sojourn_group = false;
+foreach($booking['booking_lines_groups_ids'] as $group) {
+    if($group['group_type'] === 'sojourn') {
+        $has_sojourn_group = true;
+    }
+}
+$main_group_type = $has_sojourn_group ? 'sojourn' : 'event';
+
 $nb_pers = 0;
 $map_age_range_nb_pers = [];
 foreach($booking['booking_lines_groups_ids'] as $group) {
-    if($group['group_type'] !== 'sojourn') {
+    if($group['group_type'] !== $main_group_type) {
         continue;
     }
 
@@ -374,7 +382,7 @@ foreach($map_groupings_lines as $grouping_name => $grouping_lines) {
 
 $sojourn_groups = BookingLineGroup::search([
     ['booking_id', '=', $booking['id']],
-    ['group_type', '=', 'sojourn']
+    ['group_type', '=', $main_group_type]
 ])
     ->read(['age_range_assignments_ids' => ['age_to', 'qty']])
     ->get(true);
@@ -384,7 +392,7 @@ $nb_adults = 0;
 $nb_children = 0;
 foreach($sojourn_groups as $group) {
     foreach($group['age_range_assignments_ids'] as $age_range_assignment) {
-        $nb_pers +=$age_range_assignment['qty'];
+        $nb_pers += $age_range_assignment['qty'];
         if($age_range_assignment['age_to'] <= 18) {
             $nb_children += $age_range_assignment['qty'];
         }
