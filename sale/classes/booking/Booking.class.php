@@ -832,7 +832,19 @@ class Booking extends Model {
                 }
             }
 
-            // pass-2 - no sojourn, consider other types (event, camp, simple)
+            // pass-2 - consider only events
+            if($nb_pers === 0) {
+                foreach ($booking['booking_lines_groups_ids'] as $group) {
+                    if ($group['is_autosale'] || $group['is_extra']) {
+                        continue;
+                    }
+                    if ($group['group_type'] === 'event') {
+                        $nb_pers += $group['nb_pers'];
+                    }
+                }
+            }
+
+            // pass-3 - no sojourn, consider other types (event, camp, simple)
             if($nb_pers === 0) {
                 foreach($booking['booking_lines_groups_ids'] as $group) {
                     if($group['is_autosale'] || $group['is_extra']) {
@@ -842,7 +854,7 @@ class Booking extends Model {
                 }
             }
 
-            // pass-3 - no match, fall back to any group available
+            // pass-4 - no match, fall back to any group available
             if($nb_pers === 0) {
                 foreach($booking['booking_lines_groups_ids'] as $group) {
                     $nb_pers += $group['nb_pers'];
