@@ -30,11 +30,16 @@ use sale\booking\Consumption;
             'description'       => "First date of the time interval.",
             'default'           => strtotime("tomorrow")
         ],
+        'rental_unit_category_id' => [
+            'type'              => 'many2one',
+            'description'       => "Category which current unit belongs to, if any.",
+            'foreign_object'    => 'realestate\RentalUnitCategory'
+        ],
 
         /* parameters used as properties of virtual entity */
         'date' => [
-            'type'          => 'date',
-            'description'   => 'Date of the consumption, night of the date.'
+            'type'              => 'date',
+            'description'       => "Date of the consumption, night of the date."
         ],
         'rental_unit_name' => [
             'type'              => 'string',
@@ -46,23 +51,23 @@ use sale\booking\Consumption;
         ],
         'capacity' => [
             'type'              => 'integer',
-            'description'       => "Total capacity of the building rental unit between given date from and date to interval.",
+            'description'       => "Total capacity of the building rental unit between given date from and date to interval."
         ],
         'extra' => [
             'type'              => 'integer',
-            'description'       => "Total capacity of the building rental unit between given date from and date to interval.",
+            'description'       => "Total capacity of the building rental unit between given date from and date to interval."
         ],
         'nb_total' => [
             'type'              => 'integer',
-            'description'       => "Total quantity of people.",
+            'description'       => "Total quantity of people."
         ],
         'nb_remaining' => [
             'type'              => 'integer',
-            'description'       => "Total of places that are remaining.",
+            'description'       => "Total of places that are remaining."
         ],
         'nb_remaining_with_extra' => [
             'type'              => 'integer',
-            'description'       => "Total of places that are remaining with extra.",
+            'description'       => "Total of places that are remaining with extra."
         ]
     ],
     'response'      => [
@@ -108,10 +113,15 @@ $rental_units_categories = RentalUnitCategory::search()
     ->read(['code', 'name'])
     ->get();
 
-$rental_units = RentalUnit::search([
+$rental_units_domain = [
     ['center_id', '=', $center['id']],
     ['is_accomodation', '=', true]
-])
+];
+if(isset($params['rental_unit_category_id'])) {
+    $rental_units_domain[] = ['rental_unit_category_id', '=', $params['rental_unit_category_id']];
+}
+
+$rental_units = RentalUnit::search($rental_units_domain)
     ->read(['name', 'rental_unit_category_id', 'capacity', 'extra', 'has_parent', 'parent_id', 'has_children', 'children_ids'])
     ->get();
 

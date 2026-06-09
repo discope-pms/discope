@@ -29,6 +29,11 @@
                                                 "type": "field",
                                                 "value": "date_to",
                                                 "width": "25%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "rental_unit_category_id",
+                                                "width": "25%"
                                             }
                                         ]
                                     }
