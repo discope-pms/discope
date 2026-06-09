@@ -1,0 +1,97 @@
+{
+    "name": "Occupations planning",
+    "description": "List of occupations of rooms and buildings between two dates.",
+    "access": {
+        "groups": ["booking.default.user"]
+    },
+    "header": {
+        "actions": {
+            "ACTION.CREATE": false
+        },
+        "advanced_search": {
+            "open": true
+        }
+    },
+    "domain": [
+        ["center_id", "in", "user.centers_ids"]
+    ],
+    "group_by": [
+        {
+            "open": true,
+            "field": "rental_unit_name",
+            "operations": {
+                "capacity": {
+                    "operation": "SUM"
+                },
+                "extra": {
+                    "operation": "SUM"
+                },
+                "nb_total": {
+                    "operation": "SUM"
+                },
+                "nb_remaining": {
+                    "operation": "SUM"
+                },
+                "nb_remaining_with_extra": {
+                    "operation": "SUM"
+                }
+            }
+        }
+    ],
+    "order": "date",
+    "sort" : "asc",
+    "controller": "sale_booking_consumption_stat-occupancy",
+    "layout": {
+        "items": [
+            {
+                "type": "field",
+                "value": "rental_unit_name",
+                "width": "33%",
+                "visible": false
+            },
+            {
+                "type": "field",
+                "value": "date",
+                "width": "20%"
+            },
+            {
+                "type": "field",
+                "value": "rental_unit_category",
+                "width": "33%",
+                "visible": false
+            },
+            {
+                "type": "field",
+                "value": "capacity",
+                "width": "20%"
+            },
+            {
+                "type": "field",
+                "value": "extra",
+                "width": "20%",
+                "visible": false
+            },
+            {
+                "type": "field",
+                "value": "nb_pers",
+                "width": "20%"
+            },
+            {
+                "type": "field",
+                "value": "nb_total",
+                "width": "20%"
+            },
+            {
+                "type": "field",
+                "value": "nb_remaining",
+                "width": "20%"
+            },
+            {
+                "type": "field",
+                "value": "nb_remaining_with_extra",
+                "width": "20%",
+                "visible": false
+            }
+        ]
+    }
+}

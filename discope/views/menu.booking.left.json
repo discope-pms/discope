@@ -337,6 +337,17 @@
                                     "entity": "sale\\booking\\Booking",
                                     "view": "list.checkedin"
                                 }
+                            },
+                            {
+                                "id": "item.planning.occupancy",
+                                "type": "entry",
+                                "label": "Occupations bâtiments",
+                                "description": "",
+                                "route": "/bookings",
+                                "context": {
+                                    "entity": "sale\\booking\\consumption\\stat-occupancy",
+                                    "view": "list.default"
+                                }
                             }
                         ]
                     },
