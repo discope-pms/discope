@@ -1,0 +1,66 @@
+{
+    "name": "Planning consolidé des occupations des bâtiments",
+    "description": "",
+    "model": {
+        "center_id": {
+            "label": "Centre",
+            "description": "Consommations liée à un centre.",
+            "help": ""
+        },
+        "date_from": {
+            "label": "Du",
+            "description": "Date de début de l'intervalle.",
+            "help": ""
+        },
+        "date_to": {
+            "label": "Au",
+            "description": "Date de fin de l'intervalle.",
+            "help": ""
+        },
+        "date": {
+            "label": "Date",
+            "description": "",
+            "help": ""
+        },
+        "rental_unit_name": {
+            "label": "Bâtiment",
+            "description": "",
+            "help": ""
+        },
+        "rental_unit_category": {
+            "label": "Catégorie",
+            "description": "",
+            "help": ""
+        },
+        "capacity": {
+            "label": "Capacité",
+            "description": "",
+            "help": ""
+        },
+        "extra": {
+            "label": "Capacité extra",
+            "description": "",
+            "help": ""
+        },
+        "nb_total": {
+            "label": "Occupation",
+            "description": "",
+            "help": ""
+        },
+        "nb_remaining": {
+            "label": "Libre (sans extra)",
+            "description": "",
+            "help": ""
+        },
+        "nb_remaining_with_extra": {
+            "label": "Libre (avec extra)",
+            "description": "",
+            "help": ""
+        }
+    },
+    "error": {
+        "errors": {
+
+        }
+    }
+}
