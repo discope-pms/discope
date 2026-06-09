@@ -153,24 +153,15 @@ foreach($map_parent_rental_units_children as $parent_rental_unit_id => $children
     $map_top_parent_capacities[$parent_rental_unit_id] = $capacities;
 }
 
-$existing_consumptions = Consumption::getExistingConsumptions(
-    $orm,
-    [$center['id']],
-    $params['date_from'],
-    $params['date_to']
-);
-
-$consumptions_ids = [];
-foreach($existing_consumptions as $rental_unit_id => $dates) {
-    foreach($dates as $date_index => $consumptions) {
-        // #memo - there might be several consumptions for a same rental_unit within a same day
-        foreach($consumptions as $consumption) {
-            $consumptions_ids[] = $consumption['id'];
-        }
-    }
-}
-
-$consumptions = Consumption::ids($consumptions_ids)
+$consumptions = Consumption::search(
+    [
+        ['date', '>=', $params['date_from']],
+        ['date', '<=', $params['date_to']],
+        ['center_id', 'in',  [$center['id']]],
+        ['is_rental_unit', '=', true]
+    ],
+    ['date' => 'asc']
+)
     ->read(['name', 'type', 'qty', 'date', 'schedule_to', 'rental_unit_id', 'booking_id'])
     ->get(true);
 
