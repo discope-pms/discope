@@ -41,7 +41,13 @@ $result = [
 
 foreach($bookings as $id => $booking) {
     try {
-        eQual::run('do', 'sale_booking_do-checkin', ['id' => $id]);
+        eQual::run('do', 'sale_booking_do-checkin', [
+            'id'                        => $id,
+            'no_payment'                => true,
+            'no_composition'            => true,
+            'no_rental_unit_cleaned'    => true,
+            'sign_contract'             => true
+        ]);
 
         $result['successes'][] = "Booking {$booking['name']} successfully checked in.";
     }
