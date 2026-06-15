@@ -483,7 +483,7 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
                 `<dt>${activity.name} <b>${activity.counter}/${activity.counter_total}</b></dt>` +
                 `<br>` +
                 `<dt>${activity.schedule_from} - ${activity.schedule_to}</dt>` +
-                `<dt><button data-action="createPartnerEvent" data-date="${activity.activity_date}" data-partner-id="${activity.partner_id.id}" data-time-slot-code="${activity.time_slot}">Créer événement</button></dt>` +
+                (activity.partner_id ? `<dt><button data-action="createPartnerEvent" data-date="${activity.activity_date}" data-partner-id="${activity.partner_id.id}" data-time-slot-code="${activity.time_slot}">Créer événement</button></dt>` : '') +
                 '</dl>';
         }
         else if(activity.camp_id) {
@@ -505,7 +505,7 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
                 `<dt>${activity.name}</dt>` +
                 `<br>` +
                 `<dt>${activity.schedule_from} - ${activity.schedule_to}</dt>` +
-                `<dt><button data-action="createPartnerEvent" data-date="${activity.activity_date}" data-partner-id="${activity.partner_id.id}" data-time-slot-code="${activity.time_slot}">Créer événement</button></dt>` +
+                (activity.partner_id ? `<dt><button data-action="createPartnerEvent" data-date="${activity.activity_date}" data-partner-id="${activity.partner_id.id}" data-time-slot-code="${activity.time_slot}">Créer événement</button></dt>` : '') +
                 '</dl>';
         }
     }
@@ -718,21 +718,26 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
         }
 
         if(activity) {
-            // handle tooltip position top or bottom
-            const containerBody = this.containerBody?.nativeElement as HTMLElement;
+            if(activity.employee_id || activity.partner_id) {
+                // handle tooltip position top or bottom
+                const containerBody = this.containerBody?.nativeElement as HTMLElement;
 
-            const height = containerBody.getBoundingClientRect().height;
+                const height = containerBody.getBoundingClientRect().height;
 
-            const elementId = (activity.is_partner_event ? 'partner-event-' : 'activity-') + activity.id;
-            const element = document.getElementById(elementId);
-            const elementRect = element.getBoundingClientRect();
-            const elementBottomPosition = elementRect.y + elementRect.height;
+                const elementId = (activity.is_partner_event ? 'partner-event-' : 'activity-') + activity.id;
+                const element = document.getElementById(elementId);
+                const elementRect = element.getBoundingClientRect();
+                const elementBottomPosition = elementRect.y + elementRect.height;
 
-            if(elementBottomPosition + 100 > height) {
-                this.tooltipPosition = 'top';
+                if(elementBottomPosition + 100 > height) {
+                    this.tooltipPosition = 'top';
+                }
+                else {
+                    this.tooltipPosition = 'bottom';
+                }
             }
             else {
-                this.tooltipPosition = 'bottom';
+                this.tooltipPosition = 'top';
             }
         }
 
