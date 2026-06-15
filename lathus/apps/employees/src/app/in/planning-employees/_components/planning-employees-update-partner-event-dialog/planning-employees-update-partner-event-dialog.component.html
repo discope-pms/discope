@@ -8,7 +8,7 @@
 
     <mat-form-field class="field" appearance="fill">
         <mat-select formControlName="event_type">
-            <mat-option *ngFor="let item of eventTypeMap | keyvalue" [value]="item.key">
+            <mat-option *ngFor="let item of eventTypeMap | keyvalue" [value]="item.key" [disabled]="item.key === 'time_off'">
                 {{ item.value }}
             </mat-option>
         </mat-select>
