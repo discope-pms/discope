@@ -46,6 +46,18 @@
             },
             "help": ""
         },
+        "settlement_mode": {
+            "label": "Mode de règlement",
+            "selection": {
+                "basic_payment": "Paiement simple",
+                "third_party_claim": "Récupération chez un tiers"
+            },
+            "description": "Façon dont le paiement doit être réglé."
+        },
+        "is_settled": {
+            "label": "Réglé",
+            "description": "Est-ce que le paiement est réglé."
+        },
         "enrollment_id": {
             "label": "Inscription",
             "description": "L'inscription à laquelle est lié le paiement.",
@@ -111,6 +123,9 @@
                 },
                 "section.fundings_section": {
                     "label": "Financements"
+                },
+                "section.settlement_section": {
+                    "label": "Règlement"
                 }
             }            
         },

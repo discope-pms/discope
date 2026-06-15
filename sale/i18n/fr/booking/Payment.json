@@ -96,6 +96,9 @@
                 },
                 "section.fundings_section": {
                     "label": "Financements"
+                },
+                "section.settlement_section": {
+                    "label": "Règlement"
                 }
             }            
         },

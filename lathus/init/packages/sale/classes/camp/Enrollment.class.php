@@ -158,7 +158,7 @@ class Enrollment extends Model {
             'is_foster' => [
                 'type'              => 'computed',
                 'result_type'       => 'boolean',
-                'description'       => "Is the child living in a forster family/home.",
+                'description'       => "Is the child living in a foster family/home.",
                 'store'             => true,
                 'instant'           => true,
                 'relation'          => ['child_id' => ['is_foster']]
@@ -2222,7 +2222,9 @@ class Enrollment extends Model {
                     'payment_method'    => 'camp_financial_help',
                     'funding_id'        => $last_funding['id'],
                     'center_office_id'  => $last_funding['center_office_id'],
-                    'description'       => $price_adapter['name']
+                    'description'       => $price_adapter['name'],
+                    'settlement_mode'   => 'third_party_claim',
+                    'settled'           => false
                 ]);
             }
 

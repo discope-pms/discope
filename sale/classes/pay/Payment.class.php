@@ -74,6 +74,22 @@ class Payment extends Model {
                 'default'           => 'cash'
             ],
 
+            'settlement_mode' => [
+                'type'              => 'string',
+                'description'       => "How the payment can be settled.",
+                'selection'         => [
+                    'basic_payment',
+                    'third_party_claim'
+                ],
+                'default'           => 'basic_payment'
+            ],
+
+            'is_settled' => [
+                'type'              => 'boolean',
+                'description'       => "Is the payment settled.",
+                'default'           => true
+            ],
+
             'is_manual' => [
                 'type'              => 'boolean',
                 'description'       => 'Payment was created manually at the checkout directly in the booking (not through cashdesk). Can also be a payment from a bank check for enrollments and bookings.',
