@@ -319,7 +319,7 @@ export class PlanningEmployeesCalendarNavbarComponent implements OnInit, OnChang
         // update local values
         this.duration = parseInt(event.value, 10);
         this.dateTo = new Date(this.dateFrom.getTime());
-        this.dateTo.setDate(this.dateTo.getDate() + this.duration);
+        this.dateTo.setDate(this.dateTo.getDate() + (this.duration - 1));
         this.vm.date_range.get("date_to").setValue(this.dateTo);
 
         this.params.date_from = this.dateFrom;
@@ -329,7 +329,7 @@ export class PlanningEmployeesCalendarNavbarComponent implements OnInit, OnChang
     public onToday() {
         this.dateFrom = new Date();
         this.dateTo = new Date(this.dateFrom.getTime());
-        this.dateTo.setDate(this.dateTo.getDate() + this.params.duration);
+        this.dateTo.setDate(this.dateTo.getDate() + (this.duration - 1));
         this.vm.date_range.get("date_from").setValue(this.dateFrom);
         this.vm.date_range.get("date_to").setValue(this.dateTo);
 

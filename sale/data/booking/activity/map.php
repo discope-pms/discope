@@ -69,7 +69,7 @@ $auth->su();
 
 $domain = [
     ['activity_date', '>=', $params['date_from']],
-    ['activity_date', '<', $params['date_to']],
+    ['activity_date', '<=', $params['date_to']],
     ['is_cancelled', '=', false]
 ];
 

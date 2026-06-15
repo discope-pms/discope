@@ -138,7 +138,7 @@ export class PlanningEmployeesCalendarParamService {
             const new_state = this.getState();
             if(new_state != this.state) {
                 this.state = new_state;
-                this._duration = Math.abs(this.treatAsUTC(this._date_to).getTime() - this.treatAsUTC(this._date_from).getTime()) / millisecondsPerDay;
+                this._duration = (Math.abs(this.treatAsUTC(this._date_to).getTime() - this.treatAsUTC(this._date_from).getTime()) / millisecondsPerDay) + 1;
                 this.observable.next(this.state);
             }
         }, 150);
@@ -151,7 +151,7 @@ export class PlanningEmployeesCalendarParamService {
         this._duration = 7;
         this._date_from = this.getPreviousMonday();
         this._date_to = new Date(this._date_from.getTime());
-        this._date_to.setDate(this._date_from.getDate() + this._duration);
+        this._date_to.setDate(this._date_from.getDate() + (this._duration - 1));
         this._partners_ids = [];
         this._show_only_transport = false;
         this._product_category_id = 0;
