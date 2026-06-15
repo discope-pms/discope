@@ -116,7 +116,7 @@ class Document extends Model {
         foreach($self as $id => $document) {
             $content = $document['size'];
             $base = log($content, 1024);
-            $result[$id] = round(pow(1024, $base - floor($base)), $precision) . ' '. $suffixes[floor($base)];
+            $result[$id] = round(pow(1024, $base - floor($base)), $precision) . ' '. ($suffixes[floor($base)] ?? '');
         }
 
         return $result;
