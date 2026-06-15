@@ -110,6 +110,10 @@
             "label": "Inscriptions CE",
             "help": ""
         },
+        "financial-helps.unsettled-payments": {
+            "label": "Paiements non-réglés",
+            "help": ""
+        },
         "settings": {
             "label": "Paramètres",
             "help": ""

@@ -341,6 +341,22 @@
                             "entity": "sale\\camp\\Enrollment",
                             "view": "list.work-council-search"
                         }
+                    },
+                    {
+                        "id": "financial-helps.unsettled-payments",
+                        "type": "entry",
+                        "label": "Paiements non-réglés",
+                        "description": "",
+                        "icon": "",
+                        "route": "/camps",
+                        "context": {
+                            "entity": "sale\\pay\\Payment",
+                            "view": "list.camp",
+                            "domain": [
+                                ["payment_method", "=", "camp_financial_help"],
+                                ["is_settled", "=", false]
+                            ]
+                        }
                     }
                 ]
             },
