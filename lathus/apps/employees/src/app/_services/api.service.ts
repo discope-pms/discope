@@ -154,12 +154,6 @@ export class ApiService {
     }
 
     public fetchActivityMap(dateFrom: Date, dateTo: Date, employeesIds: number[], productModelsIds: number[]): Observable<ActivityMap> {
-        let dFrom = new Date(dateFrom.getTime());
-
-        // date_to isn't included
-        let dTo = new Date(dateTo.getTime());
-        dTo.setDate(dateTo.getDate() + 1);
-
         const getDayIndex = (date: Date): string => {
             const day = String(date.getDate()).padStart(2, '0');
             const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -171,8 +165,8 @@ export class ApiService {
         const options = {
             headers: this.headers,
             params: {
-                date_from: getDayIndex(dFrom),
-                date_to: getDayIndex(dTo),
+                date_from: getDayIndex(dateFrom),
+                date_to: getDayIndex(dateTo),
                 partners_ids: JSON.stringify(employeesIds),
                 product_model_ids: JSON.stringify(productModelsIds)
             }
