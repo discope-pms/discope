@@ -97,6 +97,7 @@ div.footer p {
     padding: 3px 20px;
 }
 
+.quote-info,
 .expiry-info {
     margin-bottom: 30px;
     width: 100%;
@@ -239,9 +240,15 @@ div.footer p {
 </div>
 
 <div style="page-break-inside: avoid;">
-    <div class="expiry-info">
-        {{ parts.expiry_info|raw }}
-    </div>
+    {% if booking.status == 'option' %}
+        <div class="expiry-info">
+            {{ parts.expiry_info|raw }}
+        </div>
+    {% else %}
+        <div class="quote-info">
+            Ce document constitue un devis détaillant les prestations proposées ainsi que leur coût estimatif. Il est fourni à titre indicatif et ne vaut engagement qu’après acceptation et validation par les parties concernées.
+        </div>
+    {% endif %}
 
     <div class="transportation-info">
         {{ parts.transportation_info|raw }}

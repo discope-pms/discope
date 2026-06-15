@@ -132,7 +132,7 @@ if(is_null($booking)) {
 
 $data_to_inject = [
     'booking' => [
-        'date_expiry', 'date_from', 'date_to', 'time_from', 'time_to', 'time_arrival', 'time_departure', 'price',
+        'status', 'date_expiry', 'date_from', 'date_to', 'time_from', 'time_to', 'time_arrival', 'time_departure', 'price',
     ],
     'customer' => [
         'display_name', 'address_street', 'address_zip', 'address_dispatch', 'address_city'
