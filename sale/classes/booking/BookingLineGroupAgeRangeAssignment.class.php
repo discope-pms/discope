@@ -172,27 +172,35 @@ class BookingLineGroupAgeRangeAssignment extends Model {
      * @return array                        Returns an associative array mapping fields with their error messages. An empty array means that object has been successfully processed and can be updated.
      */
     public static function canupdate($om, $oids, $values, $lang='en') {
-        $assignments = $om->read(self::getType(), $oids, ['booking_id.status', 'booking_line_group_id.is_extra', 'booking_line_group_id.is_sojourn', 'booking_line_group_id.sojourn_type_id'], $lang);
-        if($assignments > 0) {
-            foreach($assignments as $assignment) {
-                // for GG the number of persons does not impact the booking (GG only has pricings by_accomodation), so we allow change of nb_pers at any time
-                if($assignment['booking_line_group_id.is_sojourn'] && $assignment['booking_line_group_id.sojourn_type_id'] == 2) {
-                    if(count($values) == 1 && isset($values['qty'])) {
-                        continue;
+
+        // list of fields that can be updated at any time
+        $allowed_fields = ['age_from', 'age_to'];
+
+        if(count(array_diff(array_keys($values), $allowed_fields))) {
+
+            $assignments = $om->read(self::getType(), $oids, ['booking_id.status', 'booking_line_group_id.is_extra', 'booking_line_group_id.is_sojourn', 'booking_line_group_id.sojourn_type_id'], $lang);
+            if($assignments > 0) {
+                foreach($assignments as $assignment) {
+                    // for GG the number of persons does not impact the booking (GG only has pricings by_accomodation), so we allow change of nb_pers at any time
+                    if($assignment['booking_line_group_id.is_sojourn'] && $assignment['booking_line_group_id.sojourn_type_id'] == 2) {
+                        if(count($values) == 1 && isset($values['qty'])) {
+                            continue;
+                        }
                     }
-                }
-                if($assignment['booking_line_group_id.is_extra']) {
-                    if(!in_array($assignment['booking_id.status'], ['confirmed', 'validated', 'checkedin', 'checkedout'])) {
-                        return ['booking_id' => ['non_editable' => 'Rental units assignments cannot be updated for non-quote bookings.']];
+                    if($assignment['booking_line_group_id.is_extra']) {
+                        if(!in_array($assignment['booking_id.status'], ['confirmed', 'validated', 'checkedin', 'checkedout'])) {
+                            return ['booking_id' => ['non_editable' => 'Rental units assignments cannot be updated for non-quote bookings.']];
+                        }
                     }
-                }
-                else {
-                    if($assignment['booking_id.status'] != 'quote') {
-                        return ['booking_id' => ['non_editable' => 'Rental units assignments cannot be updated for non-quote bookings.']];
+                    else {
+                        if($assignment['booking_id.status'] != 'quote') {
+                            return ['booking_id' => ['non_editable' => 'Rental units assignments cannot be updated for non-quote bookings.']];
+                        }
                     }
                 }
             }
         }
+
         return parent::canupdate($om, $oids, $values, $lang);
     }
 
