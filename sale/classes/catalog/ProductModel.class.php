@@ -355,7 +355,37 @@ class ProductModel extends Model {
                     '#A67C8C', // mauve
                     '#6B4A56', // dark mauve
                     '#8A8D93', // gray
-                    '#4A4D50'  // dark gray
+                    '#4A4D50',  // dark gray
+
+                    // New brighter colors
+                    '#00B8D9', // cyan
+                    '#006A7D', // dark cyan
+                    '#00C853', // bright green
+                    '#007A33', // dark bright green
+                    '#64DD17', // lime
+                    '#3C7F0D', // dark lime
+                    '#FFD600', // bright amber
+                    '#A88700', // dark amber
+                    '#FF9100', // bright orange
+                    '#A85E00', // dark bright orange
+                    '#FF5252', // bright red
+                    '#A32F2F', // dark bright red
+                    '#FF4081', // pink
+                    '#A12654', // dark pink
+                    '#E040FB', // magenta
+                    '#7B1FA2', // dark magenta
+                    '#7C4DFF', // violet
+                    '#4527A0', // dark violet
+                    '#536DFE', // indigo
+                    '#303F9F', // dark indigo
+                    '#18FFFF', // aqua
+                    '#00838F', // dark aqua
+                    '#FF6E40', // coral
+                    '#A33D1F', // dark coral
+                    '#FFAB40', // peach
+                    '#A66A1A', // dark peach
+                    '#69F0AE', // mint
+                    '#2E7D5B', // dark mint
                 ],
                 'description'       => 'Arbitrary color to use for the activity when rendering the employee\'s planning.'
             ],
