@@ -127,8 +127,11 @@
             </div>
         </div>
 
-        <div *ngIf="featureRoomPlansEnabled || featureActivity" class="row" style="margin-top: 30px;">
+        <div *ngIf="optionalContract || featureRoomPlansEnabled || featureActivity" class="row" style="margin-top: 30px;">
             <div class="column" style="width: 100%;">
+                <mat-slide-toggle *ngIf="optionalContract" [formControl]="vm.contract.formControl" style="transform: scale(0.8);">
+                    Contrat
+                </mat-slide-toggle>
                 <mat-slide-toggle *ngIf="featureRoomPlansEnabled" [formControl]="vm.roomPlans.formControl" style="transform: scale(0.8);">
                     Plans de chambre
                 </mat-slide-toggle>

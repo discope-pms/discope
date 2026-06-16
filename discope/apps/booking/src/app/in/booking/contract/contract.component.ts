@@ -101,6 +101,9 @@ interface vmModel {
     documents: {
         items:        any[]
     },
+    contract: {
+        formControl: FormControl
+    },
     roomPlans: {
         formControl: FormControl
     },
@@ -153,10 +156,12 @@ export class BookingContractComponent implements OnInit, AfterContentInit {
     // list of secondary recipients (addresses comma separated)
     public recipients: string[] = [];
 
+    public contract: boolean = true;
     public roomPlans: boolean = false;
     public activitiesPlanningGlobal: boolean = false;
     public activitiesPlanningWeekly: boolean = false;
 
+    public optionalContract: boolean = false;
     public featureRoomPlansEnabled: boolean = false;
     public featureActivity: boolean = false;
 
@@ -217,6 +222,9 @@ export class BookingContractComponent implements OnInit, AfterContentInit {
             documents: {
                 items:          []
             },
+            contract: {
+                formControl:    new FormControl(true),
+            },
             roomPlans: {
                 formControl:    new FormControl(false),
             },
@@ -242,6 +250,7 @@ export class BookingContractComponent implements OnInit, AfterContentInit {
         this.vm.sender.formControl.valueChanges.subscribe( (sender:string) => this.sender = sender);
         this.vm.recipient.formControl.valueChanges.subscribe( (recipient:string) => this.recipient = recipient);
         this.vm.recipients.formControl.valueChanges.subscribe( (recipients:string[]) => this.recipients = recipients);
+        this.vm.contract.formControl.valueChanges.subscribe( (contract:boolean) => this.contract = contract);
         this.vm.roomPlans.formControl.valueChanges.subscribe( (roomPlans:boolean) => this.roomPlans = roomPlans);
         this.vm.activitiesPlanningGlobal.formControl.valueChanges.subscribe( (activitiesPlanningGlobal:boolean) => this.activitiesPlanningGlobal = activitiesPlanningGlobal);
         this.vm.activitiesPlanningWeekly.formControl.valueChanges.subscribe( (activitiesPlanningWeekly:boolean) => this.activitiesPlanningWeekly = activitiesPlanningWeekly);
@@ -290,7 +299,7 @@ export class BookingContractComponent implements OnInit, AfterContentInit {
                     }
 
                     // #memo - this is only necessary when directly browsing to the URL /booking/:id/contract
-                    // relay change to context (to display sidemenu panes according to current object)
+                    // relay change to context (to display side-menu panes according to current object)
                     this.context.change({
                         context_only: true,   // do not change the view
                         context: {
@@ -312,7 +321,7 @@ export class BookingContractComponent implements OnInit, AfterContentInit {
     /**
      * Fetch templates that apply on current booking (center and related category).
      *
-     * We should received attachments, contract.mail.subject, contract.mail.body + organisation signature
+     * We should receive attachments, contract.mail.subject, contract.mail.body + organization signature
      */
     private async fetchTemplates() {
         console.log('re-fetch templates', this.center);
@@ -426,6 +435,9 @@ export class BookingContractComponent implements OnInit, AfterContentInit {
 
     private async initFeaturesSettings() {
         const environment:any = await this.env.getEnv();
+        if(environment.hasOwnProperty('sale.booking.mailling.optional_contract_pdf')) {
+            this.optionalContract = environment['sale.booking.mailling.optional_contract_pdf'];
+        }
         if(environment.hasOwnProperty('sale.features.booking.room_plans')) {
             this.featureRoomPlansEnabled = environment['sale.features.booking.room_plans'];
         }
@@ -717,6 +729,7 @@ export class BookingContractComponent implements OnInit, AfterContentInit {
                 mode: this.mode,
                 attachments_ids: this.vm.attachments.items.map( (e:any) => e.id ),
                 documents_ids: this.vm.documents.items.map( (e:any) => e.id ),
+                contract: this.contract,
                 room_plans: this.roomPlans,
                 activities_planning_global: this.activitiesPlanningGlobal,
                 activities_planning_weekly: this.activitiesPlanningWeekly
