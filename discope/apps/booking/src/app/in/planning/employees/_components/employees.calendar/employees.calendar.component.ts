@@ -135,6 +135,8 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
 
     public dropZonePosition: 'left'|'center'|'right' = null;
 
+    public activityToAssignExpanded = false;
+
     constructor(
         private params: PlanningEmployeesCalendarParamService,
         private api: ApiService,

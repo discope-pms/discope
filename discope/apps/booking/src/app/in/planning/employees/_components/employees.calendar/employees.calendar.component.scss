@@ -13,42 +13,57 @@
 
 
     .container-footer {
-        position: relative;
-        overflow-y: scroll;
-        overflow-x: hidden;
-
-        border: solid 1px #e0e0e0;
-        padding: 0 15px 0 0;
-        margin-left: 15px;
+        display: flex;
         height: 100px;
+        margin-left: 15px;
 
-        &::-webkit-scrollbar {
-            width: 6px;
-            overflow-y: scroll;
-            background: transparent;
+        &.expanded {
+            height: 300px;
         }
 
-        &::-webkit-scrollbar-thumb {
-            background: var(--mdc-theme-primary, #6200ee);
-            border-radius: 10px;
+        .container-expand {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 200px;
+            cursor: pointer;
         }
 
-        table.act-table {
+        .container-table-assign {
+            padding: 0 15px 0 0;
             position: relative;
-            z-index: 1;
-            table-layout: fixed;
-            border-spacing: 0;
-            width: 100%;
-            min-width: 100%;
-            max-width: 100%;
-            height: 100%;
-            background-color: transparent;
+            overflow-y: scroll;
+            overflow-x: hidden;
+            border: solid 1px #e0e0e0;
 
-            .cdk-drag-placeholder {
-                /* prevent drop preview */
-                display: none;
+            &::-webkit-scrollbar {
+                width: 6px;
+                overflow-y: scroll;
+                background: transparent;
             }
 
+            &::-webkit-scrollbar-thumb {
+                background: var(--mdc-theme-primary, #6200ee);
+                border-radius: 10px;
+            }
+
+            table.act-table {
+                position: relative;
+                z-index: 1;
+                table-layout: fixed;
+                border-spacing: 0;
+                width: 100%;
+                min-width: 100%;
+                max-width: 100%;
+                height: 100%;
+                background-color: transparent;
+
+                .cdk-drag-placeholder {
+                    /* prevent drop preview */
+                    display: none;
+                }
+
+            }
         }
     }
 
@@ -58,6 +73,10 @@
         overflow-x: hidden;
         height: calc(100% - 250px);
         padding: 0 15px 15px 15px;
+
+        &.contracted {
+            height: calc(100% - 450px);
+        }
 
         &::-webkit-scrollbar {
             width: 6px;
@@ -323,6 +342,7 @@
                     display: flex;
                     align-items: center;
                     flex-direction: column;
+                    gap: 1px;
                 }
             }
         }
@@ -517,12 +537,5 @@
                 font-size: calc(8px + (var(--rows_height) / 4));
             }
         }
-
-
     }
-
-
-
-
-
 }
