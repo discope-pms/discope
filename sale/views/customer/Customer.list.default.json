@@ -4,7 +4,8 @@
     "domain": ["relationship", "=", "customer"],
     "access": {
         "groups": ["sale.default.user", "booking.default.user"]
-     },
+    },
+    "controller": "sale_customer_collect",
     "layout": {
         "items": [
             {

@@ -1,0 +1,25 @@
+{
+    "name": "Recherche avancé de clients",
+    "description": "Contrôleur proposant des champs avec des relations indirectes.",
+    "model": {
+        "name": {
+            "label": "Nom",
+            "description": "Nom du client.",
+            "help": ""
+        },
+        "accounting_account": {
+            "label": "Code comptable",
+            "description": "Code comptable du client.",
+            "help": ""
+        },
+        "email": {
+            "label": "Adresse email",
+            "description": "Adresse email du client.",
+            "help": ""
+        }
+    },
+    "error": {
+        "errors": {
+        }
+    }
+}
