@@ -15,11 +15,10 @@ list($params, $providers) = announce([
     'description'   => "This archives the reservation, if the reservation is in quote  or checkout, with a date in the past and no money received",
     'params'        => [
         'id' =>  [
-            'description'   => 'Identifier of the booking the check against emptyness.',
+            'description'   => 'Identifier of the booking the check against emptiness.',
             'type'          => 'integer',
             'required'      => true
-        ],
-
+        ]
     ],
     'response'      => [
         'content-type'  => 'application/json',
