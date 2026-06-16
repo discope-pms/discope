@@ -76,6 +76,12 @@ list($params, $providers) = eQual::announce([
             'type'          => 'string',
             'default'       => constant('DEFAULT_LANG')
         ],
+        'contract' => [
+            'description'   => 'Join the contract to the mail.',
+            'type'          => 'boolean',
+            'default'       => true,
+            'help'          => 'Only available if setting sale.booking.mailling.optional_contract_pdf is activated.'
+        ],
         'room_plans' => [
             'description'   => 'Join the room plans to the mail.',
             'type'          => 'boolean',
@@ -143,13 +149,16 @@ $cron->schedule(
     [ 'id' => $params['booking_id'] ]
 );
 
-// generate attachment
-$attachment = eQual::run('get', 'sale_booking_print-contract', [
-    'id'        => $contract_id ,
-    'view_id'   => 'print.default',
-    'lang'      => $params['lang'],
-    'mode'      => $params['mode']
-]);
+$attachment = null;
+if($params['contract']) {
+    // generate attachment
+    $attachment = eQual::run('get', 'sale_booking_print-contract', [
+        'id'        => $contract_id ,
+        'view_id'   => 'print.default',
+        'lang'      => $params['lang'],
+        'mode'      => $params['mode']
+    ]);
+}
 
 // get 'contract' term translation
 $main_attachment_name = Lang::get_term('sale', 'contract', 'contract', $params['lang']);
@@ -206,7 +215,9 @@ $params['message'] .= $signature;
 $attachments = [];
 
 // push main attachment
-$attachments[] = new EmailAttachment($main_attachment_name.'.pdf', (string) $attachment, 'application/pdf');
+if(!is_null($attachment)) {
+    $attachments[] = new EmailAttachment($main_attachment_name.'.pdf', (string) $attachment, 'application/pdf');
+}
 
 // push room plans attachment if required by setting and needed
 if(!is_null($room_plans_attachment)) {
