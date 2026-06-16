@@ -7,6 +7,8 @@
 
 namespace sale\booking\followup;
 
+use core\setting\Setting;
+
 class Task extends \core\followup\Task {
 
     public static function getDescription(): string {
@@ -19,6 +21,14 @@ class Task extends \core\followup\Task {
 
     public static function getColumns(): array {
         return [
+
+            'description' => [
+                'type'              => 'computed',
+                'result_type'       => 'string',
+                'description'       => "Short description of the booking task.",
+                'store'             => true,
+                'function'          => 'calcDescription'
+            ],
 
             'is_done' => [
                 'type'              => 'boolean',
@@ -79,6 +89,47 @@ class Task extends \core\followup\Task {
             ]
 
         ];
+    }
+
+    public static function calcDescription($self): array {
+        $booking_task_description_format = Setting::get_value('sale', 'booking', 'task.description_format', '');
+        $date_format = Setting::get_value('core', 'locale', 'date_format', 'm/d/Y');
+
+        $result = [];
+        $self->read([
+            'booking_id' => [
+                'name',
+                'date_from',
+                'date_to',
+                'customer_reference',
+                'customer_identity_id' => [
+                    'address_city',
+                    'address_country'
+                ],
+                'center_id' => [
+                    'name'
+                ],
+                'center_office_id' => [
+                    'name'
+                ]
+            ]
+        ]);
+        foreach($self as $id => $task) {
+            if(isset($task['booking_id'])) {
+                $result[$id] = Setting::parse_format($booking_task_description_format, [
+                    'name'                  => $task['booking_id']['name'],
+                    'date_from'             => date($date_format, $task['booking_id']['date_from']),
+                    'date_to'               => date($date_format, $task['booking_id']['date_to']),
+                    'customer_reference'    => $task['booking_id']['customer_reference'],
+                    'address_city'          => $task['booking_id']['customer_identity_id']['address_city'],
+                    'address_country'       => $task['booking_id']['customer_identity_id']['address_country'],
+                    'center_name'           => $task['booking_id']['center_id']['name'],
+                    'center_office_name'    => $task['booking_id']['center_office_id']['name']
+                ]);
+            }
+        }
+
+        return $result;
     }
 
     public static function calcEntityId($self): array {

@@ -114,7 +114,8 @@ if(!empty($task_models)) {
                 'task_model_id' => $task_model['id'],
                 'booking_id'    => $booking['id'],
                 'notes'         => $notes
-            ]);
+            ])
+                ->read(['description']);
         }
     }
 }
