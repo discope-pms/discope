@@ -66,6 +66,11 @@
             "label": "Adresse email",
             "description": "Adresse email d'un contact de la réservation.",
             "help": ""
+        },
+        "rental_unit_category_id": {
+            "label": "Catégorie unité locative",
+            "description": "Catégorie d'unités locatives.",
+            "help": ""
         }
     },
     "error": {

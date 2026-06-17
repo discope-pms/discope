@@ -77,6 +77,17 @@
                                                 "label": "Customer accounting account",
                                                 "value": "customer_accounting_account",
                                                 "width": "100%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "label": "Rental unit category",
+                                                "value": "rental_unit_category_id",
+                                                "width": "100%",
+                                                "widget": {
+                                                    "order": "name",
+                                                    "sort": "asc",
+                                                    "limit": 15
+                                                }
                                             }
                                         ]
                                     },
