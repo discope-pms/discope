@@ -204,10 +204,18 @@ $booking['time_from'] = $formatTime($booking['time_from']);
 $booking['time_to'] = $formatTime($booking['time_to']);
 
 // nb_pers are used to inject in GroupingCode name
+$has_sojourn_group = false;
+foreach($booking['booking_lines_groups_ids'] as $group) {
+    if($group['group_type'] === 'sojourn') {
+        $has_sojourn_group = true;
+    }
+}
+$main_group_type = $has_sojourn_group ? 'sojourn' : 'event';
+
 $nb_pers = 0;
 $map_age_range_nb_pers = [];
 foreach($booking['booking_lines_groups_ids'] as $group) {
-    if($group['group_type'] !== 'sojourn') {
+    if($group['group_type'] !== $main_group_type) {
         continue;
     }
 
@@ -262,7 +270,7 @@ $contacts = Contact::search(['id', 'in', $contract['booking_id']['contacts_ids']
 
 $sojourn_contact_name = '';
 foreach($contacts as $contact) {
-    if($contact['type'] === 'sojourn') {
+    if($contact['type'] === $main_group_type) {
         $sojourn_contact_name = $contact['name'];
         break;
     }
@@ -274,7 +282,7 @@ foreach($contacts as $contact) {
 
 $sojourn_groups = BookingLineGroup::search([
     ['booking_id', '=', $contract['booking_id']['id']],
-    ['group_type', '=', 'sojourn']
+    ['group_type', '=', $main_group_type]
 ])
     ->read(['age_range_assignments_ids' => ['age_to', 'qty']])
     ->get();
