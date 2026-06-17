@@ -9,6 +9,8 @@
 use equal\orm\Domain;
 use identity\Center;
 use identity\User;
+use realestate\RentalUnit;
+use sale\booking\Consumption;
 
 list($params, $providers) = eQual::announce([
     'description'   => 'Advanced search for Bookings: returns a collection of Booking according to extra parameters.',
@@ -42,7 +44,11 @@ list($params, $providers) = eQual::announce([
             'foreign_object'    => 'sale\booking\BookingType',
             'description'       => "The kind of booking it is about.",
         ],
-
+        'rental_unit_category_id' => [
+            'type'              => 'many2one',
+            'description'       => "Category which current unit belongs to, if any.",
+            'foreign_object'    => 'realestate\RentalUnitCategory'
+        ]
     ],
     'response'      => [
         'content-type'  => 'application/json',
@@ -88,6 +94,37 @@ else {
 if(isset($params['type_id']) && $params['type_id'] > 0) {
     // add constraint on center_id
     $domain = Domain::conditionAdd($domain, ['type_id', '=', $params['type_id']]);
+}
+
+if(isset($params['rental_unit_category_id'])) {
+    $category_rental_units_ids = RentalUnit::search(['rental_unit_category_id', '=', $params['rental_unit_category_id']])->ids();
+
+    $consumptions_domain = [
+        ['rental_unit_id', 'in', $category_rental_units_ids]
+    ];
+    if(!empty($bookings_ids)) {
+        $consumptions_domain[] = ['booking_id', 'in', $bookings_ids];
+    }
+
+    $consumptions = Consumption::search($consumptions_domain)
+        ->read(['booking_id'])
+        ->get();
+
+    if(!empty($consumptions)) {
+        $map_bookings_ids = [];
+        foreach($consumptions as $consumption) {
+            $map_bookings_ids[$consumption['booking_id']] = true;
+        }
+
+        $bookings_ids = array_keys($map_bookings_ids);
+    }
+    else {
+        $bookings_ids = [0];
+    }
+}
+
+if(count($bookings_ids)) {
+    $domain = Domain::conditionAdd($domain, ['id', 'in', $bookings_ids]);
 }
 
 $params['domain'] = $domain;

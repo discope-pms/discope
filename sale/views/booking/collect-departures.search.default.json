@@ -32,6 +32,17 @@
                                                 "label": "Date",
                                                 "value": "date_to",
                                                 "width": "15%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "label": "Rental unit category",
+                                                "value": "rental_unit_category_id",
+                                                "width": "15%",
+                                                "widget": {
+                                                    "order": "name",
+                                                    "sort": "asc",
+                                                    "limit": 15
+                                                }
                                             }
                                         ]
                                     }

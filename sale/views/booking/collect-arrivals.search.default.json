@@ -39,6 +39,17 @@
                                                 "value": "type_id",
                                                 "width": "20%",
                                                 "readonly": true
+                                            },
+                                            {
+                                                "type": "field",
+                                                "label": "Rental unit category",
+                                                "value": "rental_unit_category_id",
+                                                "width": "15%",
+                                                "widget": {
+                                                    "order": "name",
+                                                    "sort": "asc",
+                                                    "limit": 15
+                                                }
                                             }
                                         ]
                                     }

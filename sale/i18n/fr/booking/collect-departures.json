@@ -16,6 +16,11 @@
             "label": "Date de fin ",
             "description": "Date de fin de l'intervalle de temps.",
             "help": ""
+        },
+        "rental_unit_category_id": {
+            "label": "Catégorie unité locative",
+            "description": "Catégorie d'unités locatives.",
+            "help": ""
         }
     }
 }
