@@ -132,7 +132,8 @@ $camps = Camp::search($domain, ['sort' => ['sojourn_number' => 'asc']])
         'booking_meals_ids' => [
             'date',
             'meal_place_id' => ['name'],
-            'time_slot_id'  => ['code']
+            'time_slot_id'  => ['code'],
+            'meal_type_id'  => ['name']
         ]
     ])
     ->get(true);
@@ -227,10 +228,19 @@ foreach($camps as $camp) {
                         continue;
                     }
 
-                    $time_slot_planning[$date_key][] = sprintf('%s %d',
-                        $meal['meal_place_id']['name'],
-                        $camp['enrollments_qty']
-                    );
+                    if($meal['meal_type_id']['name'] === 'Normal') {
+                        $time_slot_planning[$date_key][] = sprintf('%s - %d',
+                            $meal['meal_place_id']['name'],
+                            $camp['enrollments_qty']
+                        );
+                    }
+                    else {
+                        $time_slot_planning[$date_key][] = sprintf('%s - %d (%s)',
+                            $meal['meal_place_id']['name'],
+                            $camp['enrollments_qty'],
+                            $meal['meal_type_id']['name']
+                        );
+                    }
                 }
             }
 
