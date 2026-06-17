@@ -29,7 +29,7 @@ use sale\booking\Booking;
 
 $bookings = Booking::search([
     ['date_from', '<', strtotime('midnight')],
-    ['status', '=', 'validated']
+    ['status', 'in', ['confirmed', 'validated']]
 ])
     ->read(['name'])
     ->get();
