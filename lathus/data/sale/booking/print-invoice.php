@@ -220,10 +220,18 @@ $booking['time_from'] = $formatTime($booking['time_from']);
 $booking['time_to'] = $formatTime($booking['time_to']);
 
 // nb_pers are used to inject in GroupingCode name
+$has_sojourn_group = false;
+foreach($booking['booking_lines_groups_ids'] as $group) {
+    if($group['group_type'] === 'sojourn') {
+        $has_sojourn_group = true;
+    }
+}
+$main_group_type = $has_sojourn_group ? 'sojourn' : 'event';
+
 $nb_pers = 0;
 $map_age_range_nb_pers = [];
 foreach($booking['booking_lines_groups_ids'] as $group) {
-    if($group['group_type'] !== 'sojourn') {
+    if($group['group_type'] !== $main_group_type) {
         continue;
     }
 
