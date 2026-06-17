@@ -23,11 +23,20 @@
         },
         {
             "id": "action.print-enrollments-list-by-sojourn",
-            "label": "Enrollments list par séjour",
+            "label": "Enrollments list by sojourn",
             "description": "Print the enrollments list by sojourn.",
             "controller": "sale_camp_print-enrollments-list",
             "params": {
                 "by_sojourn": true
+            }
+        },
+        {
+            "id": "action.print-enrollments-list-by-location",
+            "label": "Enrollments list by location",
+            "description": "Print the enrollments list by location.",
+            "controller": "sale_camp_print-enrollments-list",
+            "params": {
+                "by_location": true
             }
         }
     ],

@@ -619,6 +619,9 @@
                 },
                 "action.print-enrollments-list-by-sojourn": {
                     "label": "Liste inscriptions par séjour"
+                },
+                "action.print-enrollments-list-by-location": {
+                    "label": "Liste inscriptions par site de vie"
                 }
             }
         }

@@ -16,7 +16,12 @@
         ],
         'by_sojourn' => [
             'type'          => 'boolean',
-            'description'   => 'Separate the enrollments by sojourn.',
+            'description'   => "Separate the enrollments by sojourn.",
+            'default'       => false
+        ],
+        'by_location' => [
+            'type'          => 'boolean',
+            'description'   => "Separate the enrollments by location.",
             'default'       => false
         ]
     ],
@@ -70,6 +75,9 @@ if(!empty($params['params'])) {
 $values = compact('date_from', 'sojourn_number', 'only_saturday', 'only_weekend', 'confirmed', 'validated');
 if($params['by_sojourn']) {
     $output = eQual::run('get', 'sale_camp_print-enrollments-list-by-sojourn', $values);
+}
+elseif($params['by_location']) {
+    $output = eQual::run('get', 'sale_camp_print-enrollments-list-by-location', $values);
 }
 else {
     $output = eQual::run('get', 'sale_camp_print-enrollments-list', $values);
