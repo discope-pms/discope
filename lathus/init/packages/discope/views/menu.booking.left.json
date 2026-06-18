@@ -352,7 +352,7 @@
                             {
                                 "id": "item.planning.occupancy_sojourns",
                                 "type": "entry",
-                                "label": "Séjours",
+                                "label": "Occupations groupes",
                                 "description": "",
                                 "route": "/bookings",
                                 "context": {
