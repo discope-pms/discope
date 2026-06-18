@@ -135,6 +135,10 @@ $map_occupations = [
     'permanent' => []
 ];
 foreach($bookings as $booking) {
+    if($booking['date_from'] !== $booking['date_to'] && $booking['date_to'] === $params['date_from']) {
+        continue;
+    }
+
     $has_sojourn_group = false;
     foreach($booking['booking_lines_groups_ids'] as $group) {
         if($group['group_type'] === 'sojourn') {
@@ -193,7 +197,8 @@ foreach($bookings as $booking) {
         $booking['customer_id']['name'],
         $main_group['nb_pers'],
         $main_group['nb_children'] > 0 ? "{$main_group['nb_children']}+$nb_adults" : '',
-        implode('-', $age_range)
+        implode('-', $age_range),
+        $booking['name']
     ];
 }
 
