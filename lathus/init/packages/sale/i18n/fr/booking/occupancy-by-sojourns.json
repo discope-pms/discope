@@ -1,0 +1,72 @@
+{
+    "name": "Planning des séjours",
+    "description": "",
+    "model": {
+        "center_id": {
+            "label": "Centre",
+            "description": "Consommations liée à un centre.",
+            "help": ""
+        },
+        "date_from": {
+            "label": "Du",
+            "description": "Date de début de l'intervalle.",
+            "help": ""
+        },
+        "date_to": {
+            "label": "Au",
+            "description": "Date de fin de l'intervalle.",
+            "help": ""
+        },
+        "rental_unit_name": {
+            "label": "Bâtiment",
+            "description": "",
+            "help": "",
+            "selection": {
+                "journée": "À la journée",
+                "marabout": "En Marabout",
+                "camping": "En camping",
+                "permanent": "En dur"
+            }
+        },
+        "sojourn_date_from": {
+            "label": "Du",
+            "description": "",
+            "help": ""
+        },
+        "sojourn_date_to": {
+            "label": "Au",
+            "description": "",
+            "help": ""
+        },
+        "customer": {
+            "label": "Client",
+            "description": "",
+            "help": ""
+        },
+        "nb_pers": {
+            "label": "Participants",
+            "description": "",
+            "help": ""
+        },
+        "nb_children": {
+            "label": "Enfants",
+            "description": "",
+            "help": ""
+        },
+        "nb_adults": {
+            "label": "Adultes",
+            "description": "",
+            "help": ""
+        },
+        "age_ranges": {
+            "label": "Tranche d'âge",
+            "description": "",
+            "help": ""
+        }
+    },
+    "error": {
+        "errors": {
+
+        }
+    }
+}

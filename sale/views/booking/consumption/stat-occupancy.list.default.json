@@ -4,14 +4,6 @@
     "access": {
         "groups": ["booking.default.user"]
     },
-    "actions": [
-        {
-            "id": "action.occupancy-csv",
-            "label": "Occupations CSV",
-            "description": "Download occupations CSV.",
-            "controller": "lathus_sale_booking_consumption_occupancy-csv"
-        }
-    ],
     "header": {
         "actions": {
             "ACTION.CREATE": false

@@ -30,13 +30,57 @@ use sale\booking\Booking;
             'type'              => 'date',
             'description'       => "First date of the time interval.",
             'default'           => strtotime("tomorrow")
+        ],
+        'rental_unit_category_id' => [
+            'type'              => 'many2one',
+            'description'       => "Category which current unit belongs to, if any.",
+            'foreign_object'    => 'realestate\RentalUnitCategory'
+        ],
+
+        /* parameters used as properties of virtual entity */
+        'rental_unit_name' => [
+            'type'              => 'string',
+            'description'       => "Name of rental unit.",
+            'selection'         => [
+                'journée',
+                'marabout',
+                'camping',
+                'permanent'
+            ]
+        ],
+        'sojourn_date_from' => [
+            'type'              => 'string',
+            'description'       => "Start date of the sojourn."
+        ],
+        'sojourn_date_to' => [
+            'type'              => 'string',
+            'description'       => "Start date of the sojourn."
+        ],
+        'customer' => [
+            'type'              => 'string',
+            'description'       => "Customer name of the sojourn."
+        ],
+        'nb_pers' => [
+            'type'              => 'string',
+            'description'       => "Quantity of participants."
+        ],
+        'nb_children' => [
+            'type'              => 'string',
+            'description'       => "Quantity of children."
+        ],
+        'nb_adults' => [
+            'type'              => 'string',
+            'description'       => "Quantity of adults."
+        ],
+        'age_ranges' => [
+            'type'              => 'string',
+            'description'       => "Description of age ranges of participants."
         ]
     ],
     'response'      => [
-        'content-type'          => 'text/csv',
-        'content-disposition'   => 'inline; filename="occupations_batiments.csv"',
-        'charset'               => 'utf-8',
-        'accept-origin'         => '*'
+        'content-type'  => 'application/json',
+        'charset'       => 'utf-8',
+        'accept-origin' => '*'
     ],
     'providers'     => ['context', 'orm', 'adapt']
 ]);
@@ -129,7 +173,7 @@ $bookings = Booking::search(
     ->get(true);
 
 $map_occupations = [
-    'day'       => [],
+    'journée'   => [],
     'marabout'  => [],
     'camping'   => [],
     'permanent' => []
@@ -159,7 +203,7 @@ foreach($bookings as $booking) {
 
     $type = 'permanent';
     if($booking['date_from'] === $booking['date_to']) {
-        $type = 'day';
+        $type = 'journée';
     }
     else {
         $accomodation_rental_unit = null;
@@ -192,53 +236,35 @@ foreach($bookings as $booking) {
     }
 
     $map_occupations[$type][] = [
-        date($date_format, $main_group['date_from']),
-        date($date_format, $main_group['date_to']),
-        $booking['customer_id']['name'].' - '.$booking['name'],
-        $main_group['nb_pers'],
-        $main_group['nb_children'] > 0 ? "{$main_group['nb_children']}+$nb_adults" : '',
-        implode('-', $age_range)
+        'sojourn_date_from' => date($date_format, $main_group['date_from']),
+        'sojourn_date_to'   => date($date_format, $main_group['date_to']),
+        'customer'          => $booking['customer_id']['name'].' - '.$booking['name'],
+        'nb_pers'           => $main_group['nb_pers'],
+        'nb_children'       => $main_group['nb_children'],
+        'nb_adults'         => $main_group['nb_pers'] - $main_group['nb_children'],
+        'age_ranges'        => implode('-', $age_range)
     ];
 }
 
-
-$data = [
-    ['Du', 'Au', 'Client', 'Participants', '', '']
-];
-
 $map_types_titles = [
-    'day'       => 'À la journée',
+    'journée'   => 'À la journée',
     'marabout'  => 'En Marabout',
     'camping'   => 'En camping',
     'permanent' => 'En dur'
 ];
 
+$result = [];
 foreach($map_types_titles as $type => $title) {
-    if(empty($map_occupations[$type])) {
-        continue;
-    }
-
-    $data[] = ['', '', '', '', '', ''];
-
-    $data[] = [$title, '', '', '', '', ''];
     foreach($map_occupations[$type] as $occupation_data) {
-        $data[] = $occupation_data;
+        $result[] = array_merge(
+            ['rental_unit_name' => $type],
+            $occupation_data
+        );
     }
 }
-
-$tmp_file = tempnam(sys_get_temp_dir(), 'csv');
-
-$fp = fopen($tmp_file, 'w');
-foreach($data as $row) {
-    fputcsv($fp, $row, ';');
-}
-fclose($fp);
-
-$output = file_get_contents($tmp_file);
-
-$output = str_replace('"', '', $output);
 
 $context
     ->httpResponse()
-    ->body($output)
+    ->header('X-Total-Count', count($result))
+    ->body($result)
     ->send();
