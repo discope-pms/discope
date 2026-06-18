@@ -79,7 +79,7 @@ $rental_units = RentalUnit::search([
     ->read(['name', 'rental_unit_category_id', 'capacity', 'extra', 'has_parent', 'parent_id', 'has_children', 'children_ids'])
     ->get();
 
-$marabout_category = RentalUnitCategory::search(['code', '=', 'CP'])->read(['id'])->first();
+$marabout_category = RentalUnitCategory::search(['code', '=', 'MB'])->read(['id'])->first();
 $marabout_parent_rental_units_ids = RentalUnit::search([
     ['rental_unit_category_id', '=', $marabout_category['id']],
     ['has_parent', '=', false]
