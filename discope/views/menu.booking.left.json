@@ -348,17 +348,6 @@
                                     "entity": "sale\\booking\\consumption\\stat-occupancy",
                                     "view": "list.default"
                                 }
-                            },
-                            {
-                                "id": "item.planning.occupancy_sojourns",
-                                "type": "entry",
-                                "label": "Séjours",
-                                "description": "",
-                                "route": "/bookings",
-                                "context": {
-                                    "entity": "sale\\booking\\occupancy-by-sojourns",
-                                    "view": "list.default"
-                                }
                             }
                         ]
                     },

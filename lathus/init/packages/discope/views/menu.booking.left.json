@@ -29,6 +29,28 @@
                         }
                     },
                     {
+                        "id": "item.bookings.week",
+                        "type": "entry",
+                        "label": "Semaine à venir",
+                        "description": "",
+                        "route": "/bookings",
+                        "context": {
+                            "entity": "sale\\booking\\Booking",
+                            "view": "list.upcoming-week"
+                        }
+                    },
+                    {
+                        "id": "item.bookings.month",
+                        "type": "entry",
+                        "label": "Mois à venir",
+                        "description": "",
+                        "route": "/bookings",
+                        "context": {
+                            "entity": "sale\\booking\\Booking",
+                            "view": "list.upcoming-month"
+                        }
+                    },
+                    {
                         "id": "item.bookings.quotes",
                         "type": "entry",
                         "label": "Quotes",
