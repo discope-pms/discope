@@ -4,6 +4,14 @@
     "access": {
         "groups": ["booking.default.user"]
     },
+    "actions": [
+        {
+            "id": "action.occupancy-csv",
+            "label": "Occupations CSV",
+            "description": "Download occupations CSV.",
+            "controller": "lathus_sale_booking_consumption_occupancy-csv"
+        }
+    ],
     "header": {
         "actions": {
             "ACTION.CREATE": false
@@ -12,35 +20,29 @@
             "open": true
         }
     },
-    "domain": [
-        ["center_id", "in", "user.centers_ids"]
-    ],
     "group_by": [
         {
             "open": true,
             "field": "rental_unit_name",
             "operations": {
-                "capacity": {
+                "nb_pers": {
                     "operation": "SUM"
                 },
-                "extra": {
+                "nb_children": {
                     "operation": "SUM"
                 },
-                "nb_total": {
-                    "operation": "SUM"
-                },
-                "nb_remaining": {
-                    "operation": "SUM"
-                },
-                "nb_remaining_with_extra": {
+                "nb_adults": {
                     "operation": "SUM"
                 }
             }
         }
     ],
+    "domain": [
+        ["center_id", "in", "user.centers_ids"]
+    ],
     "order": "date",
     "sort" : "asc",
-    "controller": "sale_booking_consumption_stat-occupancy",
+    "controller": "sale_booking_occupancy-by-sojourns",
     "layout": {
         "items": [
             {
@@ -51,46 +53,38 @@
             },
             {
                 "type": "field",
-                "value": "date",
+                "value": "sojourn_date_from",
                 "width": "20%"
             },
             {
                 "type": "field",
-                "value": "rental_unit_category",
-                "width": "33%",
-                "visible": false
-            },
-            {
-                "type": "field",
-                "value": "capacity",
+                "value": "sojourn_date_to",
                 "width": "20%"
             },
             {
                 "type": "field",
-                "value": "extra",
-                "width": "20%",
-                "visible": false
+                "value": "customer",
+                "width": "33%"
             },
             {
                 "type": "field",
                 "value": "nb_pers",
-                "width": "20%"
+                "width": "15%"
             },
             {
                 "type": "field",
-                "value": "nb_total",
-                "width": "20%"
+                "value": "nb_children",
+                "width": "15%"
             },
             {
                 "type": "field",
-                "value": "nb_remaining",
-                "width": "20%"
+                "value": "nb_adults",
+                "width": "15%"
             },
             {
                 "type": "field",
-                "value": "nb_remaining_with_extra",
-                "width": "20%",
-                "visible": false
+                "value": "age_ranges",
+                "width": "15%"
             }
         ]
     }
