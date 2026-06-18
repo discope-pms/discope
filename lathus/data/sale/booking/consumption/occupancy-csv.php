@@ -194,11 +194,10 @@ foreach($bookings as $booking) {
     $map_occupations[$type][] = [
         date($date_format, $main_group['date_from']),
         date($date_format, $main_group['date_to']),
-        $booking['customer_id']['name'],
+        $booking['customer_id']['name'].' - '.$booking['name'],
         $main_group['nb_pers'],
         $main_group['nb_children'] > 0 ? "{$main_group['nb_children']}+$nb_adults" : '',
-        implode('-', $age_range),
-        $booking['name']
+        implode('-', $age_range)
     ];
 }
 
