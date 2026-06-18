@@ -31,7 +31,7 @@
 
 $adapter = $dap->get('json');
 
-$output = eQual::run('get', 'lathus_sale_booking_consumption_occupancy-csv', [
+$output = eQual::run('get', 'lathus_sale_booking_occupancy-by-sojourns-csv', [
     'center_id' => $params['params']['center_id'],
     'date_from' => $adapter->adaptIn($params['params']['date_from'], 'date'),
     'date_to'   => $adapter->adaptIn($params['params']['date_to'], 'date')

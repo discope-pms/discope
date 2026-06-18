@@ -7,9 +7,9 @@
     "actions": [
         {
             "id": "action.occupancy-csv",
-            "label": "Occupations CSV",
-            "description": "Download occupations CSV.",
-            "controller": "lathus_sale_booking_consumption_occupancy-csv"
+            "label": "Télécharger",
+            "description": "Download occupations by sojourns CSV.",
+            "controller": "lathus_sale_booking_occupancy-by-sojourns-csv"
         }
     ],
     "header": {
