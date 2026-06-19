@@ -89,7 +89,7 @@ if($booking['booking_lines_groups_ids']) {
 }
 
 $group = BookingLineGroup::create($values)
-    ->read(['id', 'name', 'activity_group_num'])
+    ->read(['id', 'name', 'activity_group_num', 'is_extra', 'group_type'])
     ->first();
 
 Booking::refreshNbPers($orm, $booking['id']);
@@ -98,14 +98,22 @@ $first_group_type = Setting::get_value('sale', 'booking', 'group.first_type', 's
 $other_group_type = Setting::get_value('sale', 'booking', 'group.other_type', 'simple');
 
 $group_type = $other_group_type;
+// if extra group set type to "simple" or setting value
+if($group['is_extra']) {
+    $group_type = 'simple';
+}
 // if first group set type to "sojourn" or setting value
-if(count($booking['booking_lines_groups_ids']) === 0) {
+elseif(count($booking['booking_lines_groups_ids']) === 0) {
     $group_type = $first_group_type;
 }
-eQual::run('do', 'sale_booking_update-sojourn-type', [
-    'id'            => $group['id'],
-    'group_type'    => $group_type
-]);
+
+// update group type if needed
+if($group_type !== $group['group_type']) {
+    eQual::run('do', 'sale_booking_update-sojourn-type', [
+        'id'            => $group['id'],
+        'group_type'    => $group_type
+    ]);
+}
 
 $group_type_name_format = Setting::get_value('sale', 'booking', "group.$group_type.name_format");
 if(!is_null($group_type_name_format)) {

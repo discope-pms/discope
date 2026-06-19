@@ -52,7 +52,7 @@ if(!$booking) {
     throw new Exception("unknown_booking", QN_ERROR_UNKNOWN_OBJECT);
 }
 
-$sojourn = BookingLineGroup::id($params['booking_line_group_id'])->read(['id', 'name', 'booking_id'])->first(true);
+$sojourn = BookingLineGroup::id($params['booking_line_group_id'])->read(['id', 'name', 'booking_id', 'group_type'])->first(true);
 
 if(!$sojourn) {
     throw new Exception("unknown_sojourn", QN_ERROR_UNKNOWN_OBJECT);
@@ -91,7 +91,9 @@ Booking::refreshOrder($orm, $booking['id']);
 // restore events (in case this controller is chained with others)
 $orm->enableEvents();
 
-Booking::id($booking['id'])->do('refresh_groups_activity_number');
+if($sojourn['group_type'] === 'camp') {
+    Booking::id($booking['id'])->do('refresh_groups_activity_number');
+}
 
 $context->httpResponse()
         ->status(204)
