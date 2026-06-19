@@ -2478,7 +2478,8 @@ class BookingLineGroup extends Model {
                                 continue;
                             }
 
-                            $c_date = mktime(0, 0, 0, $month, $day + $day_index, $year);
+                            // #memo - service_date might be set, only for schedulable non-repeatable services
+                            $c_date = $line['service_date'] ?? mktime(0, 0, 0, $month, $day + $day_index, $year);
 
                             $c_time_slot_id = $line['time_slot_id'];
                             $c_schedule_from = $schedule_from;
