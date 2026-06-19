@@ -15,13 +15,6 @@
                     <a style="margin-left: 10px; cursor: pointer;" (click)="onclickSelectInternal()">Interne</a>
                     <a style="margin-left: 10px; cursor: pointer;" (click)="onclickSelectExternal()">Externe</a>
                 </mat-optgroup>
-                <mat-optgroup *ngIf="employeeRoles.length" [label]="'Rôles'">
-                    <a *ngIf="employeeRoles.length > 0" style="margin-left: 10px; cursor: pointer;" (click)="onclickSelectRole(employeeRoles[0].id)">{{ formatRoleName(employeeRoles[0].name) }}</a>
-                    <a *ngIf="employeeRoles.length > 1" style="margin-left: 10px; cursor: pointer;" (click)="onclickSelectRole(employeeRoles[1].id)">{{ formatRoleName(employeeRoles[1].name) }}</a>
-                    <a *ngIf="employeeRoles.length > 2" style="margin-left: 10px; cursor: pointer;" (click)="onclickSelectRole(employeeRoles[2].id)">{{ formatRoleName(employeeRoles[2].name) }}</a>
-                    <a *ngIf="employeeRoles.length > 3" style="margin-left: 10px; cursor: pointer;" (click)="onclickSelectRole(employeeRoles[3].id)">{{ formatRoleName(employeeRoles[3].name) }}</a>
-                    <a *ngIf="employeeRoles.length > 4" style="margin-left: 10px; cursor: pointer;" (click)="onclickSelectRole(employeeRoles[4].id)">{{ formatRoleName(employeeRoles[4].name) }}</a>
-                </mat-optgroup>
                 <ng-container *ngFor="let partner of partners; let i = index">
                     <mat-divider *ngIf="i > 0 && partners[i-1].relationship !== partner.relationship"></mat-divider>
                     <mat-option [value]="partner.id">

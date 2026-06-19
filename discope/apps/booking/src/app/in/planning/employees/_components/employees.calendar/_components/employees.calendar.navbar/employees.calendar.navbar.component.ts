@@ -399,18 +399,6 @@ export class PlanningEmployeesCalendarNavbarComponent implements OnInit, OnChang
         });
     }
 
-    public onclickSelectRole(roleId: number) {
-        this.partnerSelector.options.forEach((item: MatOption) => {
-            const partner = this.partners.find(p => p.id == item.value);
-            if(partner.role_id === roleId) {
-                item.select();
-            }
-            else {
-                item.deselect();
-            }
-        });
-    }
-
     public formatRoleName(roleName: string) {
         return roleName.slice(0, 5) + '.';
     }
