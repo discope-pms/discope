@@ -89,6 +89,8 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
 
     public hovered_partner: any;                         // the partner that must be displayed in tooltip to show its details
     private hoveredPartnerTimeout: any = null;           // timeout to allow time to move mouse from partner to tooltip without closing it (to scroll all activities or the partner)
+    public displayPartnerTooltip = false;       // if true the hovered partner tooltip is displayed
+    private displayPartnerTooltipTimeout: any = null;    // timeout to display a tooltip only 1sec after partner hovered
 
     public hovered_activity_partner: any;                // partner of the hovered activity to show its details in the navbar
 
@@ -823,13 +825,13 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
         }
     }
 
-    public onhoverPartner(employee: any) {
-        if(employee) {
+    public onhoverPartner(partner: any) {
+        if(partner) {
             const containerBody = this.containerBody?.nativeElement as HTMLElement;
 
             const height = containerBody.getBoundingClientRect().height;
 
-            const elementId = 'partner-' + employee.id;
+            const elementId = 'partner-' + partner.id;
             const element = document.getElementById(elementId);
             const elementRect = element.getBoundingClientRect();
             const elementBottomPosition = elementRect.y + elementRect.height;
@@ -842,17 +844,39 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
             }
         }
 
-        if(this.hoveredPartnerTimeout === null && employee) {
-            this.hovered_partner = employee;
-            this.hovered_activity_partner = employee;
+        const displayPartnerWithTimeout = () => {
+            clearTimeout(this.displayPartnerTooltipTimeout);
+            this.displayPartnerTooltipTimeout = setTimeout(() => {
+                this.displayPartnerTooltip = true;
+                this.displayPartnerTooltipTimeout = null;
+                this.cd.detectChanges();
+            }, 1000);
+        };
+
+        const hidePartner = () => {
+            this.displayPartnerTooltip = false;
+            clearTimeout(this.displayPartnerTooltipTimeout);
+            this.displayPartnerTooltipTimeout = null;
+        }
+
+        if(this.hoveredPartnerTimeout === null && partner) {
+            this.hovered_partner = partner;
+            displayPartnerWithTimeout();
         }
         else {
             clearTimeout(this.hoveredPartnerTimeout);
             this.hoveredPartnerTimeout = setTimeout(() => {
-                this.hovered_partner = employee;
-                this.hovered_activity_partner = employee;
+                this.hovered_partner = partner;
+                this.hovered_activity_partner = partner;
                 this.hoveredPartnerTimeout = null;
                 this.cd.detectChanges();
+
+                if(partner) {
+                    displayPartnerWithTimeout();
+                }
+                else {
+                    hidePartner();
+                }
             }, 100);
         }
     }

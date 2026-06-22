@@ -88,7 +88,7 @@
                         (click)="onSelectedPartner(partner)"
                     >
                         <span [id]="'partner-' + partner.id" class="partner-name">{{ partner.name }}</span>
-                        <div *ngIf="partner == hovered_partner" class="cell-hint" [style]="tooltipPosition === 'top' ? 'transform: translateY(-280px)' : ''">
+                        <div *ngIf="partner == hovered_partner && displayPartnerTooltip" class="cell-hint" [style]="tooltipPosition === 'top' ? 'transform: translateY(-280px)' : ''">
                             <div class="tooltip tooltip--with-header">
                                 <ng-container *ngIf="partner.relationship === 'employee'">
                                     <div class="header">
