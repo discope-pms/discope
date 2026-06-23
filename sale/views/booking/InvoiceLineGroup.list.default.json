@@ -3,7 +3,13 @@
     "description": "This view is intended for displaying the list of invoice line groups.",
     "access": {
         "groups": ["booking.default.user"]
-     },
+    },
+    "header": {
+        "selection": false,
+        "actions": {
+            "ACTION.CREATE": false
+        }
+    },
     "layout": {
         "items": [
             {

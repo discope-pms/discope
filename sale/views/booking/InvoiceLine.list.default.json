@@ -4,6 +4,14 @@
     "access": {
         "groups": ["finance.default.user", "sale.default.user"]
     },
+    "header": {
+        "selection": false,
+        "actions": {
+            "ACTION.EDIT": false,
+            "ACTION.CREATE": false,
+            "ACTION.SAVE": false
+        }
+    },
     "operations": {
         "total": {
             "total": {
@@ -14,14 +22,6 @@
                 "operation": "SUM",
                 "usage": "amount/money:2"
             }
-        }
-    },
-    "header": {
-        "selection": false,
-        "actions": {
-            "ACTION.EDIT": false,
-            "ACTION.CREATE": false,
-            "ACTION.SAVE": false
         }
     },
     "limit": 500,
