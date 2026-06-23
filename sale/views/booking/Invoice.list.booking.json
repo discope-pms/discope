@@ -7,7 +7,7 @@
     "header": {
         "selection": false,
         "actions": {
-            "ACTION.CREATE": true
+            "ACTION.CREATE": false
         }
     },
     "operations": {
