@@ -4,6 +4,12 @@
     "access": {
         "groups": ["finance.default.user", "sale.default.user"]
     },
+    "header": {
+        "selection": false,
+        "actions": {
+            "ACTION.CREATE": false
+        }
+    },
     "order": "date",
     "sort": "desc",
     "domain": ["center_office_id", "in", "user.center_offices_ids"],

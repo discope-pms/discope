@@ -4,6 +4,12 @@
     "access": {
         "groups": ["booking.default.user"]
     },
+    "header": {
+        "selection": false,
+        "actions": {
+            "ACTION.CREATE": true
+        }
+    },
     "operations": {
         "total": {
             "display_price": {
