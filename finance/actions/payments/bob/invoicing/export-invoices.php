@@ -5,12 +5,14 @@
     License: GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 
+use core\setting\Setting;
 use documents\Export;
 use equal\text\TextTransformer;
 use identity\CenterOffice;
 use finance\accounting\AccountingJournal;
 use sale\booking\Invoice;
 use sale\booking\Funding;
+use sale\catalog\Product;
 
 [$params, $providers] = eQual::announce([
     'description'   => "Creates an export archive containing all emitted invoices that haven't been exported yet (for external invoicing software).",
@@ -41,14 +43,15 @@ use sale\booking\Funding;
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'     => ['context', 'auth']
+    'providers'     => ['context', 'auth', 'dispatch']
 ]);
 
 /**
  * @var \equal\php\Context                  $context
  * @var \equal\auth\AuthenticationManager   $auth
+ * @var \equal\dispatch\Dispatcher          $dispatch
  */
-['context' => $context, 'auth' => $auth] = $providers;
+['context' => $context, 'auth' => $auth, 'dispatch' => $dispatch] = $providers;
 
 /**
  * Methods
@@ -173,6 +176,9 @@ $invoices = Invoice::search($domain, ['limit' => 100, 'sort' => ['number' => 'as
             'product_id',
             'vat_rate',
             'discount',
+            'downpayment_invoice_id' => [
+                'status'
+            ],
             'price_id' => [
                 'vat_rate',
                 'accounting_rule_id' => [
@@ -255,7 +261,6 @@ $invoices_schema = implode("\r\n", ['[IHDDOC_FACT]', 'FileType=Fixed', 'CharSet=
 
 $invoices_data = [];
 $map_partners_ids = [];
-$map_handled_invoices_ids = [];
 foreach($invoices as $invoice) {
     // when invoice is a credit note, PAYAMN must be inverted (in most cases should be negative)
     if($invoice['type'] == 'credit_note') {
@@ -323,10 +328,9 @@ foreach($invoices as $invoice) {
         $values[] = $map_values[$field];
     }
 
-    $invoices_data[] = implode('', $values);
+    $invoices_data[$invoice['id']] = implode('', $values);
 
     $map_partners_ids[$invoice['partner_id']['id']] = true;
-    $map_handled_invoices_ids[$invoice['id']] = true;
 }
 
 /*
@@ -334,6 +338,32 @@ foreach($invoices as $invoice) {
 */
 
 $allowed_rates = [0.0, 0.06, 0.12, 0.21];
+
+// #todo #settings - adapt to new conventions
+$account_downpayment = Setting::get_value('sale', 'accounting', 'invoice.downpayment_account', '4460000');
+$account_discount = Setting::get_value('finance', 'accounting', 'account.discount', '7080000');
+
+$map_downpayment_products = [];
+foreach($invoices as $invoice) {
+    if(isset($map_downpayment_products[$invoice['organisation_id']])) {
+        continue;
+    }
+
+    $downpayment_sku = Setting::get_value('sale', 'organization', 'sku.downpayment.'.$invoice['organisation_id']);
+    if($downpayment_sku) {
+        $downpayment_product = Product::search(['sku', '=', $downpayment_sku])
+            ->read(['id'])
+            ->first();
+
+        if($downpayment_product) {
+            $map_downpayment_products[$invoice['organisation_id']] = $downpayment_product['id'];
+        }
+    }
+}
+
+// #todo #settings #catalog - store this value in the settings
+// discount product is the same for all organisations: KA-Remise-A [65]
+$discount_product_id = 65;
 
 $invoices_lines_fields_conf = [
     'DBK'           => ['type' => 'Char',           'length' => 4,      'decimals' => 0],
@@ -371,6 +401,8 @@ $invoices_lines_schema = implode("\r\n", ['[IHISTO_FACT]', 'FileType=Fixed', 'Ch
 $invoices_lines_data = [];
 
 foreach($invoices as $invoice) {
+    $invoice_lines_data = [];
+
     $index = 1;
     foreach($invoice['invoice_lines_ids'] as $line) {
         // for orders, use static memo as internal comments
@@ -390,10 +422,38 @@ foreach($invoices as $invoice) {
         );
 
         $account_code = '';
-        foreach($line['price_id']['accounting_rule_id']['accounting_rule_line_ids'] as $rule_line) {
+        if(isset($map_downpayment_products[$invoice['organisation_id']]) && $line['product_id'] === $map_downpayment_products[$invoice['organisation_id']]) {
+            // deposit invoice or credit note
+            if($invoice['is_deposit'] || $invoice['type'] == 'credit_note') {
+                $account_code = $account_downpayment;
+            }
+            // balance invoice
+            elseif($invoice['type'] == 'invoice') {
+                // if the line refers to an invoiced downpayment and if the related downpayment invoice hasn't been cancelled
+                // #memo - we perform this test because some invoices include lines that incorrectly state non-deposit downpayments (that shouldn't be on the invoice)
+                if(isset($line['downpayment_invoice_id']) && $line['downpayment_invoice_id'] && isset($line['downpayment_invoice_id']['status']) && $line['downpayment_invoice_id']['status'] == 'invoice') {
+                    // add a writing symmetrical to the deposit invoice
+                    // #memo - price should be a negative value
+                    $account_code = $account_downpayment;
+                }
+            }
+        }
+        elseif($line['product_id'] == $discount_product_id) {
+            $account_code = $account_discount;
+        }
+        elseif(!empty($line['price_id']['accounting_rule_id']['accounting_rule_line_ids'])) {
+            $rule_line = $line['price_id']['accounting_rule_id']['accounting_rule_line_ids'][0];
             $pos = strpos($rule_line['account_id']['code'], '_');
             $account_code = ($pos !== false) ? substr($rule_line['account_id']['code'], 0, $pos) : $rule_line['account_id']['code'];
-            break;
+        }
+        elseif($line['price'] != 0.0) {
+            // #memo - this should not occur! - products shouldn't be embedded to invoices if there is no accounting rule
+            trigger_error("APP::No related price found for non-null amount for line {$line['name']} [{$line['product_id']}] with price [{$line['price_id']}] of invoice {$invoice['name']} [{$invoice['id']}]", QN_REPORT_WARNING);
+            // remove invoice from processed invoices, and skip all lines
+            unset($invoices_data[$invoice['id']]);
+            // #todo - dispatch an alert that relates to a dedicated controller
+            $dispatch->dispatch('lodging.accounting.invoice.invalid', 'sale\booking\Invoice', $invoice['id'], 'important', null, [], [], null, $params['center_office_id']);
+            continue 2;
         }
 
         $unit_price_discounted = $line['unit_price'];
@@ -445,10 +505,15 @@ foreach($invoices as $invoice) {
             $values[] = $map_values[$field];
         }
 
-        $invoices_lines_data[] = implode('', $values);
+        $invoice_lines_data[] = implode('', $values);
 
         $index++;
     }
+
+    $invoices_lines_data = array_merge(
+        $invoices_lines_data,
+        $invoice_lines_data
+    );
 }
 
 /*
@@ -479,7 +544,7 @@ $zip->addFromString('IHISTO_FACT.sch', $invoices_lines_schema);
 
 // embed data files
 $zip->addFromString('CLIENTS_FACT_PEPPOL.txt', $customers_files_data['data']);
-$zip->addFromString('IHDDOC_FACT.txt', implode("\r\n", $invoices_data)."\r\n");
+$zip->addFromString('IHDDOC_FACT.txt', implode("\r\n", array_values($invoices_data))."\r\n");
 $zip->addFromString('IHISTO_FACT.txt', implode("\r\n", $invoices_lines_data)."\r\n");
 
 $zip->close();
@@ -501,7 +566,7 @@ $export = Export::create([
     'export_type'           => $journal['type'] === 'sales' ? 'invoices' : 'invoices_peppol',
     'data'                  => $data,
     'object_class'          => Invoice::getType(),
-    'object_ids'            => json_encode(array_keys($map_handled_invoices_ids))
+    'object_ids'            => json_encode(array_keys($invoices_data))
 ])
     ->read(['id'])
     ->first();
@@ -512,7 +577,7 @@ $export = Export::create([
 
 try {
     // mark processed invoices as exported
-    Invoice::ids(array_keys($map_handled_invoices_ids))->update(['is_exported' => true]);
+    Invoice::ids(array_keys($invoices_data))->update(['is_exported' => true]);
 }
 catch(Exception $e) {
     // remove export if error triggered while flagging invoices as exported
