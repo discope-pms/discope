@@ -416,10 +416,28 @@ export class BookingServicesBookingGroupLineComponent extends TreeComponent<Book
     }
 
     private async qtyChange() {
-        if(this.instance.qty != this.vm.qty.formControl.value) {
+        if(this.instance.qty == this.vm.qty.formControl.value) {
+            return;
+        }
+
+        if(this.booking.status !== 'checkedout') {
             // notify back-end about the change
             try {
                 await this.api.update(this.instance.entity, [this.instance.id], {qty: this.vm.qty.formControl.value});
+                // relay change to parent component
+                this.updated.emit();
+            }
+            catch(response) {
+                this.api.errorFeedback(response);
+            }
+        }
+        else {
+            // notify back-end about the change
+            try {
+                await this.api.fetch('?do=sale_booking_update-checkedout-bookingline-qty', {
+                    id: this.instance.id,
+                    qty: this.vm.qty.formControl.value
+                });
                 // relay change to parent component
                 this.updated.emit();
             }

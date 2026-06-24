@@ -19,6 +19,7 @@ Setting::assert_value('sale', 'features', 'booking.age_range.sporty', false);
 Setting::assert_value('sale', 'features', 'booking.room_plans', false);
 Setting::assert_value('sale', 'features', 'booking.confirm_with_payment_plan', false);
 Setting::assert_value('sale', 'features', 'booking.expired_option.revert_to_quote', true);
+Setting::assert_value('sale', 'features', 'booking.modify_checkedout_booking', false);
 Setting::assert_value('sale', 'features', 'employee_planning', false);
 Setting::assert_value('sale', 'features', 'employee_planning.activity_filter', false);
 Setting::assert_value('sale', 'features', 'employee_planning.booking_activity_card.line1', '{group_num} - {customer_name}');
