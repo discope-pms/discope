@@ -9,6 +9,14 @@
             "ACTION.CREATE": false
         }
     },
+    "actions": [
+        {
+            "id": "action.download",
+            "label": "Répartition par chambre",
+            "description": "Download occupations by sojourns CSV.",
+            "controller": "sale_booking_consumption_print-occupancies"
+        }
+    ],
     "group_by": [{"field": "date", "operation": ["SUM", "object.qty"]}],
     "domain": [ ["center_id", "in", "user.centers_ids"], ["is_accomodation", "=", true], ["type", "=", "book"], ["schedule_to", "=", "24:00:00"] ],
     "operations": {
