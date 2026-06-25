@@ -164,15 +164,27 @@ export class BookingServicesBookingGroupAgeRangeComponent extends TreeComponent<
 
         this.updating.emit(true);
 
+        let action: string;
+        let data: any = {
+            id: this.group.id,
+            age_range_assignment_id: this.instance.id,
+            qty: this.qtyFormControl.value,
+            free_qty: this.freeQtyFormControl.value
+        };
+
+        if(this.booking.status !== 'checkedout') {
+            action = 'sale_booking_update-sojourn-agerange-set';
+
+            data['age_range_id'] = this.age_range_id;
+            data['is_sporty'] =this.isSportyFormControl.value;
+        }
+        else {
+            action = 'sale_booking_update-checkedout-sojourn-agerange-set';
+        }
+
         // notify back-end about the change
         try {
-            await this.api.fetch('?do=sale_booking_update-sojourn-agerange-set', {
-                id: this.group.id,
-                age_range_id: this.age_range_id,
-                age_range_assignment_id: this.instance.id,
-                qty: this.qtyFormControl.value,
-                free_qty: this.freeQtyFormControl.value
-            });
+            await this.api.fetch(`?do=${action}`, data);
 
             // relay change to parent component (update nb_pers)
             this.updated.emit();
