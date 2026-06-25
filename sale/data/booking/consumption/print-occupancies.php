@@ -162,6 +162,8 @@ $consumptions = Consumption::search($domain)
     ])
     ->get();
 
+$has_consumptions = count($consumptions) > 0;
+
 $date_from = $params['date_from'];
 $date_to = $params['date_to'];
 
@@ -194,15 +196,15 @@ foreach($rental_units as $id => $rental_unit) {
 }
 
 foreach($rental_units as $id => $rental_unit) {
-    $has_consumptions = false;
+    $rental_unit_has_consumptions = false;
     foreach($map_rental_units_dates_consumptions[$id] as $date_index => $consumptions) {
         if(!empty($consumptions)) {
-            $has_consumptions = true;
+            $rental_unit_has_consumptions = true;
             break;
         }
     }
 
-    if(!$has_consumptions) {
+    if(!$rental_unit_has_consumptions) {
         unset($rental_units[$id]);
     }
 }
@@ -214,7 +216,7 @@ $subtitle = sprintf('Du %s au %s',
     $formatDate($date_to)
 );
 
-$values = compact('title', 'subtitle', 'map_date_indexes', 'rental_units', 'map_rental_units_dates_consumptions');
+$values = compact('title', 'subtitle', 'has_consumptions', 'map_date_indexes', 'rental_units', 'map_rental_units_dates_consumptions');
 
 // 3. Create html view
 

@@ -106,27 +106,35 @@ div.footer {
 <table class="rental-units-occupancies-table">
     <thead>
     <tr>
-        <th></th>
+        <th style="min-width: 50px;"></th>
         {% for date in map_date_indexes %}
             <th>{{ date }}</th>
         {% endfor %}
     </tr>
     </thead>
     <tbody>
-    {% for rental_unit in rental_units %}
+    {% if has_consumptions %}
+        {% for rental_unit in rental_units %}
+            <tr>
+                <td>{{ rental_unit.name }} ({{ rental_unit.capacity }})</td>
+                {% for date_index, date in map_date_indexes %}
+                    <td>
+                        {% if map_rental_units_dates_consumptions[rental_unit.id] is defined and map_rental_units_dates_consumptions[rental_unit.id][date_index] is defined %}
+                            {% for consumption in map_rental_units_dates_consumptions[rental_unit.id][date_index] %}
+                                {{ consumption.customer_id.name }}
+                            {% endfor %}
+                        {% endif %}
+                    </td>
+                {% endfor %}
+            </tr>
+        {% endfor %}
+    {% else %}
         <tr>
-            <td>{{ rental_unit.name }} ({{ rental_unit.capacity }})</td>
-            {% for date_index, date in map_date_indexes %}
-                <td>
-                    {% if map_rental_units_dates_consumptions[rental_unit.id] is defined and map_rental_units_dates_consumptions[rental_unit.id][date_index] is defined %}
-                        {% for consumption in map_rental_units_dates_consumptions[rental_unit.id][date_index] %}
-                            {{ consumption.customer_id.name }}
-                        {% endfor %}
-                    {% endif %}
-                </td>
-            {% endfor %}
+            <td colspan="8" style="text-align: center;">
+                Aucune occupation
+            </td>
         </tr>
-    {% endfor %}
+    {% endif %}
     </tbody>
 </table>
 

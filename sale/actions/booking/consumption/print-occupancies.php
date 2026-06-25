@@ -41,6 +41,15 @@ $data = [
     'date_from' => strtotime('Monday this week'),
     'date_to'   => strtotime('Sunday this week')
 ];
+if(isset($params['params']['date_from'])) {
+    $date = new DateTime($params['params']['date_from']);
+    $day_of_week = (int) $date->format('N');
+    if($day_of_week !== 1) {
+        $date->modify('last Monday');
+    }
+    $data['date_from'] = $date->getTimestamp();
+    $data['date_to'] = $date->modify('next Sunday')->getTimestamp();
+}
 if(isset($params['params']['center_id'])) {
     $data['center_id'] = $params['params']['center_id'];
 }
