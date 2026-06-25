@@ -500,7 +500,7 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
                 `<dt>${activity.name} <b>${activity.counter}/${activity.counter_total}</b></dt>` +
                 `<br>` +
                 `<dt>${activity.schedule_from} - ${activity.schedule_to}</dt>` +
-                `<dt><button data-action="createPartnerEvent" data-date="${activity.activity_date}" data-partner-id="${activity.partner_id.id}" data-time-slot-code="${activity.time_slot}">Créer événement</button></dt>` +
+                (activity.partner_id ? `<dt><button data-action="createPartnerEvent" data-date="${activity.activity_date}" data-partner-id="${activity.partner_id.id}" data-time-slot-code="${activity.time_slot}">Créer événement</button></dt>` : '') +
                 '</dl>';
         }
         else {

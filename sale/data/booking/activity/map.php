@@ -299,7 +299,7 @@ foreach($activities as $id => $activity) {
         'line2'                     => $line2
     ];
 
-    if($activity['has_staff_required']) {
+    if($activity['has_staff_required'] || $activity['employee_id']) {
         // #memo - we use employee_id 0 for unassigned activities
         $partner_id = intval($activity['employee_id']);
         if($partner_id > 0) {
@@ -309,7 +309,7 @@ foreach($activities as $id => $activity) {
 
         $result[$partner_id][$date_index][$time_slot][] = array_merge($activity->toArray(), $data, ['partner_id' => $employee]);
     }
-    elseif($activity['has_provider']) {
+    elseif($activity['has_provider'] || !empty($activity['providers_ids'])) {
         for($i = 0; $i < $activity['qty']; $i++) {
             $provider_id = intval($activity['providers_ids'][$i] ?? null);
             if($provider_id > 0) {
