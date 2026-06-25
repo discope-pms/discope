@@ -99,4 +99,26 @@ class User extends \core\User {
             }
         }
     }
+
+    public static function getCapabilities(): array {
+        return [
+            EQ_R_CREATE => true,
+
+            EQ_R_READ   => true,
+
+            EQ_R_UPDATE => [
+                'root'      => true,
+                'creator'   => ['firstname', 'lastname', 'language', 'password', 'groups_ids'],
+                'self'      => ['firstname', 'lastname', 'language', 'password']
+            ],
+
+            EQ_R_DELETE => [
+                'root' => true
+            ],
+
+            EQ_R_MANAGE => [
+                'root' => true
+            ]
+        ];
+    }
 }
