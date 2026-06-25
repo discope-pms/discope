@@ -106,19 +106,11 @@ class User extends \core\User {
 
             EQ_R_READ   => true,
 
-            EQ_R_UPDATE => [
-                'root'      => true,
-                'creator'   => ['firstname', 'lastname', 'language', 'password', 'groups_ids'],
-                'self'      => ['firstname', 'lastname', 'language', 'password']
-            ],
+            EQ_R_UPDATE => true,
 
-            EQ_R_DELETE => [
-                'root' => true
-            ],
+            EQ_R_DELETE => true,
 
-            EQ_R_MANAGE => [
-                'root' => true
-            ]
+            EQ_R_MANAGE => true
         ];
     }
 }
