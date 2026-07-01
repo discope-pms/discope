@@ -6,6 +6,7 @@
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 
+use core\setting\Setting;
 use equal\orm\Domain;
 use identity\Center;
 use identity\User;
@@ -43,7 +44,7 @@ list($params, $providers) = announce([
         'is_not_option' => [
             'type'              => 'boolean',
             'description'       => 'Discard quote and option bookings.',
-            'default'           =>  true
+            'default'           => Setting::get_value('sale', 'features', 'booking.plannning.occupancies.is_not_option', true),
         ],
     ],
     'response'      => [

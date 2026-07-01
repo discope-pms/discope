@@ -54,7 +54,12 @@ if(isset($params['params']['center_id'])) {
     $data['center_id'] = $params['params']['center_id'];
 }
 if(isset($params['params']['is_not_option'])) {
-    $data['is_not_option'] = in_array($params['params']['is_not_option'], [true, 'true', '1']);
+    if(gettype($params['params']['is_not_option']) === 'boolean') {
+        $data['is_not_option'] = $params['params']['is_not_option'];
+    }
+    else {
+        $data['is_not_option'] = in_array($params['params']['is_not_option'], ['true', '1']);
+    }
 }
 
 $output = eQual::run('get', 'sale_booking_consumption_print-occupancies', $data);
