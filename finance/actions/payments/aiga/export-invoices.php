@@ -6,6 +6,7 @@
 */
 
 use documents\Export;
+use equal\text\TextTransformer;
 use identity\CenterOffice;
 use sale\booking\BookingActivity;
 use sale\booking\Invoice;
@@ -131,7 +132,7 @@ foreach($invoices as $index => $invoice) {
 
 /*
     Generate AIGA import file
- */
+*/
 
 $writing_number = 1;
 
@@ -237,7 +238,10 @@ foreach($invoices as $invoice) {
             }
         }
 
-        $activity_unit_price = $total_map_activities / $total_qty;
+        $activity_unit_price = 0.0;
+        if($total_qty > 0) {
+            $activity_unit_price = $total_map_activities / $total_qty;
+        }
 
         $map_analytic_accounts_totals = [];
         foreach($activities_with_analytic as $index => $activity) {
@@ -291,6 +295,8 @@ foreach($invoices as $invoice) {
 // format each line to AIGA format (handle padding and substring)
 $formatted_lines = [];
 foreach($lines as $line) {
+    $writing_label = substr(TextTransformer::toAscii($line['writing_label']), 0, 50);
+
     $formatted_lines[] = [
         'writing_number'        => str_pad($line['writing_number'], 6, ' ', STR_PAD_LEFT),
         'writing_line_number'   => str_pad($line['writing_line_number'], 6, ' ', STR_PAD_LEFT),
@@ -301,7 +307,7 @@ foreach($lines as $line) {
         'file_type'             => str_pad($line['file_type'], 3),
         'file_number'           => str_pad($line['file_number'], 15),
         'amount'                => str_pad($line['amount'], 15),
-        'writing_label'         => str_pad(substr($line['writing_label'], 0, 50), 50),
+        'writing_label'         => str_pad($writing_label, 50),
         'due_date'              => str_pad($line['due_date'], 8),
         'check_number'          => str_pad($line['check_number'], 12),
         'invoice_number'        => str_pad($line['invoice_number'], 20),
