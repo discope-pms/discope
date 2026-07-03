@@ -229,7 +229,7 @@ if(!empty($invoices)) {
                     TextTransformer::toAscii($invoice['partner_id']['name']),
                     $invoice['name'],
                     number_format(abs($line['price']), 2, '.', ''),
-                    $direction,
+                    $line['price'] >= 0 ? $inverse_direction : $direction,
                     '',
                     ''
                 ];
