@@ -5,11 +5,13 @@
     License: GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 
+use core\setting\Setting;
 use documents\Export;
 use equal\text\TextTransformer;
 use identity\CenterOffice;
 use sale\booking\BookingActivity;
 use sale\booking\Invoice;
+use sale\catalog\Product;
 
 [$params, $providers] = eQual::announce([
     'description'   => "Creates an export archive containing all emitted invoices that haven't been exported yet (for external accounting software).",
@@ -64,10 +66,13 @@ $invoices = Invoice::search(
 )
     ->read([
         'id',
+        'type',
+        'organisation_id',
         'number',
         'date',
         'total',
         'price',
+        'is_deposit',
         'has_orders',
         'booking_id',
         'partner_id'        => [
@@ -99,6 +104,9 @@ $invoices = Invoice::search(
                 'analytic_section_id' => [
                     'code'
                 ]
+            ],
+            'downpayment_invoice_id' => [
+                'status'
             ]
         ]
     ])
@@ -108,6 +116,9 @@ if(empty($invoices)) {
     // exit without error
     throw new Exception("no_match", 0);
 }
+
+// #todo #settings - adapt to new conventions
+$account_downpayment = Setting::get_value('sale', 'accounting', 'invoice.downpayment_account', '4460000');
 
 /*
     Check invoices consistency: discard invalid invoices and emit a warning.
@@ -142,6 +153,11 @@ foreach($invoices as $invoice) {
     $writing_line_number = 1;
     $invoice_date = date('dmY', $invoice['date']);
 
+    $total = $invoice['total'];
+    if($invoice['type'] === 'credit_note') {
+        $total *= -1;
+    }
+
     // invoice total line
     $lines[] = [
         'writing_number'        => $writing_number,
@@ -152,13 +168,23 @@ foreach($invoices as $invoice) {
         'journal_account'       => 'VA',
         'file_type'             => '',
         'file_number'           => $invoice['number'],
-        'amount'                => sprintf('%.02f', $invoice['total']),
+        'amount'                => sprintf('%.02f', $total),
         'writing_label'         => $invoice['partner_id']['name'],
         'due_date'              => '',
         'check_number'          => '',
         'invoice_number'        => $invoice['number'],
         'currency_type'         => 'E'
     ];
+
+    // retrieve downpayment product
+    $downpayment_product_id = 0;
+    $downpayment_sku = Setting::get_value('sale', 'organization', 'sku.downpayment.'.$invoice['organisation_id']);
+    if($downpayment_sku) {
+        $products_ids = Product::search(['sku', '=', $downpayment_sku])->ids();
+        if($products_ids) {
+            $downpayment_product_id = reset($products_ids);
+        }
+    }
 
     $total_map_activities = 0.0;
     $activities_map_accounting_rule_lines = [];
@@ -172,8 +198,38 @@ foreach($invoices as $invoice) {
             continue;
         }
 
+        $accounting_rule_lines_ids = [];
+        if($line['product_id']['id'] == $downpayment_product_id) {
+            // deposit invoice or credit note
+            if($invoice['is_deposit'] || $invoice['type'] == 'credit_note') {
+                $accounting_rule_lines_ids = [
+                    ['account_id' => ['code' => $account_downpayment], 'share' => 1.0]
+                ];
+            }
+            // balance invoice
+            elseif($invoice['type'] == 'invoice') {
+                // if the line refers to an invoiced downpayment and if the related downpayment invoice hasn't been cancelled
+                // #memo - we perform this test because some invoices include lines that incorrectly state non-deposit downpayments (that shouldn't be on the invoice)
+                if(isset($line['downpayment_invoice_id']) && $line['downpayment_invoice_id'] && isset($line['downpayment_invoice_id']['status']) && $line['downpayment_invoice_id']['status'] == 'invoice') {
+                    // add a writing symmetrical to the deposit invoice
+                    // #memo - price should be a negative value
+                    $accounting_rule_lines_ids = [
+                        ['account_id' => ['code' => $account_downpayment], 'share' => 1.0]
+                    ];
+                }
+            }
+        }
+        else {
+            $accounting_rule_lines_ids = $line['price_id']['accounting_rule_id']['accounting_rule_line_ids'] ?? [];
+        }
+
         // invoice product line
-        foreach($line['price_id']['accounting_rule_id']['accounting_rule_line_ids'] as $rule_line) {
+        foreach($accounting_rule_lines_ids as $rule_line) {
+            if(!($line['total'] * $rule_line['share'])) {
+                // skip lines when amount is zero
+                continue;
+            }
+
             // get analytic section from model, product or price
             $analytic_section_code = '';
             if(!empty($line['price_id']['analytic_section_id']['code'])) {
@@ -186,6 +242,11 @@ foreach($invoices as $invoice) {
                 $analytic_section_code = $line['product_id']['product_model_id']['analytic_section_id']['code'];
             }
 
+            $line_total = $line['total'] * $rule_line['share'];
+            if($invoice['type'] === 'invoice') {
+                $line_total *= -1;
+            }
+
             $lines[] = [
                 'writing_number'        => $writing_number,
                 'writing_line_number'   => ++$writing_line_number,
@@ -195,7 +256,7 @@ foreach($invoices as $invoice) {
                 'journal_account'       => 'VA',
                 'file_type'             => '',
                 'file_number'           => $invoice['number'],
-                'amount'                => sprintf('%.02f', -1 * ($line['total'] * $rule_line['share'])),
+                'amount'                => sprintf('%.02f', $line_total),
                 'writing_label'         => $invoice['partner_id']['name'],
                 'due_date'              => '',
                 'check_number'          => '',
@@ -269,6 +330,16 @@ foreach($invoices as $invoice) {
 
         foreach($map_analytic_accounts_totals as $analytic_section_code => $total) {
             foreach($activities_map_accounting_rule_lines as $rule_line) {
+                if(!($total * $rule_line['share'])) {
+                    // skip lines when amount is zero
+                    continue;
+                }
+
+                $activity_line_total = $total * $rule_line['share'];
+                if($invoice['type'] === 'invoice') {
+                    $activity_line_total *= -1;
+                }
+
                 $lines[] = [
                     'writing_number'        => $writing_number,
                     'writing_line_number'   => ++$writing_line_number,
@@ -278,7 +349,7 @@ foreach($invoices as $invoice) {
                     'journal_account'       => 'VA',
                     'file_type'             => '',
                     'file_number'           => $invoice['number'],
-                    'amount'                => sprintf('%.02f', -1 * ($total * $rule_line['share'])),
+                    'amount'                => sprintf('%.02f', $activity_line_total),
                     'writing_label'         => $invoice['partner_id']['name'],
                     'due_date'              => '',
                     'check_number'          => '',
