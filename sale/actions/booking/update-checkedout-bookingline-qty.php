@@ -21,7 +21,7 @@ use sale\booking\BookingLineGroup;
             'required'          => true
         ],
         'qty' => [
-            'type'              => 'integer',
+            'type'              => 'float',
             'description'       => 'New amount of participants assigned to given ages.',
             'required'          => true
         ]
