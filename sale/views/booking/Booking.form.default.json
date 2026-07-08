@@ -904,6 +904,8 @@
                                                         },
                                                         "actions": {
                                                             "ACTION.CREATE": [ {
+                                                                "view": false,
+                                                                "edit": true,
                                                                 "view_id": "form.create",
                                                                 "visible": true
                                                             } ]
