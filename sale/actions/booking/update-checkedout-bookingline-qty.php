@@ -45,8 +45,9 @@ use sale\booking\BookingLineGroup;
 ['context' => $context, 'orm' => $orm] = $providers;
 
 $modify_checkedout_booking = Setting::get_value('sale', 'features', 'booking.modify_checkedout_booking', false);
+
 if(!$modify_checkedout_booking) {
-    throw new Exception("not_allowed", EQ_ERROR_NOT_ALLOWED);
+    throw new Exception("checked_out_booking_not_allowed", EQ_ERROR_NOT_ALLOWED);
 }
 
 $line = BookingLine::id($params['id'])
@@ -54,7 +55,7 @@ $line = BookingLine::id($params['id'])
     ->first();
 
 if($line['booking_id']['status'] !== 'checkedout') {
-    throw new Exception("not_allowed", EQ_ERROR_NOT_ALLOWED);
+    throw new Exception("non_checked_out_booking", EQ_ERROR_NOT_ALLOWED);
 }
 
 if($params['qty'] < 0) {
