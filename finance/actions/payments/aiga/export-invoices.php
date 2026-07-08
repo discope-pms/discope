@@ -203,7 +203,7 @@ foreach($invoices as $invoice) {
             // deposit invoice or credit note
             if($invoice['is_deposit'] || $invoice['type'] == 'credit_note') {
                 $accounting_rule_lines_ids = [
-                    ['account_id' => ['code' => $account_downpayment], 'share' => 1.0]
+                    ['account' => $account_downpayment, 'share' => 1.0]
                 ];
             }
             // balance invoice
@@ -214,7 +214,7 @@ foreach($invoices as $invoice) {
                     // add a writing symmetrical to the deposit invoice
                     // #memo - price should be a negative value
                     $accounting_rule_lines_ids = [
-                        ['account_id' => ['code' => $account_downpayment], 'share' => 1.0]
+                        ['account' => $account_downpayment, 'share' => 1.0]
                     ];
                 }
             }
