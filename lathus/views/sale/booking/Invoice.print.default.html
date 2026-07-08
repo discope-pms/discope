@@ -161,7 +161,7 @@ hr {
             <td colspan="2" style="width: 50%;">
                 <div style="position: absolute;">
                     <div style="font-size: 1.4rem; font-weight: 500; text-align: left; margin-left: 30px;">
-                        <div>{{ organisation.name }}</div>
+                        <div>CPA Lathus à Lathus-Saint-Rémy</div>
                         <div>{{ organisation.address_street }}</div>
                         {% if organisation.address_dispatch|length > 0 %}
                             <div>{{ organisation.address_dispatch }}</div>
@@ -236,6 +236,9 @@ hr {
 <div class="inner">
     <div class="intro">
         {{ invoice_header_html | raw }}
+    </div>
+    <div style="position: relative; margin-bottom: 15px; page-break-inside: avoid;">
+        Séjour du {{ booking.date_from }} {% if booking.date_from != booking.date_to %} au {{ booking.date_to }} {% endif %}
     </div>
     <div class="wrapper">
         <table width="100%" cellpadding="4" cellspacing="0">
