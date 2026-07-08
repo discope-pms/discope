@@ -112,8 +112,10 @@
                                                     "header": {
                                                         "actions": {
                                                             "ACTION.CREATE": [ {
-                                                                "visible": true,
-                                                                "view": "form.statement-create"
+                                                                "view": false,
+                                                                "edit": true,
+                                                                "view_id": "form.statement-create",
+                                                                "visible": true
                                                             } ]
                                                         }
                                                     }

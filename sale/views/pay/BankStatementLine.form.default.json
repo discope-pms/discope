@@ -87,7 +87,9 @@
                                                     "header": {
                                                         "actions": {
                                                             "ACTION.CREATE": [ {
-                                                                "view": "form.statement",
+                                                                "view": false,
+                                                                "edit": true,
+                                                                "view_id": "form.statement",
                                                                 "visible": true
                                                             } ]
                                                         }
