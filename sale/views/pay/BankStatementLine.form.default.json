@@ -88,7 +88,7 @@
                                                         "actions": {
                                                             "ACTION.CREATE": [ {
                                                                 "view": "form.statement",
-                                                                "visible": [ ["amount", "=", "object.amount"], ["receipt_date", "=", "object.date"] ]
+                                                                "visible": true
                                                             } ]
                                                         }
                                                     }

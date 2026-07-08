@@ -112,7 +112,7 @@
                                                     "header": {
                                                         "actions": {
                                                             "ACTION.CREATE": [ {
-                                                                "visible": [ ["amount", "=", "object.remaining_amount"], ["receipt_date", "=", "object.date"] ],
+                                                                "visible": true,
                                                                 "view": "form.statement-create"
                                                             } ]
                                                         }
