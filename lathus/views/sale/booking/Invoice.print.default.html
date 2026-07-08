@@ -210,7 +210,11 @@ hr {
         </tr>
         <tr>
             <td colspan="2" style="width: 50%; text-align: center; font-size: 1.2rem; font-weight: bold;">
-                Facture
+                {% if invoice.type == 'invoice'  %}
+                    Facture
+                {% else %}
+                    Avoir
+                {% endif %}
             </td>
             <td colspan="2" style="width: 50%; text-align: right; font-size: 0.8rem;">
                 {{ period }}
