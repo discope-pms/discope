@@ -765,6 +765,13 @@ class Identity extends Model {
         $result = [];
         $self->read(['id','name']);
         foreach($self as $id => $identity) {
+            $has_bookings = Booking::search(['customer_identity_id', '=', $id])->count();
+            if(!$has_bookings) {
+                // #memo - only set accounting account if has a booking
+                continue;
+            }
+
+
             $prefix_account = Setting::get_value('identity', 'accounting', 'customer_account.prefix', '411');
             $format = Setting::get_value('identity', 'accounting', 'customer_account.sequence_format', '%3d{prefix}%05d{sequence}');
 
