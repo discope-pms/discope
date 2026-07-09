@@ -420,7 +420,7 @@ export class BookingServicesBookingGroupLineComponent extends TreeComponent<Book
             return;
         }
 
-        if(this.booking.status !== 'checkedout') {
+        if(this.booking.status !== 'checkedout' || this.group.is_extra) {
             // notify back-end about the change
             try {
                 await this.api.update(this.instance.entity, [this.instance.id], {qty: this.vm.qty.formControl.value});
