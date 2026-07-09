@@ -37,7 +37,7 @@ use sale\camp\Enrollment;
 ['context' => $context] = $providers;
 
 $enrollment = Enrollment::id($params['id'])
-    ->read(['status', 'camp_id' => ['date_from']])
+    ->read(['status'])
     ->first();
 
 if(is_null($enrollment)) {
@@ -46,10 +46,6 @@ if(is_null($enrollment)) {
 
 if(!in_array($enrollment['status'], ['pending', 'waitlisted'])) {
     throw new Exception("invalid_status", EQ_ERROR_INVALID_PARAM);
-}
-
-if($enrollment['camp_id']['date_from'] <= time()) {
-    throw new Exception("camp_already_started", EQ_ERROR_INVALID_PARAM);
 }
 
 Enrollment::id($enrollment['id'])->transition('confirm');
