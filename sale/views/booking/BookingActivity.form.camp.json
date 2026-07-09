@@ -122,6 +122,12 @@
                                                 "label": "Employee",
                                                 "value": "employee_id",
                                                 "width": "50%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "label": "Employee",
+                                                "value": "is_exclusive",
+                                                "width": "50%"
                                             }
                                         ]
                                     },
