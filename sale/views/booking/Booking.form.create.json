@@ -9,12 +9,12 @@
             "ACTION.SAVE": [
                 {
                     "id": "SAVE_AND_VIEW",
-                    "view": "form.default",
+                    "view_id": "form.default",
                     "controller": "sale_booking_update"
                 },
                 {
                     "id": "SAVE_AND_EDIT" ,
-                    "view": "form.default",
+                    "view_id": "form.default",
                     "controller": "sale_booking_update"
                 }
             ]
