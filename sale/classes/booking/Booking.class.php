@@ -1720,23 +1720,24 @@ class Booking extends Model {
                 ->read(['id', 'name', 'customer_nature_id' => ['id', 'name'], 'rate_class_id' => ['id', 'name']])
                 ->first();
 
-            $result['customer_id'] = [
-                    'id' => $partner['id'],
-                    'name' => $partner['name']
-                ];
-            if(isset($partner['customer_nature_id'])) {
-                $result['customer_nature_id'] = [
-                        'id'    => $partner['customer_nature_id']['id'],
-                        'name'  => $partner['customer_nature_id']['name']
+            if($partner) {
+                $result['customer_id'] = [
+                        'id' => $partner['id'],
+                        'name' => $partner['name']
                     ];
+                if(isset($partner['customer_nature_id'])) {
+                    $result['customer_nature_id'] = [
+                            'id'    => $partner['customer_nature_id']['id'],
+                            'name'  => $partner['customer_nature_id']['name']
+                        ];
+                }
+                if(isset($partner['rate_class_id'])) {
+                    $result['customer_rate_class_id'] = [
+                            'id'    => $partner['rate_class_id']['id'],
+                            'name'  => $partner['rate_class_id']['name']
+                        ];
+                }
             }
-            if(isset($partner['rate_class_id'])) {
-                $result['customer_rate_class_id'] = [
-                        'id'    => $partner['rate_class_id']['id'],
-                        'name'  => $partner['rate_class_id']['name']
-                    ];
-            }
-
         }
         elseif(isset($event['customer_nature_id'])) {
             $customer_nature = CustomerNature::id($event['customer_nature_id'])->read(['rate_class_id' => ['id', 'name']])->first(true);
