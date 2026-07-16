@@ -430,11 +430,11 @@ $booking = Booking::id($booking['id'])
     ->first();
 
 $template = Template::search([
-    ['category_id', '=', $booking['center_id']['template_category_id']],
-    ['code', '=', 'quote'],
-    ['type', '=', 'quote']
-])
-    ->read( ['id','parts_ids' => ['name', 'value']], $params['lang'])
+        ['category_id', '=', $booking['center_id']['template_category_id']],
+        ['code', '=', 'quote'],
+        ['type', '=', 'quote']
+    ])
+    ->read( ['id','parts_ids' => ['name', 'value']])
     ->first(true);
 
 $parts = [];
