@@ -1,7 +1,6 @@
 {
     "name": "Enrollments",
-    "order": "child_lastname",
-    "sort": "asc",
+    "#memo": "Cannot sort on child_lastname here since it is a non-stored computed field. Sort is done in controller.",
     "controller": "sale_camp_collect-enrollments",
     "layout": {
         "items": [

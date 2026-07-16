@@ -27,6 +27,7 @@ use equal\orm\DomainCondition;
                 return strtotime("first day of January {$year}");
             }
         ],
+
         'date_to' => [
             'type'              => 'date',
             'description'       => "Date interval upper limit.",
@@ -140,6 +141,12 @@ if($params['is_ase'] !== 'all') {
 $params['domain'] = $domain->toArray();
 
 $result = eQual::run('get', 'model_collect', $params, true);
+
+if(in_array('child_lastname', $params['fields'])) {
+    usort($result, function ($a, $b) {
+        return strcmp($a['child_lastname'], $b['child_lastname']);
+    });
+}
 
 $context->httpResponse()
         ->body($result)
