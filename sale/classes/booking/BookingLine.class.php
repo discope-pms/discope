@@ -2029,7 +2029,7 @@ class BookingLine extends Model {
             }
             if($booking_line['is_activity']) {
                 if(!$booking_line['is_fullday']) {
-                    $result[$id] = $booking_line['booking_activity_id']['time_slot_id'];
+                    $result[$id] = $booking_line['booking_activity_id']['time_slot_id'] ?? null;
                 }
             }
             else {
@@ -2038,7 +2038,7 @@ class BookingLine extends Model {
                     continue;
                 }
                 if($product_model['time_slot_id']) {
-                    $result[$id] = $product_model['time_slot_id'];
+                    $result[$id] = $product_model['time_slot_id'] ?? null;
                 }
                 elseif(!empty($product_model['time_slots_ids'])) {
                     $result[$id] = current($product_model['time_slots_ids']);
