@@ -28,6 +28,14 @@ class Repair extends Consumption {
                 'ondelete'          => 'cascade'        // delete repair when parent repairing is deleted
             ],
 
+            'product_model_id' => [
+                'type'              => 'many2one',
+                'foreign_object'    => 'sale\catalog\ProductModel',
+                'description'       => "The Product the consumption relates to.",
+                'help'              => "There is no product_model for Repairings. This is left to unmark field as required.",
+                'required'          => false
+            ],
+
             'type' => [
                 'type'              => 'string',
                 'description'       => "The reason the unit is unavailable (always 'out-of-order').",
