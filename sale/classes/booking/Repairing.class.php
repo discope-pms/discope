@@ -201,7 +201,7 @@ class Repairing extends Model {
 
     public static function canupdate($om, $ids, $values, $lang) {
         if(isset($values['center_id']) || isset($values['date_from'])  ||  isset($values['date_to']) || isset($values['rental_units_ids']) ) {
-            $repairings = $om->read(self::getType(), $ids, ['id','center_id', 'date','date_from', 'date_to', 'rental_units_ids'], $lang);
+            $repairings = $om->read(self::getType(), $ids, ['id','center_id', 'date_from', 'date_to', 'rental_units_ids'], $lang);
 
             if($repairings > 0) {
                 foreach($repairings as $id => $repairing) {
