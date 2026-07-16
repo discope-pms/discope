@@ -202,7 +202,7 @@ foreach($activities as $id => $activity) {
     }
 
     $date_index = date('Y-m-d', $activity['activity_date']);
-    $time_slot = [1 => 'AM', 3 => 'PM', 6 => 'EV'][$activity['time_slot_id']];
+    $time_slot = [1 => 'AM', 3 => 'PM', 6 => 'EV'][$activity['time_slot_id'] ?? null] ?? 'unknown';
 
     // common
     $product_model = isset($activity['product_model_id'], $product_models[$activity['product_model_id']]) ? $product_models[$activity['product_model_id']]->toArray() : null;
