@@ -1642,7 +1642,7 @@ class Booking extends Model {
     }
 
     public static function doRefreshGroupsActivityNumber($self) {
-        $self->read(['booking_lines_groups_ids' => ['order', 'group_type']]);
+        $self->read(['center_id' => ['name'], 'booking_lines_groups_ids' => ['order', 'group_type']]);
         foreach($self as $booking) {
             $groups_ids = [];
             $map_order_groups_ids = [];
