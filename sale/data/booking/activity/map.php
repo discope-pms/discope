@@ -361,7 +361,7 @@ if(!empty($activity_partner_activities_ids)) {
 
     foreach($partner_events as $partner_event) {
         $date_index = date('Y-m-d', $partner_event['event_date']);
-        $time_slot = [1 => 'AM', 3 => 'PM', 6 => 'EV'][$partner_event['time_slot_id']];
+        $time_slot = [1 => 'AM', 3 => 'PM', 6 => 'EV'][$partner_event['time_slot_id'] ?? null] ?? 'unknown';
 
         $camp_group = null;
         $camp = null;
