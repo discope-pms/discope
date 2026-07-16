@@ -125,7 +125,9 @@ $orm->update(Booking::getType(), $booking_id, [
         'date_to'               => $params_fields['date_to'],
         'has_tour_operator'     => $params_fields['has_tour_operator'] ?? false,
         'tour_operator_id'      => $params_fields['tour_operator_id'] ?? null,
-        'tour_operator_ref'     => $params_fields['tour_operator_ref'] ?? ''
+        'tour_operator_ref'     => $params_fields['tour_operator_ref'] ?? '',
+        'customer_identity_id'    => $params_fields['customer_identity_id'],
+        'customer_rate_class_id'  => $params_fields['customer_rate_class_id']
     ]);
 
 
