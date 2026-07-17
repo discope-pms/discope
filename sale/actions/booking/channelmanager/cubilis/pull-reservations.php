@@ -151,7 +151,7 @@ try {
 
                     // attempt to retrieve the booking relating to the reservation, if any
                     $booking = Booking::search(['extref_reservation_id', '=', $reservation['reservation_id']])
-                        ->read(['id', 'name', 'status', 'customer_id', 'customer_identity_id', 'is_cancelled'])
+                        ->read(['id', 'name', 'status', 'customer_id', 'customer_identity_id', 'is_cancelled', 'external_data'])
                         ->first(true);
 
                     // try to sync the reservation
@@ -275,6 +275,15 @@ try {
                                     'date_from'             => $date_from,
                                     'date_to'               => $date_to
                                 ]);
+
+                                try {
+                                    Booking::id($booking['id'])->update([
+                                        'external_data'     => $booking['external_data'] . "\n\n" . ($reservation['xml'] ?? '')
+                                    ]);
+                                }
+                                catch(Exception $e) {
+                                    trigger_error('APP::failed add xml to external_data booking_id:'.$booking['id'].' (error: '.$e->getMessage().')', EQ_REPORT_WARNING);
+                                }
                             }
                         }
                         else {
@@ -323,6 +332,7 @@ try {
                                     'center_office_id'      => $property['center_office_id']['id'],
                                     'organisation_id'       => $property['center_office_id']['organisation_id'],
                                     'extref_reservation_id' => $reservation['reservation_id'],
+                                    'external_data'         => $reservation['xml'] ?? '',
                                     'description'           => $reservation['comments'],
                                     'price'                 => $booking_price,
                                     'date_from'             => $date_from,
