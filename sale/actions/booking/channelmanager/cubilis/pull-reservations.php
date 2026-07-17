@@ -276,13 +276,15 @@ try {
                                     'date_to'               => $date_to
                                 ]);
 
-                                try {
-                                    Booking::id($booking['id'])->update([
-                                        'external_data'     => $booking['external_data'] . "\n\n" . ($reservation['xml'] ?? '')
-                                    ]);
-                                }
-                                catch(Exception $e) {
-                                    trigger_error('APP::failed add xml to external_data booking_id:'.$booking['id'].' (error: '.$e->getMessage().')', EQ_REPORT_WARNING);
+                                if(!empty($reservation['xml'])) {
+                                    try {
+                                        Booking::id($booking['id'])->update([
+                                            'external_data'     => $booking['external_data'] . "\n\n" . $reservation['xml']
+                                        ]);
+                                    }
+                                    catch(Exception $e) {
+                                        trigger_error('APP::failed add xml to external_data booking_id:'.$booking['id'].' (error: '.$e->getMessage().')', EQ_REPORT_WARNING);
+                                    }
                                 }
                             }
                         }
