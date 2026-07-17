@@ -100,6 +100,12 @@ class Funding extends \sale\pay\Funding {
                 'store'             => true
             ],
 
+            'center_office_id' => [
+                'type'              => 'many2one',
+                'foreign_object'    => 'identity\CenterOffice',
+                'description'       => "The center office the booking relates to."
+            ],
+
             'invoice_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\booking\Invoice',
