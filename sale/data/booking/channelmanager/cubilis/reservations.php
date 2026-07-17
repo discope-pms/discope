@@ -326,6 +326,43 @@ Example of JSON response provided by this controller :
 ```
 */
 
+$extractSingleReservation = function($xml_content, $res_id) {
+    $dom = new DOMDocument();
+    $dom->preserveWhiteSpace = false;
+    $dom->formatOutput = true;
+    $dom->loadXML($xml_content); // <-- loadXML instead of load()
+
+    $xpath = new DOMXPath($dom);
+    $xpath->registerNamespace('ota', 'http://www.opentravel.org/OTA/2003/05');
+
+    $query = "//ota:HotelReservation[.//ota:HotelReservationID[@ResID_Value='{$res_id}']]";
+    $nodes = $xpath->query($query);
+
+    if($nodes->length === 0) {
+        return ''; // not found
+    }
+
+    $reservationNode = $nodes->item(0);
+
+    $newDom = new DOMDocument('1.0', 'UTF-8');
+    $newDom->formatOutput = true;
+
+    $root = $newDom->createElementNS('http://www.opentravel.org/OTA/2003/05', 'OTA_HotelResRS');
+    $root->setAttribute('Version', '2.02');
+    $newDom->appendChild($root);
+
+    $success = $newDom->createElement('Success');
+    $root->appendChild($success);
+
+    $hotelReservations = $newDom->createElement('HotelReservations');
+    $root->appendChild($hotelReservations);
+
+    $imported = $newDom->importNode($reservationNode, true);
+    $hotelReservations->appendChild($imported);
+
+    return $newDom->saveXML();
+};
+
 // #memo - each we need the credentials from the Center
 $property = Property::search(['extref_property_id', '=', $params['property_id']])->read(['id', 'username', 'password', 'api_id'])->first(true);
 
@@ -352,6 +389,8 @@ if($status != 200) {
 // we should have received a text/xml response, if so HttpMessage::body() contains a parsed version of the XML data
 // #memo - raw body can be retrieved by using $response->getBody(true);
 $envelope = $response->body();
+
+$raw_xml = $response->getBody(true);
 
 // check response consistency
 if(!isset($envelope['name']) || $envelope['name'] != 'OTA_HotelResRS') {
@@ -417,7 +456,8 @@ if(isset($envelope['children'][0])) {
             'room_stays'            => [],
             'extra_services'        => [],
             'payments'              => [],
-            'guarantees'            => []
+            'guarantees'            => [],
+            'xml'                   => ''
         ];
 
         foreach($reservation['children'] as $reservation_info) {
@@ -491,6 +531,14 @@ if(isset($envelope['children'][0])) {
                     if($global_info['name'] == 'HotelReservationIDs' && $global_info['has_children']) {
                         $entry['reservation_id'] = intval($global_info['children']['HotelReservationID']['attributes']['ResID_Value']);
                         $entry['partner_reservation_id'] = $global_info['children']['HotelReservationID']['attributes']['ResID_Source'];
+
+                        try {
+                            $entry['xml'] = $extractSingleReservation($raw_xml, $global_info['children']['HotelReservationID']['attributes']['ResID_Value']);
+                        }
+                        catch(Exception $e) {
+                            trigger_error('APP::failed extract xml of reservation:'.$global_info['children']['HotelReservationID']['attributes']['ResID_Value'].' (error: '.$e->getMessage().')', EQ_REPORT_WARNING);
+                        }
+
                         continue;
                     }
                     if($global_info['name'] == 'Profiles' && $global_info['has_children']) {

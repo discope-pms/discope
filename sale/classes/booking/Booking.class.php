@@ -312,6 +312,12 @@ class Booking extends Model {
                 'visible'           => ['is_from_channelmanager', '=', true]
             ],
 
+            'external_data' => [
+                'type'              => 'string',
+                'usage'             => 'text/xml',
+                'description'       => "External data given to create/update booking from channel manager."
+            ],
+
             'guarantee_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\pay\Guarantee',
