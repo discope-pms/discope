@@ -338,8 +338,8 @@ $extractSingleReservation = function($xml_content, $res_id) {
     $query = "//ota:HotelReservation[.//ota:HotelReservationID[@ResID_Value='{$res_id}']]";
     $nodes = $xpath->query($query);
 
-    if ($nodes->length === 0) {
-        return null; // not found
+    if($nodes->length === 0) {
+        return ''; // not found
     }
 
     $reservationNode = $nodes->item(0);
