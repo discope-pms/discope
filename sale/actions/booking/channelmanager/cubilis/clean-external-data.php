@@ -30,12 +30,14 @@ use sale\booking\Booking;
 
 Booking::search([
     [
+        ['state', 'in', ['instance', 'archive']],
         ['is_from_channelmanager', '=', true],
         ['external_data', '<>', null],
         ['external_data', '<>', ''],
         ['status', 'in', ['balanced', 'cancelled']]
     ],
     [
+        ['state', 'in', ['instance', 'archive']],
         ['is_from_channelmanager', '=', true],
         ['external_data', '<>', null],
         ['external_data', '<>', ''],

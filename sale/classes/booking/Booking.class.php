@@ -1776,7 +1776,7 @@ class Booking extends Model {
         $bookings = $om->read(self::getType(), $oids, ['state', 'status', 'customer_id', 'customer_identity_id', 'center_id', 'booking_lines_ids'], $lang);
 
         // fields that can always be updated
-        $allowed_fields = ['status', 'description', 'is_invoiced', 'payment_status', 'activity_weeks_descriptions'];
+        $allowed_fields = ['status', 'description', 'is_invoiced', 'payment_status', 'activity_weeks_descriptions', 'external_data'];
 
         if(isset($values['status'])) {
             foreach($bookings as $booking) {
