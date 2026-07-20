@@ -6,10 +6,9 @@
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 
-use core\setting\Setting;
+use discope\setting\Setting;
 use sale\booking\Booking;
 use sale\booking\BookingLineGroup;
-
 
 list($params, $providers) = eQual::announce([
     'description'   => "Create a new Booking Lines Group ('Sojourn') for a given booking.",

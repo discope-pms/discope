@@ -7,7 +7,7 @@
 */
 
 use core\Mail;
-use core\setting\Setting;
+use discope\setting\Setting;
 use equal\email\Email;
 use sale\camp\EnrollmentImported;
 use sale\camp\GuardianImported;

@@ -8,7 +8,7 @@
 
 namespace sale\booking;
 
-use core\setting\Setting;
+use discope\setting\Setting;
 use equal\orm\Collection;
 use equal\orm\Model;
 use sale\catalog\Product;

@@ -5,7 +5,7 @@
     License: GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 
-use core\setting\Setting;
+use discope\setting\Setting;
 use documents\Export;
 use finance\accounting\AccountingJournal;
 use identity\Center;

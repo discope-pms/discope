@@ -6,7 +6,7 @@
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 
-use core\setting\Setting;
+use discope\setting\Setting;
 use documents\Export;
 use equal\text\TextTransformer;
 use finance\accounting\AccountingJournal;

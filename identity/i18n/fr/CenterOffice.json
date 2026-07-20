@@ -141,6 +141,9 @@
                 },
                 "section.accounting": {
                     "label": "Comptabilité"
+                },
+                "section.setting_values_ids": {
+                    "label": "Paramètres"
                 }
             }
         },

@@ -6,7 +6,7 @@
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 
-use core\setting\Setting;
+use discope\setting\Setting;
 use sale\booking\Booking;
 
 // announce script and fetch parameters values

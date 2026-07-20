@@ -8,7 +8,7 @@
 
 namespace sale\camp;
 
-use core\setting\Setting;
+use discope\setting\Setting;
 use equal\orm\Model;
 use sale\booking\BookingMeal;
 use sale\booking\TimeSlot;

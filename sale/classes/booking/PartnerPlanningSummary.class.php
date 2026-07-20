@@ -10,7 +10,7 @@ namespace sale\booking;
 
 use communication\Template;
 use core\Mail;
-use core\setting\Setting;
+use discope\setting\Setting;
 use equal\email\Email;
 use equal\orm\Model;
 use sale\provider\Provider;

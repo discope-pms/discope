@@ -5,7 +5,7 @@
     License: GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 
-use core\setting\Setting;
+use discope\setting\Setting;
 
 list($params, $providers) = eQual::announce([
     'name'          => "Generate Exports",

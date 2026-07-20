@@ -6,8 +6,9 @@
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 namespace sale\pay;
+
 use equal\orm\Model;
-use core\setting\Setting;
+use discope\setting\Setting;
 use sale\camp\Enrollment;
 
 class Funding extends Model {

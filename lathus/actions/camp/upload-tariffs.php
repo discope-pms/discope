@@ -6,7 +6,7 @@
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 
-use core\setting\Setting;
+use discope\setting\Setting;
 
 [$params, $provider] = eQual::announce([
     'description'   => "Uploads the tariffs csv files to Lathus website for synchronisation.",

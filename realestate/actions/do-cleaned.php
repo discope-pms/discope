@@ -7,13 +7,11 @@
 */
 use realestate\RentalUnit;
 
-use core\setting\Setting;
-
 list($params, $providers) = announce([
     'description'   => "Rental unit will marked as none the action required.",
     'params'        => [
         'id' =>  [
-            'description'   => 'Identifier of the rental unit the check against emptyness.',
+            'description'   => 'Identifier of the rental unit the check against emptiness.',
             'type'          => 'integer',
             'required'      => true
         ],

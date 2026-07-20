@@ -6,7 +6,7 @@
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 
-use core\setting\Setting;
+use discope\setting\Setting;
 use core\User;
 use Dompdf\Dompdf;
 use Dompdf\Options as DompdfOptions;

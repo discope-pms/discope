@@ -22,7 +22,7 @@ use Endroid\QrCode\ErrorCorrectionLevel\ErrorCorrectionLevelMedium;
 use sale\booking\Invoice;
 use communication\TemplatePart;
 use equal\data\DataFormatter;
-use core\setting\Setting;
+use discope\setting\Setting;
 
 [$params, $providers] = eQual::announce([
     'description'   => "Render an invoice given its ID as a PDF document, for Valrance.",

@@ -6,11 +6,7 @@
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 
-use core\setting\Setting;
 use identity\Center;
-use realestate\RentalUnit;
-use realestate\RentalUnitCategory;
-use sale\booking\Booking;
 
 [$params, $providers] = eQual::announce([
     'description'   => "Provides data about current Centers capacities (according to configuration).",

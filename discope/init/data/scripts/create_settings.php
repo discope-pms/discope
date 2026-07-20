@@ -1,5 +1,5 @@
 <?php
-use core\setting\Setting; /* #memo - +35 settings from core */
+use discope\setting\Setting; /* #memo - +35 settings from core */
 // #memo - as a convention, Discope uses the timezone set in backend as core.locale.time_zone and times are not adapted in frontend (FR & BE only)
 Setting::set_value('core', 'locale', 'time_encoding', 'backend');
 // === sale.features ===

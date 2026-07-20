@@ -20,10 +20,9 @@ use Twig\Environment as TwigEnvironment;
 use Twig\Loader\FilesystemLoader as TwigFilesystemLoader;
 use Twig\Extra\Intl\IntlExtension;
 use Twig\Extension\ExtensionInterface;
-
-use equal\data\DataFormatter;
-use core\setting\Setting;
 use Twig\TwigFilter;
+use equal\data\DataFormatter;
+use discope\setting\Setting;
 
 [$params, $providers] = eQual::announce([
     'description'   => "Render an end of camp certificate given the child ID as a PDF document, for Lathus.",

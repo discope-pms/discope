@@ -7,7 +7,7 @@
 */
 ;
 
-use core\setting\Setting;
+use discope\setting\Setting;
 use Dompdf\Dompdf;
 use Dompdf\Options as DompdfOptions;
 use realestate\RentalUnit;

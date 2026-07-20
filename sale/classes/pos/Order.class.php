@@ -6,9 +6,10 @@
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 namespace sale\pos;
+
 use equal\orm\Model;
 use equal\orm\ObjectManager;
-use core\setting\Setting;
+use discope\setting\Setting;
 
 class Order extends Model {
 

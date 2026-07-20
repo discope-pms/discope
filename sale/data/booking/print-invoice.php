@@ -19,7 +19,7 @@ use Endroid\QrCode\ErrorCorrectionLevel\ErrorCorrectionLevelMedium;
 use sale\booking\Invoice;
 use communication\TemplatePart;
 use equal\data\DataFormatter;
-use core\setting\Setting;
+use discope\setting\Setting;
 use sale\catalog\Product;
 
 list($params, $providers) = announce([

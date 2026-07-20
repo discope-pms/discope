@@ -7,7 +7,7 @@
 */
 
 use core\Lang;
-use core\setting\Setting;
+use discope\setting\Setting;
 use sale\booking\Booking;
 use sale\booking\Funding;
 use sale\booking\Invoice;
