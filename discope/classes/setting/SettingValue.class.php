@@ -14,7 +14,7 @@ class SettingValue extends \core\setting\SettingValue {
 
             'setting_id' => [
                 'type'              => 'many2one',
-                'foreign_object'    => 'fmt\setting\Setting',
+                'foreign_object'    => 'discope\setting\Setting',
                 'description'       => 'Setting the value relates to.',
                 'ondelete'          => 'cascade',
                 'required'          => true

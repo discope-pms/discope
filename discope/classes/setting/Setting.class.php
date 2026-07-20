@@ -14,7 +14,7 @@ class Setting extends \core\setting\Setting {
 
             'setting_values_ids' => [
                 'type'              => 'one2many',
-                'foreign_object'    => 'fmt\setting\SettingValue',
+                'foreign_object'    => 'discope\setting\SettingValue',
                 'foreign_field'     => 'setting_id',
                 'sort'              => 'asc',
                 'order'             => 'name',
@@ -23,7 +23,7 @@ class Setting extends \core\setting\Setting {
 
             'setting_sequences_ids' => [
                 'type'              => 'one2many',
-                'foreign_object'    => 'fmt\setting\SettingSequence',
+                'foreign_object'    => 'discope\setting\SettingSequence',
                 'foreign_field'     => 'setting_id',
                 'sort'              => 'asc',
                 'order'             => 'name',
