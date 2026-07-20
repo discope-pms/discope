@@ -5,8 +5,9 @@
     Original author(s): Yesbabylon SRL
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
+
 use sale\booking\Booking;
-use core\setting\Setting;
+use discope\setting\Setting;
 use sale\booking\channelmanager\RoomType;
 
 list($params, $providers) = eQual::announce([

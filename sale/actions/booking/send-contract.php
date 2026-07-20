@@ -6,10 +6,9 @@
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 
-use core\setting\Setting;
+use discope\setting\Setting;
 use equal\email\Email;
 use equal\email\EmailAttachment;
-
 use communication\TemplateAttachment;
 use documents\Document;
 use sale\booking\Booking;

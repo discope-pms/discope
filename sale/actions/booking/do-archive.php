@@ -9,7 +9,7 @@
 use core\alert\Message;
 use sale\booking\Booking;
 
-use core\setting\Setting;
+use discope\setting\Setting;
 
 list($params, $providers) = announce([
     'description'   => "This archives the reservation, if the reservation is in quote  or checkout, with a date in the past and no money received",

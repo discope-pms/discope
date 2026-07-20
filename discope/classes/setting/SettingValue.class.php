@@ -29,7 +29,7 @@ class SettingValue extends \core\setting\SettingValue {
 
             'organisation_id' => [
                 'type'              => 'many2one',
-                'foreign_object'    => 'identity\Organisation',
+                'foreign_object'    => 'identity\Identity',
                 'description'       => 'Organisation the setting is specific to (optional).',
                 'ondelete'          => 'cascade'
             ],

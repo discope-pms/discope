@@ -7,7 +7,7 @@
 */
 
 use identity\Center;
-use core\setting\Setting;
+use discope\setting\Setting;
 
 [$params, $providers] = eQual::announce([
     'description'   => "Render an end of camp certificate given the child ID as a PDF document.",

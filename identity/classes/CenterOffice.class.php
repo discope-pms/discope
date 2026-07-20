@@ -166,7 +166,14 @@ class CenterOffice extends \identity\Establishment {
                 'rel_local_key'     => 'center_office_id',
                 'description'       => "Follow up tasks models that are associated with the center office.",
                 'help'              => "When a camp enrollment is created for a center office, follow up tasks are generated depending on its associated models."
-            ]
+            ],
+
+            'setting_values_ids' => [
+                'type'              => 'one2many',
+                'foreign_object'    => 'discope\setting\SettingValue',
+                'foreign_field'     => 'center_office_id',
+                'description'       => 'List of settings that relate to the center office.'
+            ],
 
         ];
     }

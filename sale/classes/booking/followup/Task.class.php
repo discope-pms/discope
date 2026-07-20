@@ -7,7 +7,7 @@
 
 namespace sale\booking\followup;
 
-use core\setting\Setting;
+use discope\setting\Setting;
 
 class Task extends \core\followup\Task {
 

@@ -6,18 +6,7 @@
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 
-use core\setting\Setting;
-use equal\orm\Domain;
 use identity\Center;
-use identity\Identity;
-use realestate\RentalUnit;
-use sale\booking\Booking;
-use sale\booking\Consumption;
-use sale\booking\Contact;
-use sale\booking\Funding;
-use sale\booking\BankStatementLine;
-use sale\booking\Payment;
-use sale\booking\SojournProductModelRentalUnitAssignement;
 
 [$params, $providers] = eQual::announce([
     'description'   => 'Advanced search for Bookings: returns a collection of Booking according to extra parameters.',

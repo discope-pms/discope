@@ -24,7 +24,7 @@ use Endroid\QrCode\Builder\Builder;
 use Endroid\QrCode\ErrorCorrectionLevel\ErrorCorrectionLevelMedium;
 
 use equal\data\DataFormatter;
-use core\setting\Setting;
+use discope\setting\Setting;
 use Twig\TwigFilter;
 
 [$params, $providers] = eQual::announce([

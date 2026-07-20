@@ -12,7 +12,7 @@ use equal\data\DataGenerator;
 use equal\orm\Model;
 use sale\booking\Booking;
 use sale\booking\Invoice;
-use core\setting\Setting;
+use discope\setting\Setting;
 
 /**
  * This class is meant to be used as an interface for other entities (organisation and partner).

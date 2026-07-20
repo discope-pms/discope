@@ -5,9 +5,11 @@
     Original author(s): Yesbabylon SRL
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
+
 namespace finance\accounting;
+
 use equal\orm\Model;
-use core\setting\Setting;
+use discope\setting\Setting;
 use sale\booking\Funding;
 use sale\catalog\Product;
 

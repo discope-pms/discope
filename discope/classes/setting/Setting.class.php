@@ -44,4 +44,22 @@ class Setting extends \core\setting\Setting {
     protected static function getSettingSequenceClass(): string {
         return SettingSequence::class;
     }
+
+    public static function get_value(string $package, string $section, string $code, $default = null, array $selectors = [], string $lang = null) {
+        if(empty($selectors) || is_string($selectors[0])) {
+            // handle unique selector given
+            $selectors = [$selectors];
+        }
+
+        $setting_value = null;
+        foreach($selectors as $selector) {
+            $set_value = parent::get_value($package, $section, $code, null, $selector, $lang);
+            if(!is_null($set_value)) {
+                $setting_value = $set_value;
+                break;
+            }
+        }
+
+        return $setting_value ?? $default;
+    }
 }

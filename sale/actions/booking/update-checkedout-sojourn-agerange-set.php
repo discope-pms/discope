@@ -6,7 +6,7 @@
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 
-use core\setting\Setting;
+use discope\setting\Setting;
 use sale\booking\Booking;
 use sale\booking\BookingLine;
 use sale\booking\BookingLineGroup;
@@ -56,16 +56,19 @@ use sale\booking\BookingLineGroupAgeRangeAssignment;
  */
 ['context' => $context, 'orm' => $orm] = $providers;
 
-$modify_checkedout_booking = Setting::get_value('sale', 'features', 'booking.modify_checkedout_booking', false);
-if(!$modify_checkedout_booking) {
-    throw new Exception("not_allowed", EQ_ERROR_NOT_ALLOWED);
-}
-
 $group = BookingLineGroup::id($params['id'])
-    ->read(['nb_pers', 'date_from', 'booking_id' => ['status']])
+    ->read(['nb_pers', 'date_from', 'booking_id' => ['status', 'center_office_id']])
     ->first();
 
 if($group['booking_id']['status'] !== 'checkedout') {
+    throw new Exception("not_allowed", EQ_ERROR_NOT_ALLOWED);
+}
+
+$modify_checkedout_booking = Setting::get_value('sale', 'features', 'booking.modify_checkedout_booking', false, [
+    ['center_office_id' => $group['booking_id']['center_office_id']],   // by center_office
+    []                                                                  // fallback on global
+]);
+if(!$modify_checkedout_booking) {
     throw new Exception("not_allowed", EQ_ERROR_NOT_ALLOWED);
 }
 

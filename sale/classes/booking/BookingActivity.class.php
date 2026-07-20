@@ -8,10 +8,9 @@
 
 namespace sale\booking;
 
-use core\setting\Setting;
+use discope\setting\Setting;
 use equal\orm\Model;
 use hr\employee\Employee;
-use sale\camp\Camp;
 use sale\camp\CampGroup;
 
 class BookingActivity extends Model {

@@ -7,7 +7,7 @@
 */
 namespace identity;
 
-use core\setting\Setting;
+use discope\setting\Setting;
 use equal\orm\Model;
 
 class Establishment extends Model {

@@ -8,7 +8,7 @@
 
 use core\Lang;
 use core\Mail;
-use core\setting\Setting;
+use discope\setting\Setting;
 use equal\email\Email;
 use sale\booking\BookingType;
 use sale\booking\channelmanager\Booking;

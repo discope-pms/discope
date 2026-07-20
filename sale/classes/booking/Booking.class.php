@@ -9,7 +9,7 @@
 namespace sale\booking;
 
 use core\alert\Message;
-use core\setting\Setting;
+use discope\setting\Setting;
 use equal\data\DataFormatter;
 use equal\orm\Model;
 use identity\Center;

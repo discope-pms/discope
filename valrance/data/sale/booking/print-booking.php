@@ -8,7 +8,7 @@
 
 use communication\Template;
 use communication\TemplatePart;
-use core\setting\Setting;
+use discope\setting\Setting;
 use Dompdf\Dompdf;
 use Dompdf\Options as DompdfOptions;
 use equal\data\DataFormatter;

@@ -5,12 +5,12 @@
     Original author(s): Yesbabylon SRL
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
+
 namespace sale\booking;
 
 use sale\catalog\Product;
 use sale\price\Price;
-use core\setting\Setting;
-
+use discope\setting\Setting;
 
 class Funding extends \sale\pay\Funding {
 

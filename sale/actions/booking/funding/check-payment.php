@@ -6,7 +6,7 @@
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 use sale\booking\Funding;
-use core\setting\Setting;
+use discope\setting\Setting;
 
 [$params, $providers] = eQual::announce([
     'description'   => "Checks that a given funding has been paid (should be scheduled on due_date).",

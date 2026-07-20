@@ -5,16 +5,11 @@
     Original author(s): Yesbabylon SRL
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
+
 use equal\email\Email;
 use equal\email\EmailAttachment;
-
 use core\Mail;
-use communication\TemplateAttachment;
-use documents\Document;
-use sale\booking\Funding;
-use sale\booking\Booking;
 use sale\booking\Contract;
-use core\setting\Setting;
 
 // announce script and fetch parameters values
 list($params, $providers) = announce([

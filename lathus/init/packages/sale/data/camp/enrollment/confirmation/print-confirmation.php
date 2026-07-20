@@ -7,7 +7,7 @@
 */
 
 use communication\Template;
-use core\setting\Setting;
+use discope\setting\Setting;
 use Dompdf\Dompdf;
 use Dompdf\Options as DompdfOptions;
 use sale\camp\Enrollment;

@@ -6,7 +6,7 @@
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 
-use core\setting\Setting;
+use discope\setting\Setting;
 
 [$params, $providers] = eQual::announce([
     'description'   => "Render a booking quote as a PDF document, given its id.",
