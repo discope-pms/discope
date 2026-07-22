@@ -1796,20 +1796,26 @@ class BookingLine extends Model {
         return $result;
     }
 
-    public static function calcFareBenefit($om, $oids, $lang) {
+    public static function calcFareBenefit($self) {
         $result = [];
-        // #memo - price adapters are already applied on unit_price, so we need price_id
-        $lines = $om->read(get_called_class(), $oids, ['free_qty', 'qty', 'price_id.price', 'vat_rate', 'unit_price']);
-        if($lines) {
-            foreach($lines as $lid => $line) {
-                // delta between final price and catalog price
-                $catalog_price = $line['price_id.price'] * $line['qty'] * (1.0 + $line['vat_rate']);
-                $qty = max(0, $line['qty'] - $line['free_qty']);
-                $fare_price = $line['unit_price'] * ($qty) * (1.0 + $line['vat_rate']);
-                $benefit = round($catalog_price - $fare_price, 2);
-                $result[$lid] = max(0.0, $benefit);
-            }
+        $self->read([
+            'free_qty',
+            'qty',
+            'vat_rate',
+            'unit_price',
+            'price_id' => ['price']
+        ]);
+        foreach($self as $id => $line) {
+            // delta between final price and catalog price
+            $catalog_price = $line['price_id']['price'] * $line['qty'] * (1.0 + $line['vat_rate']);
+
+            $qty = max(0, $line['qty'] - $line['free_qty']);
+            $fare_price = $line['unit_price'] * ($qty) * (1.0 + $line['vat_rate']);
+            $benefit = round($catalog_price - $fare_price, 2);
+
+            $result[$id] = max(0.0, $benefit);
         }
+
         return $result;
     }
 
