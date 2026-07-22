@@ -1977,18 +1977,15 @@ class BookingLine extends Model {
         return $result;
     }
 
-    public static function calcQtyAccountingMethod($om, $oids, $lang) {
+    public static function calcQtyAccountingMethod($self) {
         trigger_error("ORM::calling sale\booking\BookingLine:calcQtyAccountingMethod", QN_REPORT_DEBUG);
 
         $result = [];
-        $lines = $om->read(self::getType(), $oids, [
-            'product_id.product_model_id.qty_accounting_method'
-        ]);
-        if($lines > 0 && count($lines)) {
-            foreach($lines as $oid => $odata) {
-                $result[$oid] = $odata['product_id.product_model_id.qty_accounting_method'];
-            }
+        $self->read(['product_id' => ['product_model_id' => ['qty_accounting_method']]]);
+        foreach($self as $id => $line) {
+            $result[$id] = $line['product_id']['product_model_id']['qty_accounting_method'];
         }
+
         return $result;
     }
 
