@@ -1644,7 +1644,7 @@ class BookingLine extends Model {
             $disc_percent = 0.0;
             $disc_value = 0.0;
             if(!empty($line['auto_discounts_ids'])) {
-                foreach($line['auto_discounts_ids'] as $d_id => $discount) {
+                foreach($line['auto_discounts_ids'] as $discount) {
                     if($discount['type'] == 'amount') {
                         $disc_value += $discount['value'];
                     }
@@ -1668,51 +1668,64 @@ class BookingLine extends Model {
         return $result;
     }
 
-    public static function calcFreeQty($om, $oids, $lang) {
+    public static function calcFreeQty($self) {
         $result = [];
-        $lines = $om->read(self::getType(), $oids, [
+        $self->read([
             'qty',
-            'auto_discounts_ids',
-            'manual_discounts_ids',
             'qty_accounting_method',
             'is_accomodation',
             'is_meal',
             'is_snack',
-            'product_id.is_freebie_allowed',
-            'product_id.product_model_id.has_duration',
-            'product_id.product_model_id.duration',
-            'product_id.product_model_id.is_repeatable',
-            'product_id.product_model_id.capacity',
-            'product_id.product_model_id.is_repeatable',
-            'product_id.has_age_range',
-            'product_id.age_range_id',
-            'booking_line_group_id.is_sojourn',
-            'booking_line_group_id.is_event',
-            'booking_line_group_id.nb_nights',
-            'booking_line_group_id.age_range_assignments_ids.age_range_id',
-            'booking_line_group_id.age_range_assignments_ids.free_qty'
+            'product_id' => [
+                'has_age_range',
+                'age_range_id',
+                'product_model_id' => [
+                    'is_freebie_allowed',
+                    'has_duration',
+                    'duration',
+                    'is_repeatable',
+                    'capacity',
+                    'is_repeatable'
+                ]
+            ],
+            'booking_line_group_id' => [
+                'is_sojourn',
+                'is_event',
+                'nb_nights',
+                'age_range_assignments_ids' => [
+                    'age_range_id',
+                    'free_qty'
+                ]
+            ],
+            'auto_discounts_ids' => [
+                'type',
+                'value'
+            ],
+            'manual_discounts_ids' => [
+                'type',
+                'value'
+            ]
         ]);
 
         $age_range_freebies = Setting::get_value('sale', 'features', 'booking.age_range.freebies', false);
 
-        foreach($lines as $id => $line) {
+        foreach($self as $id => $line) {
             $free_qty = 0;
 
-            if(!$line['product_id.is_freebie_allowed'] || $line['qty_accounting_method'] !== 'person') {
+            if(!$line['product_id']['is_freebie_allowed'] || $line['qty_accounting_method'] !== 'person') {
                 // product is excluded from freebies: no free quantity
                 $result[$id] = 0;
                 continue;
             }
 
-            $adapters = $om->read('sale\booking\BookingPriceAdapter', $line['auto_discounts_ids'], ['type', 'value']);
-            foreach($adapters as $adapter_id => $adapter) {
+            foreach($line['auto_discounts_ids'] as $adapter) {
                 if($adapter['type'] == 'freebie') {
                     $free_qty += $adapter['value'];
                 }
             }
+
             // check additional manual discounts
-            $discounts = $om->read('sale\booking\BookingPriceAdapter', $line['manual_discounts_ids'], ['type', 'value']);
-            foreach($discounts as $discount_id => $discount) {
+            foreach($line['manual_discounts_ids'] as $discount) {
                 if($discount['type'] == 'freebie') {
                     $free_qty += $discount['value'];
                 }
@@ -1720,31 +1733,32 @@ class BookingLine extends Model {
 
             if($age_range_freebies) {
                 $nb_repeat = 1;
-                if($line['product_id.product_model_id.has_duration']) {
-                    $nb_repeat = $line['product_id.product_model_id.duration'];
+                if($line['product_id']['product_model_id']['has_duration']) {
+                    $nb_repeat = $line['product_id']['product_model_id']['duration'];
                 }
-                elseif($line['booking_line_group_id.is_sojourn']) {
-                    if($line['product_id.product_model_id.is_repeatable']) {
-                        $nb_repeat = max(1, $line['booking_line_group_id.nb_nights']);
+                elseif($line['booking_line_group_id']['is_sojourn']) {
+                    if($line['product_id']['product_model_id']['is_repeatable']) {
+                        $nb_repeat = max(1, $line['booking_line_group_id']['nb_nights']);
                     }
                 }
-                elseif($line['booking_line_group_id.is_event']) {
-                    if($line['product_id.product_model_id.is_repeatable']) {
-                        $nb_repeat = $line['booking_line_group_id.nb_nights'] + 1;
+                elseif($line['booking_line_group_id']['is_event']) {
+                    if($line['product_id']['product_model_id']['is_repeatable']) {
+                        $nb_repeat = $line['booking_line_group_id']['nb_nights'] + 1;
                     }
                 }
 
-                foreach($line['booking_line_group_id.age_range_assignments_ids.age_range_id'] as $index => $assignment) {
-                    if(!$line['product_id.has_age_range'] || $line['product_id.age_range_id'] === $assignment['age_range_id']) {
+                foreach($line['booking_line_group_id']['age_range_assignments_ids'] as $assignment) {
+                    if(!$line['product_id']['has_age_range'] || $line['product_id']['age_range_id'] === $assignment['age_range_id']) {
                         $free_qty += self::computeLineQty(
                             $line['qty_accounting_method'],
                             $nb_repeat,
-                            $line['booking_line_group_id.age_range_assignments_ids.free_qty'][$index]['free_qty'],
-                            $line['product_id.product_model_id.is_repeatable'],
+                            $assignment['free_qty'],
+                            $line['product_id']['product_model_id']['is_repeatable'],
                             $line['is_accomodation'],
-                            $line['product_id.product_model_id.capacity']
+                            $line['product_id']['product_model_id']['capacity']
                         );
                     }
+
                     if($line['product_id.age_range_id'] === $assignment['age_range_id']) {
                         break;
                     }
@@ -1753,6 +1767,7 @@ class BookingLine extends Model {
 
             $result[$id] = min($free_qty, $line['qty']);
         }
+
         return $result;
     }
 
