@@ -1771,25 +1771,28 @@ class BookingLine extends Model {
         return $result;
     }
 
-    public static function calcDiscount($om, $oids, $lang) {
+    public static function calcDiscount($self) {
         $result = [];
-
-        $lines = $om->read(self::getType(), $oids, ['manual_discounts_ids', 'unit_price']);
-
-        foreach($lines as $oid => $line) {
-            $result[$oid] = (float) 0.0;
-            // apply additional manual discounts
-            $discounts = $om->read('sale\booking\BookingPriceAdapter', $line['manual_discounts_ids'], ['type', 'value']);
-            foreach($discounts as $aid => $adata) {
-                if($adata['type'] == 'percent') {
-                    $result[$oid] += $adata['value'];
+        $self->read([
+            'unit_price',
+            'manual_discounts_ids' => [
+                'type',
+                'value'
+            ]
+        ]);
+        foreach($self as $id => $line) {
+            $result[$id] = 0.0;
+            foreach($line['manual_discounts_ids'] as $discount) {
+                if($discount['type'] == 'percent') {
+                    $result[$id] += $discount['value'];
                 }
-                else if($adata['type'] == 'amount' && $line['unit_price'] != 0) {
+                else if($discount['type'] == 'amount' && $line['unit_price'] != 0) {
                     // amount discount is converted to a rate
-                    $result[$oid] += round($adata['value'] / $line['unit_price'], 4);
+                    $result[$id] += round($discount['value'] / $line['unit_price'], 4);
                 }
             }
         }
+
         return $result;
     }
 
