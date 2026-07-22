@@ -1619,44 +1619,52 @@ class BookingLine extends Model {
      * Compute the VAT excl. unit price of the line, with automated discounts applied.
      *
      */
-    public static function calcUnitPrice($om, $oids, $lang) {
+    public static function calcUnitPrice($self) {
         $result = [];
-        $lines = $om->read(get_called_class(), $oids, [
-                    'price_id.price',
-                    'auto_discounts_ids'
-                ]);
-        if($lines > 0) {
-            foreach($lines as $oid => $odata) {
-                $price = 0;
-                if($odata['price_id.price']) {
-                    $price = (float) $odata['price_id.price'];
-                }
-                $disc_percent = 0.0;
-                $disc_value = 0.0;
-                if(isset($odata['auto_discounts_ids']) && $odata['auto_discounts_ids']) {
-                    $adapters = $om->read('sale\booking\BookingPriceAdapter', $odata['auto_discounts_ids'], ['type', 'value', 'discount_id.discount_list_id.rate_max']);
-                    if($adapters > 0) {
-                        foreach($adapters as $aid => $adata) {
-                            if($adata['type'] == 'amount') {
-                                $disc_value += $adata['value'];
-                            }
-                            else if($adata['type'] == 'percent') {
-                                if($adata['discount_id.discount_list_id.rate_max'] && ($disc_percent + $adata['value']) > $adata['discount_id.discount_list_id.rate_max']) {
-                                    $disc_percent = $adata['discount_id.discount_list_id.rate_max'];
-                                }
-                                else {
-                                    $disc_percent += $adata['value'];
-                                }
-                            }
+        $self->read([
+            'price_id' => [
+                'price'
+            ],
+            'auto_discounts_ids' => [
+                'type',
+                'value',
+                'discount_id' => [
+                    'discount_list_id' => [
+                        'rate_max'
+                    ]
+                ]
+            ]
+        ]);
+        foreach($self as $id => $line) {
+            $price = 0;
+            if($line['price_id']['price']) {
+                $price = (float) $line['price_id']['price'];
+            }
+
+            $disc_percent = 0.0;
+            $disc_value = 0.0;
+            if(!empty($line['auto_discounts_ids'])) {
+                foreach($line['auto_discounts_ids'] as $d_id => $discount) {
+                    if($discount['type'] == 'amount') {
+                        $disc_value += $discount['value'];
+                    }
+                    else if($discount['type'] == 'percent') {
+                        if($discount['discount_id']['discount_list_id']['rate_max'] && ($disc_percent + $discount['value']) > $discount['discount_id']['discount_list_id']['rate_max']) {
+                            $disc_percent = $discount['discount_id']['discount_list_id']['rate_max'];
+                        }
+                        else {
+                            $disc_percent += $discount['value'];
                         }
                     }
-                    // #memo - when price is adapted, it no longer holds more than 2 decimals (so that unit_price x qty = displayed price)
-                    $price = max(0, round(($price * (1 - $disc_percent)) - $disc_value, 2));
                 }
-                // if no adapters, leave price given from price_id (might have more than 2 decimal digits)
-                $result[$oid] = $price;
+                // #memo - when price is adapted, it no longer holds more than 2 decimals (so that unit_price x qty = displayed price)
+                $price = max(0, round(($price * (1 - $disc_percent)) - $disc_value, 2));
             }
+
+            // if no adapters, leave price given from price_id (might have more than 2 decimal digits)
+            $result[$id] = $price;
         }
+
         return $result;
     }
 
