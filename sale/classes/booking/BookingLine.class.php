@@ -1847,65 +1847,53 @@ class BookingLine extends Model {
         return $result;
     }
 
-    public static function calcIsAccomodation($om, $oids, $lang) {
+    public static function calcIsAccomodation($self): array {
         trigger_error("ORM::calling sale\booking\BookingLine:calcIsAccomodation", QN_REPORT_DEBUG);
 
         $result = [];
-        $lines = $om->read(self::getType(), $oids, [
-            'product_id.product_model_id.is_accomodation'
-        ]);
-        if($lines > 0 && count($lines)) {
-            foreach($lines as $oid => $odata) {
-                $result[$oid] = $odata['product_id.product_model_id.is_accomodation'];
-            }
+        $self->read(['product_id' => ['product_model_id' => ['is_accomodation']]]);
+        foreach($self as $id => $line) {
+            $result[$id] = $line['product_id']['product_model_id']['is_accomodation'];
         }
+
         return $result;
     }
 
-    public static function calcIsRentalUnit($om, $oids, $lang) {
+    public static function calcIsRentalUnit($self): array {
         trigger_error("ORM::calling sale\booking\BookingLine:calcIsRentalUnit", QN_REPORT_DEBUG);
 
         $result = [];
-        $lines = $om->read(self::getType(), $oids, [
-            'product_id.product_model_id.is_rental_unit'
-        ]);
-        if($lines > 0 && count($lines)) {
-            foreach($lines as $oid => $odata) {
-                $result[$oid] = $odata['product_id.product_model_id.is_rental_unit'];
-            }
+        $self->read(['product_id' => ['product_model_id' => ['is_rental_unit']]]);
+        foreach($self as $id => $line) {
+            $result[$id] = $line['product_id']['product_model_id']['is_rental_unit'];
         }
+
         return $result;
     }
 
-    public static function calcIsMeal($om, $oids, $lang) {
+    public static function calcIsMeal($self): array {
         trigger_error("ORM::calling sale\booking\BookingLine:calcIsMeal", QN_REPORT_DEBUG);
 
         $result = [];
-        $lines = $om->read(self::getType(), $oids, [
-            'product_id.product_model_id.is_meal'
-        ]);
-        if($lines > 0 && count($lines)) {
-            foreach($lines as $oid => $odata) {
-                if(isset($odata['product_id.product_model_id.is_meal'])) {
-                    $result[$oid] = $odata['product_id.product_model_id.is_meal'];
-                }
+        $self->read(['product_id' => ['product_model_id' => ['is_meal']]]);
+        foreach($self as $id => $line) {
+            if(isset($line['product_id']['product_model_id']['is_meal'])) {
+                $result[$id] = $line['product_id']['product_model_id']['is_meal'];
             }
         }
+
         return $result;
     }
 
-    public static function calcIsSnack($om, $oids, $lang) {
+    public static function calcIsSnack($self): array {
         trigger_error("ORM::calling sale\booking\BookingLine:calcIsSnack", QN_REPORT_DEBUG);
 
         $result = [];
-        $lines = $om->read(self::getType(), $oids, [
-            'product_id.product_model_id.is_snack'
-        ]);
-        if($lines > 0 && count($lines)) {
-            foreach($lines as $oid => $odata) {
-                $result[$oid] = $odata['product_id.product_model_id.is_snack'];
-            }
+        $self->read(['product_id' => ['product_model_id' => ['is_snack']]]);
+        foreach($self as $id => $line) {
+            $result[$id] = $line['product_id']['product_model_id']['is_snack'];
         }
+
         return $result;
     }
 
