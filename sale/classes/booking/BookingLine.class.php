@@ -1759,7 +1759,7 @@ class BookingLine extends Model {
                         );
                     }
 
-                    if($line['product_id.age_range_id'] === $assignment['age_range_id']) {
+                    if($line['product_id']['age_range_id'] === $assignment['age_range_id']) {
                         break;
                     }
                 }
