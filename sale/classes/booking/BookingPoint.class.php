@@ -153,7 +153,7 @@ class BookingPoint extends Model {
         $self->read(['date_expiry', 'booking_apply_id', 'booking_id' => ['status']]);
         foreach($self as $id => $bookingPoint) {
             $is_applicable = false;
-            if($bookingPoint['date_expiry'] < time()) {
+            if($bookingPoint['date_expiry'] >= time()) {
                 if(!$bookingPoint['booking_apply_id']) {
                     if(is_null($bookingPoint['booking_id'])) {
                         $is_applicable = true;
