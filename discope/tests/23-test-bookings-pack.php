@@ -404,25 +404,27 @@ $tests = [
                 ->first(true);
 
             $booking_line_group = BookingLineGroup::create([
-                'booking_id'     => $booking['id'],
-                'is_sojourn'     => true,
-                'group_type'     => 'sojourn',
-                'rate_class_id'  => 4,
-                'sojourn_type_id'=> 2,
-                'nb_pers'        => 4
+                'booking_id'        => $booking['id'],
+                'is_sojourn'        => true,
+                'group_type'        => 'sojourn',
+                'rate_class_id'     => 4,
+                'sojourn_type_id'   => 2,
+                'nb_pers'           => 4
             ])
                 ->read(['id'])
                 ->first(true);
 
             $orm->disableEvents();
+
             try {
-                eQual::run('do', 'sale_booking_update-sojourn-dates',
-                    ['id'           => $booking_line_group['id'],
-                        'date_from'    => $booking['date_from'],
-                        'date_to'      => $booking['date_to']]);
+                eQual::run('do', 'sale_booking_update-sojourn-dates', [
+                    'id'        => $booking_line_group['id'],
+                    'date_from' => $booking['date_from'],
+                    'date_to'   => $booking['date_to']
+                ]);
             }
             catch(Exception $e) {
-                $e->getMessage();
+                trigger_error("APP::error while running sale_booking_update-sojourn-dates: ".$e->getMessage(), EQ_REPORT_ERROR);
             }
 
             $pack = Product::search(['sku','=','VS-ChSglPC-A'])
@@ -430,20 +432,25 @@ $tests = [
                 ->first(true);
 
             try {
-                eQual::run('do', 'sale_booking_update-sojourn-pack-set',
-                    ['id' => $booking_line_group['id'],'pack_id' => $pack['id']]);
+                eQual::run('do', 'sale_booking_update-sojourn-pack-set', [
+                    'id'        => $booking_line_group['id'],
+                    'pack_id'   => $pack['id']
+                ]);
             }
             catch(Exception $e) {
-                $e->getMessage();
+                trigger_error("APP::error while running sale_booking_update-sojourn-pack-set: ".$e->getMessage(), EQ_REPORT_ERROR);
             }
 
             $orm->enableEvents();
 
             $booking = Booking::id($booking['id'])
-                ->read(['id', 'price',
-                    'booking_lines_ids' => ['id', 'name', 'total', 'price'],
-                    'booking_lines_groups_ids' => ['id', 'price']
-                ])->first(true);
+                ->read([
+                    'id',
+                    'price',
+                    'booking_lines_ids'         => ['id', 'name', 'total', 'price'],
+                    'booking_lines_groups_ids'  => ['id', 'price']
+                ])
+                ->first(true);
 
             return $booking;
         },

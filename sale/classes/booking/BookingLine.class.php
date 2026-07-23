@@ -1643,7 +1643,7 @@ class BookingLine extends Model {
 
             $disc_percent = 0.0;
             $disc_value = 0.0;
-            if(!empty($line['auto_discounts_ids'])) {
+            if(count($line['auto_discounts_ids']) > 0) {
                 foreach($line['auto_discounts_ids'] as $discount) {
                     if($discount['type'] == 'amount') {
                         $disc_value += $discount['value'];
