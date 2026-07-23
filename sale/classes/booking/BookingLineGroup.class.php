@@ -431,9 +431,10 @@ class BookingLineGroup extends Model {
                         $om->create(BookingLineGroupAgeRangeAssignment::getType(), $assignment, $lang);
                     }
                 }
+                $gr = BookingLineGroup::id($gid)->read(['booking_lines_ids'])->first(true);
                 // re-compute bookinglines quantities
-                $om->update(\sale\booking\BookingLine::getType(), $group['booking_lines_ids'], ['qty_vars' => null], $lang);
-                $om->callonce(\sale\booking\BookingLine::getType(), 'updateQty', $group['booking_lines_ids'], [], $lang);
+                $om->update(\sale\booking\BookingLine::getType(), $gr['booking_lines_ids'], ['qty_vars' => null], $lang);
+                $om->callonce(\sale\booking\BookingLine::getType(), 'updateQty', $gr['booking_lines_ids'], [], $lang);
             }
             // update auto sales
             $om->callonce(self::getType(), 'updateAutosaleProducts', $oids, [], $lang);
