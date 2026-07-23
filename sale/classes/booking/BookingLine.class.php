@@ -1619,92 +1619,113 @@ class BookingLine extends Model {
      * Compute the VAT excl. unit price of the line, with automated discounts applied.
      *
      */
-    public static function calcUnitPrice($om, $oids, $lang) {
+    public static function calcUnitPrice($self) {
         $result = [];
-        $lines = $om->read(get_called_class(), $oids, [
-                    'price_id.price',
-                    'auto_discounts_ids'
-                ]);
-        if($lines > 0) {
-            foreach($lines as $oid => $odata) {
-                $price = 0;
-                if($odata['price_id.price']) {
-                    $price = (float) $odata['price_id.price'];
-                }
-                $disc_percent = 0.0;
-                $disc_value = 0.0;
-                if(isset($odata['auto_discounts_ids']) && $odata['auto_discounts_ids']) {
-                    $adapters = $om->read('sale\booking\BookingPriceAdapter', $odata['auto_discounts_ids'], ['type', 'value', 'discount_id.discount_list_id.rate_max']);
-                    if($adapters > 0) {
-                        foreach($adapters as $aid => $adata) {
-                            if($adata['type'] == 'amount') {
-                                $disc_value += $adata['value'];
-                            }
-                            else if($adata['type'] == 'percent') {
-                                if($adata['discount_id.discount_list_id.rate_max'] && ($disc_percent + $adata['value']) > $adata['discount_id.discount_list_id.rate_max']) {
-                                    $disc_percent = $adata['discount_id.discount_list_id.rate_max'];
-                                }
-                                else {
-                                    $disc_percent += $adata['value'];
-                                }
-                            }
+        $self->read([
+            'price_id' => [
+                'price'
+            ],
+            'auto_discounts_ids' => [
+                'type',
+                'value',
+                'discount_id' => [
+                    'discount_list_id' => [
+                        'rate_max'
+                    ]
+                ]
+            ]
+        ]);
+        foreach($self as $id => $line) {
+            $price = 0;
+            if($line['price_id']['price']) {
+                $price = (float) $line['price_id']['price'];
+            }
+
+            $disc_percent = 0.0;
+            $disc_value = 0.0;
+            if(count($line['auto_discounts_ids']) > 0) {
+                foreach($line['auto_discounts_ids'] as $discount) {
+                    if($discount['type'] == 'amount') {
+                        $disc_value += $discount['value'];
+                    }
+                    else if($discount['type'] == 'percent') {
+                        if($discount['discount_id']['discount_list_id']['rate_max'] && ($disc_percent + $discount['value']) > $discount['discount_id']['discount_list_id']['rate_max']) {
+                            $disc_percent = $discount['discount_id']['discount_list_id']['rate_max'];
+                        }
+                        else {
+                            $disc_percent += $discount['value'];
                         }
                     }
-                    // #memo - when price is adapted, it no longer holds more than 2 decimals (so that unit_price x qty = displayed price)
-                    $price = max(0, round(($price * (1 - $disc_percent)) - $disc_value, 2));
                 }
-                // if no adapters, leave price given from price_id (might have more than 2 decimal digits)
-                $result[$oid] = $price;
+                // #memo - when price is adapted, it no longer holds more than 2 decimals (so that unit_price x qty = displayed price)
+                $price = max(0, round(($price * (1 - $disc_percent)) - $disc_value, 2));
             }
+
+            // if no adapters, leave price given from price_id (might have more than 2 decimal digits)
+            $result[$id] = $price;
         }
+
         return $result;
     }
 
-    public static function calcFreeQty($om, $oids, $lang) {
+    public static function calcFreeQty($self) {
         $result = [];
-        $lines = $om->read(self::getType(), $oids, [
+        $self->read([
             'qty',
-            'auto_discounts_ids',
-            'manual_discounts_ids',
             'qty_accounting_method',
             'is_accomodation',
             'is_meal',
             'is_snack',
-            'product_id.is_freebie_allowed',
-            'product_id.product_model_id.has_duration',
-            'product_id.product_model_id.duration',
-            'product_id.product_model_id.is_repeatable',
-            'product_id.product_model_id.capacity',
-            'product_id.product_model_id.is_repeatable',
-            'product_id.has_age_range',
-            'product_id.age_range_id',
-            'booking_line_group_id.is_sojourn',
-            'booking_line_group_id.is_event',
-            'booking_line_group_id.nb_nights',
-            'booking_line_group_id.age_range_assignments_ids.age_range_id',
-            'booking_line_group_id.age_range_assignments_ids.free_qty'
+            'product_id' => [
+                'has_age_range',
+                'age_range_id',
+                'product_model_id' => [
+                    'is_freebie_allowed',
+                    'has_duration',
+                    'duration',
+                    'is_repeatable',
+                    'capacity',
+                    'is_repeatable'
+                ]
+            ],
+            'booking_line_group_id' => [
+                'is_sojourn',
+                'is_event',
+                'nb_nights',
+                'age_range_assignments_ids' => [
+                    'age_range_id',
+                    'free_qty'
+                ]
+            ],
+            'auto_discounts_ids' => [
+                'type',
+                'value'
+            ],
+            'manual_discounts_ids' => [
+                'type',
+                'value'
+            ]
         ]);
 
         $age_range_freebies = Setting::get_value('sale', 'features', 'booking.age_range.freebies', false);
 
-        foreach($lines as $id => $line) {
+        foreach($self as $id => $line) {
             $free_qty = 0;
 
-            if(!$line['product_id.is_freebie_allowed'] || $line['qty_accounting_method'] !== 'person') {
+            if(!$line['product_id']['is_freebie_allowed'] || $line['qty_accounting_method'] !== 'person') {
                 // product is excluded from freebies: no free quantity
                 $result[$id] = 0;
                 continue;
             }
 
-            $adapters = $om->read('sale\booking\BookingPriceAdapter', $line['auto_discounts_ids'], ['type', 'value']);
-            foreach($adapters as $adapter_id => $adapter) {
+            foreach($line['auto_discounts_ids'] as $adapter) {
                 if($adapter['type'] == 'freebie') {
                     $free_qty += $adapter['value'];
                 }
             }
+
             // check additional manual discounts
-            $discounts = $om->read('sale\booking\BookingPriceAdapter', $line['manual_discounts_ids'], ['type', 'value']);
-            foreach($discounts as $discount_id => $discount) {
+            foreach($line['manual_discounts_ids'] as $discount) {
                 if($discount['type'] == 'freebie') {
                     $free_qty += $discount['value'];
                 }
@@ -1712,32 +1733,33 @@ class BookingLine extends Model {
 
             if($age_range_freebies) {
                 $nb_repeat = 1;
-                if($line['product_id.product_model_id.has_duration']) {
-                    $nb_repeat = $line['product_id.product_model_id.duration'];
+                if($line['product_id']['product_model_id']['has_duration']) {
+                    $nb_repeat = $line['product_id']['product_model_id']['duration'];
                 }
-                elseif($line['booking_line_group_id.is_sojourn']) {
-                    if($line['product_id.product_model_id.is_repeatable']) {
-                        $nb_repeat = max(1, $line['booking_line_group_id.nb_nights']);
+                elseif($line['booking_line_group_id']['is_sojourn']) {
+                    if($line['product_id']['product_model_id']['is_repeatable']) {
+                        $nb_repeat = max(1, $line['booking_line_group_id']['nb_nights']);
                     }
                 }
-                elseif($line['booking_line_group_id.is_event']) {
-                    if($line['product_id.product_model_id.is_repeatable']) {
-                        $nb_repeat = $line['booking_line_group_id.nb_nights'] + 1;
+                elseif($line['booking_line_group_id']['is_event']) {
+                    if($line['product_id']['product_model_id']['is_repeatable']) {
+                        $nb_repeat = $line['booking_line_group_id']['nb_nights'] + 1;
                     }
                 }
 
-                foreach($line['booking_line_group_id.age_range_assignments_ids.age_range_id'] as $index => $assignment) {
-                    if(!$line['product_id.has_age_range'] || $line['product_id.age_range_id'] === $assignment['age_range_id']) {
+                foreach($line['booking_line_group_id']['age_range_assignments_ids'] as $assignment) {
+                    if(!$line['product_id']['has_age_range'] || $line['product_id']['age_range_id'] === $assignment['age_range_id']) {
                         $free_qty += self::computeLineQty(
                             $line['qty_accounting_method'],
                             $nb_repeat,
-                            $line['booking_line_group_id.age_range_assignments_ids.free_qty'][$index]['free_qty'],
-                            $line['product_id.product_model_id.is_repeatable'],
+                            $assignment['free_qty'],
+                            $line['product_id']['product_model_id']['is_repeatable'],
                             $line['is_accomodation'],
-                            $line['product_id.product_model_id.capacity']
+                            $line['product_id']['product_model_id']['capacity']
                         );
                     }
-                    if($line['product_id.age_range_id'] === $assignment['age_range_id']) {
+
+                    if($line['product_id']['age_range_id'] === $assignment['age_range_id']) {
                         break;
                     }
                 }
@@ -1745,45 +1767,55 @@ class BookingLine extends Model {
 
             $result[$id] = min($free_qty, $line['qty']);
         }
+
         return $result;
     }
 
-    public static function calcDiscount($om, $oids, $lang) {
+    public static function calcDiscount($self) {
         $result = [];
-
-        $lines = $om->read(self::getType(), $oids, ['manual_discounts_ids', 'unit_price']);
-
-        foreach($lines as $oid => $line) {
-            $result[$oid] = (float) 0.0;
-            // apply additional manual discounts
-            $discounts = $om->read('sale\booking\BookingPriceAdapter', $line['manual_discounts_ids'], ['type', 'value']);
-            foreach($discounts as $aid => $adata) {
-                if($adata['type'] == 'percent') {
-                    $result[$oid] += $adata['value'];
+        $self->read([
+            'unit_price',
+            'manual_discounts_ids' => [
+                'type',
+                'value'
+            ]
+        ]);
+        foreach($self as $id => $line) {
+            $result[$id] = 0.0;
+            foreach($line['manual_discounts_ids'] as $discount) {
+                if($discount['type'] == 'percent') {
+                    $result[$id] += $discount['value'];
                 }
-                else if($adata['type'] == 'amount' && $line['unit_price'] != 0) {
+                else if($discount['type'] == 'amount' && $line['unit_price'] != 0) {
                     // amount discount is converted to a rate
-                    $result[$oid] += round($adata['value'] / $line['unit_price'], 4);
+                    $result[$id] += round($discount['value'] / $line['unit_price'], 4);
                 }
             }
         }
+
         return $result;
     }
 
-    public static function calcFareBenefit($om, $oids, $lang) {
+    public static function calcFareBenefit($self) {
         $result = [];
-        // #memo - price adapters are already applied on unit_price, so we need price_id
-        $lines = $om->read(get_called_class(), $oids, ['free_qty', 'qty', 'price_id.price', 'vat_rate', 'unit_price']);
-        if($lines) {
-            foreach($lines as $lid => $line) {
-                // delta between final price and catalog price
-                $catalog_price = $line['price_id.price'] * $line['qty'] * (1.0 + $line['vat_rate']);
-                $qty = max(0, $line['qty'] - $line['free_qty']);
-                $fare_price = $line['unit_price'] * ($qty) * (1.0 + $line['vat_rate']);
-                $benefit = round($catalog_price - $fare_price, 2);
-                $result[$lid] = max(0.0, $benefit);
-            }
+        $self->read([
+            'free_qty',
+            'qty',
+            'vat_rate',
+            'unit_price',
+            'price_id' => ['price']
+        ]);
+        foreach($self as $id => $line) {
+            // delta between final price and catalog price
+            $catalog_price = $line['price_id']['price'] * $line['qty'] * (1.0 + $line['vat_rate']);
+
+            $qty = max(0, $line['qty'] - $line['free_qty']);
+            $fare_price = $line['unit_price'] * ($qty) * (1.0 + $line['vat_rate']);
+            $benefit = round($catalog_price - $fare_price, 2);
+
+            $result[$id] = max(0.0, $benefit);
         }
+
         return $result;
     }
 
@@ -1847,65 +1879,53 @@ class BookingLine extends Model {
         return $result;
     }
 
-    public static function calcIsAccomodation($om, $oids, $lang) {
+    public static function calcIsAccomodation($self): array {
         trigger_error("ORM::calling sale\booking\BookingLine:calcIsAccomodation", QN_REPORT_DEBUG);
 
         $result = [];
-        $lines = $om->read(self::getType(), $oids, [
-            'product_id.product_model_id.is_accomodation'
-        ]);
-        if($lines > 0 && count($lines)) {
-            foreach($lines as $oid => $odata) {
-                $result[$oid] = $odata['product_id.product_model_id.is_accomodation'];
-            }
+        $self->read(['product_id' => ['product_model_id' => ['is_accomodation']]]);
+        foreach($self as $id => $line) {
+            $result[$id] = $line['product_id']['product_model_id']['is_accomodation'];
         }
+
         return $result;
     }
 
-    public static function calcIsRentalUnit($om, $oids, $lang) {
+    public static function calcIsRentalUnit($self): array {
         trigger_error("ORM::calling sale\booking\BookingLine:calcIsRentalUnit", QN_REPORT_DEBUG);
 
         $result = [];
-        $lines = $om->read(self::getType(), $oids, [
-            'product_id.product_model_id.is_rental_unit'
-        ]);
-        if($lines > 0 && count($lines)) {
-            foreach($lines as $oid => $odata) {
-                $result[$oid] = $odata['product_id.product_model_id.is_rental_unit'];
-            }
+        $self->read(['product_id' => ['product_model_id' => ['is_rental_unit']]]);
+        foreach($self as $id => $line) {
+            $result[$id] = $line['product_id']['product_model_id']['is_rental_unit'];
         }
+
         return $result;
     }
 
-    public static function calcIsMeal($om, $oids, $lang) {
+    public static function calcIsMeal($self): array {
         trigger_error("ORM::calling sale\booking\BookingLine:calcIsMeal", QN_REPORT_DEBUG);
 
         $result = [];
-        $lines = $om->read(self::getType(), $oids, [
-            'product_id.product_model_id.is_meal'
-        ]);
-        if($lines > 0 && count($lines)) {
-            foreach($lines as $oid => $odata) {
-                if(isset($odata['product_id.product_model_id.is_meal'])) {
-                    $result[$oid] = $odata['product_id.product_model_id.is_meal'];
-                }
+        $self->read(['product_id' => ['product_model_id' => ['is_meal']]]);
+        foreach($self as $id => $line) {
+            if(isset($line['product_id']['product_model_id']['is_meal'])) {
+                $result[$id] = $line['product_id']['product_model_id']['is_meal'];
             }
         }
+
         return $result;
     }
 
-    public static function calcIsSnack($om, $oids, $lang) {
+    public static function calcIsSnack($self): array {
         trigger_error("ORM::calling sale\booking\BookingLine:calcIsSnack", QN_REPORT_DEBUG);
 
         $result = [];
-        $lines = $om->read(self::getType(), $oids, [
-            'product_id.product_model_id.is_snack'
-        ]);
-        if($lines > 0 && count($lines)) {
-            foreach($lines as $oid => $odata) {
-                $result[$oid] = $odata['product_id.product_model_id.is_snack'];
-            }
+        $self->read(['product_id' => ['product_model_id' => ['is_snack']]]);
+        foreach($self as $id => $line) {
+            $result[$id] = $line['product_id']['product_model_id']['is_snack'];
         }
+
         return $result;
     }
 
@@ -1957,18 +1977,15 @@ class BookingLine extends Model {
         return $result;
     }
 
-    public static function calcQtyAccountingMethod($om, $oids, $lang) {
+    public static function calcQtyAccountingMethod($self) {
         trigger_error("ORM::calling sale\booking\BookingLine:calcQtyAccountingMethod", QN_REPORT_DEBUG);
 
         $result = [];
-        $lines = $om->read(self::getType(), $oids, [
-            'product_id.product_model_id.qty_accounting_method'
-        ]);
-        if($lines > 0 && count($lines)) {
-            foreach($lines as $oid => $odata) {
-                $result[$oid] = $odata['product_id.product_model_id.qty_accounting_method'];
-            }
+        $self->read(['product_id' => ['product_model_id' => ['qty_accounting_method']]]);
+        foreach($self as $id => $line) {
+            $result[$id] = $line['product_id']['product_model_id']['qty_accounting_method'];
         }
+
         return $result;
     }
 
