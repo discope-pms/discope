@@ -69,13 +69,13 @@ class Establishment extends Model {
 
             'address_street' => [
                 'type'              => 'string',
-                'description'       => 'Street and number of the estalishment address.',
+                'description'       => 'Street and number of the establishment address.',
                 'required'          => true
             ],
 
             'address_dispatch' => [
                 'type'              => 'string',
-                'description'       => 'Optional info for mail dispatch (appartment, box, floor, ...).'
+                'description'       => 'Optional info for mail dispatch (apartment, box, floor, ...).'
             ],
 
             'address_city' => [

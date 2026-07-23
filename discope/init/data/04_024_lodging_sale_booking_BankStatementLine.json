@@ -32,6 +32,21 @@
                 "is_suspense": false,
                 "status": "pending",
                 "center_office_id": 1
+            },
+            {
+                "id": 3,
+                "bank_statement_id": 1,
+                "date": "2023-07-13T00:00:00+00:00",
+                "message": "",
+                "structured_message": "151022051160",
+                "customer_id": null,
+                "amount": 500,
+                "remaining_amount": 0,
+                "account_iban": "BE24063166277738",
+                "account_holder": "DOE JOHN",
+                "is_suspense": false,
+                "status": "pending",
+                "center_office_id": 1
             }
         ]
     }
