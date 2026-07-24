@@ -1679,8 +1679,8 @@ class BookingLine extends Model {
             'product_id' => [
                 'has_age_range',
                 'age_range_id',
+                'is_freebie_allowed',
                 'product_model_id' => [
-                    'is_freebie_allowed',
                     'has_duration',
                     'duration',
                     'is_repeatable',
