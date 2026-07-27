@@ -5,6 +5,28 @@ Au niveau du récapitulatif final, il faut pouvoir reprendre les repas
 servis (regroupés par jour, quel que soit le type de repas et le produit
 dont ils découlent).
 
+### Accès aux factures depuis le planning
+
+Depuis le planning, la popup de détail d'une réservation permet de
+consulter les factures liées à cette réservation via
+`Réservation > Factures > Facture`.
+
+Le lien d'une facture ouvre la fiche de la facture dans un nouvel onglet
+en conservant le contexte de la réservation. L'adresse doit donc contenir
+à la fois l'identifiant de la réservation et l'identifiant de la facture :
+
+`/booking/#/booking/{booking_id}/invoice/{invoice_id}`
+
+Par exemple, pour la réservation `12345` et la facture `35976`, l'adresse
+attendue est :
+
+`/booking/#/booking/12345/invoice/35976`
+
+Ce contexte est nécessaire pour que le composant de facture puisse être
+initialisé correctement et pour que les actions disponibles sur la fiche
+de facture, dont l'impression et l'envoi, fonctionnent. L'adresse ne doit
+pas contenir de valeur technique non interpolée comme `object.booking_id`.
+
 ### Filtres d'affichage des unités locatives
 
 Dans l'en-tête du planning, une icône « settings » permet d'ouvrir un
