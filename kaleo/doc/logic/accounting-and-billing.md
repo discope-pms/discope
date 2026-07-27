@@ -396,6 +396,29 @@ EXPORTS \> TOUS LES EXPORTS.
 Les exports correspondent à des archives .zip, il est nécessaire de le
 décompresser pour avoir accès aux différents documents.
 
+### Annuler le dernier export BOB
+
+Lorsqu'un export BOB a été généré par erreur, il peut être annulé depuis
+`EXPORTS > TOUS LES EXPORTS` en ouvrant la fiche de l'export concerné,
+puis en utilisant l'action `Supprimer`.
+
+L'action supprime l'archive d'export et remet les objets liés comme non
+exportés. Pour les exports de type `factures` ou `factures Peppol`, cela
+concerne les factures reprises dans l'archive. Pour les exports de type
+`règlements`, cela concerne les paiements repris dans l'archive. Les
+objets concernés pourront donc être repris dans un export BOB ultérieur.
+
+Par défaut, seule la suppression du dernier export est autorisée pour un
+même Centre et un même type d'export. Si un export plus récent existe
+pour ce Centre et ce type, la suppression est refusée. Pour annuler
+plusieurs exports successifs, il faut donc les supprimer du plus récent
+au plus ancien.
+
+Cette annulation agit uniquement dans Discope : elle supprime
+l'historique de l'archive et remet le flag `is_exported` des objets liés
+à `false`. Elle n'annule pas une importation déjà réalisée dans BOB à
+partir du fichier téléchargé.
+
 ## Suivi comptable
 
 Un plan comptable est défini, ainsi qu'un plan analytique.
