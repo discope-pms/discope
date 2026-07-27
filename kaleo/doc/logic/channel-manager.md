@@ -91,6 +91,36 @@ Le document source precise que :
 - la taxe de sejour est ajoutee automatiquement si elle n'est pas fournie;
 - un financement et un paiement peuvent etre crees lorsqu'un paiement est deja present cote Cubilis.
 
+### Extras non reconnus et actions temporaires Lighthouse
+
+Les actions commerciales Cubilis Lighthouse, comme les supplements ou reductions temporaires, sont transmises comme des `Extras`. L'API Cubilis ne permet pas d'automatisme exploitable pour les convertir structurellement en produits Discope : le mapping reste donc entierement gere dans Discope.
+
+Pour eviter des adaptations ponctuelles de configuration des centres, la strategie attendue est la suivante :
+
+- les extras standards du centre synchronise restent traites via le mapping `Extra Service`;
+- un produit generique `SPEC_OTA` sert de fallback pour les extras non reconnus;
+- tout `Extra` recu de Cubilis qui n'est pas present dans les extras standards du centre est affecte a une ligne extra liee au produit `SPEC_OTA`;
+- le montant encode sur cette ligne doit reprendre le montant exact transmis par Cubilis;
+- un extra peut representer un supplement ou une reduction;
+- comme Cubilis n'accepte pas de prix negatif, une reduction est encodee avec une quantite negative et un prix positif.
+
+Cette approche evite les erreurs de synchronisation Discope - Cubilis et permet de conserver un total de reservation coherent sans automatisation Cubilis ni modification structurelle du catalogue.
+
+Exemple de service Cubilis dont le total transmis doit etre conserve :
+
+```xml
+<Service ServiceInventoryCode="19472">
+    <ServiceDetails>
+        <Comments>
+            <Comment>
+                <Text></Text>
+            </Comment>
+        </Comments>
+        <Total AmountAfterTax="12.47" CurrencyCode="EUR" />
+    </ServiceDetails>
+</Service>
+```
+
 Pour Stripe, certaines metadonnees de PSP doivent etre recuperees afin de stocker les frais de transaction sur le paiement.
 
 ### Annulation et modification
