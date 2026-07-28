@@ -133,7 +133,7 @@ export class BookingServicesBookingGroupAgeRangeComponent extends TreeComponent<
             qty: this.qtyFormControl.value,
             free_qty: this.freeQtyFormControl.value
         };
-        if(this.booking.status !== 'checkedout') {
+        if(this.booking.status !== 'checkedout' || this.group.is_extra) {
             action = 'sale_booking_update-sojourn-agerange-set';
 
             data['age_range_id'] = this.age_range_id;
@@ -172,7 +172,7 @@ export class BookingServicesBookingGroupAgeRangeComponent extends TreeComponent<
             free_qty: this.freeQtyFormControl.value
         };
 
-        if(this.booking.status !== 'checkedout') {
+        if(this.booking.status !== 'checkedout' || this.group.is_extra) {
             action = 'sale_booking_update-sojourn-agerange-set';
 
             data['age_range_id'] = this.age_range_id;
