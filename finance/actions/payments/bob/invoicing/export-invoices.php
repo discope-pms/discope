@@ -529,63 +529,66 @@ $customers_files_data = eQual::run('get', 'finance_payments_bob_customers-files'
     Create Export
 */
 
-// generate the zip archive
-$tmp_file = tempnam(sys_get_temp_dir(), "zip");
-$zip = new ZipArchive();
-if($zip->open($tmp_file, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true) {
-    // could not create the ZIP archive
-    throw new Exception('Unable to create a ZIP file.', QN_ERROR_UNKNOWN);
+// #memo - prevent generating empty archives (can occur when all processed invoices were faulty)
+if(count($invoices_data)) {
+    // generate the zip archive
+    $tmp_file = tempnam(sys_get_temp_dir(), "zip");
+    $zip = new ZipArchive();
+    if($zip->open($tmp_file, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true) {
+        // could not create the ZIP archive
+        throw new Exception('Unable to create a ZIP file.', QN_ERROR_UNKNOWN);
+    }
+
+    // embed schema files
+    $zip->addFromString('CLIENTS_FACT_PEPPOL.sch', $customers_files_data['schema']);
+    $zip->addFromString('IHDDOC_FACT.sch', $invoices_schema);
+    $zip->addFromString('IHISTO_FACT.sch', $invoices_lines_schema);
+
+    // embed data files
+    $zip->addFromString('CLIENTS_FACT_PEPPOL.txt', $customers_files_data['data']);
+    $zip->addFromString('IHDDOC_FACT.txt', implode("\r\n", array_values($invoices_data))."\r\n");
+    $zip->addFromString('IHISTO_FACT.txt', implode("\r\n", $invoices_lines_data)."\r\n");
+
+    $zip->close();
+
+    // read raw data
+    $data = file_get_contents($tmp_file);
+    unlink($tmp_file);
+
+    if($data === false) {
+        throw new Exception('Unable to retrieve ZIP file content.', QN_ERROR_UNKNOWN);
+    }
+
+    // switch to root user
+    $auth->su();
+
+    // create the export archive
+    $export = Export::create([
+        'center_office_id'      => $params['center_office_id'],
+        'export_type'           => $journal['type'] === 'sales' ? 'invoices' : 'invoices_peppol',
+        'data'                  => $data,
+        'object_class'          => Invoice::getType(),
+        'object_ids'            => json_encode(array_keys($invoices_data))
+    ])
+        ->read(['id'])
+        ->first();
+
+    /*
+        Set invoices as exported
+    */
+
+    try {
+        // mark processed invoices as exported
+        Invoice::ids(array_keys($invoices_data))->update(['is_exported' => true]);
+    }
+    catch(Exception $e) {
+        // remove export if error triggered while flagging invoices as exported
+        Export::id($export['id'])->delete();
+        throw $e;
+    }
 }
 
-// embed schema files
-$zip->addFromString('CLIENTS_FACT_PEPPOL.sch', $customers_files_data['schema']);
-$zip->addFromString('IHDDOC_FACT.sch', $invoices_schema);
-$zip->addFromString('IHISTO_FACT.sch', $invoices_lines_schema);
-
-// embed data files
-$zip->addFromString('CLIENTS_FACT_PEPPOL.txt', $customers_files_data['data']);
-$zip->addFromString('IHDDOC_FACT.txt', implode("\r\n", array_values($invoices_data))."\r\n");
-$zip->addFromString('IHISTO_FACT.txt', implode("\r\n", $invoices_lines_data)."\r\n");
-
-$zip->close();
-
-// read raw data
-$data = file_get_contents($tmp_file);
-unlink($tmp_file);
-
-if($data === false) {
-    throw new Exception('Unable to retrieve ZIP file content.', QN_ERROR_UNKNOWN);
-}
-
-// switch to root user
-$auth->su();
-
-// create the export archive
-$export = Export::create([
-    'center_office_id'      => $params['center_office_id'],
-    'export_type'           => $journal['type'] === 'sales' ? 'invoices' : 'invoices_peppol',
-    'data'                  => $data,
-    'object_class'          => Invoice::getType(),
-    'object_ids'            => json_encode(array_keys($invoices_data))
-])
-    ->read(['id'])
-    ->first();
-
-/*
-    Set invoices as exported
-*/
-
-try {
-    // mark processed invoices as exported
-    Invoice::ids(array_keys($invoices_data))->update(['is_exported' => true]);
-}
-catch(Exception $e) {
-    // remove export if error triggered while flagging invoices as exported
-    Export::id($export['id'])->delete();
-    throw $e;
-}
-
-$context->httpResponse()
-        ->status(201)
-        ->send();
-
+$context
+    ->httpResponse()
+    ->status(201)
+    ->send();

@@ -1,7 +1,7 @@
 <?php
 /*
     This file is part of the Discope property management software.
-    Author: Yesbabylon SRL, 2020-2024
+    Author: Yesbabylon SRL, 2020-2026
     License: GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 
@@ -9,7 +9,7 @@ use finance\accounting\AccountingJournal;
 use identity\CenterOffice;
 use identity\User;
 
-list($params, $providers) = eQual::announce([
+[$params, $providers] = eQual::announce([
     'name'          => "Generate Exports",
     'description'   => "Creates BOB export archives with newly available data from invoices and payments.",
     'params'        => [],
