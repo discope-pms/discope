@@ -262,7 +262,7 @@ $invoices_fields_conf = [
     'TINVVCS'   => ['type' => 'Char',           'length' => 10,     'decimals' => 0]
 ];
 
-$invoices_schema = implode("\r\n", ['[HOPDIV_FACT]', 'FileType=Fixed', 'CharSet=ascii'])."\r\n".$createFieldsSchema($invoices_fields_conf);
+$invoices_schema = implode("\r\n", ['[HOPDIV_FACT]', 'FileType=Fixed', 'CharSet=ascii'])."\r\n".$createFieldsSchema($invoices_fields_conf)."\r\n";
 
 $invoices_data = [];
 $map_partners_ids = [];
@@ -332,7 +332,7 @@ $invoices_lines_fields_conf = [
     'TVSTORED'      => ['type' => 'Char',           'length' => 10,     'decimals' => 0]
 ];
 
-$invoices_lines_schema = implode("\r\n", ['[LOPDIV_FACT]', 'FileType=Fixed', 'CharSet=ascii'])."\r\n".$createFieldsSchema($invoices_lines_fields_conf);
+$invoices_lines_schema = implode("\r\n", ['[LOPDIV_FACT]', 'FileType=Fixed', 'CharSet=ascii'])."\r\n".$createFieldsSchema($invoices_lines_fields_conf)."\r\n";
 
 // #todo #settings - adapt to new conventions
 $account_sales = Setting::get_value('finance', 'accounting', 'account.sales', '7000000');
@@ -489,6 +489,8 @@ foreach($invoices as $invoice) {
             unset($account_values);
         }
     }
+
+    $invoice_lines_data = [];
 
     // pass-2 : generate lines based on account entries
     $index = 1;

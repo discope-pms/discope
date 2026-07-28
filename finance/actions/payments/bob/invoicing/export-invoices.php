@@ -257,7 +257,7 @@ $invoices_fields_conf = [
     'XUSRACOMPTE'   => ['type' => 'Float',          'length' => 21,     'decimals' => 2]
 ];
 
-$invoices_schema = implode("\r\n", ['[IHDDOC_FACT]', 'FileType=Fixed', 'CharSet=ascii'])."\r\n".$createFieldsSchema($invoices_fields_conf);
+$invoices_schema = implode("\r\n", ['[IHDDOC_FACT]', 'FileType=Fixed', 'CharSet=ascii'])."\r\n".$createFieldsSchema($invoices_fields_conf)."\r\n";
 
 $invoices_data = [];
 $map_partners_ids = [];
@@ -396,7 +396,7 @@ $invoices_lines_fields_conf = [
     'PURPRICE'      => ['type' => 'Float',          'length' => 21,     'decimals' => 2]
 ];
 
-$invoices_lines_schema = implode("\r\n", ['[IHISTO_FACT]', 'FileType=Fixed', 'CharSet=ascii'])."\r\n".$createFieldsSchema($invoices_lines_fields_conf);
+$invoices_lines_schema = implode("\r\n", ['[IHISTO_FACT]', 'FileType=Fixed', 'CharSet=ascii'])."\r\n".$createFieldsSchema($invoices_lines_fields_conf)."\r\n";
 
 $invoices_lines_data = [];
 
