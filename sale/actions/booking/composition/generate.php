@@ -1,7 +1,7 @@
 <?php
 /*
     This file is part of the Discope property management software <https://github.com/discope-pms/discope>
-    Some Rights Reserved, Discope PMS, 2020-2024
+    Some Rights Reserved, Discope PMS, 2020-2026
     Original author(s): Yesbabylon SRL
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
@@ -112,7 +112,7 @@ foreach($booking['booking_lines_groups_ids'] as $group) {
                 'rental_unit_id'    => $assignment['rental_unit_id']
             ];
 
-            if(isset($params['data']) && isset($params['data'][$index])) {
+            if(isset($params['data'][$index])) {
                 $item = array_merge($item, $params['data'][$index]);
                 ++$index;
             }
@@ -121,7 +121,7 @@ foreach($booking['booking_lines_groups_ids'] as $group) {
                 if($booking['customer_identity_id']['type'] == 'I') {
                     $item['firstname'] = $booking['customer_identity_id']['firstname'];
                     $item['lastname'] = $booking['customer_identity_id']['lastname'];
-                    $item['gender'] = $item['gender'] = !empty($booking['customer_identity_id']['gender']) ? $booking['customer_identity_id']['gender'] : 'M';
+                    $item['gender'] = !empty($booking['customer_identity_id']['gender']) ? $booking['customer_identity_id']['gender'] : 'M';
                     $item['date_of_birth'] = $booking['customer_identity_id']['date_of_birth'];
                     $item['email'] = $booking['customer_identity_id']['email'];
                     $item['phone'] = $booking['customer_identity_id']['phone'];

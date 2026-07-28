@@ -1,7 +1,7 @@
 <?php
 /*
     This file is part of the Discope property management software <https://github.com/discope-pms/discope>
-    Some Rights Reserved, Discope PMS, 2020-2024
+    Some Rights Reserved, Discope PMS, 2020-2026
     Original author(s): Yesbabylon SRL
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
@@ -9,13 +9,14 @@
 use discope\setting\Setting;
 use sale\booking\BookingLineGroup;
 use sale\booking\channelmanager\RoomType;
+use sale\booking\CompositionItem;
 use sale\booking\Consumption;
 use realestate\RentalUnit;
 use sale\booking\SojournProductModel;
 use sale\booking\SojournProductModelRentalUnitAssignement;
 use sale\catalog\ProductModel;
 
-list($params, $providers) = eQual::announce([
+[$params, $providers] = eQual::announce([
     'description'	=>	"Update the assignments of a given sojourn for a specific product model.",
     'params' 		=>	[
         'product_model_id' =>  [
@@ -53,7 +54,7 @@ list($params, $providers) = eQual::announce([
  * @var \equal\orm\ObjectManager    $orm
  * @var \equal\cron\Scheduler       $cron
  */
-list($context, $orm, $cron) = [ $providers['context'], $providers['orm'], $providers['cron'] ];
+['context' => $context, 'orm' => $orm, 'cron' => $cron] = $providers;
 
 // adapt received assignments (workaround for wrong type assignment from front-end)
 foreach($params['assignments'] as $assignment) {
@@ -63,38 +64,55 @@ foreach($params['assignments'] as $assignment) {
 // fetch the group (nb_pers)
 $group = BookingLineGroup::id($params['booking_line_group_id'])
     ->read([
-        'id', 'nb_pers', 'nb_nights', 'date_from', 'date_to', 'time_from', 'time_to', 'extref_room_type_id',
-        'booking_id' => ['id', 'center_id']
+        'nb_pers',
+        'nb_nights',
+        'date_from',
+        'date_to',
+        'time_from',
+        'time_to',
+        'extref_room_type_id',
+        'booking_id' => [
+            'center_id'
+        ]
     ])
     ->first(true);
 
 if(!$group) {
-    throw new Exception('unknown_sojourn', QN_ERROR_UNKNOWN_OBJECT);
+    throw new Exception('unknown_sojourn', EQ_ERROR_UNKNOWN_OBJECT);
 }
 
 // fetch the product_model
-$product_model = ProductModel::id($params['product_model_id'])->read(['id', 'is_accomodation', 'capacity'])->first(true);
+$product_model = ProductModel::id($params['product_model_id'])
+    ->read(['is_accomodation', 'capacity'])
+    ->first(true);
 
 if(!$product_model) {
-    throw new Exception('unknown_product_model', QN_ERROR_UNKNOWN_OBJECT);
+    throw new Exception('unknown_product_model', EQ_ERROR_UNKNOWN_OBJECT);
 }
 
 $total_qty = 0;
 foreach($params['assignments'] as $assignment) {
     $total_qty += $assignment['qty'];
-    $rental_unit = RentalUnit::id($assignment['rental_unit_id'])->read(['is_accomodation', 'capacity', 'extra'])->first(true);
+
+    $rental_unit = RentalUnit::id($assignment['rental_unit_id'])
+        ->read(['is_accomodation', 'capacity', 'extra'])
+        ->first(true);
+
     if(!$rental_unit) {
-        throw new Exception('unknown_rental_unit', QN_ERROR_UNKNOWN_OBJECT);
+        throw new Exception('unknown_rental_unit', EQ_ERROR_UNKNOWN_OBJECT);
     }
+
     /*
     // #memo - assigning more capacity than the actual number of persons is allowed
     if($group['nb_pers'] < $assignment['qty']) {
         throw new Exception('quantity_exceeds_group', QN_ERROR_INVALID_PARAM);
     }
     */
+
     if(($rental_unit['capacity'] + $rental_unit['extra']) < $assignment['qty']) {
-        throw new Exception('quantity_exceed_accommodation', QN_ERROR_INVALID_PARAM);
+        throw new Exception('quantity_exceed_accommodation', EQ_ERROR_INVALID_PARAM);
     }
+
     /*
     if($product_model['capacity'] < $assignment['qty']) {
         // overflow error
@@ -104,7 +122,7 @@ foreach($params['assignments'] as $assignment) {
 
 if($group['nb_pers'] > $total_qty) {
     // incomplete assignment: reject request
-    throw new Exception('group_assignment_too_low', QN_ERROR_INVALID_PARAM);
+    throw new Exception('group_assignment_too_low', EQ_ERROR_INVALID_PARAM);
 }
 
 // compute timestamps for the sojourn date range
@@ -141,28 +159,62 @@ foreach($params['assignments'] as $assignment) {
 // everything went well (all checks passed): proceed
 
 // retrieve SPM
-$spm = SojournProductModel::search([ ['booking_line_group_id', '=',  $group['id']], ['product_model_id', '=', $product_model['id']] ] )->read(['id', 'is_accomodation'])->first(true);
+$spm = SojournProductModel::search([
+    ['booking_line_group_id', '=',  $group['id']],
+    ['product_model_id', '=', $product_model['id']]
+])
+    ->read(['is_accomodation'])
+    ->first(true);
+
 if(!$spm) {
-    throw new Exception('missing_spm', QN_ERROR_UNKNOWN_OBJECT);
+    throw new Exception('missing_spm', EQ_ERROR_UNKNOWN_OBJECT);
 }
 
 // retrieve original consumptions
-$original_consumptions_ids = Consumption::search([ ['product_model_id', '=', $params['product_model_id']], ['booking_line_group_id', '=', $params['booking_line_group_id']] ])->ids();
+$original_consumptions_ids = Consumption::search([
+    ['product_model_id', '=', $params['product_model_id']],
+    ['booking_line_group_id', '=', $params['booking_line_group_id']]
+])
+    ->ids();
+
+$model = $orm->getModel(SojournProductModelRentalUnitAssignement::getType());
+if(!$model) {
+    throw new Exception("unknown_entity", QN_ERROR_INVALID_PARAM);
+}
+
+$schema = $model->getSchema();
 
 // remove old assignments
-$spm_assignments_ids = SojournProductModelRentalUnitAssignement::search([ ['booking_line_group_id', '=', $group['id']], ['sojourn_product_model_id', '=', $spm['id']] ])->ids();
+$spm_assignments = SojournProductModelRentalUnitAssignement::search([
+    ['booking_line_group_id', '=', $group['id']],
+    ['sojourn_product_model_id', '=', $spm['id']]
+])
+    ->read(array_keys($schema))
+    ->get(true);
+
+$spm_assignments_ids = [];
+foreach($spm_assignments as $spm_assignment) {
+    $spm_assignments_ids[] = $spm_assignment['id'];
+}
+
+// soft delete to restore them if a problem occurs
 SojournProductModelRentalUnitAssignement::ids($spm_assignments_ids)->delete(true);
 
 // create new assignments
+$new_spm_assignments_ids = [];
 foreach($params['assignments'] as $assignment) {
-    SojournProductModelRentalUnitAssignement::create([
+    $spm_assignment = SojournProductModelRentalUnitAssignement::create([
         'booking_id'                => $group['booking_id']['id'],
         'booking_line_group_id'     => $group['id'],
         'sojourn_product_model_id'  => $spm['id'],
         'qty'                       => $assignment['qty'],
         'rental_unit_id'            => $assignment['rental_unit_id'],
         'is_accomodation'           => $spm['is_accomodation']
-    ]);
+    ])
+        ->read(['id'])
+        ->first();
+
+    $new_spm_assignments_ids[] = $spm_assignment['id'];
 }
 
 // retrieve new resulting consumptions
@@ -176,13 +228,28 @@ try {
         if($consumption['product_model_id'] != $product_model['id']) {
             continue;
         }
-        $new_consumption = Consumption::create($consumption)->read(['id'])->first(true);
+
+        $new_consumption = Consumption::create($consumption)
+            ->read(['id'])
+            ->first(true);
+
         $new_consumptions_ids[] = $new_consumption['id'];
     }
 }
 catch(Exception $e) {
     // something went wrong : abort
+
+    // remove newly created consumptions
     Consumption::ids($new_consumptions_ids)->delete(true);
+
+    // recreate previous assignments
+    foreach($spm_assignments as $spm_assignment) {
+        SojournProductModelRentalUnitAssignement::create($spm_assignment);
+    }
+
+    // delete newly created assignments
+    SojournProductModelRentalUnitAssignement::ids($new_spm_assignments_ids)->delete(true);
+
     throw new Exception('unexpected: '.$e->getMessage(), QN_ERROR_UNKNOWN);
 }
 
@@ -233,5 +300,33 @@ if($is_channelmanager_enabled) {
 // if everything went well, remove old consumptions
 Consumption::ids($original_consumptions_ids)->delete(true);
 
-$context->httpResponse()
-        ->send();
+// try to update composition items
+try {
+    $composition_item_fields = ['firstname', 'lastname', 'date_of_birth', 'place_of_birth', 'citizen_identification', 'email', 'phone', 'address', 'country'];
+    $composition_items = CompositionItem::search(['booking_id', '=', $group['booking_id']['id']])
+        ->read(array_merge($composition_item_fields, ['rental_unit_id']))
+        ->get();
+
+    $composition_items_edited = false;
+    foreach($composition_items as $composition_item) {
+        foreach($composition_item_fields as $composition_item_field) {
+            if(!empty($composition_item[$composition_item_field])) {
+                $composition_items_edited = true;
+            }
+        }
+    }
+
+    if(!$composition_items_edited) {
+        // re-generate composition if not modified yet
+        eQual::run('do', 'sale_booking_composition_generate', [
+            'booking_id' => $group['booking_id']['id']
+        ]);
+    }
+}
+catch(Exception $e) {
+    trigger_error('APP::unable to update the composition items: ' . $e->getMessage(), EQ_REPORT_ERROR);
+}
+
+$context
+    ->httpResponse()
+    ->send();
