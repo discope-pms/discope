@@ -1,7 +1,7 @@
 <?php
 /*
     This file is part of the Discope property management software.
-    Author: Yesbabylon SRL, 2020-2024
+    Author: Yesbabylon SRL, 2020-2026
     License: GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 
@@ -10,10 +10,11 @@ use documents\Export;
 use equal\text\TextTransformer;
 use identity\CenterOffice;
 use finance\accounting\AccountingJournal;
+use sale\booking\Funding;
 use sale\booking\Invoice;
 use sale\catalog\Product;
 
-list($params, $providers) = eQual::announce([
+[$params, $providers] = eQual::announce([
     'description'   => "Creates an export archive containing all emitted invoices that haven't been exported yet (for external accounting software).",
     'params'        => [
 
@@ -51,8 +52,38 @@ list($params, $providers) = eQual::announce([
  * @var \equal\auth\AuthenticationManager   $auth
  * @var \equal\dispatch\Dispatcher          $dispatch
  */
-list($context, $orm, $auth, $dispatch) = [$providers['context'], $providers['orm'], $providers['auth'], $providers['dispatch']];
+['context' => $context, 'orm' => $orm, 'auth' => $auth, 'dispatch' => $dispatch] = $providers;
 
+/**
+ * Methods
+ */
+
+$createFieldsSchema = function($fields_conf) {
+    $index = 1;
+    $position = 0;
+    $fields_schema = [];
+    foreach($fields_conf as $field => $field_conf) {
+        // e.g., Field1=DBK,Char,04,00,00
+        $fields_schema[] = sprintf('Field%d=%s,%s,%02d,%02d,%02d',
+            $index,
+            $field,
+            $field_conf['type'],
+            $field_conf['length'],
+            $field_conf['decimals'],
+            $position
+        );
+
+        $index++;
+        $position += $field_conf['length'];
+    }
+
+    return implode("\r\n", $fields_schema);
+};
+
+
+/**
+ * Action
+ */
 
 /*
     This controller generates an export file related to invoices of a given center Office.
@@ -63,34 +94,28 @@ list($context, $orm, $auth, $dispatch) = [$providers['context'], $providers['orm
     Postulats
     * l'origine des fichiers n'a pas d'importance
     * les noms de fichiers peuvent avoir de l'importance
-    * les fichiers peuvent regrouper des lignes issues de differents centres
+    * les fichiers peuvent regrouper des lignes issues de différents centres
     * les imports COMPTA se font par centre de gestion : il faut un export par centre de gestion
-
 */
 
-// retrieve center_office
-$office = CenterOffice::id($params['center_office_id'])->read(['id'])->first(true);
+$office = CenterOffice::id($params['center_office_id'])
+    ->read(['id'])
+    ->first();
 
 if(!$office) {
     throw new Exception("unknown_center_office", QN_ERROR_UNKNOWN_OBJECT);
 }
 
-// retrieve the journal of sales
 $journal = AccountingJournal::search([
     ['center_office_id', '=', $params['center_office_id']],
     ['type', '=', $params['journal_type']]
 ])
-    ->read(['id', 'code', 'type'])
+    ->read(['code', 'type'])
     ->first(true);
 
 if(!$journal) {
     throw new Exception("unknown_accounting_journal", QN_ERROR_UNKNOWN_OBJECT);
 }
-
-
-/*
-    Retrieve non-exported invoices.
-*/
 
 $domain = [
     [
@@ -109,10 +134,14 @@ $domain = [
     ]
 ];
 
-// #memo - there might be several kind of invoices, we only consider the ones attached either to a booking or to a list of orders
+$funding_fields = [
+    'payment_reference',
+    'due_date',
+    'paid_amount'
+];
+
 $invoices = Invoice::search($domain, ['limit' => 100, 'sort' => ['number' => 'asc']])
     ->read([
-        'id',
         'name',
         'date',
         'due_date',
@@ -128,7 +157,6 @@ $invoices = Invoice::search($domain, ['limit' => 100, 'sort' => ['number' => 'as
         'price',
         'partner_id' => [
             '@domain' => ['state', 'in', ['instance', 'archive']],
-            'id',
             'name',
             'partner_identity_id' => [
                 '@domain' => ['state', 'in', ['instance', 'archive']],
@@ -151,16 +179,16 @@ $invoices = Invoice::search($domain, ['limit' => 100, 'sort' => ['number' => 'as
                 ]
             ]
         ],
-        'funding_id' => ['payment_reference', 'due_date'],
+        'funding_id' => $funding_fields,
         'invoice_lines_ids' => [
-            'id',
             'name',
             'total',
             'price',
             'product_id',
-            'downpayment_invoice_id' => ['id', 'status'],
+            'downpayment_invoice_id' => [
+                'status'
+            ],
             'price_id' => [
-                'id',
                 'vat_rate',
                 'accounting_rule_id' => [
                     'accounting_rule_line_ids' => [
@@ -175,74 +203,19 @@ $invoices = Invoice::search($domain, ['limit' => 100, 'sort' => ['number' => 'as
     ])
     ->get(true);
 
-if(count($invoices) == 0) {
+if(empty($invoices)) {
     // exit with no error
     throw new Exception('no match', 0);
 }
-
-
-// export file holding the schema for invoices: HOPDIV_FACT.sch
-ob_start();
-echo "[HOPDIV_FACT]
-FileType = Fixed
-Charset = ascii
-Field1=TDBK,Char,04,00,00
-Field2=TFYEAR,Char,05,00,04
-Field3=TYEAR,Long Integer,11,00,09
-Field4=TMONTH,Long Integer,11,00,20
-Field5=TDOCNO,Long Integer,11,00,31
-Field6=TINTMODE,Char,01,00,42
-Field7=TCOMPAN,Char,10,00,43
-Field8=TDOCDATE,Date,11,00,53
-Field9=TTYPCIE,Char,01,00,64
-Field10=TDUEDATE,Date,11,00,65
-Field11=TAMOUNT,Float,21,02,76
-Field12=TREMINT,Char,40,00,97
-Field13=TINVVCS,Char,10,00,137
-";
-$invoices_header_schema = ob_get_clean();
-
-ob_start();
-// export file holding the schema for lines: LOPDIV_FACT.sch
-echo "[LOPDIV_FACT]
-FileType = Fixed
-Charset = ascii
-Field1=TDBK,Char,04,00,00
-Field2=TFYEAR,Char,05,00,04
-Field3=TYEAR,Long Integer,11,00,09
-Field4=TMONTH,Long Integer,11,00,20
-Field5=TDOCNO,Long Integer,11,00,31
-Field6=TDOCLINE,Long Integer,11,00,42
-Field7=TTYPELINE,Char,01,00,53
-Field8=TDOCDATE,Date,11,00,54
-Field9=TACTTYPE,Char,01,00,65
-Field10=TACCOUNT,Char,10,00,66
-Field11=TCURAMN,Float,21,02,76
-Field12=TAMOUNT,Float,21,02,97
-Field13=TDC,Char,01,00,118
-Field14=TREM,Char,40,00,119
-Field15=COST_GITES,Char,04,00,159
-Field16=TBASVAT,Float,21,02,163
-Field17=TVATTOTAMN,Float,21,02,184
-Field18=TVATAMN,Float,21,02,205
-Field19=TVSTORED,Char,10,00,226
-";
-$invoices_lines_schema = ob_get_clean();
-
-
 
 /*
     Check invoices consistency : discard invalid invoices and emit a warning.
 */
 
 foreach($invoices as $index => $invoice) {
-    if( !isset($invoice['partner_id']) ||
-        !isset($invoice['partner_id']['partner_identity_id'])
-    ) {
-        ob_start();
-        print_r($invoice);
-        $out = ob_get_clean();
-        trigger_error("APP::Ignoring invalid invoice : missing partner info for invoice {$invoice['name']} [{$invoice['id']}] - $out", QN_REPORT_WARNING);
+    if(empty($invoice['partner_id']['partner_identity_id'])) {
+        $invoice_info = print_r($invoice, true);
+        trigger_error("APP::Ignoring invalid invoice : missing partner info for invoice {$invoice['name']} [{$invoice['id']}] - $invoice_info", EQ_REPORT_WARNING);
         unset($invoices[$index]);
     }
     elseif(!$invoice['has_orders'] && !isset($invoice['booking_id'])) {
@@ -252,13 +225,47 @@ foreach($invoices as $index => $invoice) {
     // #memo - for cancelled invoices and orders invoices, it is ok not to have funding
 }
 
+/*
+    Get fundings
+ */
+
+foreach($invoices as &$inv) {
+    if($inv['funding_id']) {
+        continue;
+    }
+
+    $funding = Funding::search(['invoice_id', '=', $inv['id']])
+        ->read($funding_fields)
+        ->first(true);
+
+    $inv['funding_id'] = $funding;
+}
+
 
 /*
     Generate headers: HOPDIV_FACT.txt
 */
 
-$invoices_header_data = [];
+$invoices_fields_conf = [
+    'TDBK'      => ['type' => 'Char',           'length' => 4,      'decimals' => 0],
+    'TFYEAR'    => ['type' => 'Char',           'length' => 5,      'decimals' => 0],
+    'TYEAR'     => ['type' => 'Long Integer',   'length' => 11,     'decimals' => 0],
+    'TMONTH'    => ['type' => 'Long Integer',   'length' => 11,     'decimals' => 0],
+    'TDOCNO'    => ['type' => 'Long Integer',   'length' => 11,     'decimals' => 0],
+    'TINTMODE'  => ['type' => 'Char',           'length' => 1,      'decimals' => 0],
+    'TCOMPAN'   => ['type' => 'Char',           'length' => 10,     'decimals' => 0],
+    'TDOCDATE'  => ['type' => 'Date',           'length' => 11,     'decimals' => 0],
+    'TTYPCIE'   => ['type' => 'Char',           'length' => 1,      'decimals' => 0],
+    'TDUEDATE'  => ['type' => 'Date',           'length' => 11,     'decimals' => 0],
+    'TAMOUNT'   => ['type' => 'Float',          'length' => 21,     'decimals' => 2],
+    'TREMINT'   => ['type' => 'Char',           'length' => 40,     'decimals' => 0],
+    'TINVVCS'   => ['type' => 'Char',           'length' => 10,     'decimals' => 0]
+];
 
+$invoices_schema = implode("\r\n", ['[HOPDIV_FACT]', 'FileType=Fixed', 'CharSet=ascii'])."\r\n".$createFieldsSchema($invoices_fields_conf)."\r\n";
+
+$invoices_data = [];
+$map_partners_ids = [];
 foreach($invoices as $invoice) {
     // when invoice is a credit note, TAMOUNT must be inverted (in most cases should be negative)
     if($invoice['type'] == 'credit_note') {
@@ -272,43 +279,60 @@ foreach($invoices as $invoice) {
     else {
         $comments = $invoice['booking_id']['name'].' '.date('d/m/Y', $invoice['booking_id']['date_from']).'-'.date('d/m/Y', $invoice['booking_id']['date_to']);
     }
-    $values = [
-        // Field1=TDBK,Char,04,00,00
-        str_pad($journal['code'], 4, ' ', STR_PAD_RIGHT),
-        // Field2=TFYEAR,Char,05,00,04
-        str_pad(date('Y', $invoice['date']), 5,' ', STR_PAD_RIGHT),
-        // Field3=TYEAR,Long Integer,11,00,09
-        str_pad(date('Y', $invoice['date']), 11,' ', STR_PAD_RIGHT),
-        // Field4=TMONTH,Long Integer,11,00,20
-        str_pad(date('m', $invoice['date']), 11,' ', STR_PAD_RIGHT),
-        // Field5=TDOCNO,Long Integer,11,00,31
-        str_pad(str_replace('-', '', $invoice['name']), 11,' ', STR_PAD_RIGHT),
-        // Field6=TINTMODE,Char,01,00,42
-        str_pad('S', 1,' ',STR_PAD_LEFT),
-        // Field7=TCOMPAN,Char,10,00,43
-        str_pad('C'.$invoice['partner_id']['partner_identity_id']['id'], 10, ' ', STR_PAD_RIGHT),
-        // Field8=TDOCDATE,Date,11,00,53
-        str_pad(date('d/m/Y', $invoice['date']), 11,' ', STR_PAD_RIGHT),
-        // Field9=TTYPCIE,Char,01,00,64
-        str_pad('C', 1,' ',STR_PAD_LEFT),
-        // Field10=TDUEDATE,Date,11,00,65
-        str_pad(date('d/m/Y', $invoice['due_date']), 11,' ', STR_PAD_RIGHT),
-        // Field11=TAMOUNT,Float,21,02,76
-        str_pad(str_replace('.', ',', sprintf('%.02f', $invoice['accounting_price'])), 21,' ', STR_PAD_LEFT),
-        // Field12=TREMINT,Char,40,00,97
-        str_pad($comments, 40,' ', STR_PAD_RIGHT),
-        // Field13=TINVVCS,Char,10,00,137
-        str_pad(isset($invoice['funding_id']['payment_reference'])?(substr($invoice['funding_id']['payment_reference'], 0, 10)):'', 10, ' ', STR_PAD_RIGHT)
+
+    $map_values = [
+        'TDBK'      => str_pad($journal['code'], 4, ' ', STR_PAD_RIGHT),
+        'TFYEAR'    => str_pad(date('Y', $invoice['date']), 5,' ', STR_PAD_RIGHT),
+        'TYEAR'     => str_pad(date('Y', $invoice['date']), 11,' ', STR_PAD_RIGHT),
+        'TMONTH'    => str_pad(date('m', $invoice['date']), 11,' ', STR_PAD_RIGHT),
+        'TDOCNO'    => str_pad(str_replace('-', '', $invoice['name']), 11,' ', STR_PAD_RIGHT),
+        'TINTMODE'  => str_pad('S', 1,' ',STR_PAD_LEFT),
+        'TCOMPAN'   => str_pad('C'.$invoice['partner_id']['partner_identity_id']['id'], 10, ' ', STR_PAD_RIGHT),
+        'TDOCDATE'  => str_pad(date('d/m/Y', $invoice['date']), 11,' ', STR_PAD_RIGHT),
+        'TTYPCIE'   => str_pad('C', 1,' ',STR_PAD_LEFT),
+        'TDUEDATE'  => str_pad(date('d/m/Y', $invoice['due_date']), 11,' ', STR_PAD_RIGHT),
+        'TAMOUNT'   => str_pad(str_replace('.', ',', sprintf('%.02f', $invoice['accounting_price'])), 21,' ', STR_PAD_LEFT),
+        'TREMINT'   => str_pad($comments, 40,' ', STR_PAD_RIGHT),
+        'TINVVCS'   => str_pad(isset($invoice['funding_id']['payment_reference'])?(substr($invoice['funding_id']['payment_reference'], 0, 10)) : '', 10, ' ', STR_PAD_RIGHT)
     ];
 
-    $invoices_header_data[$invoice['id']] = implode('', $values);
+    $values = [];
+    foreach(array_keys($invoices_fields_conf) as $field) {
+        $values[] = $map_values[$field];
+    }
+
+    $invoices_data[$invoice['id']] = implode('', $values);
+
+    $map_partners_ids[$invoice['partner_id']['id']] = true;
 }
-
-
 
 /*
     Generate lines: LOPDIV_FACT.txt
 */
+
+$invoices_lines_fields_conf = [
+    'TDBK'          => ['type' => 'Char',           'length' => 4,      'decimals' => 0],
+    'TFYEAR'        => ['type' => 'Char',           'length' => 5,      'decimals' => 0],
+    'TYEAR'         => ['type' => 'Long Integer',   'length' => 11,     'decimals' => 0],
+    'TMONTH'        => ['type' => 'Long Integer',   'length' => 11,     'decimals' => 0],
+    'TDOCNO'        => ['type' => 'Long Integer',   'length' => 11,     'decimals' => 0],
+    'TDOCLINE'      => ['type' => 'Long Integer',   'length' => 11,     'decimals' => 0],
+    'TTYPELINE'     => ['type' => 'Char',           'length' => 1,      'decimals' => 0],
+    'TDOCDATE'      => ['type' => 'Date',           'length' => 11,     'decimals' => 0],
+    'TACTTYPE'      => ['type' => 'Char',           'length' => 1,      'decimals' => 0],
+    'TACCOUNT'      => ['type' => 'Char',           'length' => 10,     'decimals' => 0],
+    'TCURAMN'       => ['type' => 'Float',          'length' => 21,     'decimals' => 2],
+    'TAMOUNT'       => ['type' => 'Float',          'length' => 21,     'decimals' => 2],
+    'TDC'           => ['type' => 'Char',           'length' => 1,      'decimals' => 0],
+    'TREM'          => ['type' => 'Char',           'length' => 40,     'decimals' => 0],
+    'COST_GITES'    => ['type' => 'Char',           'length' => 4,      'decimals' => 0],
+    'TBASVAT'       => ['type' => 'Float',          'length' => 21,     'decimals' => 2],
+    'TVATTOTAMN'    => ['type' => 'Float',          'length' => 21,     'decimals' => 2],
+    'TVATAMN'       => ['type' => 'Float',          'length' => 21,     'decimals' => 2],
+    'TVSTORED'      => ['type' => 'Char',           'length' => 10,     'decimals' => 0]
+];
+
+$invoices_lines_schema = implode("\r\n", ['[LOPDIV_FACT]', 'FileType=Fixed', 'CharSet=ascii'])."\r\n".$createFieldsSchema($invoices_lines_fields_conf)."\r\n";
 
 // #todo #settings - adapt to new conventions
 $account_sales = Setting::get_value('finance', 'accounting', 'account.sales', '7000000');
@@ -394,7 +418,7 @@ foreach($invoices as $invoice) {
             // #memo - this should not occur! - products shouldn't be embedded to invoices if there is no accounting rule
             trigger_error("APP::No related price found for non-null amount for line {$line['name']} [{$line['product_id']}] with price [{$line['price_id']}] of invoice {$invoice['name']} [{$invoice['id']}]", QN_REPORT_WARNING);
             // remove invoice from processed invoices, and skip all lines
-            unset($invoices_header_data[$invoice['id']]);
+            unset($invoices_data[$invoice['id']]);
             // #todo - dispatch an alert that relates to a dedicated controller
             $dispatch->dispatch('lodging.accounting.invoice.invalid', 'sale\booking\Invoice', $invoice['id'], 'important', null, [], [], null, $params['center_office_id']);
             continue 2;
@@ -453,6 +477,9 @@ foreach($invoices as $invoice) {
             if(round(abs($diff), 2) == 0.0) {
                 continue;
             }
+            if($invoice['type'] === 'credit_note') {
+                $diff *= -1;
+            }
             foreach($invoice_lines_accounts as &$account_values) {
                 $vat_rate = ((float) $vat_rate_index) / 100;
                 if($account_values['vat_rate'] === $vat_rate) {
@@ -465,6 +492,8 @@ foreach($invoices as $invoice) {
             unset($account_values);
         }
     }
+
+    $invoice_lines_data = [];
 
     // pass-2 : generate lines based on account entries
     $index = 1;
@@ -499,66 +528,51 @@ foreach($invoices as $invoice) {
             $comments = (($invoice['type'] == 'invoice')?'F. ':'NC.').strtoupper( substr(TextTransformer::normalize($invoice['partner_id']['name']), 0, 30) ).'/'.$invoice['booking_id']['name'];
         }
 
-        $values = [
-            // Field1=TDBK,Char,04,00,00
-            str_pad($journal['code'], 4, ' ', STR_PAD_RIGHT),
-            // Field2=TFYEAR,Char,05,00,04
-            str_pad(date('Y', $invoice['date']), 5,' ', STR_PAD_RIGHT),
-            // Field3=TYEAR,Long Integer,11,00,09
-            str_pad(date('Y', $invoice['date']), 11,' ', STR_PAD_RIGHT),
-            // Field4=TMONTH,Long Integer,11,00,20
-            str_pad(date('m', $invoice['date']), 11,' ', STR_PAD_RIGHT),
-            // Field5=TDOCNO,Long Integer,11,00,31
-            str_pad(str_replace('-', '', $invoice['name']), 11,' ', STR_PAD_RIGHT),
-            // Field6=TDOCLINE,Long Integer,11,00,42
-            str_pad($index, 11,' ', STR_PAD_RIGHT),
-            // Field7=TTYPELINE,Char,01,00,53
-            str_pad('S', 1,' ',STR_PAD_LEFT),
-            // Field8=TDOCDATE,Date,11,00,54
-            str_pad(date('d/m/Y', $invoice['date']), 11,' ', STR_PAD_RIGHT),
-            // Field9=TACTTYPE,Char,01,00,65
-            str_pad('A', 1,' ', STR_PAD_RIGHT),
-            // Field10=TACCOUNT,Char,10,00,66
-            str_pad($account_code, 10,' ', STR_PAD_RIGHT),
-            // Field11=TCURAMN,Float,21,02,76
-            str_pad('0,00', 21,' ', STR_PAD_LEFT),
-            // Field12=TAMOUNT,Float,21,02,97
-            str_pad(str_replace('.', ',', sprintf('%.02f', $account_values['amount'])), 21,' ', STR_PAD_LEFT),
-            // Field13=TDC,Char,01,00,118
-            str_pad('C', 1,' ', STR_PAD_RIGHT),
-            // Field14=TREM,Char,40,00,119
-            str_pad( $comments, 40,' ', STR_PAD_RIGHT),
-            // Field15=COST_GITES,Char,04,00,159
-            str_pad($analytic_section, 4,' ', STR_PAD_RIGHT),
-            // Field16=TBASVAT,Float,21,02,163
-            str_pad(str_replace('.', ',', sprintf('%.02f', $account_values['amount'])), 21,' ', STR_PAD_LEFT),
-            // Field17=TVATTOTAMN,Float,21,02,184
-            str_pad(str_replace('.', ',', sprintf('%.02f', $account_values['vat'])), 21,' ', STR_PAD_LEFT),
-            // Field18=TVATAMN,Float,21,02,205
-            str_pad(str_replace('.', ',', sprintf('%.02f', $account_values['vat'])), 21,' ', STR_PAD_LEFT),
-            // Field19=TVSTORED,Char,10,00,226
-            str_pad('NSS  '.intval($account_values['vat_rate'] * 100), 10,' ', STR_PAD_RIGHT),
+        $map_values = [
+            'TDBK'          => str_pad($journal['code'], 4, ' ', STR_PAD_RIGHT),
+            'TFYEAR'        => str_pad(date('Y', $invoice['date']), 5,' ', STR_PAD_RIGHT),
+            'TYEAR'         => str_pad(date('Y', $invoice['date']), 11,' ', STR_PAD_RIGHT),
+            'TMONTH'        => str_pad(date('m', $invoice['date']), 11,' ', STR_PAD_RIGHT),
+            'TDOCNO'        => str_pad(str_replace('-', '', $invoice['name']), 11,' ', STR_PAD_RIGHT),
+            'TDOCLINE'      => str_pad($index, 11,' ', STR_PAD_RIGHT),
+            'TTYPELINE'     => str_pad('S', 1,' ',STR_PAD_LEFT),
+            'TDOCDATE'      => str_pad(date('d/m/Y', $invoice['date']), 11,' ', STR_PAD_RIGHT),
+            'TACTTYPE'      => str_pad('A', 1,' ', STR_PAD_RIGHT),
+            'TACCOUNT'      => str_pad($account_code, 10,' ', STR_PAD_RIGHT),
+            'TCURAMN'       => str_pad('0,00', 21,' ', STR_PAD_LEFT),
+            'TAMOUNT'       => str_pad(str_replace('.', ',', sprintf('%.02f', $account_values['amount'])), 21,' ', STR_PAD_LEFT),
+            'TDC'           => str_pad('C', 1,' ', STR_PAD_RIGHT),
+            'TREM'          => str_pad( $comments, 40,' ', STR_PAD_RIGHT),
+            'COST_GITES'    => str_pad($analytic_section, 4,' ', STR_PAD_RIGHT),
+            'TBASVAT'       => str_pad(str_replace('.', ',', sprintf('%.02f', $account_values['amount'])), 21,' ', STR_PAD_LEFT),
+            'TVATTOTAMN'    => str_pad(str_replace('.', ',', sprintf('%.02f', $account_values['vat'])), 21,' ', STR_PAD_LEFT),
+            'TVATAMN'       => str_pad(str_replace('.', ',', sprintf('%.02f', $account_values['vat'])), 21,' ', STR_PAD_LEFT),
+            'TVSTORED'      => str_pad('NSS  '.intval($account_values['vat_rate'] * 100), 10,' ', STR_PAD_RIGHT)
         ];
 
-        ++$index;
-        $invoices_lines_data[] = implode('', $values);
+        $values = [];
+        foreach(array_keys($invoices_lines_fields_conf) as $field) {
+            $values[] = $map_values[$field];
+        }
+
+        $invoice_lines_data[] = implode('', $values);
+
+        $index++;
     }
 
+    $invoices_lines_data = array_merge(
+        $invoices_lines_data,
+        $invoice_lines_data
+    );
 }
 
 /*
     Generate: CLIENTS_FACT.txt
 */
 
-$map_partners_ids = [];
-foreach($invoices as $invoice) {
-    if(isset($invoices_header_data[$invoice['id']])) {
-        $map_partners_ids[$invoice['partner_id']['id']] = true;
-    }
-}
-
 $customers_files_data = eQual::run('get', 'finance_payments_bob_customers-files', [
-    'domain' => ['id', 'in', array_keys($map_partners_ids)]
+    'domain'    => ['id', 'in', array_keys($map_partners_ids)],
+    'file_name' => 'CLIENTS_FACT'
 ]);
 
 
@@ -567,8 +581,7 @@ $customers_files_data = eQual::run('get', 'finance_payments_bob_customers-files'
 */
 
 // #memo - prevent generating empty archives (can occur when all processed invoices were faulty)
-if(count($invoices_header_data)) {
-
+if(count($invoices_data)) {
     // generate the zip archive
     $tmpfile = tempnam(sys_get_temp_dir(), "zip");
     $zip = new ZipArchive();
@@ -579,13 +592,13 @@ if(count($invoices_header_data)) {
 
     // embed schema files
     $zip->addFromString('CLIENTS_FACT.sch', $customers_files_data['schema']);
-    $zip->addFromString('HOPDIV_FACT.sch', $invoices_header_schema);
+    $zip->addFromString('HOPDIV_FACT.sch', $invoices_schema);
     $zip->addFromString('LOPDIV_FACT.sch', $invoices_lines_schema);
 
     // embed data files
     $zip->addFromString('CLIENTS_FACT.txt', $customers_files_data['data']);
-    $zip->addFromString('HOPDIV_FACT.txt', implode("\r\n", array_values($invoices_header_data))."\r\n");
-    $zip->addFromString('LOPDIV_FACT.txt', implode("\r\n", $invoices_lines_data)."\r\n");
+    $zip->addFromString('HOPDIV_FACT.txt', implode("\r\n", array_values($invoices_data)) . "\r\n");
+    $zip->addFromString('LOPDIV_FACT.txt', implode("\r\n", $invoices_lines_data) . "\r\n");
 
     $zip->close();
 
@@ -611,9 +624,13 @@ if(count($invoices_header_data)) {
         ->read(['id'])
         ->first();
 
+    /*
+        Set invoices as exported
+    */
+
     try {
         // mark processed invoices as exported
-        Invoice::ids(array_keys($invoices_header_data))->update(['is_exported' => true]);
+        Invoice::ids(array_keys($invoices_data))->update(['is_exported' => true]);
     }
     catch(Exception $e) {
         // remove export if error triggered while flagging invoices as exported
@@ -622,6 +639,7 @@ if(count($invoices_header_data)) {
     }
 }
 
-$context->httpResponse()
-        ->status(201)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(201)
+    ->send();
