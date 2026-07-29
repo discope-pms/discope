@@ -25,7 +25,7 @@ $orm = $services['orm'];
 $tests = [
 
     '2700' => [
-        'description' =>  'Tests that BOB export-invoice handle adaptation of lines VAT to match the invoice subtotal per vat rate.',
+        'description' => 'Tests that BOB export-invoices handle adaptation of lines VAT to match the invoice subtotal per vat rate.',
 
         'help' => 'The VAT included price of an booking/invoice line is informational, but has to be used for the compatibility with BOB accounting software. ' .
             'We need to test that the compatibility works in case the lines vat amounts does not match the subtotals per vat rates.',
@@ -209,9 +209,9 @@ $tests = [
                     $invoice_sum_lines_vat_inc_prices += $line['price'];
                 }
 
-                return $invoice['price'] === 631.19                                 // Invoice vat included price
-                    && round($export_file_sum_lines_vat_inc_prices, 2) === 631.19   // Export invoice vat included price
-                    && round($invoice_sum_lines_vat_inc_prices, 2) === 631.21;      // Invoice vat included price with sum of lines prices
+                return $invoice['price'] === 631.19                                         // Invoice vat included price
+                    && round($export_file_sum_lines_vat_inc_prices, 2) === 631.19  // Export invoice vat included price
+                    && round($invoice_sum_lines_vat_inc_prices, 2) === 631.21;     // Invoice vat included price with sum of lines prices
             }
             catch(Exception $e) {
                 trigger_error("APP::error while reading export: ".$e->getMessage(), EQ_REPORT_ERROR);
@@ -241,5 +241,213 @@ $tests = [
                   ->delete(true);
         }
     ],
+
+    '2701' => [
+        'description' => 'Tests that BOB export-invoices handle adaptation of lines VAT to match the invoice subtotal per vat rate for credit note.',
+
+        'help' => 'The VAT included price of an booking/invoice line is informational, but has to be used for the compatibility with BOB accounting software. ' .
+            'We need to test that the compatibility works in case the lines vat amounts does not match the subtotals per vat rates for credit note.',
+
+        'arrange' => function() {
+            $center_vat = Center::id(2)->read(['center_office_id' => ['code']])->first(true);
+            $booking_type = BookingType::search(['code', '=', 'TP'])->read(['id'])->first(true);
+            $customer_nature = CustomerNature::search(['code', '=', 'IN'])->read(['id'])->first(true);
+            $customer_identity = Identity::search([['firstname', '=', 'John'], ['lastname', '=', 'Doe']])->read(['id'])->first(true);
+
+            AccountingJournal::create([
+                'name'              => 'Accounting journal to test BOB invoice export',
+                'type'              => 'sales',
+                'center_office_id'  => $center_vat['center_office_id']['id']
+            ]);
+
+            Setting::assert_sequence('sale', 'accounting', 'invoice.sequence.'.$center_vat['center_office_id']['code'], 1);
+
+            return [$center_vat['id'], $center_vat['center_office_id']['id'], $booking_type['id'], $customer_nature['id'], $customer_identity['id']];
+        },
+
+        'act' => function($data) use($orm) {
+            [$center_id, $center_office_id, $booking_type_id, $customer_nature_id, $customer_identity_id] = $data;
+
+            $booking = Booking::create([
+                'date_from'             => strtotime('2023-08-02'),
+                'date_to'               => strtotime('2023-08-05'),
+                'center_id'             => $center_id,
+                'type_id'               => $booking_type_id,
+                'customer_nature_id'    => $customer_nature_id,
+                'customer_identity_id'  => $customer_identity_id,
+                'description'           => 'Booking to test BOB invoice export'
+            ])
+                ->read(['id','date_from','date_to'])
+                ->first(true);
+
+            $booking_line_group = BookingLineGroup::create([
+                'booking_id'        => $booking['id'],
+                'is_sojourn'        => true,
+                'group_type'        => 'sojourn',
+                'rate_class_id'     => 4,
+                'sojourn_type_id'   => 2,
+                'nb_pers'           => 4
+            ])
+                ->read(['id'])
+                ->first(true);
+
+            $orm->disableEvents();
+
+            try {
+                eQual::run('do', 'sale_booking_update-sojourn-dates', [
+                    'id'            => $booking_line_group['id'],
+                    'date_from'    => $booking['date_from'],
+                    'date_to'      => $booking['date_to']
+                ]);
+            }
+            catch(Exception $e) {
+                trigger_error("APP::error while running sale_booking_update-sojourn-dates: ".$e->getMessage(), EQ_REPORT_ERROR);
+            }
+
+            $pack = Product::search(['sku','=','VS-ChSglPC-A'])
+                ->read(['id','label'])
+                ->first(true);
+
+            try {
+                eQual::run('do', 'sale_booking_update-sojourn-pack-set', [
+                    'id'        => $booking_line_group['id'],
+                    'pack_id'   => $pack['id']
+                ]);
+            }
+            catch(Exception $e) {
+                trigger_error("APP::error while running sale_booking_update-sojourn-pack-set: ".$e->getMessage(), EQ_REPORT_ERROR);
+            }
+
+            $orm->enableEvents();
+
+            $booking = Booking::id($booking['id'])
+                ->read([
+                    'id',
+                    'price',
+                    'booking_lines_ids'         => ['id', 'name', 'total', 'price'],
+                    'booking_lines_groups_ids'  => ['id', 'price']
+                ])
+                ->first(true);
+
+            Booking::id($booking['id'])->update(['status' => 'checkedout']);
+
+            try {
+                eQual::run('do', 'sale_booking_do-invoice', [
+                    'id' => $booking['id']
+                ]);
+            }
+            catch(Exception $e) {
+                trigger_error("APP::error while running sale_booking_do-invoice: ".$e->getMessage(), EQ_REPORT_ERROR);
+            }
+
+            try {
+                $invoice = Invoice::search(['booking_id', '=', $booking['id']])
+                    ->read(['status'])
+                    ->first();
+
+                // update date to match fiscal year
+                Invoice::id($invoice['id'])->update(['date' => strtotime('2023-01-01')]);
+
+                eQual::run('do', 'sale_booking_invoice_do-emit', [
+                    'id' => $invoice['id']
+                ]);
+
+                eQual::run('do', 'sale_booking_invoice_do-reverse', [
+                    'id' => $invoice['id']
+                ]);
+
+                $in = Invoice::id($invoice['id'])->read(['reversed_invoice_id'])->first();
+
+                $credit_note = Invoice::id($in['reversed_invoice_id'])->first();
+
+                // update date to match fiscal year
+                Invoice::id($credit_note['id'])->update(['date' => strtotime('2023-01-01')]);
+
+                eQual::run('do', 'sale_booking_invoice_do-emit', [
+                    'id' => $credit_note['id']
+                ]);
+
+                eQual::run('do', 'finance_payments_bob_export-invoices', [
+                    'center_office_id' => $center_office_id
+                ]);
+            }
+            catch(Exception $e) {
+                trigger_error("APP::error while running sale_booking_invoice_do-emit or finance_payments_bob_export-invoices: ".$e->getMessage(), EQ_REPORT_ERROR);
+            }
+
+            return [$center_office_id];
+        },
+
+        'assert' => function($data) {
+            [$center_office_id] = $data;
+
+            $export = Export::search([
+                ['center_office_id', '=', $center_office_id],
+                ['export_type', '=', 'invoices'],
+                ['is_exported', '=', false]
+            ])
+                ->read(['data'])
+                ->first();
+
+            $balance = null;
+            try {
+                $extractTo = sys_get_temp_dir() . '/zip_extract_' . uniqid();
+                $tempZip = tempnam(sys_get_temp_dir(), 'zip_');
+
+                file_put_contents($tempZip, $export['data']);
+
+                $zip = new ZipArchive();
+                $zip->open($tempZip);
+
+                $zip->extractTo($extractTo);
+                $zip->close();
+
+                $filePath = $extractTo . '/LOPDIV_FACT.txt';
+
+                $lopdiv_fact = file_get_contents($filePath);
+
+                $lopdiv_fact_lines = explode(PHP_EOL, $lopdiv_fact);
+
+                $balance = 0.0;
+                foreach($lopdiv_fact_lines as $index => $line) {
+                    $is_last = $index === (count($lopdiv_fact_lines) - 1);
+                    if($is_last) {
+                        continue;
+                    }
+
+                    $amounts = [
+                        'ext_vat'   => floatval(str_replace(',', '.', substr($line, 163, 21))),
+                        'vat'       => floatval(str_replace(',', '.', substr($line, 163 + 21, 21)))
+                    ];
+
+                    $balance += $amounts['ext_vat'] + $amounts['vat'];
+                }
+            }
+            catch(Exception $e) {
+                trigger_error("APP::error while reading export: ".$e->getMessage(), EQ_REPORT_ERROR);
+            }
+
+            return round($balance, 2) === 0.0;
+        },
+
+        'rollback' => function() use($orm) {
+            $booking = Booking::search(['description', 'like', '%'.'Booking to test BOB invoice export'.'%'])
+                ->read(['center_office_id'])
+                ->first();
+            $orm->delete(Booking::getType(), $booking['id'], true);
+
+            $invoices_ids = Invoice::search(['booking_id', '=', $booking['id']])->ids();
+            $orm->delete(Invoice::getType(), $invoices_ids, true);
+
+            AccountingJournal::search(['name', '=', 'Accounting journal to test BOB invoice export'])->delete(true);
+
+            Export::search([
+                ['center_office_id', '=', $booking['center_office_id']],
+                ['export_type', '=', 'invoices'],
+                ['is_exported', '=', false]
+            ])
+                ->delete(true);
+        }
+    ]
 
 ];

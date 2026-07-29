@@ -477,6 +477,9 @@ foreach($invoices as $invoice) {
             if(round(abs($diff), 2) == 0.0) {
                 continue;
             }
+            if($invoice['type'] === 'credit_note') {
+                $diff *= -1;
+            }
             foreach($invoice_lines_accounts as &$account_values) {
                 $vat_rate = ((float) $vat_rate_index) / 100;
                 if($account_values['vat_rate'] === $vat_rate) {
