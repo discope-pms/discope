@@ -40,7 +40,7 @@ list($params, $providers) = eQual::announce([
  * @var \equal\php\Context                  $context
  * @var \equal\dispatch\Dispatcher          $dispatch
  */
-list($context, $dispatch) = [ $providers['context'], $providers['dispatch']];
+['context' => $context, 'dispatch' => $dispatch] = $providers['context'];
 
 $booking = Booking::id($params['id'])
     ->read([
@@ -115,8 +115,7 @@ if(strlen($bcc)) {
 }
 
 Mail::queue($message, 'sale\booking\Booking', $booking['id']);
-$result = $booking['id'];
 
-
-$httpResponse->body($result)
-             ->send();
+$context->httpResponse()
+        ->body(['id' => $booking['id']])
+        ->send();
