@@ -691,9 +691,11 @@ export class PlanningEmployeesCalendarComponent implements OnInit, OnChanges, Af
     public ondoubleclickTableCell(day: Date, partner: any, timeSlotCode: 'AM'|'PM'|'EV') {
         // remove timezone offset
         const eventDate = new Date();
-        eventDate.setFullYear(day.getFullYear());
-        eventDate.setMonth(day.getMonth());
-        eventDate.setDate(day.getDate());
+        eventDate.setFullYear(
+            day.getFullYear(),
+            day.getMonth(),
+            day.getDate()
+        );
 
         this.createPartnerEvent.emit({
             eventDate,
