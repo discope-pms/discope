@@ -238,7 +238,7 @@ class Payment extends \sale\pay\Payment {
             $fundings = $om->read(Funding::getType(), $event['funding_id'],
                 [
                     'type',
-                    'due_amount',
+                    'remaining_amount',
                     'booking_id',
                     'booking_id.name',
                     'booking_id.customer_id.id',
@@ -274,8 +274,8 @@ class Payment extends \sale\pay\Payment {
                     $result['partner_id'] = [ 'id' => $funding['booking_id.customer_id.id'], 'name' => $funding['booking_id.customer_id.name'] ];
                 }
 
-                // set the amount according to the funding due_amount (the maximum assignable)
-                $max = $funding['due_amount'];
+                // set the amount according to the funding remaining_amount (the maximum assignable to it)
+                $max = $funding['remaining_amount'];
                 if(isset($values['amount']) && $values['amount'] < $max ) {
                     $max = $values['amount'];
                 }
