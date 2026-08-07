@@ -350,6 +350,7 @@ $tests = [
             try {
                 Payment::create([
                         'statement_line_id' => $bank_statement_line['id'],
+                        'amount'            => $bank_statement_line['amount'],
                         'funding_id'        => $funding['id']
                     ]);
             }
