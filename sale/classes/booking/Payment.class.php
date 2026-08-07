@@ -154,12 +154,20 @@ class Payment extends \sale\pay\Payment {
     }
 
     public static function onupdateStatementLineId($om, $ids, $values, $lang) {
-        $payments = $om->read(self::getType(), $ids, ['state', 'statement_line_id.bank_statement_id', 'statement_line_id.remaining_amount']);
+        $payments = $om->read(self::getType(), $ids, ['state', 'statement_line_id', 'statement_line_id.bank_statement_id', 'statement_line_id.remaining_amount']);
         if($payments > 0 && count($payments)) {
             foreach($payments as $id => $payment) {
-                $om->update(self::getType(), $id, ['state' => $payment['state'], 'amount' => $payment['statement_line_id.remaining_amount']]);
-                // #memo - status of BankStatement is computed from statement lines, and status of BankStatementLine depends on payments
-                $om->update(\sale\booking\BankStatement::getType(), $payment['statement_line_id.bank_statement_id'], ['status' => null]);
+                switch($payment['state']) {
+                    case 'draft':
+                        // #memo - keep payment as draft and set its default amount to the statement line one
+                        $om->update(self::getType(), $id, ['state' => 'draft', 'amount' => $payment['statement_line_id.remaining_amount']]);
+                        break;
+                    case 'instance':
+                        // #memo - status of BankStatement is computed from statement lines, and status of BankStatementLine depends on payments
+                        $om->update(BankStatement::getType(), $payment['statement_line_id.bank_statement_id'], ['status' => null]);
+                        $om->update(BankStatementLine::getType(), $payment['statement_line_id'], ['remaining_amount' => null]);
+                        break;
+                }
             }
         }
     }
@@ -223,65 +231,51 @@ class Payment extends \sale\pay\Payment {
         }
     }
 
-    /**
-     * Signature for single object change from views.
-     *
-     * @param  Object   $om        Object Manager instance.
-     * @param  array    $event     Associative array holding changed fields as keys, and their related new values.
-     * @param  array    $values    Copy of the current (partial) state of the object.
-     * @param  string   $lang      Language (char 2) in which multilang field are to be processed.
-     * @return array    Associative array mapping fields with their resulting values.
-     */
-    public static function onchange($om, $event, $values, $lang='en') {
+    public static function onchange($event, $values) {
         $result = [];
-        if(isset($event['funding_id'])) {
-            $fundings = $om->read(Funding::getType(), $event['funding_id'],
-                [
+        if($event['funding_id']) {
+            $funding = Funding::id($event['funding_id'])
+                ->read([
                     'type',
                     'remaining_amount',
-                    'booking_id',
-                    'booking_id.name',
-                    'booking_id.customer_id.id',
-                    'booking_id.customer_id.name',
-                    'enrollment_id',
-                    'enrollment_id.name',
-                    'invoice_id.partner_id.id',
-                    'invoice_id.partner_id.name'
-                ],
-                $lang
-            );
+                    'booking_id'        => ['name', 'customer_id' => ['name'],],
+                    'enrollment_id'     => ['name'],
+                    'invoice_id'        => ['partner_id' => ['name']]
+                ])
+                ->first();
 
-            if($fundings > 0) {
-                $funding = reset($fundings);
-
-                if($funding['booking_id']) {
-                    $result['booking_id'] = [ 'id' => $funding['booking_id'], 'name' => $funding['booking_id.name'] ];
-                    $result['enrollment_id'] = null;
-                }
-                elseif($funding['enrollment_id']) {
-                    $result['enrollment_id'] = [ 'id' => $funding['enrollment_id'], 'name' => $funding['enrollment_id.name'] ];
-                    $result['booking_id'] = null;
-                }
-                else {
-                    $result['booking_id'] = null;
-                    $result['enrollment_id'] = null;
-                }
-
-                if($funding['type'] == 'invoice')  {
-                    $result['partner_id'] = [ 'id' => $funding['invoice_id.partner_id.id'], 'name' => $funding['invoice_id.partner_id.name'] ];
-                }
-                else {
-                    $result['partner_id'] = [ 'id' => $funding['booking_id.customer_id.id'], 'name' => $funding['booking_id.customer_id.name'] ];
-                }
-
-                // set the amount according to the funding remaining_amount (the maximum assignable to it)
-                $max = $funding['remaining_amount'];
-                if(isset($values['amount']) && $values['amount'] < $max ) {
-                    $max = $values['amount'];
-                }
-                $result['amount'] = $max;
+            if($funding['booking_id']) {
+                $result['booking_id'] = [ 'id' => $funding['booking_id']['id'], 'name' => $funding['booking_id']['name'] ];
+                $result['enrollment_id'] = null;
             }
+            elseif($funding['enrollment_id']) {
+                $result['enrollment_id'] = [ 'id' => $funding['enrollment_id']['id'], 'name' => $funding['enrollment_id']['name'] ];
+                $result['booking_id'] = null;
+            }
+            else {
+                $result['booking_id'] = null;
+                $result['enrollment_id'] = null;
+            }
+
+            if($funding['type'] == 'invoice')  {
+                $result['partner_id'] = [ 'id' => $funding['invoice_id']['partner_id']['id'], 'name' => $funding['invoice_id']['partner_id']['name'] ];
+            }
+            else {
+                $result['partner_id'] = [ 'id' => $funding['booking_id']['customer_id']['id'], 'name' => $funding['booking_id']['customer_id']['name'] ];
+            }
+
+            $max_amount = $funding['remaining_amount'];
+            if($values['statement_line_id']) {
+                $statement_line = BankStatementLine::id($values['statement_line_id'])
+                    ->read(['remaining_amount'])
+                    ->first();
+
+                $max_amount = min($funding['remaining_amount'], $statement_line['remaining_amount']);
+            }
+
+            $result['amount'] = $max_amount;
         }
+
         return $result;
     }
 

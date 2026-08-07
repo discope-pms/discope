@@ -17,6 +17,12 @@
                                         "items": [
                                             {
                                                 "type": "field",
+                                                "value": "statement_line_id",
+                                                "visible": false,
+                                                "width": "0"
+                                            },
+                                            {
+                                                "type": "field",
                                                 "value": "status",
                                                 "visible": false,
                                                 "width": "0"
