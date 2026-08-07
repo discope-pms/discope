@@ -90,8 +90,7 @@ class Funding extends Model {
                 'usage'             => 'amount/money:2',
                 'description'       => "Total amount that has been received (can be greater than due_amount).",
                 'function'          => 'calcPaidAmount',
-                'store'             => true,
-                'instant'           => true
+                'store'             => true
             ],
 
             'remaining_amount' => [
