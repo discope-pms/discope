@@ -97,6 +97,9 @@ if($pricelist['status'] == 'published') {
         BookingLineGroup::ids($booking['booking_lines_groups_ids'])->read(['unit_price', 'vat_rate', 'price', 'total']);
         Booking::id($booking_id)->read(['total', 'price']);
 
+        // refresh price adapters
+        $orm->callonce(BookingLineGroup::getType(), 'updatePriceAdapters', $booking['booking_lines_groups_ids']);
+
         // dispatch a message for notifying users
         $dispatch->dispatch('lodging.booking.ready', 'sale\booking\Booking', $booking_id, 'warning', null, [], [], null, $booking['center_office_id']);
     }
