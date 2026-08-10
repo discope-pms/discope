@@ -121,10 +121,10 @@ class Address extends Model {
     }
 
     public static function onupdateIdentityId($om, $oids, $values, $lang) {
-        $om->write(__CLASS__, $oids, [ 'identity_name' => null ], $lang);
+        $om->update(__CLASS__, $oids, [ 'identity_name' => null ], $lang);
     }
 
     public static function onupdateAddress($om, $oids, $values, $lang) {
-        $om->write(__CLASS__, $oids, [ 'display_name' => null ], $lang);
+        $om->update(__CLASS__, $oids, [ 'display_name' => null ], $lang);
     }
 }

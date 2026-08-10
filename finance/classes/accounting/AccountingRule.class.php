@@ -91,7 +91,7 @@ class AccountingRule extends Model {
         $res = $om->read(__CLASS__, $oids, ['prices_ids']);
         if($res > 0 && count($res)) {
             foreach($res as $oid => $odata) {
-                $om->write('sale\price\Price', $odata['prices_ids'], ['vat_rate' => null], $lang);
+                $om->update('sale\price\Price', $odata['prices_ids'], ['vat_rate' => null], $lang);
             }
         }
     }

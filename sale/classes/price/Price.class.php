@@ -170,15 +170,15 @@ class Price extends Model {
     }
 
     public static function onupdateAccountingRuleId($om, $oids, $values, $lang) {
-        $res = $om->write(__CLASS__, $oids, ['vat_rate' => null, 'price_vat' => null]);
+        $res = $om->update(__CLASS__, $oids, ['vat_rate' => null, 'price_vat' => null]);
     }
 
     public static function onupdatePriceListId($om, $oids, $values, $lang) {
-        $om->write(__CLASS__, $oids, ['name' => null], $lang);
+        $om->update(__CLASS__, $oids, ['name' => null], $lang);
     }
 
     public static function onupdateProductId($om, $oids, $values, $lang) {
-        $om->write(__CLASS__, $oids, ['name' => null], $lang);
+        $om->update(__CLASS__, $oids, ['name' => null], $lang);
     }
 
     /**
@@ -189,13 +189,13 @@ class Price extends Model {
 
         if($prices > 0 && count($prices)) {
             foreach($prices as $pid => $price) {
-                $om->write(__CLASS__, $pid, ['price' => $price['price_vat'] / (1.0 + $price['vat_rate'])]);
+                $om->update(__CLASS__, $pid, ['price' => $price['price_vat'] / (1.0 + $price['vat_rate'])]);
             }
         }
     }
 
     public static function onupdatePrice($om, $oids, $values, $lang) {
-        $om->write(__CLASS__, $oids, ['price_vat' => null]);
+        $om->update(__CLASS__, $oids, ['price_vat' => null]);
     }
 
     public function getUnique() {

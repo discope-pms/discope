@@ -58,7 +58,7 @@ class InvoiceLineGroup extends Model {
             foreach($groups as $gid => $group) {
                 $invoices_ids[] = $group['invoice_id'];
             }
-            $om->write('finance\accounting\Invoice', $invoices_ids, ['price' => null, 'total' => null]);
+            $om->update('finance\accounting\Invoice', $invoices_ids, ['price' => null, 'total' => null]);
         }        
     }
 

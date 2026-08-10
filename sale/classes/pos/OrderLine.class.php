@@ -265,8 +265,8 @@ class OrderLine extends Model {
         $lines = $om->read(self::getType(), $ids, ['order_id'], $lang);
         if($lines > 0) {
             $orders_ids = array_map(function ($a) {return $a['order_id'];}, $lines);
-            $om->write(Order::getType(), $orders_ids, ['total' => null, 'price' => null], $lang);
+            $om->update(Order::getType(), $orders_ids, ['total' => null, 'price' => null], $lang);
         }
-        $om->write(self::getType(), $ids, ['total' => null, 'price' => null], $lang);
+        $om->update(self::getType(), $ids, ['total' => null, 'price' => null], $lang);
     }
 }

@@ -79,17 +79,17 @@ class Template extends Model {
     }
 
     public static function onupdateCode($orm, $oids, $values, $lang) {
-        $orm->write(__CLASS__, $oids, ['name' => null], $lang);
+        $orm->update(__CLASS__, $oids, ['name' => null], $lang);
         $orm->read(__CLASS__, $oids, ['name'], $lang);
     }
 
     public static function onupdateType($orm, $oids, $values, $lang) {
-        $orm->write(__CLASS__, $oids, ['name' => null], $lang);
+        $orm->update(__CLASS__, $oids, ['name' => null], $lang);
         $orm->read(__CLASS__, $oids, ['name'], $lang);
     }
 
     public static function onupdateCategoryId($orm, $oids, $values, $lang) {
-        $orm->write(__CLASS__, $oids, ['name' => null], $lang);
+        $orm->update(__CLASS__, $oids, ['name' => null], $lang);
         $orm->read(__CLASS__, $oids, ['name'], $lang);
     }
 

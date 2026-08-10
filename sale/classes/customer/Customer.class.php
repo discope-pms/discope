@@ -106,7 +106,7 @@ class Customer extends \identity\Partner {
                 $customer_type_id = $customer['customer_nature_id.customer_type_id'];
                 $rate_class_id = $customer['customer_nature_id.rate_class_id'];
                 if(!empty($customer_type_id) && !empty($rate_class_id)) {
-                    $om->write(__CLASS__, $oids, ['rate_class_id' => $rate_class_id, 'customer_type_id' => $customer_type_id]);
+                    $om->update(__CLASS__, $oids, ['rate_class_id' => $rate_class_id, 'customer_type_id' => $customer_type_id]);
                 }
             }
         }

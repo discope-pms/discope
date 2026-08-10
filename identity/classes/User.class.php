@@ -89,13 +89,13 @@ class User extends \core\User {
 
             foreach($users as $uid => $user) {
                 // pass-1 remove previous centers_ids
-                $om->write(__CLASS__, $uid, ['centers_ids' => array_map(function($id) { return "-{$id}";}, $user['centers_ids'])], $lang);
+                $om->update(__CLASS__, $uid, ['centers_ids' => array_map(function($id) { return "-{$id}";}, $user['centers_ids'])], $lang);
                 // pass-2 add new centers_ids
                 $centers_ids = [];
                 foreach((array) $user['center_offices_ids.centers_ids'] as $oid => $office) {
                     $centers_ids = array_merge($centers_ids, $office['centers_ids']);
                 }
-                $om->write(__CLASS__, $uid, ['centers_ids' => $centers_ids], $lang);
+                $om->update(__CLASS__, $uid, ['centers_ids' => $centers_ids], $lang);
             }
         }
     }

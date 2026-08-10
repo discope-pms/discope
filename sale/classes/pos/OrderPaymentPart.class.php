@@ -167,7 +167,7 @@ class OrderPaymentPart extends \equal\orm\Model {
         $parts = $om->read(get_called_class(), $ids, ['order_payment_id'], $lang);
         if($parts > 0) {
             $order_payments_ids = array_reduce($parts, function($c, $o) { return array_merge($c, [$o['order_payment_id']]); }, []);
-            $om->write(OrderPayment::getType(), $order_payments_ids, ['total_paid' => null ], $lang);
+            $om->update(OrderPayment::getType(), $order_payments_ids, ['total_paid' => null ], $lang);
         }
     }
 

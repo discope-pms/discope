@@ -84,7 +84,7 @@ class SeasonPeriod extends Model {
     }
 
     public static function onupdateDateFrom($om, $oids, $values, $lang) {
-        $om->write(__CLASS__, $oids, ['month' => null, 'year' => null]);
+        $om->update(__CLASS__, $oids, ['month' => null, 'year' => null]);
         // force immediate re-computing
         $om->read(__CLASS__, $oids, ['month', 'year']);
     }

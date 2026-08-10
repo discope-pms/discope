@@ -287,11 +287,11 @@ class OrderPayment extends Model {
     }
 
     public static function onupdateOrderPaymentPartsIds($om, $ids, $values, $lang) {
-        $om->write(self::getType(), $ids, ['total_paid' => null], $lang);
+        $om->update(self::getType(), $ids, ['total_paid' => null], $lang);
     }
 
     public static function onupdateOrderLinesIds($om, $ids, $values, $lang) {
-        $om->write(self::getType(), $ids, ['total_due' => null], $lang);
+        $om->update(self::getType(), $ids, ['total_due' => null], $lang);
     }
 
     public static function candelete($om, $ids) {

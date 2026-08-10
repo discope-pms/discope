@@ -300,7 +300,7 @@ class Order extends Model {
     }
 
     public static function onupdateOrderLinesIds($om, $ids, $values, $lang) {
-        $om->write(self::getType(), $ids, ['price' => null, 'total' => null], $lang);
+        $om->update(self::getType(), $ids, ['price' => null, 'total' => null], $lang);
     }
 
     public static function onupdateFundingId($om, $ids, $values, $lang) {

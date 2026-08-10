@@ -70,12 +70,12 @@ class DocumentCategory extends Model {
     }
 
     public static function onupdatePath($om, $oids, $values, $lang){
-        $om->write(__CLASS__, $oids, ['path' => null], $lang);
+        $om->update(__CLASS__, $oids, ['path' => null], $lang);
         $res = $om->read(__CLASS__, $oids, ['children_ids']);
 
         if($res > 0 && count($res)) {
             foreach($res as $oid => $odata) {
-                $om->write('documents\DocumentCategory', $odata['children_ids'], ['path' => null], $lang);
+                $om->update('documents\DocumentCategory', $odata['children_ids'], ['path' => null], $lang);
             }
         }
     }

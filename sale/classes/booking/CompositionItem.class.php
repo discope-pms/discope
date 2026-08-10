@@ -125,7 +125,7 @@ class CompositionItem extends Model {
         $items = $om->read(get_called_class(), $oids, ['composition_id.booking_id'], $lang);
 
         foreach($items as $oid => $odata) {
-            $om->write(get_called_class(), $oid, ['booking_id' => $odata['composition_id.booking_id']], $lang);
+            $om->update(get_called_class(), $oid, ['booking_id' => $odata['composition_id.booking_id']], $lang);
         }
     }
 
