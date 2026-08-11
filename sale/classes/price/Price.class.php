@@ -214,12 +214,24 @@ class Price extends Model {
      */
     public static function onchange($event, $values) {
         $result = [];
-        if(isset($event['price'])) {
-            $result['price_vat'] = round($event['price'] * (1 + $values['vat_rate'] ?? 0), 4);
+
+        if(isset($event['price']) || isset($event['price_vat'])) {
+            $vat_rate = $values['vat_rate'] ?? 0.0;
+            if(!isset($values['vat_rate']) && isset($values['id'])) {
+                $price = Price::id($values['id'])->read(['vat_rate'])->first();
+                if($price) {
+                    $vat_rate = $price['vat_rate'];
+                }
+            }
+
+            if(isset($event['price'])) {
+                $result['price_vat'] = round($event['price'] * (1 + $vat_rate), 4);
+            }
+            elseif(isset($event['price_vat'])) {
+                $result['price'] = round($event['price_vat'] / (1 + $vat_rate), 4);
+            }
         }
-        elseif(isset($event['price_vat'])) {
-            $result['price'] = round($event['price_vat'] / (1 + $values['vat_rate'] ?? 0), 4);
-        }
+
         return $result;
     }
 }
