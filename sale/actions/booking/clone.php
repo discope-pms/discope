@@ -363,6 +363,8 @@ foreach($booking['booking_lines_groups_ids'] as $group) {
         $map_old_to_new_lines[$line['id']] = $cloned_line['id'];
     }
 
+    $orm->callonce(BookingLineGroup::getType(), 'updatePriceAdapters', [$cloned_group['id']]);
+
     foreach($group['booking_activities_ids'] as $activity) {
         if(!in_array($activity['product_id'], $not_deleted_product_id)) {
             continue;
