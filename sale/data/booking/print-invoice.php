@@ -583,14 +583,14 @@ if(empty($output)) {
             }
 
             $line = [
-                'name'          => (strlen($invoice_line['description']) > 0)?$invoice_line['description']:$invoice_line['name'],
-                'price'         => round(($invoice['type'] == 'credit_note')?(-$invoice_line['price']):$invoice_line['price'], 2),
-                'total'         => round(($invoice['type'] == 'credit_note')?(-$invoice_line['total']):$invoice_line['total'], 2),
+                'name'          => (strlen(($invoice_line['description'] ?? '')) > 0) ? $invoice_line['description'] : $invoice_line['name'],
+                'price'         => round(($invoice['type'] == 'credit_note') ? (-$invoice_line['price']) : $invoice_line['price'], 2),
+                'total'         => round(($invoice['type'] == 'credit_note') ? (-$invoice_line['total']) : $invoice_line['total'], 2),
                 'unit_price'    => $invoice_line['unit_price'],
                 'vat_rate'      => $invoice_line['vat_rate'],
                 'qty'           => $invoice_line['qty'],
-                'discount'      => $invoice_line['discount'],
-                'free_qty'      => $invoice_line['free_qty'],
+                'discount'      => $invoice_line['discount'] ?? 0,
+                'free_qty'      => $invoice_line['free_qty'] ?? 0,
                 'is_group'      => false
             ];
 
