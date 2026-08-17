@@ -477,11 +477,11 @@ if(!$output) {
                 $value = str_replace('{center}', $booking['center_id']['name'], $value);
                 $value = str_replace('{price}', $booking['price'] ,$value);
                 $values['contract_notice_html'] = $value;
-            }elseif($part['name'] == 'contract_approved') {
+            }
+            elseif($part['name'] == 'contract_approved') {
                 $value = $part['value'];
                 $values['has_contract_approved'] = 1;
                 $values['contract_approved_html'] = $part['value'] . $values['center_signature'];
-                $has_contract_approved = true;
             }
             elseif($part['name'] == 'contract_authorization') {
                 $value = $part['value'];
@@ -494,7 +494,7 @@ if(!$output) {
 
     }
 
-    if (!$has_contract_approved) {
+    if(!$values['has_contract_approved']) {
         $values['contract_header_html'] .= $values['center_signature'];
     }
 
