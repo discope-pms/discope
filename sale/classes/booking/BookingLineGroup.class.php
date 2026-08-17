@@ -3543,7 +3543,9 @@ class BookingLineGroup extends Model {
 
         // #todo - temporary solution - remove and deprecate
         if($group['pack_id.has_age_range'] && isset($group['pack_id.age_range_id'])) {
-            $age_assignments = ['age_range_id' => $group['pack_id.age_range_id']];
+            $age_assignments = [
+                ['age_range_id' => $group['pack_id.age_range_id']]
+            ];
         }
 
         // special case for school sojourn (#kaleo)
