@@ -152,19 +152,19 @@ $consumptions = Consumption::search([
                     // ...impacted by current date
                     ['date', '<=', $today]
                 ])
-                ->read(['rental_unit_id'])
+                ->read(['type', 'rental_unit_id'])
                 ->get();
 
 if($consumptions) {
     foreach($consumptions as $cid => $consumption) {
         if($consumption['type'] == 'book') {
-            $orm->update('realestate\RentalUnit', $rental_unit_id, ['status' => 'busy_full']);
+            $orm->update('realestate\RentalUnit', $consumption['rental_unit_id'], ['status' => 'busy_full']);
         }
-        else if($consumption['type'] == 'link') {
-            $orm->update('realestate\RentalUnit', $rental_unit_id, ['status' => 'busy_full']);
+        elseif($consumption['type'] == 'link') {
+            $orm->update('realestate\RentalUnit', $consumption['rental_unit_id'], ['status' => 'busy_full']);
         }
-        else if($consumption['type'] == 'part') {
-            $orm->update('realestate\RentalUnit', $rental_unit_id, ['status' => 'busy_part']);
+        elseif($consumption['type'] == 'part') {
+            $orm->update('realestate\RentalUnit', $consumption['rental_unit_id'], ['status' => 'busy_part']);
         }
     }
 }
