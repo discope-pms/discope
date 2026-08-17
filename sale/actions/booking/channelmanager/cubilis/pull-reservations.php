@@ -1080,7 +1080,7 @@ try {
                 }
                 catch(Exception $e) {
                     // rollback : remove all elements relating to booking (only in case of new booking)
-                    if($is_new_booking && $booking && isset($booking['id'])) {
+                    if(isset($is_new_booking) && isset($booking['id']) && $is_new_booking && $booking) {
                         SojournProductModelRentalUnitAssignement::search(['booking_id', '=', $booking['id']])->delete(true);
                         Consumption::search(['booking_id', '=', $booking['id']])->delete(true);
                         SojournProductModel::search(['booking_id', '=', $booking['id']])->delete(true);
@@ -1090,7 +1090,13 @@ try {
                     }
                     // notify that sync for reservation failed
                     ++$result['errors'];
-                    $result['logs'][] = "ERR - Booking creation failed for Cubilis reservation {$reservation['reservation_id']} (property {$property['extref_property_id']}) : ".$e->getMessage();
+                    $message = "ERR - Booking creation failed for Cubilis reservation {$reservation['reservation_id']} (property {$property['extref_property_id']}) : ".$e->getMessage();
+                    $orm_last_error = trim((string) $orm->getLastError());
+                    if(strlen($orm_last_error)) {
+                        $message .= " (ORM last error: {$orm_last_error})";
+                    }
+                    $result['logs'][] = $message;
+                    trigger_error('APP::'.substr($message, 0, 4000), EQ_REPORT_WARNING);
                 }
             }
         }
