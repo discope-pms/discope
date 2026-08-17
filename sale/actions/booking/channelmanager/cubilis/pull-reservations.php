@@ -83,6 +83,14 @@ $result = [
 // map for queuing reservations successfully synched from Cubilis (for sending ack requests)
 $map_property_ack_reservations = [];
 
+/**
+ * Remove UTF8mb4 chars (mostly emojis) to avoir DB collation errors.
+ */
+$getSanitizedUft8String = function(string $value): string {
+    $sanitized = preg_replace('/(?:\xF0[\x90-\xBF][\x80-\xBF]{2}|[\xF1-\xF3][\x80-\xBF]{3}|\xF4[\x80-\x8F][\x80-\xBF]{2})/s', '', $value);
+    return ($sanitized === null) ? $value : $sanitized;
+};
+
 try {
     $properties = Property::search(['is_active', '=', true])
         ->read([
@@ -270,7 +278,7 @@ try {
 
                                 // update additional values that might have changed
                                 Booking::id($booking['id'])->update([
-                                    'description'           => $reservation['comments'],
+                                    'description'           => $getSanitizedUft8String($reservation['comments']),
                                     'price'                 => $booking_price,
                                     'date_from'             => $date_from,
                                     'date_to'               => $date_to
@@ -279,7 +287,7 @@ try {
                                 if(!empty($reservation['xml'])) {
                                     try {
                                         Booking::id($booking['id'])->update([
-                                            'external_data'     => $booking['external_data'] . "\n\n" . $reservation['xml']
+                                            'external_data'     => $getSanitizedUft8String($booking['external_data'] . "\n\n" . $reservation['xml'])
                                         ]);
                                     }
                                     catch(Exception $e) {
@@ -334,8 +342,8 @@ try {
                                     'center_office_id'      => $property['center_office_id']['id'],
                                     'organisation_id'       => $property['center_office_id']['organisation_id'],
                                     'extref_reservation_id' => $reservation['reservation_id'],
-                                    'external_data'         => $reservation['xml'] ?? '',
-                                    'description'           => $reservation['comments'],
+                                    'external_data'         => $getSanitizedUft8String($reservation['xml'] ?? ''),
+                                    'description'           => $getSanitizedUft8String($reservation['comments']),
                                     'price'                 => $booking_price,
                                     'date_from'             => $date_from,
                                     'date_to'               => $date_to,
@@ -551,7 +559,7 @@ try {
                                         // #memo - we don't need the price_id here : only the group will generate an invoice line
                                         'product_id'            => $line_product['id'],
                                         'product_model_id'      => $line_product['product_model_id'],
-                                        'description'           => (isset($room_stay['room_type']['name']))?$room_stay['room_type']['name']:''
+                                        'description'           => $getSanitizedUft8String((isset($room_stay['room_type']['name']))?$room_stay['room_type']['name']:'')
                                     ]);
 
                                 // create SPM
@@ -664,7 +672,7 @@ try {
                                     // #memo - we have to do this because we do not receive VAT excl price
                                     $booking_line = BookingLine::create([
                                             'booking_id'            => $booking['id'],
-                                            'description'           => $extra_service['comments'],
+                                            'description'           => $getSanitizedUft8String($extra_service['comments']),
                                             'booking_line_group_id' => $extra_booking_line_group['id'],
                                             'qty'                   => 1,
                                             'price_id'              => $price['id'],
