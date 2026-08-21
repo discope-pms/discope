@@ -149,15 +149,6 @@ class BookingLineGroup extends \sale\booking\BookingLineGroup {
     }
 
     /**
-     *
-     */
-    public static function oncreate($om, $oids, $values, $lang) {
-
-    }
-
-
-
-    /**
      * Check wether an object can be created, and optionally perform additional operations.
      * These tests come in addition to the unique constraints return by method `getUnique()`.
      * This method can be overridden to define a more precise set of tests.

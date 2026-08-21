@@ -1317,7 +1317,7 @@ class BookingLineGroup extends Model {
         }
 
         // actually remove the age ranges
-        $om->remove(BookingLineGroupAgeRangeAssignment::getType(), $detached_ids, true);
+        $om->delete(BookingLineGroupAgeRangeAssignment::getType(), $detached_ids, true);
     }
 
     /**
@@ -1644,7 +1644,7 @@ class BookingLineGroup extends Model {
             Remove all previous price adapters relating to given lines were automatically created
         */
         $price_adapters_ids = $om->search('sale\booking\BookingPriceAdapter', [['booking_line_id', 'in', $booking_lines_ids], ['is_manual_discount', '=', false]]);
-        $om->remove('sale\booking\BookingPriceAdapter', $price_adapters_ids, true);
+        $om->delete('sale\booking\BookingPriceAdapter', $price_adapters_ids, true);
 
         $line_groups = $om->read(self::getType(), $oids, [
             'has_pack',

@@ -663,7 +663,7 @@ class Booking extends Model {
 
     /**
      * #memo - this is necessary when a Booking is created at once using ::create
-     *
+     * #todo - use onafterinstantiate
      */
     public static function oncreate($self) {
         $self->do('import_contacts');
