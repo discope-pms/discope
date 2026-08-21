@@ -105,7 +105,7 @@ class Ticket extends Model {
     /**
      * Used to intercept ticket submission and create a first entry.
     */
-    public static function onupdate($om, $ids, $values, $lang) {
+    public static function onbeforeupdate($om, $ids, $values, $lang) {
         $tickets = $om->read(self::getType(), $ids, ['creator', 'status', 'description', 'environment', 'attachments_ids']);
         if($tickets > 0 && count($tickets)) {
             foreach($tickets as $tid => $ticket) {
