@@ -46,7 +46,7 @@ $invoice = Invoice::id($params['id'])
 
 if($invoice['status'] != 'invoice') {
     // only emitted invoices can have fundings
-    throw new Exception("incompatible_status", QN_ERROR_INVALID_PARAM);
+    throw new Exception("incompatible_status", EQ_ERROR_INVALID_PARAM);
 }
 
 // if invoice do not yet relate to a funding it is a final/balance invoice (otherwise it is an installment invoice)
@@ -59,7 +59,7 @@ if(is_null($invoice['funding_id'])) {
             */
 
             // create a new funding relating to the invoice
-            $funding = [
+            $funding_values = [
                 'description'           => 'Facture d\'acompte',
                 'booking_id'            => $invoice['booking_id'],
                 'invoice_id'            => $invoice['id'],
@@ -72,8 +72,8 @@ if(is_null($invoice['funding_id'])) {
                 'due_date'              => $invoice['due_date']
             ];
             // attach the invoice to the new funding
-            $new_funding_id = reset(Funding::create($funding)->ids());
-            Invoice::id($params['id'])->update(['funding_id' => $new_funding_id]);
+            $funding = Funding::create($funding_values)->first();
+            Invoice::id($params['id'])->update(['funding_id' => $funding['id']]);
         }
         else {
             // balance invoice : check for partially paid installments
@@ -85,17 +85,17 @@ if(is_null($invoice['funding_id'])) {
                 ->first(true);
 
             // #memo - invoice balance can be negative, so can the amount of the funding
-            $invoice_price = round($invoice['balance'], 2);
+            $invoice_balance = round($invoice['balance'], 2);
 
-            // #memo - there is no funding for nul invoices
-            if($invoice_price != 0.00) {
+            // #memo - there is no funding for null invoices or rounding differences up to one cent
+            if(abs($invoice_balance) > 0.01) {
                 // create a new funding relating to the invoice
-                $funding = [
+                $funding_values = [
                     'description'           => 'Facture de solde',
                     'booking_id'            => $invoice['booking_id'],
                     'invoice_id'            => $invoice['id'],
                     'center_office_id'      => $invoice['center_office_id'],
-                    'due_amount'            => $invoice_price,
+                    'due_amount'            => $invoice_balance,
                     'is_paid'               => false,
                     'type'                  => 'invoice',
                     'order'                 => 9,
@@ -103,9 +103,9 @@ if(is_null($invoice['funding_id'])) {
                     'due_date'              => $invoice['due_date']
                 ];
 
-                $new_funding = Funding::create($funding)->read(['id', 'name'])->first(true);
+                $funding = Funding::create($funding_values)->read(['id', 'name'])->first();
                 // attach the invoice to the new funding
-                Invoice::id($params['id'])->update(['funding_id' => $new_funding['id']]);
+                Invoice::id($params['id'])->update(['funding_id' => $funding['id']]);
             }
         }
     }
@@ -139,7 +139,7 @@ if(is_null($invoice['funding_id'])) {
             $credit_note_label = Setting::get_value('lodging', 'locale', 'i18n.credit_note');
 
             // create a new funding relating to the invoice
-            $funding = [
+            $funding_values = [
                 'description'           => $credit_note_label,
                 'booking_id'            => $invoice['booking_id'],
                 'invoice_id'            => $invoice['id'],
@@ -152,8 +152,8 @@ if(is_null($invoice['funding_id'])) {
                 'due_date'              => $invoice['due_date']
             ];
             // attach the invoice to the new funding
-            $new_funding_id = reset(Funding::create($funding)->ids());
-            Invoice::id($params['id'])->update(['funding_id' => $new_funding_id]);
+            $funding = Funding::create($funding_values)->first();
+            Invoice::id($params['id'])->update(['funding_id' => $funding['id']]);
         }
         else {
             Invoice::id($params['id'])->update(['is_paid' => true]);

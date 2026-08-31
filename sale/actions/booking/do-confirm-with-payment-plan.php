@@ -432,7 +432,7 @@ try {
         if(!$on_time) {
             $reporter->debug("Delay too short: due {$date}, from {$booking['date_from']}");
             // create a single funding with 100% of due amount
-            $funding = [
+            $funding_values = [
                     'booking_id'            => $params['id'],
                     'center_office_id'      => $booking['center_id']['center_office_id'],
                     'due_amount'            => $remaining_amount,
@@ -441,7 +441,7 @@ try {
                     'due_date'              => $booking['date_from'],
                     'description'           => 'Full'
                 ];
-            Funding::create($funding)->read(['name']);
+            Funding::create($funding_values)->read(['name']);
         }
         else {
             $funding_order = 0;
@@ -460,7 +460,7 @@ try {
                     break;
                 }
                 $remaining_amount -= $funding_amount;
-                $funding = [
+                $funding_values = [
                     'payment_deadline_id'   => $deadline_id,
                     'booking_id'            => $params['id'],
                     'center_office_id'      => $booking['center_id']['center_office_id'],
@@ -482,15 +482,15 @@ try {
                         $date = $booking['date_to'];
                         break;
                 }
-                $funding['issue_date'] = $date + ($deadline['delay_from_event_offset'] * 86400);
-                $funding['due_date'] = $funding['issue_date'] + ($deadline['delay_count'] * 86400);
+                $funding_values['issue_date'] = $date + ($deadline['delay_from_event_offset'] * 86400);
+                $funding_values['due_date'] = $funding_values['issue_date'] + ($deadline['delay_count'] * 86400);
 
                 // request funding creation
                 try {
-                    $new_funding = Funding::create($funding)->read(['id', 'name'])->first(true);
+                    $funding = Funding::create($funding_values)->read(['id', 'name'])->first(true);
                     if($deadline['type'] == 'invoice') {
                         // an invoice was requested: convert the installment to an invoice
-                        eQual::run('do', 'sale_booking_funding_convert', ['id' => $new_funding['id'], 'partner_id' => $booking['customer_id']['id']]);
+                        eQual::run('do', 'sale_booking_funding_convert', ['id' => $funding['id'], 'partner_id' => $booking['customer_id']['id']]);
                     }
                 }
                 catch(Exception $e) {

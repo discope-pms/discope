@@ -1305,11 +1305,12 @@ class Booking extends Model {
                     foreach($fundings as $fid => $funding) {
                         $sum += $funding['paid_amount'];
                     }
-                    if(round($sum, 2) < round($booking['price'], 2)) {
+                    $balance = round($sum - $booking['price'], 2);
+                    if($balance < -0.01) {
                         // an unpaid amount remains
                         $om->update(self::getType(), $id, ['status' => 'debit_balance']);
                     }
-                    elseif(round($sum, 2) > round($booking['price'], 2)) {
+                    elseif($balance > 0.01) {
                         // a reimbursement is due
                         $om->update(self::getType(), $id, ['status' => 'credit_balance']);
                     }

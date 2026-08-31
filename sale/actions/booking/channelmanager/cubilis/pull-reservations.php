@@ -57,14 +57,14 @@ list($params, $providers) = eQual::announce([
 $channelmanager_enabled = Setting::get_value('sale', 'features', 'booking.channel_manager', false);
 
 if(!$channelmanager_enabled) {
-    throw new Exception('disabled_feature', QN_ERROR_INVALID_CONFIG);
+    throw new Exception('disabled_feature', EQ_ERROR_INVALID_CONFIG);
 }
 
 $client_domain = Setting::get_value('sale', 'organization', 'booking.channel_manager.client_domain', 'https://kaleo.discope.run');
 
 // #memo - prevent calls from non-production server
 if(constant('ROOT_APP_URL') != $client_domain) {
-    throw new Exception('wrong_host', QN_ERROR_INVALID_CONFIG);
+    throw new Exception('wrong_host', EQ_ERROR_INVALID_CONFIG);
 }
 
 
@@ -105,7 +105,7 @@ try {
     if(!count($properties)) {
         ++$result['errors'];
         $result['logs'][] = "ERR - No property found in Discope for syncing with Cubilis.";
-        throw new Exception('no_property_defined', QN_ERROR_INVALID_CONFIG);
+        throw new Exception('no_property_defined', EQ_ERROR_INVALID_CONFIG);
     }
 
     foreach($properties as $property) {
@@ -127,7 +127,7 @@ try {
             if(!$flag_success && $count_attempts >= 3) {
                 ++$result['errors'];
                 $result['logs'][] = "ERR - Property {$property['extref_property_id']} : Unable to connect to Cubilis server (retry scheduled).";
-                throw new Exception('cubilis_unreachable', QN_ERROR_UNKNOWN);
+                throw new Exception('cubilis_unreachable', EQ_ERROR_UNKNOWN);
             }
         }
 
@@ -171,7 +171,7 @@ try {
                     // handle booking cancellation
                     if($reservation['status'] == 'Cancelled') {
                         if(!$booking) {
-                            // throw new Exception('unknown_reservation_cancellation', QN_ERROR_UNKNOWN_OBJECT);
+                            // throw new Exception('unknown_reservation_cancellation', EQ_ERROR_UNKNOWN_OBJECT);
                             ++$result['warnings'];
                             $result['logs'][] = "WARN- Unable to handle request for cancelling unknown reservation {$reservation['reservation_id']}.";
                         }
@@ -315,11 +315,11 @@ try {
                                         'lang'              => $reservation['customer']['lang']
                                     ]);
                                 if(!isset($customer['id']) || !isset($customer['customer_identity_id'])) {
-                                    throw new Exception('invalid_customer', QN_ERROR_UNKNOWN);
+                                    throw new Exception('invalid_customer', EQ_ERROR_UNKNOWN);
                                 }
                             }
                             catch(Exception $e) {
-                                throw new Exception('failed_customer_resolution'.' : '.$e->getMessage(), QN_ERROR_UNKNOWN);
+                                throw new Exception('failed_customer_resolution'.' : '.$e->getMessage(), EQ_ERROR_UNKNOWN);
                             }
 
                             // #memo - in this controller, groups and lines creations do not trigger the update of the booking type_id, so we have to assign it manually
@@ -328,7 +328,7 @@ try {
                                 ->first(true);
 
                             if(!$booking_type) {
-                                throw new Exception('missing_ota_booking_type', QN_ERROR_INVALID_CONFIG);
+                                throw new Exception('missing_ota_booking_type', EQ_ERROR_INVALID_CONFIG);
                             }
 
                             // 1) create booking
@@ -354,7 +354,7 @@ try {
                                 ->first(true);
 
                             if(!$booking) {
-                                throw new Exception('failed_ota_booking_creation', QN_ERROR_UNKNOWN);
+                                throw new Exception('failed_ota_booking_creation', EQ_ERROR_UNKNOWN);
                             }
 
                             if(strlen($reservation['partner']) > 0) {
@@ -428,7 +428,7 @@ try {
                                         }
                                     }
                                     if(!$found) {
-                                        throw new Exception('no_rentalunit_available', QN_ERROR_INVALID_CONFIG);
+                                        throw new Exception('no_rentalunit_available', EQ_ERROR_INVALID_CONFIG);
                                     }
                                 }
                                 catch(Exception $e) {
@@ -444,7 +444,7 @@ try {
                                     ->first(true);
 
                                 if(!$group_product) {
-                                    throw new Exception('missing_ota_sojourn_product', QN_ERROR_INVALID_CONFIG);
+                                    throw new Exception('missing_ota_sojourn_product', EQ_ERROR_INVALID_CONFIG);
                                 }
 
                                 // retrieve the Price List that matches the criteria from the booking with the shortest duration
@@ -478,8 +478,8 @@ try {
                                     ->first(true);
 
                                 if(!$price) {
-                                    trigger_error("APP::no price found for dates [".date('Y-m-d', $date_from)." ,".date('Y-m-d', $date_to)."] for product {$group_product['id']} in price lists".implode($price_lists_ids), QN_REPORT_INFO);
-                                    throw new Exception('missing_ota_price', QN_ERROR_INVALID_CONFIG);
+                                    trigger_error("APP::no price found for dates [".date('Y-m-d', $date_from)." ,".date('Y-m-d', $date_to)."] for product {$group_product['id']} in price lists".implode($price_lists_ids), EQ_REPORT_INFO);
+                                    throw new Exception('missing_ota_price', EQ_ERROR_INVALID_CONFIG);
                                 }
 
                                 $resulting_price = round($room_stay['total']['amount'], 2);
@@ -510,7 +510,7 @@ try {
                                     ->first(true);
 
                                 if(!$booking_line_group) {
-                                    throw new Exception('failed_ota_sojourn_creation', QN_ERROR_UNKNOWN);
+                                    throw new Exception('failed_ota_sojourn_creation', EQ_ERROR_UNKNOWN);
                                 }
 
                                 // create the age range assignments
@@ -547,7 +547,7 @@ try {
                                     ->first(true);
 
                                 if(!$line_product) {
-                                    throw new Exception('missing_ota_night_product', QN_ERROR_INVALID_CONFIG);
+                                    throw new Exception('missing_ota_night_product', EQ_ERROR_INVALID_CONFIG);
                                 }
 
                                 // #memo - bookings from OTA should always use nights with products accounted "by accommodation".
@@ -589,7 +589,7 @@ try {
                                     ->first(true);
 
                                 if(!$line_product) {
-                                    throw new Exception('missing_breakfast_product', QN_ERROR_INVALID_CONFIG);
+                                    throw new Exception('missing_breakfast_product', EQ_ERROR_INVALID_CONFIG);
                                 }
 
                                 BookingLine::create([
@@ -603,7 +603,7 @@ try {
                             }
                         }
                         catch(Exception $e) {
-                            throw new Exception('failed_sojourn_creation:'.$e->getMessage(), QN_ERROR_UNKNOWN);
+                            throw new Exception('failed_sojourn_creation:'.$e->getMessage(), EQ_ERROR_UNKNOWN);
                         }
 
                         // 3) add extra services
@@ -634,7 +634,7 @@ try {
                                     if(!$service) {
                                         ++$result['errors'];
                                         $result['logs'][] = "ERR - Service extra inconnu:  {$extra_service['inventory_code']} pour property {$property['id']} ({$extra_service['comments']} {$extra_service['total']['amount']})";
-                                        throw new Exception('unknown_extra_service', QN_ERROR_UNKNOWN_OBJECT);
+                                        throw new Exception('unknown_extra_service', EQ_ERROR_UNKNOWN_OBJECT);
                                     }
 
                                     $products_ids = Product::search([ ['product_model_id', '=', $service['product_model_id']], ['can_sell', '=', true] ])->ids();
@@ -662,7 +662,7 @@ try {
                                         ->first(true);
 
                                     if(!$price) {
-                                        throw new Exception('missing_ota_extra_price', QN_ERROR_INVALID_CONFIG);
+                                        throw new Exception('missing_ota_extra_price', EQ_ERROR_INVALID_CONFIG);
                                     }
 
                                     $resulting_price = round(floatval($extra_service['total']['amount']), 2);
@@ -693,7 +693,7 @@ try {
                                     }
                                 }
                                 catch(Exception $e) {
-                                    throw new Exception('failed_services_creation:'.$e->getMessage(), QN_ERROR_UNKNOWN);
+                                    throw new Exception('failed_services_creation:'.$e->getMessage(), EQ_ERROR_UNKNOWN);
                                 }
                             }
                         }
@@ -721,7 +721,7 @@ try {
 
                                 $products_ids = Product::search(['sku', '=' ,'KA-CTaxSej-A'])->ids();
                                 if(empty($products_ids)) {
-                                    throw new Exception('missing_city_tax_product', QN_ERROR_INVALID_CONFIG);
+                                    throw new Exception('missing_city_tax_product', EQ_ERROR_INVALID_CONFIG);
                                 }
                                 // retrieve a product matching the service for the current property
                                 $price_lists_ids = PriceList::search([
@@ -743,7 +743,7 @@ try {
                                     ->first(true);
 
                                 if(!$price) {
-                                    throw new Exception('missing_ota_city_tax_price', QN_ERROR_INVALID_CONFIG);
+                                    throw new Exception('missing_ota_city_tax_price', EQ_ERROR_INVALID_CONFIG);
                                 }
 
                                 $city_tax_total = round($price['price'] * $booking['nb_pers'] * $nb_nights, 4);
@@ -776,7 +776,7 @@ try {
                                 }
                             }
                             catch(Exception $e) {
-                                throw new Exception('extra_services_creation_failed:'.$e->getMessage(), QN_ERROR_UNKNOWN);
+                                throw new Exception('extra_services_creation_failed:'.$e->getMessage(), EQ_ERROR_UNKNOWN);
                             }
                         }
 
@@ -794,9 +794,10 @@ try {
                             // get new price
                             $updated_book = Booking::id($booking['id'])->read(['price'])->first(true);
 
-                            // if vat calculation method gives a different price than Cubilis, then we add a rounding VAT product
-                            if($booking_price !== $updated_book['price']) {
-                                $rounding_vat_amount = round($booking_price - $updated_book['price'], 2);
+                            // if vat calculation method gives a significantly different price than Cubilis, then we add a rounding VAT product
+                            $rounding_vat_delta = $booking_price - $updated_book['price'];
+                            if(abs($rounding_vat_delta) >= 0.01) {
+                                $rounding_vat_amount = round($rounding_vat_delta, 2);
 
                                 $sku_vat_rounding_product = Setting::get_value('sale', 'organization', 'sku.vat_rounding_product');
                                 if(is_null($sku_vat_rounding_product)) {
@@ -805,7 +806,7 @@ try {
 
                                 $products_ids = Product::search(['sku', '=' , $sku_vat_rounding_product])->ids();
                                 if(empty($products_ids)) {
-                                    throw new Exception('missing_vat_rounding_product', QN_ERROR_INVALID_CONFIG);
+                                    throw new Exception('missing_vat_rounding_product', EQ_ERROR_INVALID_CONFIG);
                                 }
 
                                 $vat_rounding_product = Product::search(['sku', '=', $sku_vat_rounding_product])
@@ -883,7 +884,7 @@ try {
                                 ->first(true);
 
                             if(!$funding) {
-                                throw new Exception('failed_funding_creation', QN_ERROR_UNKNOWN);
+                                throw new Exception('failed_funding_creation', EQ_ERROR_UNKNOWN);
                             }
 
                             foreach($reservation['payments'] as $payment) {
