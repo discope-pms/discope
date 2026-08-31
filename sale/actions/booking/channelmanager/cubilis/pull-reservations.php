@@ -834,24 +834,24 @@ try {
                                 }
 
                                 $extra_booking_line_group = BookingLineGroup::create([
-                                    'name'          => "Arrondi TVA",
-                                    'is_sojourn'    => false,
-                                    'is_event'      => false,
-                                    'has_pack'      => false,
-                                    'is_locked'     => false,
-                                    'nb_pers'       => 1,
-                                    'booking_id'    => $booking['id']
-                                ])
+                                        'name'          => "Arrondi TVA",
+                                        'is_sojourn'    => false,
+                                        'is_event'      => false,
+                                        'has_pack'      => false,
+                                        'is_locked'     => false,
+                                        'nb_pers'       => 1,
+                                        'booking_id'    => $booking['id']
+                                    ])
                                     ->read(['id'])
                                     ->first(true);
 
                                 BookingLine::create([
-                                    'booking_id'            => $booking['id'],
-                                    'booking_line_group_id' => $extra_booking_line_group['id'],
-                                    'qty'                   => 1,
-                                    'price_id'              => $vat_rounding_product_price['id'],
-                                    'product_id'            => $vat_rounding_product['id']
-                                ])
+                                        'booking_id'            => $booking['id'],
+                                        'booking_line_group_id' => $extra_booking_line_group['id'],
+                                        'qty'                   => 1,
+                                        'price_id'              => $vat_rounding_product_price['id'],
+                                        'product_id'            => $vat_rounding_product['id']
+                                    ])
                                     ->update([
                                         'unit_price'            => $rounding_vat_amount,
                                         'has_manual_unit_price' => true,
@@ -959,6 +959,7 @@ try {
                                     ])
                                     ->read(['id'])
                                     ->first(true);
+
                                 Contact::create([
                                         'booking_id'            => $booking['id'],
                                         'owner_identity_id'     => $booking['customer_identity_id'],
