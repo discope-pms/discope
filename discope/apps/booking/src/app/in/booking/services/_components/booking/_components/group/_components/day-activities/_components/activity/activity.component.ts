@@ -71,6 +71,8 @@ export class BookingServicesBookingGroupDayActivitiesActivityComponent implement
         'EV': 'Soir',
     };
 
+    public rentalUnits: { id: number, name: string, available: boolean }[] = [];
+
     constructor(
         private api: ApiService,
         public dialog: MatDialog
@@ -142,6 +144,37 @@ export class BookingServicesBookingGroupDayActivitiesActivityComponent implement
 
         if(this.booking.status !== 'quote') {
             this.vm.rentalUnit.formControl.disable();
+        }
+
+        if(this.activity.activity_booking_line_id?.product_id.product_model_id.has_rental_unit) {
+            const mapRentalUnitsAvailabilities: any = {};
+            for(let rental_unit of this.activity.activity_booking_line_id.product_id.product_model_id.activity_rental_units_ids) {
+                mapRentalUnitsAvailabilities[rental_unit.id] = {
+                    id: rental_unit.id,
+                    name: rental_unit.name,
+                    available: true
+                };
+            }
+
+            const date = (this.activity.activity_date as unknown as string).split('T')[0];
+
+            const domain: any = [
+                ['booking_id', '<>', this.booking.id],
+                ['rental_unit_id', 'in', this.activity.activity_booking_line_id.product_id.product_model_id.activity_rental_units_ids.map((rental_unit: any) => rental_unit.id)],
+                ['date', '=', date],
+                ['schedule_from', '<', this.activity.schedule_to],
+                ['schedule_to', '>', this.activity.schedule_from]
+            ];
+
+            this.api.collect('sale\\booking\\Consumption', domain, ['rental_unit_id'])
+                .then((consumptions) => {
+                    for(let consumption of consumptions) {
+                        mapRentalUnitsAvailabilities[consumption.rental_unit_id].available = false;
+                    }
+                })
+                .finally(() => {
+                    this.rentalUnits = Object.values(mapRentalUnitsAvailabilities);
+                });
         }
 
         this.ready = true;
