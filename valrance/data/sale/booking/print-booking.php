@@ -176,6 +176,7 @@ $fields = [
     'total',
     'price',
     'is_price_tbc',
+    'booking_applied_points_ids',
     'type_id' => [
             'id',
             'booking_schedule_layout'
@@ -472,6 +473,7 @@ $connection_names = array_map(function($item) use ($params) {
 /*
     retrieve templates
 */
+$has_footer = false;
 if($booking['center_id']['template_category_id']) {
 
     $template = Template::search([
@@ -720,7 +722,7 @@ if($booking['center_id']['template_category_id']) {
         elseif($part['name'] == 'footer') {
             $values['has_footer'] = 1;
             $values['footer_html'] = $part['value'];
-            $hasFooter = true;
+            $has_footer = true;
         }
         elseif($part['name'] == 'signature') {
             $values['signature_html'] = $part['value'] . $values['center_signature'];
@@ -729,7 +731,7 @@ if($booking['center_id']['template_category_id']) {
 
 }
 
-if (!$hasFooter) {
+if(!$has_footer) {
     $values['header_html'] .= $values['center_signature'];
 }
 
