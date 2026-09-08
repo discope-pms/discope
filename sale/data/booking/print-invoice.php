@@ -410,12 +410,7 @@ if(empty($output)) {
         $values['total'] = -$values['total'];
     }
 
-    $translations_file_path = EQ_BASEDIR."/packages/sale/i18n/{$params['lang']}/_parts/booking/print-invoice.json";
-    $json_translations_file = file_get_contents($translations_file_path);
-
-    $translations_file = json_decode($json_translations_file, true);
-
-    $values['i18n'] = $getLabels($params['lang'], sprintf('%s/packages/sale/i18n/%s/booking/Invoice.%s.json', EQ_BASEDIR, $params['lang'], $params['view_id']));
+    $values['i18n'] = $getLabels($params['lang'], sprintf('%s/packages/sale/i18n/%s/_parts/Invoice.json', EQ_BASEDIR, $params['lang']));
 
     /**
      * Add info for ATTN, if required.
