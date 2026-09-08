@@ -79,8 +79,6 @@ use Twig\Loader\FilesystemLoader as TwigFilesystemLoader;
     Retrieve the requested template
 */
 
-file_put_contents(QN_LOG_STORAGE_DIR.'/tmp.log', 'test'.PHP_EOL, FILE_APPEND | LOCK_EX);
-
 $entity = 'sale\camp\Enrollment';
 $parts = explode('\\', $entity);
 $package = array_shift($parts);
@@ -239,8 +237,6 @@ $subtitle = '(dossier complet ou non)';
 /*
     Inject all values into the template
 */
-
-file_put_contents(QN_LOG_STORAGE_DIR.'/tmp.log', json_encode($map_locations_enrollments).PHP_EOL, FILE_APPEND | LOCK_EX);
 
 try {
     $loader = new TwigFilesystemLoader(EQ_BASEDIR."/packages/$package/views/");
