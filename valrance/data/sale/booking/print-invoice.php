@@ -80,7 +80,8 @@ use discope\setting\Setting;
 ['context' => $context, 'orm' => $orm] = $providers;
 
 $getLabels = function($lang, $default_labels = []) {
-    $view_i18n_file_path = sprintf('%s/packages/sale/i18n/%s/_parts/labels.json', EQ_BASEDIR, $lang);
+    $global_view_i18n_file_path = sprintf('%s/packages/sale/i18n/%s/_parts/labels.json', EQ_BASEDIR, $lang);
+    $valrance_view_i18n_file_path = sprintf('%s/packages/valrance/i18n/%s/_parts/labels.json', EQ_BASEDIR, $lang);
 
     $readLabels = function($path) {
         if(!$path || !file_exists($path)) {
@@ -92,7 +93,8 @@ $getLabels = function($lang, $default_labels = []) {
 
     return array_merge(
         $default_labels,
-        $readLabels($view_i18n_file_path)
+        $readLabels($global_view_i18n_file_path),
+        $readLabels($valrance_view_i18n_file_path)
     );
 };
 
@@ -493,7 +495,7 @@ if($invoice['type'] == 'credit_note') {
 /*
     3) retrieve terms translations
 */
-$labels = $getLabels($params['lang']);
+$values['i18n'] = $getLabels($params['lang']);
 
 /**
  * Add info for ATTN, if required.
