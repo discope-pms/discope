@@ -64,5 +64,14 @@
     "origin": "Origin",
     "received": "Received",
     "left_to_pay": "Remaining to pay",
-    "payments_history": "Payments history"
+    "payments_history": "Payments history",
+    "time_slot": "Time slot",
+    "snack": "Snack",
+    "meals": "Meal",
+    "title_agreement": "APPROVED",
+    "activities_details": "Activity details",
+    "activity": "Activity",
+    "activity_schedule": "Provisional activity schedule",
+    "children": "child(ren)",
+    "people": "person(s)"
 }

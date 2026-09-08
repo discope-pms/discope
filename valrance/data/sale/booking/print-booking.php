@@ -73,7 +73,9 @@ list($context, $orm) = [$providers['context'], $providers['orm']];
  * Methods
  */
 
-$getLabels = function($lang, $global_view_i18n_file_path, $valrance_view_i18n_file_path, $default_labels = []) {
+$getLabels = function($lang, $default_labels = []) {
+    $view_i18n_file_path = sprintf('%s/packages/sale/i18n/%s/_parts/labels.json', EQ_BASEDIR, $lang);
+
     $readLabels = function($path) {
         if(!$path || !file_exists($path)) {
             return [];
@@ -84,8 +86,7 @@ $getLabels = function($lang, $global_view_i18n_file_path, $valrance_view_i18n_fi
 
     return array_merge(
         $default_labels,
-        $readLabels($global_view_i18n_file_path),
-        $readLabels($valrance_view_i18n_file_path)
+        $readLabels($view_i18n_file_path)
     );
 };
 
@@ -428,13 +429,7 @@ $values = [
     retrieve terms translations
 */
 
-$values['i18n'] = $getLabels(
-    $params['lang'],
-    sprintf('%s/packages/sale/i18n/%s/_parts/Invoice.json', EQ_BASEDIR, $params['lang']),
-    sprintf('%s/packages/valrance/i18n/%s/_parts/Invoice.json', EQ_BASEDIR, $params['lang'])
-);
-
-file_put_contents(QN_LOG_STORAGE_DIR.'/tmp.log', json_encode($values['i18n']).PHP_EOL, FILE_APPEND | LOCK_EX);
+$values['i18n'] = $getLabels($params['lang']);
 
 
 /**

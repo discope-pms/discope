@@ -72,6 +72,23 @@ use Twig\Loader\FilesystemLoader as TwigFilesystemLoader;
 
 $output = '';
 
+$getLabels = function($lang, $default_labels = []) {
+    $view_i18n_file_path = sprintf('%s/packages/sale/i18n/%s/_parts/labels.json', EQ_BASEDIR, $lang);
+
+    $readLabels = function($path) {
+        if(!$path || !file_exists($path)) {
+            return [];
+        }
+        $labels = json_decode(file_get_contents($path), true);
+        return is_array($labels) ? $labels : [];
+    };
+
+    return array_merge(
+        $default_labels,
+        $readLabels($view_i18n_file_path)
+    );
+};
+
 // steer towards custom controller, if any
 $has_custom_package = Setting::get_value('discope', 'features', 'has_custom_package', false);
 if($has_custom_package) {
@@ -216,17 +233,7 @@ if(empty($output)) {
         'time_slots_activities'      => [],
     ];
 
-    $values['i18n'] = [
-        'activity_schedule'    => Setting::get_value('lodging', 'locale', 'i18n.activity_schedule', null, [], $params['lang']),
-        'booking_ref'          => Setting::get_value('lodging', 'locale', 'i18n.booking_ref', null, [], $params['lang']),
-        'children'             => Setting::get_value('lodging', 'locale', 'i18n.children', null, [], $params['lang']),
-        'company_registry'     => Setting::get_value('lodging', 'locale', 'i18n.company_registry', null, [], $params['lang']),
-        'date'                 => Setting::get_value('lodging', 'locale', 'i18n.date', null, [], $params['lang']),
-        'day'                  => Setting::get_value('lodging', 'locale', 'i18n.day', null, [], $params['lang']),
-        'people'               => Setting::get_value('lodging', 'locale', 'i18n.people', null, [], $params['lang']),
-        'vat'                  => Setting::get_value('lodging', 'locale', 'i18n.vat', null, [], $params['lang']),
-        'vat_number'           => Setting::get_value('lodging', 'locale', 'i18n.vat_number', null, [], $params['lang']),
-    ];
+    $values['i18n'] = $getLabels($params['lang']);
 
 
 

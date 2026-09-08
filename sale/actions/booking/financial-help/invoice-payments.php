@@ -95,7 +95,9 @@ use sale\booking\FinancialHelp;
  */
 ['context' => $context] = $providers;
 
-$getLabels = function($lang, $view_i18n_file_path, $default_labels = []) {
+$getLabels = function($lang, $default_labels = []) {
+    $view_i18n_file_path = sprintf('%s/packages/sale/i18n/%s/_parts/labels.json', EQ_BASEDIR, $lang);
+
     $readLabels = function($path) {
         if(!$path || !file_exists($path)) {
             return [];
@@ -209,7 +211,7 @@ $values = [
     'payments'                  => $payments
 ];
 
-$values['i18n'] = $getLabels($params['lang'], sprintf('%s/packages/sale/i18n/%s/_parts/Invoice.json', EQ_BASEDIR, $params['lang']));
+$values['i18n'] = $getLabels($params['lang']);
 
 try {
     $loader = new TwigFilesystemLoader(EQ_BASEDIR.'/packages/sale/views/');

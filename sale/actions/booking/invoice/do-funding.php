@@ -40,7 +40,9 @@ list($params, $providers) = announce([
  */
 list($context, $orm, $cron, $auth) = [$providers['context'], $providers['orm'], $providers['cron'], $providers['auth']];
 
-$getLabels = function($lang, $view_i18n_file_path, $default_labels = []) {
+$getLabels = function($lang, $default_labels = []) {
+    $view_i18n_file_path = sprintf('%s/packages/sale/i18n/%s/_parts/labels.json', EQ_BASEDIR, $lang);
+
     $readLabels = function($path) {
         if(!$path || !file_exists($path)) {
             return [];
@@ -151,11 +153,11 @@ if(is_null($invoice['funding_id'])) {
             }, 0);
 
         if($paid_amount > 0) {
-            $invoice_i18n = $getLabels($params['lang'], sprintf('%s/packages/sale/i18n/%s/_parts/Invoice.json', EQ_BASEDIR, $params['lang']));
+            $labels = $getLabels($params['lang']);
 
             // create a new funding relating to the invoice
             $funding_values = [
-                'description'           => $invoice_i18n['credit_note'],
+                'description'           => $labels['credit_note'],
                 'booking_id'            => $invoice['booking_id'],
                 'invoice_id'            => $invoice['id'],
                 'center_office_id'      => $invoice['center_office_id'],

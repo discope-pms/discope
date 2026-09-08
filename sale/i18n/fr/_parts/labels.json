@@ -64,5 +64,14 @@
     "origin": "Origine",
     "received": "Reçu",
     "left_to_pay": "Restant à payer",
-    "payments_history": "Historique des paiements"
+    "payments_history": "Historique des paiements",
+    "time_slot": "Tranche horaire",
+    "snack": "Collation",
+    "meals": "Repas",
+    "title_agreement": "BON POUR ACCORD",
+    "activities_details": "Détail des activités",
+    "activity": "Activité",
+    "activity_schedule": "Planning prévisionnel des activités",
+    "children": "enfant(s)",
+    "people": "personne(s)"
 }

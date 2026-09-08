@@ -64,5 +64,14 @@
     "origin": "Afkomst",
     "received": "Ontvangen",
     "left_to_pay": "Nog te betalen",
-    "payments_history": "Betalingen lijst"
+    "payments_history": "Betalingen lijst",
+    "time_slot": "Tijdslot",
+    "snack": "Snack",
+    "meals": "Maaltijd",
+    "title_agreement": "VOOR AKKOORD",
+    "activities_details": "Details van de activiteiten",
+    "activity": "Activiteit",
+    "activity_schedule": "Voorlopige activiteitenplanning",
+    "children": "kind(eren)",
+    "people": "perso(o)n(en)"
 }
