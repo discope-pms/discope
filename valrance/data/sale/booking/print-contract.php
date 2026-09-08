@@ -579,8 +579,6 @@ $values = [
 */
 $values['i18n'] = $getLabels($params['lang']);
 
-file_put_contents(QN_LOG_STORAGE_DIR.'/tmp.log', json_encode($values['i18n']).PHP_EOL, FILE_APPEND | LOCK_EX);
-
 /**
  * Add info for ATTN, if required.
  * If the invoice is emitted to a partner distinct from the booking customer, the latter is ATTN and the former is considered as the customer.
