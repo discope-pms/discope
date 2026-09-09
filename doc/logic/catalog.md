@@ -19,13 +19,15 @@ marqués comme pouvant être vendu ou non.
 Les **types** possibles des produits sont hiérarchisés de la manière
 suivante :
 
--   **Consommables** : des produits physiques qui font partie d'un
-    stock. Leur vente implique la diminution du stock disponible.
+-   **Consommables** : des produits physiques, avec ou sans suivi de
+    stock selon leur configuration et les flux utilisés.
     -   Simple : il n'y a pas de suivi formel des consommables simples
         et la gestion du stock n'est pas supervisée.
-    -   Stockable : les consommables stockables impliquent la gestion
-        détaillée d'un stock avec la possibilité d'assigner des règles
-        de commande automatique.
+    -   Stockable : les consommables stockables disposent d'un mode de
+        suivi (`none`, `batch`, `sku` ou `upc`). La configuration de ces
+        champs ne suffit pas à mettre en place les mouvements de stock
+        ou les règles de réapprovisionnement ; leur intégration doit être
+        vérifiée dans le flux utilisé.
 
 -   **Services** : des produits de type services ne se stockent pas et
     leur disponibilité est, a priori, illimitée (dans les faits, il y a
@@ -50,11 +52,10 @@ ou **à la personne**.
 
 -   Par défaut, un produit est comptabilisé à **l'unité**.
 
--   Un produit comptabilisé au **logement** est facturé au prorata
-    nombre de jours (ou de nuits), quel que soit le nombre de
-    participants et est assigné à une unité locative, ou à une catégorie
-    d'unités locatives (auxquelles correspond un attribut
-    '**capacité**', utilisé pour gérer les compositions).
+-   Un produit comptabilisé au **logement** tient compte du nombre de
+    logements nécessaires selon la **capacité** et le nombre de
+    participants. S'il est répétable, cette quantité est multipliée par
+    le nombre d'occurrences, généralement les nuits du séjour.
 
 -   Un produit comptabilisé à la **personne** est facturé en fonction du
     nombre de participants et dispose d'un attribut '**durée**' (en
@@ -67,43 +68,29 @@ l'occupation d'une unité locative dont le stock est limité.
 
 Les consommations se réfèrent exclusivement à des services planifiables.
 
-<div style="margin-top: 20px;">1. <b>Si</b> le produit est logement (is_accomodation = true)</div>
+Le calcul dépend de `qty_accounting_method`, `is_repeatable`,
+`is_accomodation`, `capacity` et des éventuelles quantités ou durées propres.
+Pour un service répétable, le nombre d'occurrences repose normalement sur
+les **nuits du séjour**, ou les **jours de l'événement**. Une durée propre
+peut remplacer cette durée.
 
-> Il peut s'agir :
+| Mode | Calcul courant, avant dérogations |
+| --- | --- |
+| `unit` | Une unité par défaut ; la durée ou la répétition peut faire varier la quantité, indépendamment du nombre de personnes. |
+| `person`, sans répétition | Nombre de personnes concernées. |
+| `person`, avec répétition, hors logement | Nombre de personnes concernées × nombre d'occurrences. |
+| `person`, avec répétition et logement | Nombre d'occurrences × arrondi supérieur du nombre de personnes / capacité, lorsque la capacité est positive. Utiliser `capacity=1` pour une nuitée par personne. |
+| `accomodation` | Nombre de logements nécessaires, arrondi au supérieur selon la capacité ; multiplication par les occurrences si le produit est répétable. |
 
-> -   D'un logement individuel (nuitée) : qty_accounting_method = 'person'
-> -   Ou d'un logement de groupe (ex. un gîte): qty_accounting_method = 'accomodation'
+Exemples :
 
-<div style="margin-left: 15px; margin-bottom: 15px;">
-<b>Si</b> la comptabilisation se fait à la personne (qty_accounting_method = 'person'), <br>
-<div style="margin-left: 15px;">alors la quantité correspond à : nb_personnes x nb_jours</div>
-</div>
+- Six personnes pendant deux nuits, avec une nuitée de capacité `1` : **12 nuitées-personnes**.
+- Six personnes pendant deux nuits, avec une chambre de capacité `2` comptabilisée au logement : **6 nuitées-chambres**.
+- Quatre adultes et deux enfants, avec deux petits-déjeuners chacun : **8 petits-déjeuners adultes et 4 enfants**, si les variantes et les affectations d'âge sont configurées.
+- Un nettoyage final non répétable, comptabilisé à l'unité : **1 prestation**.
 
-<div style="margin-left: 15px; margin-bottom: 15px;">
-<b>Si</b> la comptabilisation se fait au logement (qty_accounting_method = 'accomodation'),  <br>
-<div style="margin-left: 15px;">alors la quantité correspond à : nb_jours</div>
-</div>
-
-<div style="margin-left: 15px; margin-bottom: 15px;">
-<b>Si</b> la comptabilisation se fait à l'unité (qty_accounting_method ='unit'),  <br>
-<div style="margin-left: 15px;">alors la quantité est indépendante (défaut = 1)</div>
-</div>
-
-<div style="margin-top: 20px; margin-bottom: 15px;">2. <b>Si</b> le produit n'est pas un logement</div>
-
-<div style="margin-left: 15px; margin-bottom: 15px;">
-<b>Si</b> la comptabilisation se fait à la personne (qty_accounting_method = 'person'),
-<div style="margin-left: 15px;">alors la quantité correspond à : nb_personnes x nb_jours</div>
-</div>
-
-<div style="margin-left: 15px; margin-bottom: 15px;">
-<b>Si</b> la comptabilisation se fait à l'unité (qty_accounting_method = 'unit'),
-<div style="margin-left: 15px;">alors la quantité est indépendante (défaut = 1)</div>
-</div>
-
-(**Si** 'is_meal' = true, le décalage éventuel est utilisé pour les consommations)
-
-<br>
+Pour les repas, `schedule_offset` décale le début des consommations ;
+ce champ n'active pas à lui seul la répétition.
 
 ### Organisation
 
@@ -194,8 +181,9 @@ caractéristiques que les produits (il est possible d'y assigner un
 prix, des règles comptables, et un mode de comptabilisation) et ils
 peuvent être ajoutés à une réservation.
 
-Les produits d'un pack sont comptabilisés selon le mode de
-comptabilisation du pack: soit au logement; soit à la personne.
+Les lignes d'un pack conservent le mode de comptabilisation de leur
+modèle de produit : à l'unité, à la personne ou au logement. Le pack
+possède également sa propre configuration de quantité et de prix.
 
 Dans la plupart des cas, lors d'une réservation, ce sont les forfaits
 **séjours** qui sont utilisés.
@@ -247,16 +235,20 @@ Dans le cas d'un séjour, un forfait est constitué :
 -   D'éventuels compléments (animation, ...)
 -   Des frais fixes
 
-Lorsque les produits sont réservés par séjour, il est possible
+Lorsqu'un séjour utilise un pack à prix propre, il est possible
 d'ajuster les consommations de manière indépendante (les moments
 auxquels les personnes seront effectivement présentes pour les repas,
 pour les chambres), mais le prix comptabilisé est celui du pack
 (forfait), même dans le cas où certains produits présents dans le pack
 ne sont finalement pas "consommés".
 
-Lors de la création d'un pack, le prix par défaut du pack est calculé
-sur base des prix de chacun de ses produits, mais peut être modifié
-manuellement.
+Avec `has_own_price=false`, le montant est calculé à partir des lignes
+de services. Avec `has_own_price=true`, un prix est défini pour le
+produit pack dans une liste de prix. Dans le code actuel, la génération
+d'un pack à prix propre verrouille le groupe, et le calcul de quantité
+d'un groupe verrouillé renvoie `1` ; il faut donc vérifier le montant
+forfaitaire attendu plutôt que supposer une multiplication par les personnes
+ou les nuits.
 
 Les produits, y compris les packs, sont tous identifiés par un code SKU
 (stock keeping unit), unique et invariable.
@@ -321,7 +313,95 @@ Par contre, dans les documents, lorsqu'un groupe est lié à un pack, on
 renseigne le prix total pour le groupe. Le détail des services est
 repris avec les quantités, mais pas les tarifs.
 
-Pour qu'un pack apparaisse dans la liste, même s'il s'agit d'un
-template, il faut qu'une ligne correspondante soit présente dans la
-liste de prix ciblée par la réservation (ceci permet de définir pour
-quelles plages de date un pack est disponible ou non).
+Dans le sélecteur `sale_catalog_product_collect-pack`, un pack sans prix
+propre peut apparaître sans ligne de prix pour le pack. Un pack à prix
+propre doit disposer d'un prix applicable. Dans les deux cas, le pack doit
+être vendable et appartenir à un groupe de produits du centre. Les prix
+des composants doivent également être configurés pour calculer correctement
+les packs sans prix propre.
+
+## Synthèse : modèles, produits et packs
+
+Le **modèle** définit le comportement de réservation commun, tandis que
+le **produit** représente la variante sélectionnable. Un pack est lui-même
+un produit, dont le modèle porte `is_pack=true`.
+
+| Objet | Configuration portée | Exemple |
+| --- | --- | --- |
+| `ProductModel` | Type, planification, calcul des quantités, unité locative ou activité, code de regroupement. | Modèle « Petit-déjeuner ». |
+| `Product` | SKU unique, prix associés, tranche d'âge, catégorie tarifaire, éligibilité aux gratuités. | « Petit-déjeuner adulte » et « Petit-déjeuner enfant ». |
+| Pack | Produit associé à un modèle avec `is_pack=true` ; contenu défini sur `Product.pack_lines_ids`. | « Nuitée et petit-déjeuner ». |
+| `PackLine` | Référence à un modèle enfant via `child_product_model_id`, quantité et durée propres éventuelles. | Inclure le modèle « Petit-déjeuner », puis choisir les variantes selon les participants. |
+
+Les prix sont des objets `sale\price\Price` liés au produit et à une liste
+de prix. Un même produit peut ainsi avoir différents prix selon la période
+et, lorsque le flux le prend en charge, la catégorie tarifaire.
+
+### Types de produits et exemples
+
+Les champs du tableau suivant appartiennent à `ProductModel`, sauf mention
+explicite du produit. Il s'agit d'exemples de configuration ; leur présence
+dans un catalogue donné dépend des données installées.
+
+| Type | Exemple | Configuration principale | Possibilité illustrée |
+| --- | --- | --- | --- |
+| Consommable simple | Kit de bienvenue | `type=consumable`, `consumable_type=simple` | Article physique ajouté à la réservation. |
+| Consommable stockable | Mug souvenir | `type=consumable`, `consumable_type=storable`, `tracking_type=sku` | Configuration d'un article avec suivi de stock. |
+| Service simple à l'unité | Nettoyage final | `type=service`, `service_type=simple`, `qty_accounting_method=unit` | Frais indépendants du nombre de participants. |
+| Service simple à la personne | Linge de lit | `service_type=simple`, `qty_accounting_method=person` | Quantité liée au nombre de personnes. |
+| Logement par personne et par nuit | Lit en dortoir | `is_rental_unit=true`, `is_accomodation=true`, `qty_accounting_method=person`, `capacity=1`, `is_repeatable=true` | Nuitées facturées par personne. |
+| Logement par chambre et par nuit | Chambre double | `is_rental_unit=true`, `is_accomodation=true`, `qty_accounting_method=accomodation`, `capacity=2`, `is_repeatable=true` | Capacité, nombre de chambres et nuits. |
+| Unité locative précise | Gîte privatisé | `is_rental_unit=true`, `rental_unit_assignement=unit`, `rental_unit_id` | Réservation d'une ressource déterminée. |
+| Location hors logement | Salle de réunion | `is_rental_unit=true`, `is_accomodation=false`, `service_type=schedulable`, `schedule_type=timerange`, `schedule_default_value=09:00-17:00` | Occupation d'une salle sur une plage horaire. |
+| Repas répétable | Petit-déjeuner | `is_meal=true`, `service_type=schedulable`, `qty_accounting_method=person`, `is_repeatable=true`, créneau petit-déjeuner | Repas répartis sur un séjour. |
+| Repas ponctuel | Panier pique-nique | `is_meal=true`, `service_type=schedulable`, `qty_accounting_method=person`, `is_repeatable=false`, `meal_location=takeaway` | Repas à une date déterminée. |
+| Collation | Goûter | `is_snack=true`, `service_type=schedulable`, `qty_accounting_method=person`, créneau après-midi | Gestion séparée des collations. |
+| Activité interne | Tir à l'arc | `is_activity=true`, `activity_scope=internal`, `service_type=schedulable`, `has_staff_required=true` | Planification et affectation d'employés. |
+| Activité externe | Visite de musée | `is_activity=true`, `activity_scope=external`, `has_staff_required=false`, `has_provider=true`, `providers_ids` | Intervention d'un prestataire. |
+| Activité sur une journée | Journée aventure | `is_activity=true`, `is_fullday=true` | Affectations sur les créneaux AM et PM. |
+| Transport d'activité | Navette musée | `is_transport=true` | Modèle référencé par `transport_product_model_id` sur l'activité. |
+| Matériel d'activité | Location de casque | `is_supply=true` | Location de matériel sous forme de service ; les besoins d'une activité peuvent aussi être définis via `supplies_ids`. |
+| Produit de camp | Camp de vacances | `is_camp=true` ; sur `Product`, `camp_product_type=full` | Démonstration distincte du flux d'inscription aux camps. |
+
+Pour les consommables stockables, `tracking_type` accepte aussi `none`
+(papeterie sans suivi), `batch` (lots de barres céréalières) et `upc`
+(boissons avec code-barres). Aucun usage de ce champ n'a été identifié dans
+le calcul des réservations du package `sale` ; ne pas assimiler ces valeurs
+à une démonstration complète de mouvements de stock.
+
+Pour les unités locatives, `rental_unit_assignement` propose trois modes :
+`unit` pour une unité précise, `category` pour une catégorie d'unités,
+et `auto` pour une attribution selon les capacités. Les orthographes
+`accomodation` et `rental_unit_assignement` sont celles des identifiants du code.
+
+### Variations possibles
+
+| Dimension | Configuration | Exemple d'utilisation |
+| --- | --- | --- |
+| Quantité selon l'âge | Sur `Product`, `has_age_range=true` et `age_range_id` | Variantes adulte et enfant d'un même repas. |
+| Gratuités | Sur `Product`, `is_freebie_allowed` | Petit-déjeuner éligible ; linge de lit exclu. Une règle de gratuité applicable reste nécessaire. |
+| Catégorie tarifaire | Prix standard et prix lié à une catégorie tarifaire | Tarif scolaire d'une activité. Distinguer ce tarif de la restriction portée par le produit. |
+| Répétition | `is_repeatable` | Petit-déjeuner quotidien et pique-nique ponctuel. |
+| Décalage de début | `schedule_offset=1` | Premier petit-déjeuner le lendemain de l'arrivée. |
+| Durée fixe du service | `has_duration=true`, `duration=2` | Service prévu pour deux jours, indépendamment de la durée globale du groupe. |
+| Durée de l'activité | `has_activity_duration=true`, `activity_duration=2` | Activité de deux **heures**, distincte de la durée du service en jours. |
+| Contraintes opérationnelles | Employés éligibles, `has_rental_unit`, `activity_rental_units_ids`, fournitures, transport ou prestataires | Activité nécessitant un animateur, un espace et du matériel. |
+| Activité non facturable | `is_billable=false` | Accueil ou présentation conservés dans le planning. |
+| Regroupement documentaire | `grouping_code_id` | Codes « Logement » et « Restauration » ; rendu à vérifier avec les modèles de documents utilisés. |
+
+### Exemples de packs réutilisant ces produits
+
+| Pack | Composition | Configuration | Objectif de démonstration |
+| --- | --- | --- | --- |
+| Nuitée et petit-déjeuner | Nuitée + petit-déjeuner | `has_own_price=false` ; sur le produit pack, `has_age_range=false` | Addition des composants et variantes de repas selon l'âge. |
+| Pension complète | Nuitée + petit-déjeuner + déjeuner + dîner | `has_own_price=false`, `allow_price_adaptation=true` | Répétition et adaptations tarifaires applicables. |
+| Week-end famille | Logement + repas + activité | `has_own_price=true`, `allow_price_adaptation=false` | Prix propre du forfait et groupe verrouillé. |
+| Journée séminaire | Salle + déjeuner + goûter + kit de bienvenue | `has_own_price=false` ; ligne de salle avec `has_own_qty=true`, `own_qty=1` | Ressource commune et prestations par personne. |
+| Séjour découverte | Logement + tir à l'arc + pique-nique + navette | Prix des composants ; dérogations `has_own_qty` ou `has_own_duration` sur certaines lignes | Composants dont la quantité ou la durée diffère de celle du séjour. |
+
+Sur `PackLine`, `has_own_qty` active `own_qty`, tandis que
+`has_own_duration` active `own_duration` (en jours). Le champ `share`
+définit la part analytique de la ligne. Sur le produit pack, `is_locked`
+permet de définir le verrouillage ; un prix propre force également le
+verrouillage lors de la génération du groupe. Le cas d'un pack verrouillé
+sans prix propre doit être validé séparément avant d'être utilisé en démonstration.
