@@ -203,16 +203,7 @@ class RentalUnit extends Model {
             'center_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'identity\Center',
-                'description'       => 'The center to which belongs the rental unit.',
-                'default'           => function() {
-                    $centers_ids = Center::search()->ids();
-
-                    if(count($centers_ids) === 1) {
-                        return $centers_ids[0];
-                    }
-
-                    return null;
-                }
+                'description'       => 'The center to which belongs the rental unit.'
             ],
 
             'sojourn_type_id' => [
