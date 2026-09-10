@@ -132,8 +132,7 @@ export class ConsumptionMeterReadingNewComponent implements OnInit  {
     public async onMeterChange() {
         const consumption_meter_id = this.form.controls.consumption_meter_id.value;
         const meter = this.consumptionMeters.find((meter) => meter.id == consumption_meter_id);
-
-        if(meter) {
+        if(meter?.index_value) {
             this.form.get('index_value')?.setValue(this.adaptIntegerIndex(meter.index_value));
             try {
                 const lastConsumption = await this.api.fetchLastConsumptionMeterReadingByMeterId(meter.id).toPromise();
@@ -149,7 +148,6 @@ export class ConsumptionMeterReadingNewComponent implements OnInit  {
     }
 
     public onIndexChange() {
-        console.log(this.consumptionMeters);
         const new_value = this.form.get('index_value')?.value ?? '';
         if(new_value.length) {
             this.form.get('index_value')?.setValue(this.sanitizeStringIndex(new_value));

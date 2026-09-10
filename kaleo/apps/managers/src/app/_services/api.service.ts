@@ -144,7 +144,7 @@ export class ApiService {
     public fetchCenterConsumptionMetersExcept(centerId: number, exceptIds: number[]): Observable<ConsumptionMeter[]> {
         return this.modelCollect<ConsumptionMeter>(
             'sale\\booking\\ConsumptionMeter',
-            ['id', 'name', 'center_id', 'type_meter', 'meter_number', 'index_value'],
+            ['id', 'name', 'center_id', 'type_meter', 'has_ean', 'meter_ean', 'meter_number', 'index_value'],
             [
                 ['center_id', '=', centerId],
                 ['id', 'not in', exceptIds]
