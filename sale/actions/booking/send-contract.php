@@ -300,7 +300,7 @@ Mail::queue($message, 'sale\booking\Booking', $params['booking_id']);
 
 $guestlist_invite_enabled = Setting::get_value('sale', 'features', 'booking.guestlist.invite', false);
 
-// #memo - this should only be sent to specific bookings (GG / GA 'groups' / ???)
+// #memo - this should only be sent to non OTA bookings
 if($guestlist_invite_enabled && !$booking['is_from_channelmanager']) {
     // schedule a task in 10 minutes to send the guest list encoding invitation
     $cron->schedule(
