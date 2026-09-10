@@ -37,13 +37,14 @@ export class ApiService {
         });
     }
 
-    public requestAccess(booking_id: number, email_address: string) {
+    public requestAccess(booking_id: number, email_address: string, lang: string = '') {
         return new Promise<any>( async (resolve, reject) => {
             try {
                 const environment:any = await this.env.getEnv();
                 const response:any = await this.http.put<any>(environment.backend_url+'?do=sale_booking_guests_list_request-access', {
                         booking_id: booking_id,
-                        email: email_address
+                        email: email_address,
+                        lang: (lang.length)?lang:environment.lang
                     })
                     .toPromise();
                 resolve(response);

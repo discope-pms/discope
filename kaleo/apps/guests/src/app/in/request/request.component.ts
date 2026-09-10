@@ -20,6 +20,8 @@ export class AppRequestComponent implements OnInit  {
     public booking_id: number = 0;
     public emailFormControl = new FormControl('', [Validators.required, Validators.email]);
 
+    private customer_lang: string = 'fr';
+
     public get email_address() { return this.emailFormControl.value; }
 
     constructor(
@@ -36,6 +38,13 @@ export class AppRequestComponent implements OnInit  {
                     this.loading = false;
                 }
             });
+
+        this.route.queryParamMap.subscribe(params => {
+                const lang = params.get('lang');
+                if(lang && ['fr', 'en', 'nl'].includes(lang)) {
+                    this.customer_lang = lang;
+                }
+            });
     }
 
     public ngAfterViewInit() {
@@ -48,7 +57,7 @@ export class AppRequestComponent implements OnInit  {
         }
         this.loading = true;
         try {
-            await this.api.requestAccess(this.booking_id, this.email_address);
+            await this.api.requestAccess(this.booking_id, this.email_address, this.customer_lang);
             this.is_sent = true;
         }
         catch(response) {

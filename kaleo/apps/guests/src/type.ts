@@ -1,6 +1,7 @@
 export interface GuestUser {
     booking_id: number,
-    email: string
+    email: string,
+    lang: string
 }
 
 export interface Booking {
