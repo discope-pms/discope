@@ -48,7 +48,7 @@ export class AppWebComponent implements OnInit  {
 
             this.bookingLinesGroups = this.booking.booking_lines_groups_ids;
 
-            this.guestListItems = Object.values(this.booking.guest_list_id.guest_list_items_ids);
+            this.guestListItems = this.booking.guest_list_id.guest_list_items_ids;
         }
     }
 

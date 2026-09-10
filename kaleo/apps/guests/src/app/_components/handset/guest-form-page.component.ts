@@ -83,7 +83,7 @@ export class GuestFormPageComponent implements OnInit  {
             }
             else {
                 citizenIdentificationFormControl.enable();
-                if(citizenIdentificationFormControl.value === null || citizenIdentificationFormControl.value.length === 0) {
+                if(value && (citizenIdentificationFormControl.value === null || citizenIdentificationFormControl.value.length === 0)) {
                     let year = value.getFullYear().toString().slice(-2);
                     let month = (value.getMonth() + 1).toString().padStart(2, '0');
                     let day = value.getDate().toString().padStart(2, '0');

@@ -38,7 +38,7 @@ export type GuestListStatus = 'pending'|'sent';
 export interface GuestList {
     id: number,
     status: GuestListStatus,
-    guest_list_items_ids: { [key: number]: GuestListItem }
+    guest_list_items_ids: GuestListItem[]
 }
 
 export type Gender = 'M'|'F'|'X';
