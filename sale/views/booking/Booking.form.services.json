@@ -289,7 +289,10 @@
             "description": "",
             "icon": "view_list",
             "route": "/booking/object.id/composition/invite",
-            "visible": ["status", "in", ["confirmed", "validated"]]
+            "visible": [
+                ["status", "in", ["confirmed", "validated"]],
+                [true, "=", "env.sale.features.booking.guestlist.invite"]
+            ]
         },
         {
             "id": "item.booking.contract",
