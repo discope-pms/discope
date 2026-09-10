@@ -1,12 +1,32 @@
 import { Injectable } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { translations } from 'src/assets/i18n/translations';
+
+export type AvailableLang = 'fr'|'en'|'nl';
 
 @Injectable({
   providedIn: 'root',
 })
 export class TranslationService {
 
-    public translate(resource_id: string, lang: string = 'fr'): string {
+    private _selectedLang: AvailableLang = 'fr';
+
+    constructor(
+        private route: ActivatedRoute
+    ) {
+        this.route.queryParamMap.subscribe(params => {
+            const lang = params.get('lang');
+            if(lang && ['fr', 'en', 'nl'].includes(lang)) {
+                this._selectedLang = lang as AvailableLang;
+            }
+        });
+    }
+
+    public translate(resource_id: string, lang: string|null = null): string {
+        if(!lang) {
+            lang = this._selectedLang;
+        }
+
         const specificLang = translations[lang];
         const genericLang = translations[lang.split('_')[0]];
 
@@ -21,7 +41,11 @@ export class TranslationService {
         }
     }
 
-    public translateWithVar(resource_id: string, values:  { [key: string]: any }, lang: string = 'fr') {
+    public translateWithVar(resource_id: string, values:  { [key: string]: any }, lang: string|null = null) {
+        if(!lang) {
+            lang = this._selectedLang;
+        }
+
         let translation = this.translate(resource_id, lang);
 
         Object.entries(values).forEach(([key, value]) => {
@@ -29,5 +53,9 @@ export class TranslationService {
         });
 
         return translation;
+    }
+
+    public setLang(lang: AvailableLang) {
+        this._selectedLang = lang;
     }
 }

@@ -317,7 +317,7 @@ export class BookingCompositionInviteComponent implements OnInit, AfterContentIn
                             body = body + '<p>{link}</p>';
                         }
                         const environment:any = await this.env.getEnv();
-                        let url = environment.backend_url + '/guests/#/request/' + this.booking_id;
+                        let url = environment.backend_url + '/guests/#/request/' + this.booking_id + '?lang=' + this.lang;
                         body = body.replace("{link}", url);
                         this.vm.message.formControl.setValue(body);
                         this.message = body;

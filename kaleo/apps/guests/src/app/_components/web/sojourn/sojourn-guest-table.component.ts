@@ -126,7 +126,6 @@ export class SojournGuestTableComponent implements OnInit  {
     }
 
     public updateToggleFieldValue(id: number, field: 'is_coordinator', event: MatSlideToggleChange) {
-        console.log(event);
         this.updateFieldValue(id, field, event.checked ? 1 : 0);
     }
 

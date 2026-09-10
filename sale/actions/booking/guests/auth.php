@@ -24,7 +24,7 @@ list($params, $providers) = eQual::announce([
         'accept-origin'     => '*'
     ],
     'providers'     => ['context', 'auth', 'orm'],
-    'constants'     => ['AUTH_ACCESS_TOKEN_VALIDITY', 'AUTH_REFRESH_TOKEN_VALIDITY', 'AUTH_TOKEN_HTTPS']
+    'constants'     => ['AUTH_ACCESS_TOKEN_VALIDITY', 'AUTH_TOKEN_HTTPS']
 ]);
 
 /**

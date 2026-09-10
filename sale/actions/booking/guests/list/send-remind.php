@@ -88,7 +88,7 @@ foreach($template['parts_ids'] as $part) {
         }
     }
     elseif($part['name'] == 'body') {
-        $url = constant('BACKEND_URL').'/guests/#/request/'.$booking['id'];
+        $url = constant('BACKEND_URL').'/guests/#/request/'.$booking['id'].'?lang='.$params['lang'];
         $body = str_replace('{link}', "<a href=\"$url\">$url</a>", $part['value']);
     }
 }

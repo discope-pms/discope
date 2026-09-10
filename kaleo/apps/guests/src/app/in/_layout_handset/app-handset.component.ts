@@ -32,7 +32,7 @@ export class AppHandsetComponent implements OnInit  {
 
     public ngOnChanges(changes: SimpleChanges) {
         if(changes.booking && this.booking) {
-            this.updateMapGroupGuestListItem(Object.values(this.booking.guest_list_id.guest_list_items_ids));
+            this.updateMapGroupGuestListItem(this.booking.guest_list_id.guest_list_items_ids);
         }
     }
 
@@ -45,7 +45,7 @@ export class AppHandsetComponent implements OnInit  {
     }
 
     public editGuestListItem(guestListItemId: number) {
-        this.selectedGuest = Object.values(this.booking.guest_list_id.guest_list_items_ids).find(g => g.id === guestListItemId) ?? null;
+        this.selectedGuest = this.booking.guest_list_id.guest_list_items_ids.find(g => g.id === guestListItemId) ?? null;
     }
 
     public closeGuest() {

@@ -187,7 +187,7 @@ foreach($data as $key => $val) {
     $subject = str_replace('{'.$key.'}', $val, $subject);
 }
 
-$url = constant('BACKEND_URL').'/guests/#/request/'.$booking['id'];
+$url = constant('BACKEND_URL').'/guests/#/request/'.$booking['id'].'?lang='.$params['lang'];
 $body = str_replace('{link}', "<p><a href=\"$url\">$url</a></p>", $body);
 
 try {

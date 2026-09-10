@@ -93,7 +93,7 @@ export class AppComponent implements OnInit  {
         let qty_completed = 0;
         let qty_coordinator = 0;
         let is_submittable = true;
-        Object.values(this.booking.guest_list_id.guest_list_items_ids).forEach(guest => {
+        this.booking.guest_list_id.guest_list_items_ids.forEach(guest => {
             let is_guest_complete = true;
 
             if(guest['date_of_birth'] === null) {
@@ -162,7 +162,8 @@ export class AppComponent implements OnInit  {
         await this.api.deleteListItems(ids);
 
         ids.forEach(id => {
-            delete(this.booking.guest_list_id.guest_list_items_ids[id]);
+            const index = this.booking.guest_list_id.guest_list_items_ids.findIndex(guest_list_item => guest_list_item.id === id);
+            delete(this.booking.guest_list_id.guest_list_items_ids[index]);
         });
 
         await this.loadBooking();
@@ -187,15 +188,17 @@ export class AppComponent implements OnInit  {
         }
         else {
             Object.entries(values).forEach(([field, value]) => {
+                const index = this.booking.guest_list_id.guest_list_items_ids.findIndex(guest_list_item => guest_list_item.id === id);
+
                 if(field == 'date_of_birth') {
                     if(value) {
                         const date = new Date(<string>value);
-                        this.booking.guest_list_id.guest_list_items_ids[id]['date_of_birth'] = date.getTime() / 1000;
+                        this.booking.guest_list_id.guest_list_items_ids[index]['date_of_birth'] = date.getTime() / 1000;
                     }
                 }
                 else {
                     // @ts-ignore
-                    this.booking.guest_list_id.guest_list_items_ids[id][field] = value;
+                    this.booking.guest_list_id.guest_list_items_ids[index][field] = value;
                 }
             });
 

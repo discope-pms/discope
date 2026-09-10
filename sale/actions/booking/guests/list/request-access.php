@@ -37,16 +37,15 @@ list($params, $providers) = eQual::announce([
         'charset'           => 'utf-8',
         'accept-origin'     => '*'
     ],
-    'providers'     => ['context', 'auth', 'orm'],
+    'providers'     => ['context', 'auth'],
     'constants'     => ['BACKEND_URL']
 ]);
 
 /**
  * @var \equal\php\Context                  $context
- * @var \equal\orm\ObjectManager            $orm
  * @var \equal\auth\AuthenticationManager   $auth
  */
-['context' => $context, 'orm' => $orm, 'auth' => $auth] = $providers;
+['context' => $context, 'auth' => $auth] = $providers;
 
 $booking = Booking::id($params['booking_id'])
     ->read([
@@ -112,9 +111,10 @@ foreach($template['parts_ids'] as $part) {
     elseif($part['name'] == 'body') {
         // generate a "nonce" access token, valid for 30 minutes
         $nonce_token  = $auth->encode([
-                'booking_id' => $params['booking_id'],
-                'email'      => $params['email'],
-                'exp'        => time() + (30 * 60)
+                'booking_id'    => $params['booking_id'],
+                'email'         => $params['email'],
+                'lang'          => $params['lang'],
+                'exp'           => time() + (30 * 60)
             ]);
         $url = constant('BACKEND_URL').'/guests/#/'.$nonce_token;
         $url_txt = substr($url, 0, 50).'...';

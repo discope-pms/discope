@@ -71,6 +71,7 @@ $booking = Booking::id($params['id'])
                 'id', 'name', 'email', 'phone', 'address_street', 'address_city', 'address_zip', 'address_country'
             ],
             'booking_lines_groups_ids' => [
+                '@domain' => ['group_type', '=', 'sojourn'],
                 'id', 'name', 'date_from', 'date_to', 'group_type', 'nb_pers', 'nb_children'
             ],
             'guest_list_id' => [
@@ -86,12 +87,6 @@ $booking = Booking::id($params['id'])
         ])
         ->adapt('json')
         ->first(true);
-
-$booking['booking_lines_groups_ids'] = array_values(
-        array_filter($booking['booking_lines_groups_ids'], function($group) {
-            return $group['group_type'] === 'sojourn';
-        })
-    );
 
 $context->httpResponse()
         ->body($booking)
