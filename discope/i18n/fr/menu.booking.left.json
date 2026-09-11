@@ -149,6 +149,10 @@
             "label": "En cours",
             "help": ""
         },
+        "item.planning.guest-lists": {
+            "label": "Hôtes",
+            "help": ""
+        },
         "item.repairings": {
             "label": "Réparation & Maintenance",
             "help": ""
