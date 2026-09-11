@@ -533,7 +533,10 @@
                             "entity": "sale\\booking\\GuestListItem",
                             "view": "list.planning"
                         },
-                        "visible": [true, "=", "env.sale.features.booking.guestlist"]
+                        "visible": [
+                            [true, "=", "env.sale.features.booking.guestlist"],
+                            ["booking.guestlist.user", "in", "user.groups"]
+                        ]
                     }
                 ]
             },
