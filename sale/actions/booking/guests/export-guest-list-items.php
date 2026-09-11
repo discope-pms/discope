@@ -42,6 +42,11 @@ use sale\booking\GuestListItem;
             'default'           => constant('DEFAULT_LANG')
         ]
     ],
+    'access' => [
+        'visibility'    => 'protected',
+        'groups'        => ['booking.guestlist.user'],
+        'level'         => 2
+    ],
     'response'      => [
         'content-type'  => 'application/zip',
         'accept-origin' => '*'

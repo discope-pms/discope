@@ -33,6 +33,11 @@ use sale\booking\Booking;
             'description'       => 'The center the guest list items must be part of..'
         ]
     ],
+    'access' => [
+        'visibility'    => 'protected',
+        'groups'        => ['booking.guestlist.user'],
+        'level'         => 2
+    ],
     'response'      => [
         'content-type'  => 'application/json',
         'charset'       => 'utf-8',
