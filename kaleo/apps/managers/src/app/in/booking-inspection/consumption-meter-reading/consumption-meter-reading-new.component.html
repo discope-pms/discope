@@ -8,7 +8,7 @@
             <mat-label>{{ 'CONSUMPTION_METER_READING_NEW_METER_FIELD' | translate }}</mat-label>
             <mat-select formControlName="consumption_meter_id" (selectionChange)="onMeterChange()">
                 <mat-option *ngFor="let consumptionMeter of consumptionMeters" [value]="consumptionMeter.id">
-                    {{ translateTypeMeter(consumptionMeter.type_meter) }} - {{ consumptionMeter.meter_number }}
+                    {{ translateTypeMeter(consumptionMeter.type_meter) }} - {{ (consumptionMeter.has_ean && !consumptionMeter.meter_number ) ? consumptionMeter.meter_ean : consumptionMeter.meter_number }}
                 </mat-option>
             </mat-select>
         </mat-form-field>

@@ -3,6 +3,8 @@ import { Booking, BookingLineGroup, GuestListItem, GuestUser } from '../../../ty
 import { AuthService } from '../../_services/AuthService';
 import { MatDialog } from '@angular/material/dialog';
 import { DialogDownloadComponent } from 'src/app/_components/dialog-download/dialog-download.component';
+import { TranslationService } from '../../_services/TranslationService';
+
 @Component({
     selector: 'app-web',
     templateUrl: 'app-web.component.html',
@@ -32,12 +34,16 @@ export class AppWebComponent implements OnInit  {
 
     constructor(
             public dialog: MatDialog,
-            private auth: AuthService
+            private auth: AuthService,
+            private translation: TranslationService
         ) {}
 
     public ngOnInit() {
         this.auth.getObservable().subscribe((guestUser: GuestUser) => {
             this.guestUser = guestUser;
+            if(['fr', 'en', 'nl'].includes(guestUser?.lang)) {
+                this.translation.setLang(guestUser.lang as 'fr' | 'en' | 'nl');
+            }
         });
     }
 
@@ -48,7 +54,7 @@ export class AppWebComponent implements OnInit  {
 
             this.bookingLinesGroups = this.booking.booking_lines_groups_ids;
 
-            this.guestListItems = Object.values(this.booking.guest_list_id.guest_list_items_ids);
+            this.guestListItems = this.booking.guest_list_id.guest_list_items_ids;
         }
     }
 

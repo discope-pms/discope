@@ -95,6 +95,23 @@ use sale\booking\FinancialHelp;
  */
 ['context' => $context] = $providers;
 
+$getLabels = function($lang, $default_labels = []) {
+    $view_i18n_file_path = sprintf('%s/packages/sale/i18n/%s/_parts/labels.json', EQ_BASEDIR, $lang);
+
+    $readLabels = function($path) {
+        if(!$path || !file_exists($path)) {
+            return [];
+        }
+        $labels = json_decode(file_get_contents($path), true);
+        return is_array($labels) ? $labels : [];
+    };
+
+    return array_merge(
+        $default_labels,
+        $readLabels($view_i18n_file_path)
+    );
+};
+
 $financial_help = FinancialHelp::id($params['id'])
     ->read([
         'payments_ids' => [
@@ -194,15 +211,7 @@ $values = [
     'payments'                  => $payments
 ];
 
-$values['i18n'] = [
-    'invoice'           => Setting::get_value('lodging', 'locale', 'i18n.invoice', null, array(), $params['lang']),
-    'customer_name'     => Setting::get_value('lodging', 'locale', 'i18n.customer_name', null, array(), $params['lang']),
-    'customer_address'  => Setting::get_value('lodging', 'locale', 'i18n.customer_address', null, array(), $params['lang']),
-    'company_registry'  => Setting::get_value('lodging', 'locale', 'i18n.company_registry', null, array(), $params['lang']),
-    'vat_number'        => Setting::get_value('lodging', 'locale', 'i18n.vat_number', null, array(), $params['lang']),
-    'vat'               => Setting::get_value('lodging', 'locale', 'i18n.vat', null, array(), $params['lang']),
-    'total_tax_incl'    => Setting::get_value('lodging', 'locale', 'i18n.total_tax_incl', null, [], $params['lang'])
-];
+$values['i18n'] = $getLabels($params['lang']);
 
 try {
     $loader = new TwigFilesystemLoader(EQ_BASEDIR.'/packages/sale/views/');

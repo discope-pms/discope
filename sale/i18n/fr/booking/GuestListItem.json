@@ -1,6 +1,6 @@
 {
-    "name": "Hote",
-    "plural": "Hotes",
+    "name": "Hôte",
+    "plural": "Hôtes",
     "description": "La personne physique faisant partie d'une réservation.",
     "model": {
         "firstname": {
@@ -46,6 +46,21 @@
         "booking_id": {
             "label": "Réservation",
             "description": "",
+            "help": ""
+        },
+        "center_id": {
+            "label": "Centre",
+            "description": "Le centre visé par la réservation.",
+            "help": ""
+        },
+        "date_from": {
+            "label": "Du",
+            "description": "Date de début du séjour.",
+            "help": ""
+        },
+        "date_to": {
+            "label": "Au",
+            "description": "Date de fin du séjour.",
             "help": ""
         },
         "booking_line_group_id": {

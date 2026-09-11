@@ -100,8 +100,8 @@
             <mat-form-field style="max-width: 220px;">
                 <mat-label>Unité locative</mat-label>
                 <mat-select [formControl]="vm.rentalUnit.formControl" (selectionChange)="vm.rentalUnit.change()">
-                    <mat-option *ngFor="let rentalUnit of activity?.activity_booking_line_id?.product_id.product_model_id.activity_rental_units_ids" [value]="rentalUnit.id">
-                        {{ rentalUnit.name }}
+                    <mat-option *ngFor="let rentalUnit of rentalUnits" [value]="rentalUnit.id" [disabled]="!rentalUnit.available">
+                        {{ rentalUnit.name + (!rentalUnit.available ? ' (Non dispo.)' : '') }}
                     </mat-option>
                 </mat-select>
             </mat-form-field>

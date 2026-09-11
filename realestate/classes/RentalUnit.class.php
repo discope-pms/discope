@@ -8,6 +8,7 @@
 namespace realestate;
 
 use equal\orm\Model;
+use identity\Center;
 
 class RentalUnit extends Model {
 

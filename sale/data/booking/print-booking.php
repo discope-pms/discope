@@ -69,6 +69,23 @@ use Twig\Loader\FilesystemLoader as TwigFilesystemLoader;
  */
 ['context' => $context] = $providers;
 
+$getLabels = function($lang, $default_labels = []) {
+    $view_i18n_file_path = sprintf('%s/packages/sale/i18n/%s/_parts/labels.json', EQ_BASEDIR, $lang);
+
+    $readLabels = function($path) {
+        if(!$path || !file_exists($path)) {
+            return [];
+        }
+        $labels = json_decode(file_get_contents($path), true);
+        return is_array($labels) ? $labels : [];
+    };
+
+    return array_merge(
+        $default_labels,
+        $readLabels($view_i18n_file_path)
+    );
+};
+
 $lodging_booking_print_booking_formatMember = function($booking) {
     $id = $booking['customer_id']['partner_identity_id']['id'];
     $code = ltrim(sprintf("%3d.%03d.%03d", intval($id) / 1000000, (intval($id) / 1000) % 1000, intval($id)% 1000), '0');
@@ -309,73 +326,7 @@ if(!$output) {
     /*
         retrieve terms translations
     */
-    $values['i18n'] = [
-        'invoice'               => Setting::get_value('lodging', 'locale', 'i18n.invoice', null, [], $params['lang']),
-        'quote'                 => Setting::get_value('lodging', 'locale', 'i18n.quote', null, [], $params['lang']),
-        'option'                => Setting::get_value('lodging', 'locale', 'i18n.option', null, [], $params['lang']),
-        'contract'              => Setting::get_value('lodging', 'locale', 'i18n.contract', null, [], $params['lang']),
-        'booking_invoice'       => Setting::get_value('lodging', 'locale', 'i18n.booking_invoice', null, [], $params['lang']),
-        'booking_quote'         => Setting::get_value('lodging', 'locale', 'i18n.booking_quote', null, [], $params['lang']),
-        'booking_contract'      => Setting::get_value('lodging', 'locale', 'i18n.booking_contract', null, [], $params['lang']),
-        'credit_note'           => Setting::get_value('lodging', 'locale', 'i18n.credit_note', null, [], $params['lang']),
-        'company_registry'      => Setting::get_value('lodging', 'locale', 'i18n.company_registry', null, [], $params['lang']),
-        'vat_number'            => Setting::get_value('lodging', 'locale', 'i18n.vat_number', null, [], $params['lang']),
-        'vat'                   => Setting::get_value('lodging', 'locale', 'i18n.vat', null, [], $params['lang']),
-        'your_stay_at'          => Setting::get_value('lodging', 'locale', 'i18n.your_stay_at', null, [], $params['lang']),
-        'contact'               => Setting::get_value('lodging', 'locale', 'i18n.contact', null, [], $params['lang']),
-        'period'                => Setting::get_value('lodging', 'locale', 'i18n.period', null, [], $params['lang']),
-        'member'                => Setting::get_value('lodging', 'locale', 'i18n.member', null, [], $params['lang']),
-        'phone'                 => Setting::get_value('lodging', 'locale', 'i18n.phone', null, [], $params['lang']),
-        'email'                 => Setting::get_value('lodging', 'locale', 'i18n.email', null, [], $params['lang']),
-        'booking_ref'           => Setting::get_value('lodging', 'locale', 'i18n.booking_ref', null, [], $params['lang']),
-        'your_reference'        => Setting::get_value('lodging', 'locale', 'i18n.your_reference', null, [], $params['lang']),
-        'number_short'          => Setting::get_value('lodging', 'locale', 'i18n.number_short', null, [], $params['lang']),
-        'date'                  => Setting::get_value('lodging', 'locale', 'i18n.date', null, [], $params['lang']),
-        'status'                => Setting::get_value('lodging', 'locale', 'i18n.status', null, [], $params['lang']),
-        'paid'                  => Setting::get_value('lodging', 'locale', 'i18n.paid', null, [], $params['lang']),
-        'to_pay'                => Setting::get_value('lodging', 'locale', 'i18n.to_pay', null, [], $params['lang']),
-        'to_refund'             => Setting::get_value('lodging', 'locale', 'i18n.to_refund', null, [], $params['lang']),
-        'product_label'         => Setting::get_value('lodging', 'locale', 'i18n.product_label', null, [], $params['lang']),
-        'quantity_short'        => Setting::get_value('lodging', 'locale', 'i18n.quantity_short', null, [], $params['lang']),
-        'freebies_short'        => Setting::get_value('lodging', 'locale', 'i18n.freebies_short', null, [], $params['lang']),
-        'unit_price'            => Setting::get_value('lodging', 'locale', 'i18n.unit_price', null, [], $params['lang']),
-        'discount_short'        => Setting::get_value('lodging', 'locale', 'i18n.discount_short', null, [], $params['lang']),
-        'taxes'                 => Setting::get_value('lodging', 'locale', 'i18n.taxes', null, [], $params['lang']),
-        'price'                 => Setting::get_value('lodging', 'locale', 'i18n.price', null, [], $params['lang']),
-        'total'                 => Setting::get_value('lodging', 'locale', 'i18n.total', null, [], $params['lang']),
-        'price_tax_excl'        => Setting::get_value('lodging', 'locale', 'i18n.price_tax_excl', null, [], $params['lang']),
-        'total_tax_excl'        => Setting::get_value('lodging', 'locale', 'i18n.total_tax_excl', null, [], $params['lang']),
-        'total_tax_incl'        => Setting::get_value('lodging', 'locale', 'i18n.total_tax_incl', null, [], $params['lang']),
-        'stay_total_tax_incl'   => Setting::get_value('lodging', 'locale', 'i18n.stay_total_tax_incl', null, [], $params['lang']),
-        'balance_of'            => Setting::get_value('lodging', 'locale', 'i18n.balance_of', null, [], $params['lang']),
-        'to_be_paid_before'     => Setting::get_value('lodging', 'locale', 'i18n.to_be_paid_before', null, [], $params['lang']),
-        'communication'         => Setting::get_value('lodging', 'locale', 'i18n.communication', null, [], $params['lang']),
-        'amount_to_be refunded' => Setting::get_value('lodging', 'locale', 'i18n.amount_to_be refunded', null, [], $params['lang']),
-        'advantage_included'    => Setting::get_value('lodging', 'locale', 'i18n.advantage_included', null, [], $params['lang']),
-        'fare_category'         => Setting::get_value('lodging', 'locale', 'i18n.fare_category', null, [], $params['lang']),
-        'advantage'             => Setting::get_value('lodging', 'locale', 'i18n.advantage', null, [], $params['lang']),
-        'consumptions_details'  => Setting::get_value('lodging', 'locale', 'i18n.consumptions_details', null, [], $params['lang']),
-        'day'                   => Setting::get_value('lodging', 'locale', 'i18n.day', null, [], $params['lang']),
-        'meals_morning'         => Setting::get_value('lodging', 'locale', 'i18n.meals_morning', null, [], $params['lang']),
-        'meals_midday'          => Setting::get_value('lodging', 'locale', 'i18n.meals_midday', null, [], $params['lang']),
-        'meal_evening'          => Setting::get_value('lodging', 'locale', 'i18n.meal_evening', null, [], $params['lang']),
-        'nights'                => Setting::get_value('lodging', 'locale', 'i18n.nights', null, [], $params['lang']),
-        'payments_schedule'     => Setting::get_value('lodging', 'locale', 'i18n.payments_schedule', null, [], $params['lang']),
-        'payment'               => Setting::get_value('lodging', 'locale', 'i18n.payment', null, [], $params['lang']),
-        'already_paid'          => Setting::get_value('lodging', 'locale', 'i18n.already_paid', null, [], $params['lang']),
-        'amount'                => Setting::get_value('lodging', 'locale', 'i18n.amount', null, [], $params['lang']),
-        'yes'                   => Setting::get_value('lodging', 'locale', 'i18n.yes', null, [], $params['lang']),
-        'no'                    => Setting::get_value('lodging', 'locale', 'i18n.no', null, [], $params['lang']),
-        'the_amount_of'         => Setting::get_value('lodging', 'locale', 'i18n.the_amount_of', null, [], $params['lang']),
-        'must_be_paid_before'   => Setting::get_value('lodging', 'locale', 'i18n.must_be_paid_before', null, [], $params['lang']),
-        'date_and_signature'    => Setting::get_value('lodging', 'locale', 'i18n.date_and_signature', null, [], $params['lang']),
-        'time_slot'             => Setting::get_value('lodging', 'locale', 'i18n.time_slot', null, [], $params['lang']),
-        'snack'                 => Setting::get_value('lodging', 'locale', 'i18n.snack', null, [], $params['lang']),
-        'meals'                 => Setting::get_value('lodging', 'locale', 'i18n.meals', null, [], $params['lang']),
-        'title_agreement'       => Setting::get_value('lodging', 'locale', 'i18n.title_agreement', null, [], $params['lang']),
-        'activities_details'    => Setting::get_value('lodging', 'locale', 'i18n.activities_details', null, [], $params['lang']),
-        'activity'              => Setting::get_value('lodging', 'locale', 'i18n.activity', null, [], $params['lang'])
-    ];
+    $values['i18n'] = $getLabels($params['lang']);
 
 
     /**

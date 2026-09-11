@@ -123,9 +123,12 @@ list($context, $orm, $cron, $dispatch) = [$providers['context'], $providers['orm
 
 $booking = Booking::id($params['booking_id'])
     ->read([
-        'center_id' => ['id', 'center_office_id' => ['email_bcc']],
+        'is_from_channelmanager',
         'has_contract',
-        'contracts_ids'
+        'contracts_ids',
+        'center_id' => [
+            'center_office_id' => ['email_bcc']
+        ],
     ])
     ->first(true);
 
@@ -295,12 +298,11 @@ Mail::queue($message, 'sale\booking\Booking', $params['booking_id']);
     Schedule invite to fill in Guests List
 */
 
+$guestlist_invite_enabled = Setting::get_value('sale', 'features', 'booking.guestlist', false);
 
-/*
-// #todo - activate guest list invite
-// #memo - this should only be sent to specific bookings (GG / GA 'groups' / ???)
-if ($email !== null  && $lang !== null ) {
-    // schedule a task in 10 minutes to send the guest list
+// #memo - this should only be sent to non OTA bookings
+if($guestlist_invite_enabled && !$booking['is_from_channelmanager']) {
+    // schedule a task in 10 minutes to send the guest list encoding invitation
     $cron->schedule(
         "booking.guest.email.send.invite.{$params['booking_id']}",
         time() + 600,
@@ -312,10 +314,6 @@ if ($email !== null  && $lang !== null ) {
         ]
     );
 }
-
-// #todo - also schedule a guest_list_check-sent (same way than contract)
-
-*/
 
 
 /*

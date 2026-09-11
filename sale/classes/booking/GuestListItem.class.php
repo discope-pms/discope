@@ -64,10 +64,35 @@ class GuestListItem extends Model {
                 'description'       => 'The booking the guest list item relates to.'
             ],
 
+            'center_id' => [
+                'type'              => 'computed',
+                'result_type'       => 'many2one',
+                'foreign_object'    => 'identity\Center',
+                'description'       => 'The center that host the guest.',
+                'store'             => true,
+                'relation'          => ['booking_id' => 'center_id']
+            ],
+
             'booking_line_group_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\booking\BookingLineGroup',
                 'description'       => 'Group the line relates to guest list item.'
+            ],
+
+            'date_from' => [
+                'type'              => 'computed',
+                'result_type'       => 'date',
+                'description'       => 'Start date of the related booking group.',
+                'store'             => false,
+                'relation'          => ['booking_line_group_id' => 'date_from']
+            ],
+
+            'date_to' => [
+                'type'              => 'computed',
+                'result_type'       => 'date',
+                'description'       => 'Start date of the related booking group.',
+                'store'             => false,
+                'relation'          => ['booking_line_group_id' => 'date_to']
             ],
 
             'address_street' => [

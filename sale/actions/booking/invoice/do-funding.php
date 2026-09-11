@@ -40,6 +40,23 @@ list($params, $providers) = announce([
  */
 list($context, $orm, $cron, $auth) = [$providers['context'], $providers['orm'], $providers['cron'], $providers['auth']];
 
+$getLabels = function($lang, $default_labels = []) {
+    $view_i18n_file_path = sprintf('%s/packages/sale/i18n/%s/_parts/labels.json', EQ_BASEDIR, $lang);
+
+    $readLabels = function($path) {
+        if(!$path || !file_exists($path)) {
+            return [];
+        }
+        $labels = json_decode(file_get_contents($path), true);
+        return is_array($labels) ? $labels : [];
+    };
+
+    return array_merge(
+        $default_labels,
+        $readLabels($view_i18n_file_path)
+    );
+};
+
 $invoice = Invoice::id($params['id'])
     ->read(['id', 'status', 'type', 'is_deposit', 'booking_id', 'funding_id', 'center_office_id', 'reversed_invoice_id', 'price', 'balance', 'due_date'])
     ->first(true);
@@ -136,11 +153,11 @@ if(is_null($invoice['funding_id'])) {
             }, 0);
 
         if($paid_amount > 0) {
-            $credit_note_label = Setting::get_value('lodging', 'locale', 'i18n.credit_note');
+            $labels = $getLabels($params['lang']);
 
             // create a new funding relating to the invoice
             $funding_values = [
-                'description'           => $credit_note_label,
+                'description'           => $labels['credit_note'],
                 'booking_id'            => $invoice['booking_id'],
                 'invoice_id'            => $invoice['id'],
                 'center_office_id'      => $invoice['center_office_id'],

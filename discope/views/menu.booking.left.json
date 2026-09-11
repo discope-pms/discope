@@ -523,6 +523,20 @@
                             "entity": "sale\\booking\\Booking",
                             "view": "list.pending"
                         }
+                    },
+                    {
+                        "id": "item.planning.guest-lists",
+                        "type": "entry",
+                        "label": "Guests",
+                        "description": "",
+                        "context": {
+                            "entity": "sale\\booking\\GuestListItem",
+                            "view": "list.planning"
+                        },
+                        "visible": [
+                            [true, "=", "env.sale.features.booking.guestlist"],
+                            ["booking.guestlist.user", "in", "user.groups"]
+                        ]
                     }
                 ]
             },
