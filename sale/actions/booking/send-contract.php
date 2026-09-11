@@ -298,7 +298,7 @@ Mail::queue($message, 'sale\booking\Booking', $params['booking_id']);
     Schedule invite to fill in Guests List
 */
 
-$guestlist_invite_enabled = Setting::get_value('sale', 'features', 'booking.guestlist.invite', false);
+$guestlist_invite_enabled = Setting::get_value('sale', 'features', 'booking.guestlist', false);
 
 // #memo - this should only be sent to non OTA bookings
 if($guestlist_invite_enabled && !$booking['is_from_channelmanager']) {

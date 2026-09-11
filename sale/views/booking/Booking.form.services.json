@@ -291,7 +291,7 @@
             "route": "/booking/object.id/composition/invite",
             "visible": [
                 ["status", "in", ["confirmed", "validated"]],
-                [true, "=", "env.sale.features.booking.guestlist.invite"]
+                [true, "=", "env.sale.features.booking.guestlist"]
             ]
         },
         {
