@@ -698,8 +698,6 @@ try {
                             }
                         }
 
-                        $city_tax_manually_added = false;
-
                         // if not present, manually add the city tax (must always be present)
                         if(!$city_tax_found) {
                             try {
@@ -768,11 +766,8 @@ try {
                                     // set total and price to null
                                     Booking::id($booking['id'])->update(['total' => null, 'price' => null]);
 
-                                    // recalc booking_price to new price
-                                    $book = Booking::id($booking['id'])->read(['total', 'price'])->first(true);
-                                    $booking_price = $book['price'];
-
-                                    $city_tax_manually_added = true;
+                                    // add the locally computed city tax to the price received from Cubilis
+                                    $booking_price = round($booking_price + $city_tax_price, 2);
                                 }
                             }
                             catch(Exception $e) {
@@ -786,8 +781,8 @@ try {
                             ->read(['total', 'center_id' => ['organisation_id' => ['has_vat']]])
                             ->first(true);
 
-                        // add vat rounding product to match Cubilis reservation price, only if center has vat and no other products were manually added (e.g. : the city tax).
-                        if($book['center_id']['organisation_id']['has_vat'] && !$city_tax_manually_added) {
+                        // add vat rounding product to match Cubilis reservation price
+                        if($book['center_id']['organisation_id']['has_vat']) {
                             // set price to null to force recalc
                             Booking::id($booking['id'])->update(['price' => null]);
 
@@ -795,9 +790,8 @@ try {
                             $updated_book = Booking::id($booking['id'])->read(['price'])->first(true);
 
                             // if vat calculation method gives a significantly different price than Cubilis, then we add a rounding VAT product
-                            $rounding_vat_delta = $booking_price - $updated_book['price'];
-                            if(abs($rounding_vat_delta) >= 0.01) {
-                                $rounding_vat_amount = round($rounding_vat_delta, 2);
+                            $rounding_vat_amount = round($booking_price - $updated_book['price'], 2);
+                            if(abs($rounding_vat_amount) >= 0.01) {
 
                                 $sku_vat_rounding_product = Setting::get_value('sale', 'organization', 'sku.vat_rounding_product');
                                 if(is_null($sku_vat_rounding_product)) {
@@ -855,6 +849,8 @@ try {
                                     ->update([
                                         'unit_price'            => $rounding_vat_amount,
                                         'has_manual_unit_price' => true,
+                                        'vat_rate'               => 0.0,
+                                        'has_manual_vat_rate'    => true,
                                         'total'                 => $rounding_vat_amount,
                                         'price'                 => $rounding_vat_amount
                                     ]);
