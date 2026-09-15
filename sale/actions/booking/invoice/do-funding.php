@@ -105,6 +105,8 @@ if(is_null($invoice['funding_id'])) {
             $invoice_balance = round($invoice['balance'], 2);
 
             // #memo - there is no funding for null invoices or rounding differences up to one cent
+            // #memo - doing that leads to non balanced invoices in accounting software
+            // #todo - this should raise a warning because a funding of 0.01 is a rounding issue indicator
             if(abs($invoice_balance) > 0.01) {
                 // create a new funding relating to the invoice
                 $funding_values = [
