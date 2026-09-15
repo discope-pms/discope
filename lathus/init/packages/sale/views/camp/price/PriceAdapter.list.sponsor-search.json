@@ -1,7 +1,7 @@
 {
     "name": "Price adapters",
     "description": "This view is intended for displaying the list of sponsors' price adapters.",
-    "controller": "sale_camp_price_collect-price-adapters",
+    "controller": "sale_camp_price_sponsor_collect-price-adapters",
     "header": {
         "selection": {
             "default" : false,
@@ -28,8 +28,7 @@
         }
     },
     "group_by": [{"field": "sponsor_id", "operation": ["SUM", "object.value"]}],
-    "domain": ["origin_type", "in", ["commune", "community-of-communes", "department-caf", "department-msa"]],
-    "limit": 500,
+    "limit": 1000,
     "actions": [
         {
             "id": "action.print-list",
@@ -89,7 +88,8 @@
                 "value": "price_adapter_type",
                 "width": "10%",
                 "sortable": false,
-                "readonly": true
+                "readonly": true,
+                "visible": true
             },
             {
                 "type": "field",

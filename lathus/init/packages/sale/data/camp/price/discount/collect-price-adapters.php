@@ -18,21 +18,13 @@ use sale\camp\Camp;
             'description'       => "Full name (including namespace) of the class to look into (e.g. 'core\\User').",
             'default'           => 'sale\camp\price\PriceAdapter'
         ],
-        'sponsor_id' => [
-            'type'              => 'many2one',
-            'foreign_object'    => 'sale\camp\Sponsor',
-            'description'       => "Sponsor that is concerned by the price adapter."
-        ],
         'origin_type' => [
             'type'              => 'string',
             'description'       => "Type of price adapter.",
             'selection'         => [
                 'all',
                 'other',
-                'commune',
-                'community-of-communes',
-                'department-caf',
-                'department-msa'
+                'loyalty-discount'
             ],
             'default' => 'all'
         ],
@@ -46,6 +38,30 @@ use sale\camp\Camp;
             'description'       => 'Date interval upper limit.',
             'default'           => fn() => strtotime('last day of December this year')
         ],
+        'price_adapter_type' => [
+            'type'              => 'string',
+            'selection'         => [
+                'all',
+                'percent',
+                'amount'
+            ],
+            'description'       => "Type of manual discount (fixed amount or percentage of the price).",
+            'default'           => 'all'
+        ],
+        'min_value' => [
+            'type'              => 'float',
+            'description'       => 'Min amount/percentage removed to the enrollment price.',
+            'default'           => 0
+        ],
+        'max_value' => [
+            'type'              => 'float',
+            'description'       => 'Max amount/percentage removed to the enrollment price.',
+            'default'           => 1000
+        ],
+        'name' => [
+            'type'              => 'string',
+            'description'       => 'The name of the price adapter'
+        ]
     ],
     'response'      => [
         'content-type'  => 'application/json',
@@ -68,19 +84,36 @@ $domain->addCondition(
     new DomainCondition('price_adapter_type', '=', 'amount')
 );
 
-$domain->addCondition(
-    new DomainCondition('origin_type', '<>', 'loyalty-discount')
-);
-
-if(isset($params['sponsor_id'])) {
-    $domain->addCondition(
-        new DomainCondition('sponsor_id', '=', $params['sponsor_id'])
-    );
-}
-
 if($params['origin_type'] !== 'all') {
     $domain->addCondition(
         new DomainCondition('origin_type', '=', $params['origin_type'])
+    );
+}
+else {
+    $domain->addCondition(
+        new DomainCondition('origin_type', 'in', ['other', 'loyalty-discount'])
+    );
+}
+
+if($params['price_adapter_type'] !== 'all') {
+    $domain->addCondition(
+        new DomainCondition('price_adapter_type', '=', $params['price_adapter_type'])
+    );
+}
+
+$domain->addCondition(
+    new DomainCondition('value', '>=', $params['min_value'])
+);
+
+$domain->addCondition(
+    new DomainCondition('value', '<=', $params['max_value'])
+);
+
+if(!empty($params['name'])) {
+    $name_escaped = str_replace(['\\', '%', '_'], ['\\\\', '\\%', '\\_'], $params['name']);
+
+    $domain->addCondition(
+        new DomainCondition('name', 'like', '%'.$name_escaped.'%')
     );
 }
 

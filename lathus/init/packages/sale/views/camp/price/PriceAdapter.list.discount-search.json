@@ -1,7 +1,7 @@
 {
     "name": "Price adapters",
     "description": "This view is intended for displaying the list of discounts' price adapters.",
-    "controller": "sale_camp_price_collect-price-adapters",
+    "controller": "sale_camp_price_discount_collect-price-adapters",
     "header": {
         "advanced_search": {
             "open": true
@@ -15,8 +15,7 @@
             }
         }
     },
-    "domain": ["origin_type", "in", ["other", "loyalty-discount"]],
-    "limit": 500,
+    "limit": 1000,
     "layout": {
         "items": [
             {
@@ -68,7 +67,8 @@
                 "value": "price_adapter_type",
                 "width": "10%",
                 "sortable": false,
-                "readonly": true
+                "readonly": true,
+                "visible": true
             },
             {
                 "type": "field",

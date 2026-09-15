@@ -1,6 +1,6 @@
 {
-    "name": "Réduction",
-    "plural": "Réductions",
+    "name": "Aide financière",
+    "plural": "Aide financières",
     "description": "Reductions d'aides.",
     "model": {
         "sponsor_id": {
@@ -12,7 +12,6 @@
             "description": "",
             "selection": {
                 "all": "Tous",
-                "other": "Autres",
                 "commune": "Communes",
                 "community-of-communes": "Communautés de communes",
                 "department-caf": "CAF",
