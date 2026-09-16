@@ -30,6 +30,10 @@ class Funding extends \sale\booking\Funding {
         ];
     }
 
+    public static function getModelScope(): ?string {
+        return \sale\booking\Funding::getType();
+    }
+
     /**
      * Check whether an object can be created.
      * These tests come in addition to the unique constraints returned by method `getUnique()`.

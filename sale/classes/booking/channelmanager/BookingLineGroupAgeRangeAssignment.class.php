@@ -52,6 +52,10 @@ class BookingLineGroupAgeRangeAssignment extends \sale\booking\BookingLineGroupA
         ];
     }
 
+    public static function getModelScope(): ?string {
+        return \sale\booking\BookingLineGroupAgeRangeAssignment::getType();
+    }
+
     public static function ondelete($om, $ids) {
     }
 

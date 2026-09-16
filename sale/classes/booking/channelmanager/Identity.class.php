@@ -45,6 +45,10 @@ class Identity extends \identity\Identity {
         ];
     }
 
+    public static function getModelScope(): ?string {
+        return \identity\Identity::getType();
+    }
+
     public static function onupdateAddressCountry($orm, $ids, $values, $lang) {
         if(isset($values['address_country'])) {
             if(in_array($values['address_country'], ['be', 'Belgium', 'belgium', 'belgique', 'Belgique', 'Belgie', 'België', 'belgie', 'belgië'])) {

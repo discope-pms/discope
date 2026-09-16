@@ -30,6 +30,10 @@ class Payment extends \sale\booking\Payment {
         ];
     }
 
+    public static function getModelScope(): ?string {
+        return \sale\booking\Payment::getType();
+    }
+
     /**
      * Check whether the payment can be updated, and perform some additional operations if necessary.
      * This method can be overridden to define a more precise set of tests.
