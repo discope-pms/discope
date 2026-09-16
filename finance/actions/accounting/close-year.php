@@ -1,7 +1,7 @@
 <?php
 /*
     This file is part of the Discope property management software.
-    Author: Yesbabylon SRL, 2020-2024
+    Author: Yesbabylon SRL, 2020-2026
     License: GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 
@@ -9,9 +9,19 @@ use discope\setting\Setting;
 use identity\CenterOffice;
 
 [$params, $providers] = eQual::announce([
-    'description'   => "Cette action clôturera l'année comptable. Les nouvelles factures seront désormais sur l'année en cours et il ne sera plus possible d'émettre des factures sur l'année précédente.\n
-                        ATTENTION: cette opération en peut pas être annulée.",
-    'params'        => [],
+    'description'   => "This action will close the accounting year. New invoices will now be for the current year, and it will no longer be possible to issue invoices for the previous year.",
+    'help'          => "WARNING:  this action cannot be cancelled.",
+    'params'        => [
+        'fiscal_year_ref' => [
+            'type'                  => 'string',
+            'description'           => "Determines from which date the fiscal year must be determined.",
+            'selection'             => [
+                'date_from',
+                'date_to'
+            ],
+            'default'               => 'date_from'
+        ]
+    ],
     'access'        => [
         'visibility'    => 'private'
     ],
@@ -20,17 +30,16 @@ use identity\CenterOffice;
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'     => ['context', 'orm']
+    'providers'     => ['context']
 ]);
 
 /**
- * @var \equal\php\Context          $context
- * @var \equal\orm\ObjectManager    $orm
+ * @var \equal\php\Context  $context
  */
-['context' => $context, 'orm' => $orm] = $providers;
+['context' => $context] = $providers;
 
-$increment_year = function(string $date_str): string {
-    // "2024-01-01" → "2025-01-01"
+$incrementYear = function(string $date_str): string {
+    // "2024-01-01" → "2024-12-31"
     $parts = explode('-', $date_str);
     if (count($parts) !== 3) {
         throw new Exception('invalid_date_format', EQ_ERROR_INVALID_CONFIG);
@@ -52,8 +61,8 @@ if(!$date_from || !$date_to) {
     throw new Exception("missing_fiscal_year_dates", EQ_ERROR_INVALID_CONFIG);
 }
 
-$new_date_from = $increment_year($date_from);
-$new_date_to   = $increment_year($date_to);
+$new_date_from = $incrementYear($date_from);
+$new_date_to = $incrementYear($date_to);
 
 $date = time();
 
@@ -65,10 +74,13 @@ $from_year = intval(substr($new_date_from, 0, 4));
 $to_year   = intval(substr($new_date_to, 0, 4));
 
 $new_fiscal_year = (string) $from_year;
+if($params['fiscal_year_ref'] === 'date_to') {
+    $new_fiscal_year = (string) $to_year;
+}
 
 // update fiscal year to current year
 Setting::set_value('finance', 'accounting', 'fiscal_year.date_from', $new_date_from);
-Setting::set_value('finance', 'accounting', 'fiscal_year.date_to',   $new_date_to);
+Setting::set_value('finance', 'accounting', 'fiscal_year.date_to', $new_date_to);
 Setting::set_value('finance', 'accounting', 'fiscal_year', $new_fiscal_year);
 
 // reset invoice sequences for all Center Offices
