@@ -65,10 +65,7 @@ if(count($missing_columns)) {
 
 // Resolve every row to one concrete ORM model before opening a transaction.
 $classify = static function (array $row) : string {
-    if(!empty($row['identity_id']) || !empty($row['organisation_id'])) {
-        return 'identity\\User';
-    }
-    return 'core\\User';
+    return 'identity\\User';
 };
 
 // Group only rows whose discriminator must change.
