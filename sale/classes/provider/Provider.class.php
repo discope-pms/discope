@@ -20,7 +20,8 @@ class Provider extends \identity\Partner {
             'relationship' => [
                 'type'              => 'string',
                 'default'           => 'provider',
-                'description'       => 'Force relationship to Provider.'
+                'description'       => 'Force relationship to Provider.',
+                'readonly'          => true
             ],
 
             'address' => [

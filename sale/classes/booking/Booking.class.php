@@ -370,7 +370,7 @@ class Booking extends Model {
 
             'payment_plan_id' => [
                 'type'              => 'many2one',
-                'foreign_object'    => 'sale\booking\PaymentPlan',
+                'foreign_object'    => 'sale\pay\PaymentPlan',
                 'description'       => 'The payment plan that has been automatically assigned.'
             ],
 
