@@ -61,7 +61,7 @@ if($date < strtotime($new_date_from) || $date > strtotime($new_date_to)) {
     throw new Exception("fiscal_year_mismatch", EQ_ERROR_CONFLICT_OBJECT);
 }
 
-$fiscal_year_format = Setting::set_value('finance', 'accounting', 'fiscal_year.format', '%4d{from_year}');
+$fiscal_year_format = Setting::get_value('finance', 'accounting', 'fiscal_year.format', '%4d{from_year}');
 
 $from_year = intval(substr($new_date_from, 0, 4));
 $to_year   = intval(substr($new_date_to, 0, 4));
