@@ -45,7 +45,7 @@ foreach($migration_files as $migration_file) {
         throw new Exception('invalid_model_migration_name:' . $action_name, EQ_ERROR_INVALID_CONFIG);
     }
 
-    $controller = 'core_model_' . $action_name;
+    $controller = 'discope_model_' . $action_name;
     try {
         $result = eQual::run('do', $controller, ['confirm' => true]);
     }
