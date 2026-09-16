@@ -14,7 +14,7 @@ use sale\booking\Contract;
 use sale\booking\ContractLine;
 use sale\booking\ContractLineGroup;
 use sale\booking\Funding;
-use sale\booking\PaymentPlan;
+use sale\pay\PaymentPlan;
 
 
 list($params, $providers) = announce([

@@ -45,4 +45,8 @@ class GuardianImported extends Guardian {
 
         ];
     }
+
+    public static function getModelScope(): ?string {
+        return Guardian::getType();
+    }
 }

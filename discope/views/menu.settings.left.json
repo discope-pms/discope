@@ -1007,7 +1007,7 @@
                                 "label": "Payment plans",
                                 "description": "",
                                 "context": {
-                                    "entity": "sale\\booking\\PaymentPlan",
+                                    "entity": "sale\\pay\\PaymentPlan",
                                     "view": "list.default"
                                 }
                             },

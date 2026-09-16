@@ -24,4 +24,8 @@ class EnrollmentImported extends Enrollment {
 
         ];
     }
+
+    public static function getModelScope(): ?string {
+        return Enrollment::getType();
+    }
 }
