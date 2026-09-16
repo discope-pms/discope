@@ -5,7 +5,7 @@
     License: GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 
-use core\User;
+use identity\User;
 use discope\setting\Setting;
 use identity\Center;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;

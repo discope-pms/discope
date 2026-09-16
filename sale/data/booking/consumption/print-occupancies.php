@@ -7,7 +7,7 @@
 */
 
 use discope\setting\Setting;
-use core\User;
+use identity\User;
 use Dompdf\Dompdf;
 use Dompdf\Options as DompdfOptions;
 use equal\orm\Domain;
