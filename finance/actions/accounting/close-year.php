@@ -12,15 +12,6 @@ use identity\CenterOffice;
     'description'   => "This action will close the accounting year. New invoices will now be for the current year, and it will no longer be possible to issue invoices for the previous year.",
     'help'          => "WARNING:  this action cannot be cancelled.",
     'params'        => [
-        'fiscal_year_ref' => [
-            'type'                  => 'string',
-            'description'           => "Determines from which date the fiscal year must be determined.",
-            'selection'             => [
-                'date_from',
-                'date_to'
-            ],
-            'default'               => 'date_from'
-        ]
     ],
     'access'        => [
         'visibility'    => 'private'
@@ -70,13 +61,15 @@ if($date < strtotime($new_date_from) || $date > strtotime($new_date_to)) {
     throw new Exception("fiscal_year_mismatch", EQ_ERROR_CONFLICT_OBJECT);
 }
 
+$fiscal_year_format = Setting::set_value('finance', 'accounting', 'fiscal_year.format', '%2{from_year}');
+
 $from_year = intval(substr($new_date_from, 0, 4));
 $to_year   = intval(substr($new_date_to, 0, 4));
 
-$new_fiscal_year = (string) $from_year;
-if($params['fiscal_year_ref'] === 'date_to') {
-    $new_fiscal_year = (string) $to_year;
-}
+$new_fiscal_year = Setting::parse_format($fiscal_year_format, [
+    'from_year' => $from_year,
+    'to_year'   => $to_year
+]);
 
 // update fiscal year to current year
 Setting::set_value('finance', 'accounting', 'fiscal_year.date_from', $new_date_from);
