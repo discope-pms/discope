@@ -104,7 +104,7 @@ jobs:
           when: on_fail
       - store_artifacts:
           path: /tmp/dumps
-  php_8-3_&_equal_2-0-2:
+  php_8-3_equal_2-0-2:
     docker:
     - image: php:8.3-apache
     - image: mysql:5.7
@@ -312,5 +312,5 @@ workflows:
   build_and_test:
     jobs:
       - php_8-3
-      - php_8-3_&_equal_2-0-2
+      - php_8-3_equal_2-0-2
       - php_8-4
