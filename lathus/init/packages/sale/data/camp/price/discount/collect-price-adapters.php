@@ -48,12 +48,12 @@ use sale\camp\Camp;
             'description'       => "Type of manual discount (fixed amount or percentage of the price).",
             'default'           => 'all'
         ],
-        'min_value' => [
+        'min_amount' => [
             'type'              => 'float',
             'description'       => 'Min amount/percentage removed to the enrollment price.',
             'default'           => 0
         ],
-        'max_value' => [
+        'max_amount' => [
             'type'              => 'float',
             'description'       => 'Max amount/percentage removed to the enrollment price.',
             'default'           => 1000
@@ -80,10 +80,6 @@ $result = [];
 
 $domain = new Domain($params['domain']);
 
-$domain->addCondition(
-    new DomainCondition('price_adapter_type', '=', 'amount')
-);
-
 if($params['origin_type'] !== 'all') {
     $domain->addCondition(
         new DomainCondition('origin_type', '=', $params['origin_type'])
@@ -100,14 +96,6 @@ if($params['price_adapter_type'] !== 'all') {
         new DomainCondition('price_adapter_type', '=', $params['price_adapter_type'])
     );
 }
-
-$domain->addCondition(
-    new DomainCondition('value', '>=', $params['min_value'])
-);
-
-$domain->addCondition(
-    new DomainCondition('value', '<=', $params['max_value'])
-);
 
 if(!empty($params['name'])) {
     $name_escaped = str_replace(['\\', '%', '_'], ['\\\\', '\\%', '\\_'], $params['name']);
@@ -144,6 +132,14 @@ $params['domain'] = $domain->toArray();
 
 $result = eQual::run('get', 'model_collect', $params, true);
 
-$context->httpResponse()
-        ->body($result)
-        ->send();
+$result = array_filter($result, function($price_adapter) use($params) {
+    return $price_adapter['amount'] >= $params['min_amount'] && $price_adapter['amount'] <= $params['max_amount'];
+});
+
+$result = array_values($result);
+
+$context
+    ->httpResponse()
+    ->header('X-Total-Count', count($result))
+    ->body($result)
+    ->send();

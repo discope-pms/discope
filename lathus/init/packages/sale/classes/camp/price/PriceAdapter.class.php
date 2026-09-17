@@ -9,7 +9,9 @@
 namespace sale\camp\price;
 
 use equal\orm\Model;
+use sale\camp\catalog\Product;
 use sale\camp\Enrollment;
+use sale\camp\EnrollmentLine;
 use sale\camp\Sponsor;
 
 class PriceAdapter extends Model {
@@ -74,6 +76,16 @@ class PriceAdapter extends Model {
                 'onupdate'          => 'onupdateValue'
             ],
 
+            'amount' => [
+                'type'              => 'computed',
+                'result_type'       => 'float',
+                'usage'             => 'amount/money:2',
+                'description'       => "Amount to remove to enrollment price.",
+                'help'              => "Allows to display the amount of percent price adapters.",
+                'store'             => false,
+                'function'          => 'calcAmount'
+            ],
+
             'sponsor_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\camp\Sponsor',
@@ -105,6 +117,51 @@ class PriceAdapter extends Model {
                     $result['name'] = $sponsor['name'];
                 }
             }
+        }
+
+        return $result;
+    }
+
+    public static function calcAmount($self): array {
+        $result = [];
+        $self->read([
+            'price_adapter_type',
+            'value',
+            'enrollment_id' => ['camp_id' => ['is_clsh']]
+        ]);
+
+        $map_camp_products_ids = [
+            'clsh'  => Product::search(['camp_product_type', 'in', ['clsh-full-5-days', 'clsh-full-4-days', 'clsh-day']])->ids(),
+            'full'  => Product::search(['camp_product_type', '=', 'full'])->ids()
+        ];
+
+        foreach($self as $id => $price_adapter) {
+            $amount = 0.0;
+            if($price_adapter['price_adapter_type'] === 'amount') {
+                $amount = $price_adapter['value'];
+            }
+            else {
+                $camp_product_ids = null;
+                if($price_adapter['enrollment_id']['camp_id']['is_clsh']) {
+                    $camp_product_ids = $map_camp_products_ids['clsh'];
+                }
+                else {
+                    $camp_product_ids = $map_camp_products_ids['full'];
+                }
+
+                $camp_product_line = EnrollmentLine::search([
+                    ['product_id', 'in', $camp_product_ids],
+                    ['enrollment_id', '=', $price_adapter['enrollment_id']['id']]
+                ])
+                    ->read(['total'])
+                    ->first();
+
+                if($camp_product_line) {
+                    $amount = ($camp_product_line['total'] / (1 - ($price_adapter['value'] / 100))) - $camp_product_line['total'];
+                }
+            }
+
+            $result[$id] = $amount;
         }
 
         return $result;

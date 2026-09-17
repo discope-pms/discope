@@ -45,6 +45,11 @@
             "description": "Montant/pourcentage à retirer au prix de l'inscription.",
             "help": ""
         },
+        "amount": {
+            "label": "Montant",
+            "description": "Montant retiré au prix de l'inscription.",
+            "help": ""
+        },
         "sponsor_id": {
             "label": "Aide",
             "description": "Origine de l'aide.",

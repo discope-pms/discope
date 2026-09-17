@@ -38,19 +38,24 @@
                                             },
                                             {
                                                 "type": "field",
-                                                "label": "Min value",
-                                                "value": "min_value",
+                                                "label": "Min amount",
+                                                "value": "min_amount",
                                                 "width": "15%"
                                             },
                                             {
                                                 "type": "field",
-                                                "label": "Max value",
-                                                "value": "max_value",
+                                                "label": "Max amount",
+                                                "value": "max_amount",
                                                 "width": "15%"
                                             },
                                             {
                                                 "type": "field",
                                                 "value": "name",
+                                                "width": "33%"
+                                            },
+                                            {
+                                                "type": "field",
+                                                "value": "advanced_type",
                                                 "width": "33%"
                                             }
                                         ]
