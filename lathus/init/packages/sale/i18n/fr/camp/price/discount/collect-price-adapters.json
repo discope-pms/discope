@@ -43,6 +43,16 @@
             "label": "Libellé",
             "description": "Nom de la réduction.",
             "help": ""
+        },
+        "advanced_filter": {
+            "label": "Filtre avancé",
+            "description": "Les autres filtres sont ignorés sauf les dates.",
+            "selection": {
+                "all": "Tout",
+                "second-sojourn": "Remise 2ème séjour (10%)",
+                "third-sojourn": "Remise 3ème séjour (80€)"
+            },
+            "help": ""
         }
     },
     "view": {

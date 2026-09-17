@@ -61,6 +61,16 @@ use sale\camp\Camp;
         'name' => [
             'type'              => 'string',
             'description'       => 'The name of the price adapter'
+        ],
+        'advanced_filter' => [
+            'type'              => 'string',
+            'description'       => 'Other filters are ignored except dates.',
+            'selection'         => [
+                'all',
+                'second-sojourn',
+                'third-sojourn'
+            ],
+            'default'           => 'all'
         ]
     ],
     'response'      => [
@@ -78,33 +88,7 @@ use sale\camp\Camp;
 
 $result = [];
 
-$domain = new Domain($params['domain']);
-
-if($params['origin_type'] !== 'all') {
-    $domain->addCondition(
-        new DomainCondition('origin_type', '=', $params['origin_type'])
-    );
-}
-else {
-    $domain->addCondition(
-        new DomainCondition('origin_type', 'in', ['other', 'loyalty-discount'])
-    );
-}
-
-if($params['price_adapter_type'] !== 'all') {
-    $domain->addCondition(
-        new DomainCondition('price_adapter_type', '=', $params['price_adapter_type'])
-    );
-}
-
-if(!empty($params['name'])) {
-    $name_escaped = str_replace(['\\', '%', '_'], ['\\\\', '\\%', '\\_'], $params['name']);
-
-    $domain->addCondition(
-        new DomainCondition('name', 'like', '%'.$name_escaped.'%')
-    );
-}
-
+$date_filters_enrollment_ids = [];
 if(isset($params['date_from']) || isset($params['date_to'])) {
     $camp_dom = [];
     if(isset($params['date_from'])) {
@@ -118,25 +102,105 @@ if(isset($params['date_from']) || isset($params['date_to'])) {
         ->read(['enrollments_ids'])
         ->get(true);
 
-    $enrollments_ids = [];
     foreach($camps as $camp) {
-        $enrollments_ids = array_merge($enrollments_ids, $camp['enrollments_ids']);
+        $date_filters_enrollment_ids = array_merge($date_filters_enrollment_ids, $camp['enrollments_ids']);
     }
-
-    $domain->addCondition(
-        new DomainCondition('enrollment_id', 'in', $enrollments_ids)
-    );
 }
 
-$params['domain'] = $domain->toArray();
+if($params['advanced_filter'] === 'all') {
+    $domain = new Domain($params['domain']);
+
+    if($params['origin_type'] !== 'all') {
+        $domain->addCondition(
+            new DomainCondition('origin_type', '=', $params['origin_type'])
+        );
+    }
+    else {
+        $domain->addCondition(
+            new DomainCondition('origin_type', 'in', ['other', 'loyalty-discount'])
+        );
+    }
+
+    if($params['price_adapter_type'] !== 'all') {
+        $domain->addCondition(
+            new DomainCondition('price_adapter_type', '=', $params['price_adapter_type'])
+        );
+    }
+
+    if(!empty($params['name'])) {
+        $name_escaped = str_replace(['\\', '%', '_'], ['\\\\', '\\%', '\\_'], $params['name']);
+
+        $domain->addCondition(
+            new DomainCondition('name', 'like', '%'.$name_escaped.'%')
+        );
+    }
+
+    if(isset($params['date_from']) || isset($params['date_to'])) {
+        $domain->addCondition(
+            new DomainCondition('enrollment_id', 'in', $date_filters_enrollment_ids)
+        );
+    }
+
+    $params['domain'] = $domain->toArray();
+}
+else {
+    switch($params['advanced_filter']) {
+        case 'second-sojourn':
+            $params['domain'] = [
+                [
+                    ['enrollment_id', 'in', $date_filters_enrollment_ids],
+                    ['origin_type', 'in', ['other', 'loyalty-discount']],
+                    ['price_adapter_type', '=', 'percent']
+                ],
+                [
+                    ['enrollment_id', 'in', $date_filters_enrollment_ids],
+                    ['origin_type', 'in', ['other', 'loyalty-discount']],
+                    ['price_adapter_type', '=', 'amount'],
+                    ['name', 'like', '%10\\%%']
+                ]
+            ];
+
+            break;
+        case 'third-sojourn':
+            $params['domain'] = [
+                [
+                    ['enrollment_id', 'in', $date_filters_enrollment_ids],
+                    ['origin_type', 'in', ['other', 'loyalty-discount']],
+                    ['name', 'like', '%3%']
+                ],
+                [
+                    ['enrollment_id', 'in', $date_filters_enrollment_ids],
+                    ['origin_type', 'in', ['other', 'loyalty-discount']],
+                    ['description', 'like', '%3%']
+                ],
+                [
+                    ['enrollment_id', 'in', $date_filters_enrollment_ids],
+                    ['origin_type', 'in', ['other', 'loyalty-discount']],
+                    ['name', 'like', '%trois%']
+                ],
+                [
+                    ['enrollment_id', 'in', $date_filters_enrollment_ids],
+                    ['origin_type', 'in', ['other', 'loyalty-discount']],
+                    ['description', 'like', '%trois%']
+                ]
+            ];
+
+            $params['min_amount'] = 80;
+            $params['max_amount'] = 80;
+
+            break;
+    }
+}
 
 $result = eQual::run('get', 'model_collect', $params, true);
 
-$result = array_filter($result, function($price_adapter) use($params) {
-    return $price_adapter['amount'] >= $params['min_amount'] && $price_adapter['amount'] <= $params['max_amount'];
-});
+if(in_array($params['advanced_filter'], ['all', 'third-sojourn'])) {
+    $result = array_filter($result, function($price_adapter) use($params) {
+        return $price_adapter['amount'] >= $params['min_amount'] && $price_adapter['amount'] <= $params['max_amount'];
+    });
 
-$result = array_values($result);
+    $result = array_values($result);
+}
 
 $context
     ->httpResponse()

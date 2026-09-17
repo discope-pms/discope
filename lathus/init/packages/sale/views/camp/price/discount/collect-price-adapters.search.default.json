@@ -55,7 +55,7 @@
                                             },
                                             {
                                                 "type": "field",
-                                                "value": "advanced_type",
+                                                "value": "advanced_filter",
                                                 "width": "33%"
                                             }
                                         ]
