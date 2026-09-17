@@ -31,13 +31,13 @@ use sale\camp\Enrollment;
         ],
         'date_from' => [
             'type'              => 'date',
-            'description'       => "Date interval lower limit (defaults to first day of the current week).",
-            'default'           => fn() => strtotime('last Sunday')
+            'description'       => "Date interval lower limit.",
+            'default'           => fn() => strtotime('First day of July this year')
         ],
         'date_to' => [
             'type'              => 'date',
-            'description'       => "Date interval upper limit (defaults to last day of the current week).",
-            'default'           => fn() => strtotime('Sunday this week')
+            'description'       => "Date interval upper limit.",
+            'default'           => fn() => strtotime('Last day of August this year')
         ],
         'confirmed' => [
             'type'              => 'boolean',
