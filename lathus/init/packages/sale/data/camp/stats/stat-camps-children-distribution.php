@@ -184,18 +184,40 @@ $children_ids = array_keys($map_children_ids);
 
 $children_enrollments = Enrollment::search(['child_id', 'in', $children_ids])
     ->read([
-        'child_id',
-        'camp_id' => ['date_from']
+        'child_id'  => ['created'],
+        'camp_id'   => ['date_from']
     ])
     ->get();
 
 $map_children_first_camp_date = [];
 foreach($children_enrollments as $enrollment) {
-    if(isset($map_children_first_camp_date[$enrollment['child_id']]) && $map_children_first_camp_date[$enrollment['child_id']] < $enrollment['camp_id']['date_from']) {
+    // #memo: handle children imported from Lathus Access DB in June 2025
+    if(date('Y', $enrollment['child_id']['created']) === '2025') {
+        $map_children_first_camp_date[$enrollment['child_id']['id']] = strtotime('Fist day of July 2025');
         continue;
     }
 
-    $map_children_first_camp_date[$enrollment['child_id']] = $enrollment['camp_id']['date_from'];
+    if(isset($map_children_first_camp_date[$enrollment['child_id']['id']]) && $map_children_first_camp_date[$enrollment['child_id']['id']] < $enrollment['camp_id']['date_from']) {
+        continue;
+    }
+
+    $map_children_first_camp_date[$enrollment['child_id']['id']] = $enrollment['camp_id']['date_from'];
+}
+
+$map_new_children = [];
+foreach($camps as $camp) {
+    foreach($camp['enrollments_ids'] as $enrollment) {
+        if(isset($map_new_children[$enrollment['child_id']['id']]) && $map_new_children[$enrollment['child_id']['id']]) {
+            continue;
+        }
+
+        if($map_children_first_camp_date[$enrollment['child_id']['id']] < $camp['date_from']) {
+            $map_new_children[$enrollment['child_id']['id']] = false;
+        }
+        else {
+            $map_new_children[$enrollment['child_id']['id']] = true;
+        }
+    }
 }
 
 $map_location = [
@@ -242,11 +264,11 @@ foreach($camps as $camp) {
                 break;
         }
 
-        if($map_children_first_camp_date[$enrollment['child_id']['id']] < $camp['date_from']) {
-            $map_age_data[$enrollment['child_age']]['qty_old']++;
+        if($map_new_children[$enrollment['child_id']['id']]) {
+            $map_age_data[$enrollment['child_age']]['qty_new']++;
         }
         else {
-            $map_age_data[$enrollment['child_age']]['qty_new']++;
+            $map_age_data[$enrollment['child_age']]['qty_old']++;
         }
 
         if($enrollment['is_ase']) {
