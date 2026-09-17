@@ -29,14 +29,14 @@
                 "percent": "Pourcentage"
             }
         },
-        "min_value": {
-            "label": "Valeur min.",
-            "description": "Montant/pourcentage min. retiré au prix de l'inscription.",
+        "min_amount": {
+            "label": "Montant min.",
+            "description": "Montant min. retiré au prix de l'inscription.",
             "help": ""
         },
-        "max_value": {
-            "label": "Valeur max.",
-            "description": "Montant/pourcentage max. retiré au prix de l'inscription.",
+        "max_amount": {
+            "label": "Montant max.",
+            "description": "Montant max. retiré au prix de l'inscription.",
             "help": ""
         },
         "name": {
