@@ -201,6 +201,13 @@ if(in_array($params['advanced_filter'], ['all', 'third-sojourn'])) {
 
     $result = array_values($result);
 }
+elseif($params['advanced_filter'] === 'second-sojourn') {
+    $result = array_filter($result, function($price_adapter) use($params) {
+        return $price_adapter['amount'] >= 0.01;
+    });
+
+    $result = array_values($result);
+}
 
 $context
     ->httpResponse()
