@@ -33,6 +33,10 @@ class Setting extends \core\setting\Setting {
         ];
     }
 
+    public static function getModelScope(): ?string {
+        return null;
+    }
+
     protected static function getSelectorKeys() {
         return ['user_id', 'organisation_id', 'center_office_id', 'center_id'];
     }
