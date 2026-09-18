@@ -34,8 +34,8 @@ list($params, $providers) = announce([
         ],
         'date_to' => [
             'type'              => 'date',
-            'description'       => 'Output: Day of departure / Input: Exclusive date interval upper limit (defaults to first day of current month).',
-            'default'           => mktime(0, 0, 0, date("m"), 1)
+            'description'       => 'Output: Day of departure / Input: Inclusive date interval upper limit (defaults to last day of previous month).',
+            'default'           => mktime(0, 0, 0, date("m"), 0)
         ],
         'age_range_id' => [
             'type'              => 'many2one',
@@ -110,7 +110,7 @@ $domain = [];
 if($params['center_id'] || $params['center_office_id']) {
     $domain = [
         ['state', 'in', ['instance', 'archive']],
-        ['date_from', '<', $params['date_to']],
+        ['date_from', '<=', $params['date_to']], // #memo - if date_to is 05/08 we want the night from 05/08 -> 06/08
         ['date_to', '>=', $params['date_from']],
         ['is_cancelled', '=', false], // #memo - needed to handle booking cancelled but invoiced to customer
         ['status', 'not in', ['quote', 'option']]
@@ -144,6 +144,7 @@ $bookings = [];
 if(!empty($domain)) {
     $bookings = Booking::search($domain)
         ->read([
+            'name',
             'center_id'                 => ['name'],
             'customer_id'               => ['customer_nature_id', 'rate_class_id'],
             'booking_lines_groups_ids'  => $booking_lines_groups_fields
@@ -187,9 +188,12 @@ foreach($bookings as $booking) {
             continue;
         }
 
-        // Both the report period and the sojourn use an exclusive departure date.
+        // #memo - if date_to is 05/08 we want the night from 05/08 -> 06/08
+        $date_to_exclusive = strtotime('+1 day', $params['date_to']);
+
+        // Sojourn departure dates are exclusive; the inclusive report end date is normalized above.
         $nights_from = max($params['date_from'], $group['date_from']);
-        $nights_to = min($params['date_to'], $group['date_to']);
+        $nights_to = min($date_to_exclusive, $group['date_to']);
         if($nights_from >= $nights_to) {
             continue;
         }
