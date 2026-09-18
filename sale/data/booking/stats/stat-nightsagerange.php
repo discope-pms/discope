@@ -1,20 +1,18 @@
 <?php
 /*
     This file is part of the Discope property management software <https://github.com/discope-pms/discope>
-    Some Rights Reserved, Discope PMS, 2020-2024
+    Some Rights Reserved, Discope PMS, 2020-2026
     Original author(s): Yesbabylon SRL
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 
 use sale\booking\Booking;
-use sale\booking\BookingLine;
-use sale\booking\BookingLineGroup;
 use sale\customer\AgeRange;
 use sale\customer\CustomerNature;
 use sale\customer\RateClass;
 
 list($params, $providers) = announce([
-    'description'   => '',
+    'description'   => 'Provides participant and person-night counts grouped by center, rate class, customer nature and age range.',
     'params'        => [
         /* mixed-usage parameters: required both for fetching data (input) and property of virtual entity (output) */
         'center_id' => [
@@ -36,7 +34,7 @@ list($params, $providers) = announce([
         ],
         'date_to' => [
             'type'              => 'date',
-            'description'       => 'Output: Day of departure / Input: Date interval upper limit (defaults to last day of previous month).',
+            'description'       => 'Output: Day of departure / Input: Inclusive date interval upper limit (defaults to last day of previous month).',
             'default'           => mktime(0, 0, 0, date("m"), 0)
         ],
         'age_range_id' => [
@@ -86,67 +84,83 @@ list($params, $providers) = announce([
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'     => [ 'context', 'orm', 'adapt', 'auth' ]
+    'providers'     => ['context']
 ]);
 
 /**
- * @var \equal\php\Context          $context
- * @var \equal\orm\ObjectManager    $orm
- * @var \equal\data\DataAdapter     $adapter
- * @var \equal\auth\AuthenticationManager $auth
+ * @var \equal\php\Context  $context
  */
-list($context, $orm, $adapter, $auth) = [ $providers['context'], $providers['orm'], $providers['adapt'] ,$providers['auth'] ];
+['context' => $context] = $providers;
+
+$map_age_ranges = AgeRange::search()
+    ->read(['name'])
+    ->get();
+
+$map_rate_class = RateClass::search()
+    ->read(['name', 'description'])
+    ->get();
+
+$map_customer_nature = CustomerNature::search()
+    ->read(['code', 'description'])
+    ->get();
 
 $domain = [];
 
-$map_age_ranges = AgeRange::search()->read(['id', 'name'])->get();
-
-$map_rate_class = RateClass::search()->read(['id', 'name', 'description'])->get();
-$map_customer_nature = CustomerNature::search()->read(['id', 'code', 'description'])->get();
-
-// #memo - we consider all bookings for which at least one sojourn starts during the given period
-if ($params['center_id'] || $params['center_office_id']){
+// #memo - we consider all bookings for which at least one sojourn intersects the given period
+if($params['center_id'] || $params['center_office_id']) {
     $domain = [
-        ['date_from', '>=', $params['date_from'] ],
-        ['date_from', '<=', $params['date_to'] ],
         ['state', 'in', ['instance', 'archive']],
-        ['is_cancelled', '=', false],
-        ['status', 'not in', ['quote','option']]
+        ['date_from', '<=', $params['date_to']], // #memo - if date_to is 05/08 we want the night from 05/08 -> 06/08
+        ['date_to', '>=', $params['date_from']],
+        ['is_cancelled', '=', false], // #memo - needed to handle booking cancelled but invoiced to customer
+        ['status', 'not in', ['quote', 'option']]
     ];
 
-    if($params['center_id'] && $params['center_id'] > 0) {
-        $domain[] = [ 'center_id', '=', $params['center_id'] ];
+    if(isset($params['center_id'])) {
+        $domain[] = ['center_id', '=', $params['center_id']];
     }
 
-    if($params['center_office_id'] && $params['center_office_id'] > 0) {
-        $domain[] = [ 'center_office_id', '=', $params['center_office_id'] ];
+    if(isset($params['center_office_id'])) {
+        $domain[] = ['center_office_id', '=', $params['center_office_id']];
     }
 }
 
-if($domain){
+$booking_lines_fields = [
+    '@domain' => ['is_accomodation', '=', true],
+    'qty',
+    'price'
+];
+
+$booking_lines_groups_fields = [
+    '@domain' => ['is_sojourn', '=', true],
+    'date_from',
+    'date_to',
+    'nb_pers',
+    'age_range_assignments_ids' => ['qty', 'age_range_id'],
+    'booking_lines_ids'         => $booking_lines_fields
+];
+
+$bookings = [];
+if(!empty($domain)) {
     $bookings = Booking::search($domain)
-    ->read([
-        'id',
-        'booking_lines_groups_ids',
-        'center_id'                 => ['id', 'name'],
-        'customer_id'               => ['customer_nature_id', 'rate_class_id']
-    ])
-    ->get(true);
+        ->read([
+            'name',
+            'center_id'                 => ['name'],
+            'customer_id'               => ['customer_nature_id', 'rate_class_id'],
+            'booking_lines_groups_ids'  => $booking_lines_groups_fields
+        ])
+        ->get(true);
 }
-
-
 
 if($params['rate_class_id'] && $params['rate_class_id'] > 0) {
     $bookings = array_filter($bookings, function ($booking) use ($params) {
-    $rate_class_id = $booking['customer_id']['rate_class_id'];
-    return isset($rate_class_id) && $rate_class_id == $params['rate_class_id'];
+        $rate_class_id = $booking['customer_id']['rate_class_id'];
+        return isset($rate_class_id) && $rate_class_id == $params['rate_class_id'];
     });
 }
 
 $map_centers = [];
-
 foreach($bookings as $booking) {
-
     $center_id = $booking['center_id']['id'];
     $rate_class_id = $booking['customer_id']['rate_class_id'];
     $customer_nature_id =  $booking['customer_id']['customer_nature_id'];
@@ -154,116 +168,92 @@ foreach($bookings as $booking) {
     if(!isset($map_centers[$center_id])) {
         $map_centers[$center_id] = [];
     }
-
     if(!isset($map_centers[$center_id][$rate_class_id])) {
-        $map_centers[$booking[$center_id][$rate_class_id]] = [];
+        $map_centers[$center_id][$rate_class_id] = [];
     }
-
     if(!isset($map_centers[$center_id][$rate_class_id][$customer_nature_id])) {
-        $map_centers[$booking[$center_id][$rate_class_id][$customer_nature_id]] = [];
+        $map_centers[$center_id][$rate_class_id][$customer_nature_id] = [];
     }
 
-    // find all sojourns
-    $groups = BookingLineGroup::search([
-            ['id', 'in', $booking['booking_lines_groups_ids']],
-            ['is_sojourn', '=', true]
-        ])
-        ->read([
-            'id',
-            'nb_pers',
-            'nb_nights',
-            'age_range_assignments_ids' => ['qty', 'age_range_id'],
-            'booking_lines_ids'
-        ])
-        ->get(true);
-
-    foreach($groups as $group) {
-
-        $lines = BookingLine::search([
-                ['id', 'in', $group['booking_lines_ids']],
-                ['is_accomodation', '=', true]
-            ])
-            ->read([
-                'id',
-                'qty',
-                'price',
-                'is_accomodation',
-                'product_id' => ['has_age_range', 'age_range_id' => ['id', 'name'], 'product_model_id' => ['qty_accounting_method']]
-            ])
-            ->get(true);
-
-        $group_age_range_id = 0;
-        if(count($group['age_range_assignments_ids']) == 1) {
-            $age_range_assignment = reset($group['age_range_assignments_ids']);
-            $group_age_range_id = $age_range_assignment['age_range_id'];
-            // discard groups not matching given age_range
-            if(isset($params['age_range_id']) && $group_age_range_id != $params['age_range_id']) {
-                continue;
+    foreach($booking['booking_lines_groups_ids'] as $group) {
+        $has_valid_accommodation = false;
+        foreach($group['booking_lines_ids'] as $line) {
+            if($line['price'] >= 0 && $line['qty'] >= 0) {
+                $has_valid_accommodation = true;
+                break;
             }
         }
 
-        foreach($lines as $line) {
-            if($line['price'] < 0 || $line['qty'] < 0) {
-                continue;
-            }
+        if(!$has_valid_accommodation) {
+            continue;
+        }
 
-            $age_range_id = $group_age_range_id;
+        // #memo - if date_to is 05/08 we want the night from 05/08 -> 06/08
+        $date_to_exclusive = strtotime('+1 day', $params['date_to']);
 
-            // set qty as default value for nb_pers, according to accounting method
-            $nb_pers = $line['qty'];
+        // Sojourn departure dates are exclusive; the inclusive report end date is normalized above.
+        $nights_from = max($params['date_from'], $group['date_from']);
+        $nights_to = min($date_to_exclusive, $group['date_to']);
+        if($nights_from >= $nights_to) {
+            continue;
+        }
+        $nb_nights = (int) round(($nights_to - $nights_from) / 86400);
 
-            if($line['product_id']['product_model_id']['qty_accounting_method'] == 'person') {
-                $nb_pers /= $group['nb_nights'];
-            }
-
-            if($line['product_id']['has_age_range']) {
-                $age_range_id = $line['product_id']['age_range_id']['id'];
-                // discard lines not matching given age_range
+        $participants_by_age_range = [];
+        if(count($group['age_range_assignments_ids'])) {
+            foreach($group['age_range_assignments_ids'] as $age_range_assignment) {
+                $age_range_id = $age_range_assignment['age_range_id'];
                 if(isset($params['age_range_id']) && $age_range_id != $params['age_range_id']) {
                     continue;
                 }
-                foreach($group['age_range_assignments_ids'] as $age_range_assignment) {
-                    if($age_range_assignment['age_range_id'] == $age_range_id) {
-                        $nb_pers = $age_range_assignment['qty'];
-                        break;
-                    }
-                }
-            }
-            $rate_class = $map_rate_class[$booking['customer_id']['rate_class_id']];
-            $customer_nature = $map_customer_nature[$booking['customer_id']['customer_nature_id']];
 
+                if(!isset($participants_by_age_range[$age_range_id])) {
+                    $participants_by_age_range[$age_range_id] = 0;
+                }
+                $participants_by_age_range[$age_range_id] += $age_range_assignment['qty'];
+            }
+        }
+        // Without age assignments, the whole sojourn belongs to the "all ages" bucket.
+        elseif(!isset($params['age_range_id'])) {
+            $participants_by_age_range[0] = $group['nb_pers'];
+        }
+
+        $rate_class = $map_rate_class[$rate_class_id];
+        $customer_nature = $map_customer_nature[$customer_nature_id];
+
+        foreach($participants_by_age_range as $age_range_id => $nb_pers) {
             if(!isset($map_centers[$center_id][$rate_class_id][$customer_nature_id][$age_range_id])) {
                 $map_centers[$center_id][$rate_class_id][$customer_nature_id][$age_range_id] = [
-                    'center'                => $booking['center_id']['name'],
-                    'rate_class'            => $rate_class['name'].' - '.$rate_class['description'],
-                    'customer_nature'       => $customer_nature['description'],
-                    'nb_pers'               => $nb_pers,
-                    'nb_nights'             => $group['nb_nights'] * $nb_pers,
-                    'age_range'             => ($age_range_id)?$map_age_ranges[$age_range_id]['name']:'tous les ages'
+                    'center'            => $booking['center_id']['name'],
+                    'rate_class'        => $rate_class['name'].' - '.$rate_class['description'],
+                    'customer_nature'   => $customer_nature['description'],
+                    'nb_pers'           => $nb_pers,
+                    'nb_nights'         => $nb_nights * $nb_pers,
+                    'age_range'         => $map_age_ranges[$age_range_id]['name'] ?? 'tous les ages'
                 ];
             }
             else {
                 $map_centers[$center_id][$rate_class_id][$customer_nature_id][$age_range_id]['nb_pers'] += $nb_pers;
-                $map_centers[$center_id][$rate_class_id][$customer_nature_id][$age_range_id]['nb_nights'] += ($group['nb_nights'] * $nb_pers);
+                $map_centers[$center_id][$rate_class_id][$customer_nature_id][$age_range_id]['nb_nights'] += ($nb_nights * $nb_pers);
             }
-
         }
-
     }
 }
 
 // linearize the result (there might be several lines for a same center)
 $result = [];
-foreach($map_centers as $center) {
-    foreach($center as $rate_class_id) {
-        foreach($rate_class_id as $customer_nature) {
-            foreach($customer_nature as $age_range) {
-                $result[] = $age_range;
+foreach($map_centers as $map_rate_classes) {
+    foreach($map_rate_classes as $map_customer_natures) {
+        foreach($map_customer_natures as $age_range_stats) {
+            foreach($age_range_stats as $age_range_stat) {
+                $result[] = $age_range_stat;
             }
         }
     }
 }
-$context->httpResponse()
-        ->header('X-Total-Count', count($bookings))
-        ->body($result)
-        ->send();
+
+$context
+    ->httpResponse()
+    ->header('X-Total-Count', count($bookings))
+    ->body($result)
+    ->send();
