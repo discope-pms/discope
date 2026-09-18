@@ -122,6 +122,10 @@ class Booking extends \sale\booking\Booking {
         ];
     }
 
+    public static function getModelScope(): ?string {
+        return \sale\booking\Booking::getType();
+    }
+
     public static function canupdate($orm, $ids, $values, $lang) {
         // ignore parent method and allow all changes
         return [];
