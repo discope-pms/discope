@@ -101,7 +101,7 @@ $formatMember = function($booking) {
     return $code.' - '.$booking['customer_id']['partner_identity_id']['display_name'];
 };
 
-$getCustomPackageOutput = function() use($params) {
+$getCustomPackageOutput = function() use($context, $params) {
     $has_custom_package = Setting::get_value('discope', 'features', 'has_custom_package', false);
     if(!$has_custom_package) {
         return null;
@@ -113,16 +113,36 @@ $getCustomPackageOutput = function() use($params) {
         trigger_error('APP::Missing customization package setting (despite `discope.features.has_custom_package`)', EQ_REPORT_WARNING);
     }
     elseif($custom_package !== 'sale') {
-        if(file_exists(EQ_BASEDIR."/packages/{$custom_package}/data/sale/booking/print-contract.php")) {
-            $output = eQual::run('get', "{$custom_package}_sale_booking_print-contract", $params, true);
+        $operation = $context->get('operation');
+
+        $custom_ctrl_file = sprintf(
+            '%s/packages/%s/data/%s/%s',
+            EQ_BASEDIR,
+            $custom_package,
+            $operation['package'],
+            $operation['script']
+        );
+
+        if(file_exists($custom_ctrl_file)) {
+            $custom_ctrl = sprintf(
+                '%s_%s',
+                $custom_package,
+                $operation['operation']
+            );
+
+            $output = eQual::run('get', $custom_ctrl, $params, true, true);
         }
     }
 
     return $output;
 };
 
-$getTemplateFilePath = function($package, $class_path, $view_id) {
+$getTemplateFilePath = function($entity, $view_id) {
     $template_file = '';
+
+    $parts = explode('\\', $entity);
+    $package = array_shift($parts);
+    $class_path = implode('/', $parts);
 
     $has_custom_package = Setting::get_value('discope', 'features', 'has_custom_package', false);
     if($has_custom_package) {
@@ -131,7 +151,7 @@ $getTemplateFilePath = function($package, $class_path, $view_id) {
             trigger_error('APP::Missing customization package setting (despite `discope.features.has_custom_package`)', EQ_REPORT_WARNING);
         }
         elseif(file_exists(EQ_BASEDIR."/packages/{$custom_package}/views/{$package}/{$class_path}.{$view_id}.html")) {
-            $template_file = EQ_BASEDIR."/packages/{$custom_package}/views/{$package}/{$class_path}.{$view_id}.html";
+            $template_file = EQ_BASEDIR . "/packages/{$custom_package}/views/{$package}/{$class_path}.{$view_id}.html";
         }
     }
 
@@ -149,17 +169,8 @@ $getTemplateFilePath = function($package, $class_path, $view_id) {
 // handle custom package override, if any
 $output = $getCustomPackageOutput();
 
-if(!$output) {
-    /*
-        Retrieve the requested template
-    */
-
-    $entity = 'sale\booking\Contract';
-    $parts = explode('\\', $entity);
-    $package = array_shift($parts);
-    $class_path = implode('/', $parts);
-
-    $template_file_path = $getTemplateFilePath($package, $class_path, $params['view_id']);
+if(is_null($output)) {
+    $template_file_path = $getTemplateFilePath(Contract::getType(), $params['view_id']);
 
     // read contract
     $fields = [
