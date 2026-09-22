@@ -23,56 +23,53 @@ use Twig\Loader\FilesystemLoader as TwigFilesystemLoader;
     'description'   => "Render a booking activities planning as a PDF document, given its id.",
     'params'        => [
         'id' => [
-            'description'   => 'Identifier of the booking to print.',
-            'type'          => 'integer',
-            'required'      => true
+            'type'              => 'integer',
+            'description'       => 'Identifier of the booking to print.',
+            'required'          => true
         ],
         'type' => [
-            'description'   => 'The type of activities planning.',
-            'type'          => 'string',
-            'selection'     => [
-                'global',
-                'weekly'
-            ],
-            'default'       => 'global'
+            'type'              => 'string',
+            'selection'         => ['global', 'weekly'],
+            'description'       => 'The type of activities planning.',
+            'default'           => 'global'
         ],
         'mode' =>  [
-            'description'   => 'Mode in which document has to be rendered: simple or detailed.',
-            'type'          => 'string',
-            'selection'     => ['simple', 'grouped', 'detailed'],
-            'default'       => 'grouped'
+            'type'              => 'string',
+            'selection'         => ['simple', 'grouped', 'detailed'],
+            'description'       => 'Mode in which document has to be rendered: simple or detailed.',
+            'default'           => 'grouped'
         ],
         'lang' =>  [
-            'description'   => 'Language in which labels and multilang field have to be returned (2 letters ISO 639-1).',
-            'type'          => 'string',
-            'default'       => constant('DEFAULT_LANG')
+            'type'              => 'string',
+            'description'       => 'Language in which labels and multilang field have to be returned (2 letters ISO 639-1).',
+            'default'           => constant('DEFAULT_LANG')
         ],
         'output' =>  [
-            'description'   => 'Output format of the document.',
-            'type'          => 'string',
-            'selection'     => ['pdf', 'html'],
-            'default'       => 'pdf'
+            'type'              => 'string',
+            'selection'         => ['pdf', 'html'],
+            'description'       => 'Output format of the document.',
+            'default'           => 'pdf'
         ],
         'booking_line_group_id' => [
-            'type'          => 'many2one',
-            'foreign_object'=> 'sale\booking\BookingLineGroup',
-            'description'   => 'Identifier of the booking line group (sojourn) to print.'
+            'type'              => 'many2one',
+            'foreign_object'    => 'sale\booking\BookingLineGroup',
+            'description'       => 'Identifier of the booking line group (sojourn) to print.'
         ]
     ],
-    'constants'             => ['DEFAULT_LANG', 'L10N_LOCALE'],
-    'access' => [
-        'visibility'        => 'protected',
-        'groups'            => ['booking.default.user'],
+    'access'        => [
+        'visibility'    => 'protected',
+        'groups'        => ['booking.default.user'],
     ],
     'response'      => [
-        'content-type'      => 'application/pdf',
-        'accept-origin'     => '*'
+        'content-type'  => 'application/pdf',
+        'accept-origin' => '*'
     ],
-    'providers'     => ['context', 'orm']
+    'constants'     => ['DEFAULT_LANG'],
+    'providers'     => ['context']
 ]);
 
 
-['context' => $context, 'orm' => $orm] = $providers;
+['context' => $context] = $providers;
 
 $type = $params['type'];
 
@@ -86,14 +83,16 @@ unset($params['type']);
 $output = eQual::run('get', "sale_booking_print-booking-activity-$type", $params);
 
 if($params['output'] == 'html') {
-    $context->httpResponse()
-            ->header('Content-Type', 'text/html')
-            ->body($output)
-            ->send();
+    $context
+        ->httpResponse()
+        ->header('Content-Type', 'text/html')
+        ->body($output)
+        ->send();
 }
 else {
-    $context->httpResponse()
-            ->header('Content-Disposition', 'inline; filename="document.pdf"')
-            ->body($output)
-            ->send();
+    $context
+        ->httpResponse()
+        ->header('Content-Disposition', 'inline; filename="document.pdf"')
+        ->body($output)
+        ->send();
 }

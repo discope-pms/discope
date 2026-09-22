@@ -1,71 +1,73 @@
 <?php
 /*
     This file is part of the Discope property management software <https://github.com/discope-pms/discope>
-    Some Rights Reserved, Discope PMS, 2020-2024
+    Some Rights Reserved, Discope PMS, 2020-2026
     Original author(s): Yesbabylon SRL
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
+
 use Dompdf\Dompdf;
 use Dompdf\Options as DompdfOptions;
 use Twig\Environment as TwigEnvironment;
 use Twig\Loader\FilesystemLoader as TwigFilesystemLoader;
 use Twig\Extra\Intl\IntlExtension;
 use Twig\Extension\ExtensionInterface;
-
 use SepaQr\Data;
 use Endroid\QrCode\Builder\Builder;
 use Endroid\QrCode\ErrorCorrectionLevel\ErrorCorrectionLevelMedium;
-
 use sale\booking\Invoice;
 use communication\TemplatePart;
 use equal\data\DataFormatter;
 use discope\setting\Setting;
 use sale\catalog\Product;
 
-list($params, $providers) = announce([
-    'description'   => "Render an invoice its ID as a PDF document.",
+[$params, $providers] = eQual::announce([
+    'description'   => "Render an invoice given its ID as a PDF document.",
     'params'        => [
         'id' => [
-            'description'   => 'Identifier of the invoice to print.',
             'type'          => 'integer',
+            'description'   => 'Identifier of the invoice to print.',
             'required'      => true
         ],
         'view_id' =>  [
-            'description'   => 'The identifier of the view <type.name>.',
             'type'          => 'string',
+            'description'   => 'The identifier of the view <type.name>.',
             'default'       => 'print.default'
         ],
         'mode' =>  [
-            'description'   => 'Mode in which document has to be rendered: simple (default) or detailed.',
             'type'          => 'string',
+            'description'   => 'Mode in which document has to be rendered: simple (default) or detailed.',
             'selection'     => ['simple', 'grouped', 'detailed'],
             'default'       => 'grouped'
         ],
         'lang' =>  [
-            'description'   => 'Language in which labels and multilang field have to be returned (2 letters ISO 639-1).',
             'type'          => 'string',
+            'description'   => 'Language in which labels and multilang field have to be returned (2 letters ISO 639-1).',
             'default'       => constant('DEFAULT_LANG')
         ],
         'output' =>  [
-            'description'   => 'Output format of the document.',
             'type'          => 'string',
+            'description'   => 'Output format of the document.',
             'selection'     => ['pdf', 'html'],
             'default'       => 'pdf'
         ]
     ],
-    'constants'             => ['DEFAULT_LANG', 'L10N_LOCALE'],
-    'access' => [
-        'visibility'        => 'protected',
-        'groups'            => ['booking.default.user'],
+    'access'        => [
+        'visibility'    => 'protected',
+        'groups'        => ['booking.default.user'],
     ],
     'response'      => [
-        'content-type'      => 'application/pdf',
-        'accept-origin'     => '*'
+        'content-type'  => 'application/pdf',
+        'accept-origin' => '*'
     ],
-    'providers'     => ['context', 'orm']
+    'constants'     => ['DEFAULT_LANG'],
+    'providers'     => ['context']
 ]);
 
-list($context, $orm) = [$providers['context'], $providers['orm']];
+/**
+ * @var \equal\php\Context  $context
+ */
+['context' => $context] = $providers;
 
 $getLabels = function($lang, $default_labels = []) {
     $view_i18n_file_path = sprintf('%s/packages/sale/i18n/%s/_parts/labels.json', EQ_BASEDIR, $lang);
@@ -84,39 +86,76 @@ $getLabels = function($lang, $default_labels = []) {
     );
 };
 
-$output = '';
+$getCustomPackageOutput = function() use($context, $params) {
+    $has_custom_package = Setting::get_value('discope', 'features', 'has_custom_package', false);
+    if(!$has_custom_package) {
+        return null;
+    }
 
-// steer towards custom controller, if any
-$has_custom_package = Setting::get_value('discope', 'features', 'has_custom_package', false);
-if($has_custom_package) {
+    $output = null;
     $custom_package = Setting::get_value('discope', 'features', 'custom_package');
-    if(!$custom_package) {
+    if(is_null($custom_package)) {
         trigger_error('APP::Missing customization package setting (despite `discope.features.has_custom_package`)', EQ_REPORT_WARNING);
     }
     elseif($custom_package !== 'sale') {
-        if(file_exists(EQ_BASEDIR."/packages/{$custom_package}/data/sale/booking/print-invoice.php")) {
-            $output = eQual::run('get', "{$custom_package}_sale_booking_print-invoice", $params, true);
+        $operation = $context->get('operation');
+
+        $custom_ctrl_file = sprintf(
+            '%s/packages/%s/data/%s/%s',
+            EQ_BASEDIR,
+            $custom_package,
+            $operation['package'],
+            $operation['script']
+        );
+
+        if(file_exists($custom_ctrl_file)) {
+            $custom_ctrl = sprintf(
+                '%s_%s',
+                $custom_package,
+                $operation['operation']
+            );
+
+            $output = eQual::run('get', $custom_ctrl, $params, true, true);
         }
     }
-}
 
-if(empty($output)) {
-    /*
-        Retrieve the requested template
-    */
+    return $output;
+};
 
-    $entity = 'sale\booking\Invoice';
+$getTemplateFilePath = function($entity, $view_id) {
+    $template_file = '';
+
     $parts = explode('\\', $entity);
     $package = array_shift($parts);
     $class_path = implode('/', $parts);
-    $parent = get_parent_class($entity);
 
-    $file = QN_BASEDIR."/packages/{$package}/views/{$class_path}.{$params['view_id']}.html";
-
-    if(!file_exists($file)) {
-        throw new Exception("unknown_view_id", QN_ERROR_UNKNOWN_OBJECT);
+    $has_custom_package = Setting::get_value('discope', 'features', 'has_custom_package', false);
+    if($has_custom_package) {
+        $custom_package = Setting::get_value('discope', 'features', 'custom_package');
+        if(is_null($custom_package)) {
+            trigger_error('APP::Missing customization package setting (despite `discope.features.has_custom_package`)', EQ_REPORT_WARNING);
+        }
+        elseif(file_exists(EQ_BASEDIR."/packages/{$custom_package}/views/{$package}/{$class_path}.{$view_id}.html")) {
+            $template_file = EQ_BASEDIR . "/packages/{$custom_package}/views/{$package}/{$class_path}.{$view_id}.html";
+        }
     }
 
+    if(empty($template_file)) {
+        $template_file = EQ_BASEDIR."/packages/{$package}/views/{$class_path}.{$view_id}.html";
+
+        if(!file_exists($template_file)) {
+            throw new Exception("unknown_view_id", QN_ERROR_UNKNOWN_OBJECT);
+        }
+    }
+
+    return $template_file;
+};
+
+// handle custom package override, if any
+$output = $getCustomPackageOutput();
+
+if(is_null($output)) {
+    $template_file_path = $getTemplateFilePath(Invoice::getType(), $params['view_id']);
 
     // read invoice
     $fields = [
@@ -765,14 +804,12 @@ if(empty($output)) {
         // unknown error
     }
 
-
     /*
         Inject all values into the template
     */
 
     try {
-
-        $loader = new TwigFilesystemLoader(QN_BASEDIR."/packages/{$package}/views/");
+        $loader = new TwigFilesystemLoader(dirname($template_file_path));
 
         $twig = new TwigEnvironment($loader);
         /**  @var ExtensionInterface **/
@@ -784,7 +821,7 @@ if(empty($output)) {
         });
         $twig->addFilter($filter);
 
-        $template = $twig->load("{$class_path}.{$params['view_id']}.html");
+        $template = $twig->load(basename($template_file_path));
 
         $html = $template->render($values);
     }
@@ -793,45 +830,48 @@ if(empty($output)) {
         throw new Exception("template_parsing_issue", QN_ERROR_INVALID_CONFIG);
     }
 
-    if($params['output'] == 'html') {
-        $context->httpResponse()
-            ->header('Content-Type', 'text/html')
-            ->body($html)
-            ->send();
-        exit(0);
+    if($params['output'] === 'html') {
+        $output = $html;
     }
+    else {
+        /*
+            Convert HTML to PDF
+        */
 
-    /*
-        Convert HTML to PDF
-    */
+        // instantiate and use the dompdf class
+        $options = new DompdfOptions();
+        $options->set('isRemoteEnabled', true);
+        $dompdf = new Dompdf($options);
+        // if external fonts are involved, tell dompdf to store them in /bin
+        $options->setFontDir(QN_BASEDIR.'/bin');
+        $dompdf->setPaper('A4', 'portrait');
 
-    // instantiate and use the dompdf class
-    $options = new DompdfOptions();
-    $options->set('isRemoteEnabled', true);
-    $dompdf = new Dompdf($options);
-    // if external fonts are involved, tell dompdf to store them in /bin
-    $options->setFontDir(QN_BASEDIR.'/bin');
-    $dompdf->setPaper('A4', 'portrait');
+        // remove utf8mb4 chars (emojis)
+        $html = preg_replace('/(?:\xF0[\x90-\xBF][\x80-\xBF]{2} | [\xF1-\xF3][\x80-\xBF]{3} | \xF4[\x80-\x8F][\x80-\xBF]{2})/xs', '', $html);
 
-    // remove utf8mb4 chars (emojis)
-    $html = preg_replace('/(?:\xF0[\x90-\xBF][\x80-\xBF]{2} | [\xF1-\xF3][\x80-\xBF]{3} | \xF4[\x80-\x8F][\x80-\xBF]{2})/xs', '', $html);
+        $dompdf->loadHtml((string) $html, 'UTF-8');
+        $dompdf->render();
 
+        $canvas = $dompdf->getCanvas();
+        $font = $dompdf->getFontMetrics()->getFont("helvetica", "regular");
+        $canvas->page_text(530, $canvas->get_height() - 35, "p. {PAGE_NUM} / {PAGE_COUNT}", $font, 9, [0,0,0]);
 
-    $dompdf->loadHtml((string) $html, 'UTF-8');
-    $dompdf->render();
-
-    $canvas = $dompdf->getCanvas();
-    $font = $dompdf->getFontMetrics()->getFont("helvetica", "regular");
-    $canvas->page_text(530, $canvas->get_height() - 35, "p. {PAGE_NUM} / {PAGE_COUNT}", $font, 9, array(0,0,0));
-    // $canvas->page_text(40, $canvas->get_height() - 35, "Export", $font, 9, array(0,0,0));
-
-
-    // get generated PDF raw binary
-    $output = $dompdf->output();
+        // get generated PDF raw binary
+        $output = $dompdf->output();
+    }
 }
 
-$context->httpResponse()
-        // ->header('Content-Disposition', 'attachment; filename="document.pdf"')
+if($params['output'] === 'html') {
+    $context
+        ->httpResponse()
+        ->header('Content-Type', 'text/html')
+        ->body($output)
+        ->send();
+}
+else {
+    $context
+        ->httpResponse()
         ->header('Content-Disposition', 'inline; filename="document.pdf"')
         ->body($output)
         ->send();
+}

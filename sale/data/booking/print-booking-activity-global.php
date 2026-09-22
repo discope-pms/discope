@@ -1,7 +1,7 @@
 <?php
 /*
     This file is part of the Discope property management software <https://github.com/discope-pms/discope>
-    Some Rights Reserved, Discope PMS, 2020-2025
+    Some Rights Reserved, Discope PMS, 2020-2026
     Original author(s): Yesbabylon SRL
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
@@ -23,52 +23,54 @@ use Twig\Loader\FilesystemLoader as TwigFilesystemLoader;
     'description'   => "Render a booking activities planning as a PDF document, given its id.",
     'params'        => [
         'id' => [
-            'description'   => 'Identifier of the booking to print.',
-            'type'          => 'integer',
-            'required'      => true
+            'type'              => 'integer',
+            'description'       => 'Identifier of the booking to print.',
+            'required'          => true
         ],
-        'view_id' =>  [
-            'description'   => 'The identifier of the view <type.name>.',
-            'type'          => 'string',
-            'default'       => 'print.activity'
+        'view_id' => [
+            'type'              => 'string',
+            'description'       => 'The identifier of the view <type.name>.',
+            'default'           => 'print.activity'
         ],
-        'mode' =>  [
-            'description'   => 'Mode in which document has to be rendered: simple or detailed.',
-            'type'          => 'string',
-            'selection'     => ['simple', 'grouped', 'detailed'],
-            'default'       => 'grouped'
+        'mode' => [
+            'type'              => 'string',
+            'description'       => 'Mode in which document has to be rendered: simple or detailed.',
+            'selection'         => ['simple', 'grouped', 'detailed'],
+            'default'           => 'grouped'
         ],
-        'lang' =>  [
-            'description'   => 'Language in which labels and multilang field have to be returned (2 letters ISO 639-1).',
-            'type'          => 'string',
-            'default'       => constant('DEFAULT_LANG')
+        'lang' => [
+            'type'              => 'string',
+            'description'       => 'Language in which labels and multilang field have to be returned (2 letters ISO 639-1).',
+            'default'           => constant('DEFAULT_LANG')
         ],
-        'output' =>  [
-            'description'   => 'Output format of the document.',
-            'type'          => 'string',
-            'selection'     => ['pdf', 'html'],
-            'default'       => 'pdf'
+        'output' => [
+            'type'              => 'string',
+            'description'       => 'Output format of the document.',
+            'selection'         => ['pdf', 'html'],
+            'default'           => 'pdf'
         ],
         'booking_line_group_id' => [
-            'type'          => 'many2one',
-            'foreign_object'=> 'sale\booking\BookingLineGroup',
-            'description'   => 'Identifier of the booking line group (sojourn) to print.'
+            'type'              => 'many2one',
+            'foreign_object'    => 'sale\booking\BookingLineGroup',
+            'description'       => 'Identifier of the booking line group (sojourn) to print.'
         ]
     ],
-    'constants'             => ['DEFAULT_LANG', 'L10N_LOCALE'],
-    'access' => [
-        'visibility'        => 'protected',
-        'groups'            => ['booking.default.user'],
+    'access'        => [
+        'visibility'    => 'protected',
+        'groups'        => ['booking.default.user'],
     ],
     'response'      => [
-        'content-type'      => 'application/pdf',
-        'accept-origin'     => '*'
+        'content-type'  => 'application/pdf',
+        'accept-origin' => '*'
     ],
-    'providers'     => ['context', 'orm']
+    'constants'     => ['DEFAULT_LANG'],
+    'providers'     => ['context']
 ]);
 
-
-['context' => $context, 'orm' => $orm] = $providers;
+/**
+ * @var \equal\php\Context  $context
+ */
+['context' => $context] = $providers;
 
 $output = '';
 
@@ -89,37 +91,76 @@ $getLabels = function($lang, $default_labels = []) {
     );
 };
 
-// steer towards custom controller, if any
-$has_custom_package = Setting::get_value('discope', 'features', 'has_custom_package', false);
-if($has_custom_package) {
+$getCustomPackageOutput = function() use($context, $params) {
+    $has_custom_package = Setting::get_value('discope', 'features', 'has_custom_package', false);
+    if(!$has_custom_package) {
+        return null;
+    }
+
+    $output = null;
     $custom_package = Setting::get_value('discope', 'features', 'custom_package');
-    if(!$custom_package) {
+    if(is_null($custom_package)) {
         trigger_error('APP::Missing customization package setting (despite `discope.features.has_custom_package`)', EQ_REPORT_WARNING);
     }
     elseif($custom_package !== 'sale') {
-        if(file_exists(EQ_BASEDIR."/packages/{$custom_package}/data/sale/booking/print-booking-activity.php")) {
-            $output = eQual::run('get', "{$custom_package}_sale_booking_print-booking-activity", $params, true);
+        $operation = $context->get('operation');
+
+        $custom_ctrl_file = sprintf(
+            '%s/packages/%s/data/%s/%s',
+            EQ_BASEDIR,
+            $custom_package,
+            $operation['package'],
+            $operation['script']
+        );
+
+        if(file_exists($custom_ctrl_file)) {
+            $custom_ctrl = sprintf(
+                '%s_%s',
+                $custom_package,
+                $operation['operation']
+            );
+
+            $output = eQual::run('get', $custom_ctrl, $params, true, true);
         }
     }
-}
 
-if(empty($output)) {
-    /*
-        Retrieve the requested template
-    */
+    return $output;
+};
 
-    $entity = 'sale\booking\Booking';
+$getTemplateFilePath = function($entity, $view_id) {
+    $template_file = '';
+
     $parts = explode('\\', $entity);
     $package = array_shift($parts);
     $class_path = implode('/', $parts);
-    $parent = get_parent_class($entity);
 
-    $file = QN_BASEDIR."/packages/{$package}/views/{$class_path}.{$params['view_id']}.html";
-
-    if(!file_exists($file)) {
-        throw new Exception("unknown_view_id", QN_ERROR_UNKNOWN_OBJECT);
+    $has_custom_package = Setting::get_value('discope', 'features', 'has_custom_package', false);
+    if($has_custom_package) {
+        $custom_package = Setting::get_value('discope', 'features', 'custom_package');
+        if(is_null($custom_package)) {
+            trigger_error('APP::Missing customization package setting (despite `discope.features.has_custom_package`)', EQ_REPORT_WARNING);
+        }
+        elseif(file_exists(EQ_BASEDIR."/packages/{$custom_package}/views/{$package}/{$class_path}.{$view_id}.html")) {
+            $template_file = EQ_BASEDIR . "/packages/{$custom_package}/views/{$package}/{$class_path}.{$view_id}.html";
+        }
     }
 
+    if(empty($template_file)) {
+        $template_file = EQ_BASEDIR."/packages/{$package}/views/{$class_path}.{$view_id}.html";
+
+        if(!file_exists($template_file)) {
+            throw new Exception("unknown_view_id", QN_ERROR_UNKNOWN_OBJECT);
+        }
+    }
+
+    return $template_file;
+};
+
+// handle custom package override, if any
+$output = $getCustomPackageOutput();
+
+if(is_null($output)) {
+    $template_file_path = $getTemplateFilePath(Booking::getType(), $params['view_id']);
 
     // read booking
     $fields = [
@@ -401,7 +442,7 @@ if(empty($output)) {
     }
 
     try {
-        $loader = new TwigFilesystemLoader(EQ_BASEDIR . "/packages/{$package}/views/");
+        $loader = new TwigFilesystemLoader(dirname($template_file_path));
 
         $twig = new TwigEnvironment($loader);
         /**  @var ExtensionInterface **/
@@ -411,7 +452,7 @@ if(empty($output)) {
             return number_format((float)($value), 2, ",", ".") . ' €';
         });
         $twig->addFilter($filter);
-        $template = $twig->load("{$class_path}.{$params['view_id']}.html");
+        $template = $twig->load(basename($template_file_path));
         $html = $template->render($values);
     }
     catch(Exception $e) {
@@ -419,37 +460,42 @@ if(empty($output)) {
         throw new Exception("template_parsing_issue", EQ_ERROR_INVALID_CONFIG);
     }
 
-    if($params['output'] == 'html') {
-        $context->httpResponse()
-                ->header('Content-Type', 'text/html')
-                ->body($html)
-                ->send();
+    if($params['output'] === 'html') {
+        $output = $html;
     }
     else {
+        /*
+            Convert HTML to PDF
+        */
+
+        // instantiate and use the dompdf class
         $options = new DompdfOptions();
         $options->set('isRemoteEnabled', true);
         $dompdf = new Dompdf($options);
 
         $dompdf->setPaper('A4', 'portrait');
-        $dompdf->loadHtml((string) $html);
+        $dompdf->loadHtml($html);
         $dompdf->render();
 
         $canvas = $dompdf->getCanvas();
         $font = $dompdf->getFontMetrics()->getFont("helvetica", "regular");
-        $canvas->page_text(530, $canvas->get_height() - 35, "p. {PAGE_NUM} / {PAGE_COUNT}", $font, 9, array(0,0,0));
-
+        $canvas->page_text(530, $canvas->get_height() - 35, "p. {PAGE_NUM} / {PAGE_COUNT}", $font, 9, [0,0,0]);
 
         $output = $dompdf->output();
-
-        $context->httpResponse()
-                ->header('Content-Disposition', 'inline; filename="document.pdf"')
-                ->body($output)
-                ->send();
     }
 }
+
+if($params['output'] === 'html') {
+    $context
+        ->httpResponse()
+        ->header('Content-Type', 'text/html')
+        ->body($output)
+        ->send();
+}
 else {
-    $context->httpResponse()
-            ->header('Content-Disposition', 'inline; filename="document.pdf"')
-            ->body($output)
-            ->send();
+    $context
+        ->httpResponse()
+        ->header('Content-Disposition', 'inline; filename="document.pdf"')
+        ->body($output)
+        ->send();
 }

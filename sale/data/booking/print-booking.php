@@ -29,37 +29,37 @@ use Twig\Loader\FilesystemLoader as TwigFilesystemLoader;
             'type'          => 'integer',
             'required'      => true
         ],
-        'view_id' =>  [
+        'view_id' => [
             'description'   => 'The identifier of the view <type.name>.',
             'type'          => 'string',
             'default'       => 'print.default'
         ],
-        'mode' =>  [
+        'mode' => [
             'description'   => 'Mode in which document has to be rendered: simple or detailed.',
             'type'          => 'string',
             'selection'     => ['simple', 'grouped', 'detailed'],
             'default'       => 'grouped'
         ],
-        'lang' =>  [
+        'lang' => [
             'description'   => 'Language in which labels and multilang field have to be returned (2 letters ISO 639-1).',
             'type'          => 'string',
             'default'       => constant('DEFAULT_LANG')
         ],
-        'output' =>  [
+        'output' => [
             'description'   => 'Output format of the document.',
             'type'          => 'string',
             'selection'     => ['pdf', 'html'],
             'default'       => 'pdf'
         ]
     ],
-    'constants'             => ['DEFAULT_LANG', 'L10N_LOCALE'],
-    'access' => [
-        'visibility'        => 'protected',
-        'groups'            => ['booking.default.user'],
+    'constants'     => ['DEFAULT_LANG'],
+    'access'        => [
+        'visibility'    => 'protected',
+        'groups'        => ['booking.default.user'],
     ],
     'response'      => [
-        'content-type'      => 'application/pdf',
-        'accept-origin'     => '*'
+        'content-type'  => 'application/pdf',
+        'accept-origin' => '*'
     ],
     'providers'     => ['context']
 ]);
@@ -86,45 +86,82 @@ $getLabels = function($lang, $default_labels = []) {
     );
 };
 
-$lodging_booking_print_booking_formatMember = function($booking) {
+$formatMember = function($booking) {
     $id = $booking['customer_id']['partner_identity_id']['id'];
     $code = ltrim(sprintf("%3d.%03d.%03d", intval($id) / 1000000, (intval($id) / 1000) % 1000, intval($id)% 1000), '0');
     return $code.' - '.$booking['customer_id']['partner_identity_id']['display_name'];
 };
 
-$output = null;
+$getCustomPackageOutput = function() use($context, $params) {
+    $has_custom_package = Setting::get_value('discope', 'features', 'has_custom_package', false);
+    if(!$has_custom_package) {
+        return null;
+    }
 
-// steer towards custom controller, if any
-$has_custom_package = Setting::get_value('discope', 'features', 'has_custom_package', false);
-if($has_custom_package) {
+    $output = null;
     $custom_package = Setting::get_value('discope', 'features', 'custom_package');
-    if(!$custom_package) {
+    if(is_null($custom_package)) {
         trigger_error('APP::Missing customization package setting (despite `discope.features.has_custom_package`)', EQ_REPORT_WARNING);
     }
     elseif($custom_package !== 'sale') {
-        if(file_exists(EQ_BASEDIR."/packages/{$custom_package}/data/sale/booking/print-booking.php")) {
-            $output = eQual::run('get', "{$custom_package}_sale_booking_print-booking", $params, true);
+        $operation = $context->get('operation');
+
+        $custom_ctrl_file = sprintf(
+            '%s/packages/%s/data/%s/%s',
+            EQ_BASEDIR,
+            $custom_package,
+            $operation['package'],
+            $operation['script']
+        );
+
+        if(file_exists($custom_ctrl_file)) {
+            $custom_ctrl = sprintf(
+                '%s_%s',
+                $custom_package,
+                $operation['operation']
+            );
+
+            $output = eQual::run('get', $custom_ctrl, $params, true, true);
         }
     }
-}
 
-if(!$output) {
-    /*
-        Retrieve the requested template
-    */
+    return $output;
+};
 
-    $entity = 'sale\booking\Booking';
+$getTemplateFilePath = function($entity, $view_id) {
+    $template_file = '';
+
     $parts = explode('\\', $entity);
     $package = array_shift($parts);
     $class_path = implode('/', $parts);
-    $parent = get_parent_class($entity);
 
-    $file = EQ_BASEDIR."/packages/{$package}/views/{$class_path}.{$params['view_id']}.html";
-
-    if(!file_exists($file)) {
-        throw new Exception("unknown_view_id", EQ_ERROR_UNKNOWN_OBJECT);
+    $has_custom_package = Setting::get_value('discope', 'features', 'has_custom_package', false);
+    if($has_custom_package) {
+        $custom_package = Setting::get_value('discope', 'features', 'custom_package');
+        if(is_null($custom_package)) {
+            trigger_error('APP::Missing customization package setting (despite `discope.features.has_custom_package`)', EQ_REPORT_WARNING);
+        }
+        elseif(file_exists(EQ_BASEDIR."/packages/{$custom_package}/views/{$package}/{$class_path}.{$view_id}.html")) {
+            $template_file = EQ_BASEDIR . "/packages/{$custom_package}/views/{$package}/{$class_path}.{$view_id}.html";
+        }
     }
 
+    if(empty($template_file)) {
+        $template_file = EQ_BASEDIR."/packages/{$package}/views/{$class_path}.{$view_id}.html";
+
+        if(!file_exists($template_file)) {
+            throw new Exception("unknown_view_id", QN_ERROR_UNKNOWN_OBJECT);
+        }
+    }
+
+    return $template_file;
+};
+
+// handle custom package override, if any
+$output = $getCustomPackageOutput();
+
+if(is_null($output)) {
+    $template_file_path = $getTemplateFilePath(Booking::getType(), $params['view_id']);
 
     // read booking
     $fields = [
@@ -139,16 +176,16 @@ if(!$output) {
         'price',
         'is_price_tbc',
         'type_id' => [
-                'id',
-                'booking_schedule_layout'
+            'id',
+            'booking_schedule_layout'
         ],
         'customer_identity_id' => [
-                'id',
-                'display_name',
-                'address_street', 'address_dispatch', 'address_city', 'address_zip', 'address_country',
-                'phone',
-                'mobile',
-                'email'
+            'id',
+            'display_name',
+            'address_street', 'address_dispatch', 'address_city', 'address_zip', 'address_country',
+            'phone',
+            'mobile',
+            'email'
         ],
         'customer_id' => [
             'partner_identity_id' => [
@@ -307,7 +344,7 @@ if(!$output) {
         'is_price_tbc'               => $booking['is_price_tbc'],
         'is_agreement_html'    => '',
         'lines'                      => [],
-        'member'                     => $lodging_booking_print_booking_formatMember($booking),
+        'member'                     => $formatMember($booking),
         'period'                     => 'Du '.date('d/m/Y', $booking['date_from']).' au '.date('d/m/Y', $booking['date_to']),
         'postal_address'             => sprintf("%s - %s %s", $booking['center_id']['organisation_id']['address_street'], $booking['center_id']['organisation_id']['address_zip'], $booking['center_id']['organisation_id']['address_city']),
         'price'                      => $booking['price'],
@@ -360,12 +397,12 @@ if(!$output) {
     if($booking['center_id']['template_category_id']) {
 
         $template = Template::search([
-                                ['category_id', '=', $booking['center_id']['template_category_id']],
-                                ['code', '=', $booking['status']],
-                                ['type', '=', $booking['status']]
-                            ])
-                            ->read(['parts_ids' => ['name', 'value']], $params['lang'])
-                            ->first(true);
+            ['category_id', '=', $booking['center_id']['template_category_id']],
+            ['code', '=', $booking['status']],
+            ['type', '=', $booking['status']]
+        ])
+            ->read(['parts_ids' => ['name', 'value']], $params['lang'])
+            ->first(true);
 
         foreach($template['parts_ids'] as $part_id => $part) {
             if($part['name'] == 'header') {
@@ -394,16 +431,16 @@ if(!$output) {
     }
 
     $template_part = TemplatePart::search(['name', '=', 'advantage_notice'])
-                            ->read(['value'], $params['lang'])
-                            ->first(true);
+        ->read(['value'], $params['lang'])
+        ->first(true);
 
     if($template_part) {
         $values['advantage_notice_html'] = $template_part['value'];
     }
 
     $template_part = TemplatePart::search(['name', '=', 'tbc_notice'])
-                            ->read(['value'], $params['lang'])
-                            ->first(true);
+        ->read(['value'], $params['lang'])
+        ->first(true);
 
     if($template_part) {
         $values['tbc_notice_html'] = $template_part['value'];
@@ -605,8 +642,6 @@ if(!$output) {
         }
     }
 
-
-
     /*
         retrieve final VAT and group by rate
     */
@@ -715,12 +750,12 @@ if(!$output) {
     */
 
     $consumptions_map_detailed = [
-            'total' => [
-                'total_snack'  => 0,
-                'total_meals'  => 0,
-                'total_nights' => 0
-            ]
-        ];
+        'total' => [
+            'total_snack'  => 0,
+            'total_meals'  => 0,
+            'total_nights' => 0
+        ]
+    ];
 
     $consumptions_detailed = Consumption::search(['booking_id', '=', $booking['id'] ])
         ->read([
@@ -804,7 +839,7 @@ if(!$output) {
     $values['consumptions_map_detailed'] = $consumptions_map_detailed;
 
 
-    if($has_activity){
+    if($has_activity) {
         $activities_map = [];
 
         $booking_activities = BookingActivity::search(['booking_id', '=', $booking['id'] ])
@@ -820,24 +855,24 @@ if(!$output) {
 
         $time_slots_activities_ids = TimeSlot::search(["is_meal", "=", false])->read(['id', 'name','code', 'order'], $params['lang'])->get();
 
-        usort($time_slots_activities_ids, function ($a, $b) {
+        usort($time_slots_activities_ids, function($a, $b) {
             return $a['order'] <=> $b['order'];
         });
 
-        usort($booking_activities, function ($a, $b) {
+        usort($booking_activities, function($a, $b) {
             return $a['booking_line_group_id']['id'] <=> $b['booking_line_group_id']['id']
                 ?: $a['activity_date'] <=> $b['activity_date'];
         });
 
-        foreach ($booking_activities as $activity) {
+        foreach($booking_activities as $activity) {
             $group = $activity['booking_line_group_id']['name'];
 
-            if (!isset($activities_map[$group])) {
+            if(!isset($activities_map[$group])) {
                 $activities_map[$group] = [];
             }
 
             $date = date('d/m/Y', $activity['activity_date']) . ' (' . $days_names[date('w', $activity['activity_date'])] . ')';
-            if (!isset($activities_map[$group][$date])) {
+            if(!isset($activities_map[$group][$date])) {
                 $activities_map[$group][$date] = [
                     'time_slots' => [],
                 ];
@@ -848,15 +883,15 @@ if(!$output) {
             }
 
             $time_slot_name = $activity['time_slot_id']['name'];
-            if (isset($activities_map[$group][$date]['time_slots'][$time_slot_name])) {
+            if(isset($activities_map[$group][$date]['time_slots'][$time_slot_name])) {
                 $activities_map[$group][$date]['time_slots'][$time_slot_name][] = $activity['name'];
             }
         }
 
-        foreach ($activities_map as &$dates) {
-            foreach ($dates as &$time_slots) {
+        foreach($activities_map as &$dates) {
+            foreach($dates as &$time_slots) {
                 array_walk($time_slots['time_slots'], fn(&$activities) =>
-                    $activities = $activities ? (count($activities) === 1 ? $activities[0] : implode(', ', $activities)) : null
+                $activities = $activities ? (count($activities) === 1 ? $activities[0] : implode(', ', $activities)) : null
                 );
             }
         }
@@ -864,12 +899,13 @@ if(!$output) {
 
         $values['activities_map'] = $activities_map;
     }
+
     /*
         Inject all values into the template
     */
 
     try {
-        $loader = new TwigFilesystemLoader(EQ_BASEDIR."/packages/{$package}/views/");
+        $loader = new TwigFilesystemLoader(dirname($template_file_path));
 
         $twig = new TwigEnvironment($loader);
         /**  @var ExtensionInterface **/
@@ -881,7 +917,7 @@ if(!$output) {
         });
         $twig->addFilter($filter);
 
-        $template = $twig->load("{$class_path}.{$params['view_id']}.html");
+        $template = $twig->load(basename($template_file_path));
 
         $html = $template->render($values);
     }
@@ -890,42 +926,43 @@ if(!$output) {
         throw new Exception("template_parsing_issue", EQ_ERROR_INVALID_CONFIG);
     }
 
-    if($params['output'] == 'html') {
-        $context->httpResponse()
-            ->header('Content-Type', 'text/html')
-            ->body($html)
-            ->send();
-        exit(0);
+    if($params['output'] === 'html') {
+        $output = $html;
     }
+    else {
+        /*
+            Convert HTML to PDF
+        */
 
-    /*
-        Convert HTML to PDF
-    */
+        // instantiate and use the dompdf class
+        $options = new DompdfOptions();
+        $options->set('isRemoteEnabled', true);
+        $dompdf = new Dompdf($options);
 
-    // instantiate and use the dompdf class
-    $options = new DompdfOptions();
-    $options->set('isRemoteEnabled', true);
-    $dompdf = new Dompdf($options);
+        $dompdf->setPaper('A4', 'portrait');
+        $dompdf->loadHtml($html);
+        $dompdf->render();
 
-    $dompdf->setPaper('A4', 'portrait');
-    $dompdf->loadHtml((string) $html);
-    $dompdf->render();
+        $canvas = $dompdf->getCanvas();
+        $font = $dompdf->getFontMetrics()->getFont("helvetica", "regular");
+        $canvas->page_text(530, $canvas->get_height() - 35, "p. {PAGE_NUM} / {PAGE_COUNT}", $font, 9, [0,0,0]);
 
-    $canvas = $dompdf->getCanvas();
-    $font = $dompdf->getFontMetrics()->getFont("helvetica", "regular");
-    $canvas->page_text(530, $canvas->get_height() - 35, "p. {PAGE_NUM} / {PAGE_COUNT}", $font, 9, array(0,0,0));
-    // $canvas->page_text(40, $canvas->get_height() - 35, "Export", $font, 9, array(0,0,0));
-
-
-    // get generated PDF raw binary
-    $output = $dompdf->output();
+        // get generated PDF raw binary
+        $output = $dompdf->output();
+    }
 }
 
-$context->httpResponse()
-        // ->header('Content-Disposition', 'attachment; filename="document.pdf"')
+if($params['output'] === 'html') {
+    $context
+        ->httpResponse()
+        ->header('Content-Type', 'text/html')
+        ->body($output)
+        ->send();
+}
+else {
+    $context
+        ->httpResponse()
         ->header('Content-Disposition', 'inline; filename="document.pdf"')
         ->body($output)
         ->send();
-
-
-
+}
