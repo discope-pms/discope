@@ -72,11 +72,9 @@ use sale\booking\BookingActivity;
 ]);
 
 /**
- * @var \equal\php\Context               $context
+ * @var \equal\php\Context  $context
  */
 ['context' => $context] = $providers;
-
-$output = null;
 
 $getLabels = function($lang, $default_labels = []) {
     $view_i18n_file_path = sprintf('%s/packages/sale/i18n/%s/_parts/labels.json', EQ_BASEDIR, $lang);
@@ -1002,6 +1000,7 @@ if(is_null($output)) {
 
         $values['activities_map'] = $activities_map;
     }
+
     /*
         Inject all values into the template
     */
@@ -1029,7 +1028,7 @@ if(is_null($output)) {
         throw new Exception("template_parsing_issue", QN_ERROR_INVALID_CONFIG);
     }
 
-    if($params['output'] == 'html') {
+    if($params['output'] === 'html') {
         $output = $html;
     }
     else {
