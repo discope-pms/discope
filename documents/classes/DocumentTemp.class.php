@@ -10,7 +10,12 @@ namespace documents;
 
 class DocumentTemp extends Document {
 
-    public function getTable(): string {
+    /** @deprecated */
+    public function getTable() {
+        return self::getModelTable();
+    }
+
+    public static function getModelTable() {
         return 'documents_document_temp';
     }
 

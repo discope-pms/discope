@@ -18,7 +18,12 @@ class CenterOffice extends \identity\Establishment {
         return 'Allow support for management of Centers by distinct Offices.';
     }
 
+    /** @deprecated */
     public function getTable() {
+        return self::getModelTable();
+    }
+
+    public static function getModelTable() {
         // force table name to use distinct tables and ID columns
         return 'lodging_identity_centeroffice';
     }

@@ -9,7 +9,12 @@ use equal\orm\Model;
 
 class CenterCategory extends Model {
 
+    /** @deprecated */
     public function getTable() {
+        return self::getModelTable();
+    }
+
+    public static function getModelTable() {
         return 'lodging_identity_centercategory';
     }
 

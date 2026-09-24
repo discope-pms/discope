@@ -9,7 +9,12 @@ namespace sale\booking;
 
 class ConsumptionMeter extends \equal\orm\Model {
 
+    /** @deprecated */
     public function getTable() {
+        return self::getModelTable();
+    }
+
+    public static function getModelTable() {
         return 'lodging_sale_booking_consumptionmeter';
     }
 
