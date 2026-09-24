@@ -54,6 +54,14 @@
             },
             {
                 "type": "field",
+                "value": "is_manual_discount",
+                "width": "10%",
+                "sortable": false,
+                "readonly": true,
+                "visible": false
+            },
+            {
+                "type": "field",
                 "value": "price_adapter_type",
                 "width": "10%",
                 "sortable": false,
