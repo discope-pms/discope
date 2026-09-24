@@ -41,9 +41,11 @@
         "sponsor_type": {
             "label": "Type",
             "selection": {
-                "other": "Autres",
                 "commune": "Commune",
-                "community-of-communes": "Communauté de communes"
+                "community-of-communes": "Communauté de communes",
+                "department-ase": "Aide ASE",
+                "department-caf": "Aide CAF",
+                "department-msa": "Aide MSA"
             },
             "description": "Type d'aide financière.",
             "help": ""

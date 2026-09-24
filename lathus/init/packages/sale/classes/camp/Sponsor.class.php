@@ -65,12 +65,14 @@ class Sponsor extends Model {
             'sponsor_type' => [
                 'type'              => 'string',
                 'selection'         => [
-                    'other',
                     'commune',
-                    'community-of-communes'
+                    'community-of-communes',
+                    'department-ase',
+                    'department-caf',
+                    'department-msa'
                 ],
                 'description'       => "Type of the sponsor.",
-                'default'           => 'other'
+                'default'           => 'commune'
             ],
 
             'price_adapters_ids' => [

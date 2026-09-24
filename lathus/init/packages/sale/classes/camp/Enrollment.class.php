@@ -2192,7 +2192,7 @@ class Enrollment extends Model {
             $payments_price_adapters = [];
             foreach($enrollment['price_adapters_ids'] as $price_adapter) {
                 // #memo - the other price-adapters are already removed from enrollment price
-                if (in_array($price_adapter['origin_type'], ['commune', 'community-of-communes', 'department-caf', 'department-msa'])) {
+                if (in_array($price_adapter['origin_type'], ['commune', 'community-of-communes', 'department-ase', 'department-caf', 'department-msa'])) {
                     $payments_price_adapters[] = $price_adapter;
                 }
             }
@@ -2224,7 +2224,7 @@ class Enrollment extends Model {
                     'center_office_id'  => $last_funding['center_office_id'],
                     'description'       => $price_adapter['name'],
                     'settlement_mode'   => 'third_party_claim',
-                    'settled'           => false
+                    'is_settled'        => false
                 ]);
             }
 

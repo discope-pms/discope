@@ -30,6 +30,7 @@ use sale\camp\Camp;
                 'all',
                 'commune',
                 'community-of-communes',
+                'department-ase',
                 'department-caf',
                 'department-msa'
             ],
@@ -80,7 +81,7 @@ if($params['origin_type'] !== 'all') {
 }
 else {
     $domain->addCondition(
-        new DomainCondition('origin_type', 'in', ['commune', 'community-of-communes', 'department-caf', 'department-msa'])
+        new DomainCondition('origin_type', 'in', ['commune', 'community-of-communes', 'department-ase', 'department-caf', 'department-msa'])
     );
 }
 
