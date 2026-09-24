@@ -72,7 +72,7 @@
             },
             "layout": {
                 "section.price-adapters": {
-                    "label": "Réductions"
+                    "label": "Aides"
                 },
                 "action.invoice-selected": {
                     "label": "Facturer"

@@ -42,6 +42,14 @@
                 "value": "value",
                 "width": "10%",
                 "sortable": false,
+                "readonly": true,
+                "visible": false
+            },
+            {
+                "type": "field",
+                "value": "amount",
+                "width": "10%",
+                "sortable": false,
                 "readonly": true
             },
             {
