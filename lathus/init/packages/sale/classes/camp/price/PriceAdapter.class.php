@@ -29,7 +29,8 @@ class PriceAdapter extends Model {
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\camp\Enrollment',
                 'description'       => "Enrollment the line is part of.",
-                'required'          => true
+                'required'          => true,
+                'ondelete'          => 'cascade'
             ],
 
             'is_manual_discount' => [
