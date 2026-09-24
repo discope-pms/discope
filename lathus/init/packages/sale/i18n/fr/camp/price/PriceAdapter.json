@@ -27,12 +27,13 @@
             "description": "Type de l'origine de la réduction.",
             "help": "",
             "selection": {
-                "other": "Autre",
+                "other": "Réduction autre",
+                "loyalty-discount": "Réduction fidélité",
                 "commune": "Aide commune",
                 "community-of-communes": "Aide communauté de communes",
+                "department-ase": "Aide ASE",
                 "department-caf": "Aide CAF",
-                "department-msa": "Aide MSA",
-                "loyalty-discount": "Réduction fidélité"
+                "department-msa": "Aide MSA"
             }
         },
         "description": {

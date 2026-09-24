@@ -97,7 +97,7 @@ if($enrollment['status'] === 'cancelled') {
 
 $customer_price = $enrollment['price'];
 foreach($enrollment['price_adapters_ids'] as $price_adapter) {
-    if(in_array($price_adapter['origin_type'], ['commune', 'community-of-communes', 'department-caf', 'department-msa'])) {
+    if(in_array($price_adapter['origin_type'], ['commune', 'community-of-communes', 'department-ase', 'department-caf', 'department-msa'])) {
         $customer_price -= $price_adapter['value'];
     }
 }

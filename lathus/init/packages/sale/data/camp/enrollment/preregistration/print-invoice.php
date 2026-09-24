@@ -241,7 +241,7 @@ foreach($enrollments as &$enrollment) {
     }
 
     foreach($enrollment['price_adapters_ids'] as &$price_adapter) {
-        if(in_array($price_adapter['origin_type'], ['commune', 'community-of-communes', 'department-caf', 'department-msa'])) {
+        if(in_array($price_adapter['origin_type'], ['commune', 'community-of-communes', 'department-ase', 'department-caf', 'department-msa'])) {
             continue;
         }
 
