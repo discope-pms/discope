@@ -118,7 +118,8 @@ $sponsor = Sponsor::id($params['id'])
             'value',
             'enrollment_id' => [
                 'center_id',
-                'date_from'
+                'date_from',
+                'status'
             ]
         ]
     ])
@@ -163,6 +164,7 @@ foreach($sponsor['price_adapters_ids'] as $price_adapter) {
         $price_adapter['enrollment_id']['center_id'] !== $center['id']
         || $price_adapter['enrollment_id']['date_from'] < $params['date_from']
         || $price_adapter['enrollment_id']['date_from'] > $params['date_to']
+        || !in_array($price_adapter['enrollment_id']['status'], ['confirmed', 'validated'])
     ) {
         continue;
     }
