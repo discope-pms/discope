@@ -54,7 +54,11 @@ $price_adapters = PriceAdapter::ids($ase_price_adapters_ids)
 
 $map_enrollments_ids = [];
 foreach($price_adapters as $id => $price_adapter) {
-    if(!in_array($price_adapter['enrollment_id']['status'], ['confirmed', 'validated'])) {
+    if(
+        !$price_adapter['enrollment_id']
+        || !in_array($price_adapter['enrollment_id']['status'], ['confirmed', 'validated'])
+        || isset($map_enrollments_ids[$price_adapter['enrollment_id']['id']])
+    ) {
         continue;
     }
 
