@@ -116,6 +116,7 @@
                                                 "value": "price_adapters_ids",
                                                 "width": "100%",
                                                 "widget": {
+                                                    "view": "list.sponsor",
                                                     "header": {
                                                         "actions": {
                                                             "ACTION.CREATE": false
