@@ -1,0 +1,9 @@
+{
+    "description": "Modifier l'origine de l'aide",
+    "model": {
+        "sponsor_id": {
+            "label": "Nouvelle origine",
+            "description": "Origine vers laquelle transférer l'aide."
+        }
+    }
+}

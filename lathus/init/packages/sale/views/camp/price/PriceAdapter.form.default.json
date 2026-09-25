@@ -1,5 +1,16 @@
 {
     "name": "Price Adapter",
+    "actions": [
+        {
+            "id": "action.modify-sponsor",
+            "label": "Modify sponsor",
+            "controller": "sale_camp_price_modify-sponsor",
+            "visible": [
+                ["camp.default.administrator", "in", "user.groups"],
+                ["origin_type", "in", ["commune", "community-of-communes", "department-ase", "department-caf", "department-msa"]]
+            ]
+        }
+    ],
     "layout": {
         "groups": [
             {

@@ -61,6 +61,11 @@
         "form.default": {
             "name": "Réduction",
             "description": "",
+            "actions": {
+                "action.modify-sponsor": {
+                    "label": "Modifier l'origine"
+                }
+            },
             "layout": {}
         },
         "list.sponsor-search": {
