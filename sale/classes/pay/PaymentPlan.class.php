@@ -5,7 +5,9 @@
     Original author(s): Yesbabylon SRL
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
+
 namespace sale\pay;
+
 use equal\orm\Model;
 
 class PaymentPlan extends Model {
@@ -38,6 +40,12 @@ class PaymentPlan extends Model {
                 'foreign_object'    => 'sale\booking\BookingType',
                 'description'       => "Filter for selecting the plan according to booking type.",
                 'default'           => 1                // default to 'general public'
+            ],
+
+            'sojourn_type_id' => [
+                'type'              => 'many2one',
+                'foreign_object'    => 'sale\booking\SojournType',
+                'description'       => "The sojourn type that applies to the payment plan."
             ],
 
             'payment_deadlines_ids' => [

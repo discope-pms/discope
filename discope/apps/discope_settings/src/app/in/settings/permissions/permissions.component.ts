@@ -1,8 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ApiService, EnvService } from 'sb-shared-lib';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { ActivatedRoute } from '@angular/router';
-import { FormControl, FormGroup } from '@angular/forms';
+import { FormControl } from '@angular/forms';
 import { startWith, map } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 import { Location } from '@angular/common';
@@ -56,7 +55,7 @@ export class PermissionsComponent implements OnInit {
 
 
     this.users = await this.api.collect(
-      'core\\User',
+      'identity\\User',
       [],
       ['login'],
       'id', 'asc', 0, 1000,
@@ -150,21 +149,5 @@ export class PermissionsComponent implements OnInit {
     if (!this.newGroup) this.newGroup = 0;
     this.api.update('core\\Permission', [this.permission_id], { user_id: this.newUser, group_id: this.newGroup, class_name: this.className, rights: this.rights }, true);
     this._location.back();
-
-    // let snackBarRef = this.snackBar.open('Changes saved', 'Undo', {
-    //   duration: 3000,
-    //   verticalPosition: 'bottom',
-    //   horizontalPosition: 'start',
-    // });
-    // let undo = "";
-    // snackBarRef.onAction().subscribe(() => {
-    //   undo = "undo";
-    // })
-
-    // snackBarRef.afterDismissed().subscribe(() => {
-    //   if (undo != "undo") {
-       
-    //   }
-    // });
   };
 }

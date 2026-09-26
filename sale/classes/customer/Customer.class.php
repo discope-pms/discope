@@ -32,7 +32,8 @@ class Customer extends \identity\Partner {
             'relationship' => [
                 'type'              => 'string',
                 'default'           => 'customer',
-                'description'       => 'Force relationship to Customer'
+                'description'       => 'Force relationship to Customer',
+                'readonly'          => true
             ],
 
             'is_tour_operator' => [

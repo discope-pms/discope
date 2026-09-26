@@ -148,6 +148,10 @@ class BookingLineGroup extends \sale\booking\BookingLineGroup {
         ];
     }
 
+    public static function getModelScope(): ?string {
+        return \sale\booking\BookingLineGroup::getType();
+    }
+
     /**
      * Check wether an object can be created, and optionally perform additional operations.
      * These tests come in addition to the unique constraints return by method `getUnique()`.

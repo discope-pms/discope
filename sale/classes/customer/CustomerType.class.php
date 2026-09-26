@@ -38,4 +38,8 @@ class CustomerType extends \identity\IdentityType {
         ];
     }
 
+    // #todo - Is CustomerType necessary ?
+    public static function getModelScope(): ?string {
+        return null;
+    }
 }

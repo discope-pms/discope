@@ -63,7 +63,8 @@ class Contact extends \identity\Partner {
             'relationship' => [
                 'type'              => 'string',
                 'default'           => 'contact',
-                'description'       => "The partnership should remain 'contact'."
+                'description'       => "The partnership should remain 'contact'.",
+                'readonly'          => true
             ],
 
             'type' => [

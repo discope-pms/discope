@@ -383,7 +383,7 @@
             },
             {
                 "id": 43,
-                "class_name": "core\\User",
+                "class_name": "identity\\User",
                 "domain": null,
                 "group_id": 36,
                 "user_id": null,

@@ -50,4 +50,8 @@ class InstitutionImported extends Institution {
 
         ];
     }
+
+    public static function getModelScope(): ?string {
+        return Institution::getType();
+    }
 }

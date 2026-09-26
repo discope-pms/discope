@@ -18,7 +18,7 @@ list($params, $providers) = announce([
         'payment_plan_id' => [
             'description'       => 'The payment plan to use to create the fundings.',
             'type'              => 'many2one',
-            'foreign_object'    => 'sale\booking\PaymentPlan',
+            'foreign_object'    => 'sale\pay\PaymentPlan',
             'required'          => true
         ]
     ],
