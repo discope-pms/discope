@@ -9,6 +9,10 @@ namespace sale\booking\channelmanager;
 
 class Funding extends \sale\booking\Funding {
 
+    public static function getModelScope(): ?string {
+        return \sale\booking\Funding::getType();
+    }
+
     public static function getColumns() {
 
         return [
@@ -28,10 +32,6 @@ class Funding extends \sale\booking\Funding {
             ]
 
         ];
-    }
-
-    public static function getModelScope(): ?string {
-        return \sale\booking\Funding::getType();
     }
 
     /**

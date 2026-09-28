@@ -9,6 +9,10 @@ namespace sale\booking\channelmanager;
 
 class BookingLineGroupAgeRangeAssignment extends \sale\booking\BookingLineGroupAgeRangeAssignment {
 
+    public static function getModelScope(): ?string {
+        return \sale\booking\BookingLineGroupAgeRangeAssignment::getType();
+    }
+
     public static function getName() {
         return "Age Range Assignment";
     }
@@ -50,10 +54,6 @@ class BookingLineGroupAgeRangeAssignment extends \sale\booking\BookingLineGroupA
             ]
 
         ];
-    }
-
-    public static function getModelScope(): ?string {
-        return \sale\booking\BookingLineGroupAgeRangeAssignment::getType();
     }
 
     public static function ondelete($om, $ids) {

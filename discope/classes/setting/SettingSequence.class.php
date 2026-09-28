@@ -9,6 +9,10 @@ namespace discope\setting;
 
 class SettingSequence extends \core\setting\SettingSequence {
 
+    public static function getModelScope(): ?string {
+        return null;
+    }
+
     public static function getColumns() {
         return [
 
@@ -49,10 +53,6 @@ class SettingSequence extends \core\setting\SettingSequence {
             ]
 
         ];
-    }
-
-    public static function getModelScope(): ?string {
-        return null;
     }
 
     public function getUnique() {
