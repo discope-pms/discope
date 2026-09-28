@@ -51,7 +51,7 @@ if(!in_array('model', $columns, true)) {
     $columns = $db->getTableColumns($table);
 }
 
-$required_columns = ['id', 'model'];
+$required_columns = ['id', 'model', 'name'];
 $missing_columns = array_values(array_diff($required_columns, $columns));
 if(count($missing_columns)) {
     throw new Exception('missing_columns:' . implode(',', $missing_columns), EQ_ERROR_INVALID_CONFIG);
@@ -95,7 +95,9 @@ foreach($loadRows('sale_price_price', ['price_list_id', 'product_id']) as $price
 
 // Resolve every row to one concrete ORM model before opening a transaction.
 $classify = static function (array $row) use($camp_price_list_ids) : string {
-    if(isset($camp_price_list_ids[(int) ($row['id'] ?? 0)])) {
+    $has_camp_product = isset($camp_price_list_ids[(int) ($row['id'] ?? 0)]);
+    $has_camp_name = strpos((string) ($row['name'] ?? ''), 'Camp') !== false;
+    if($has_camp_product && $has_camp_name) {
         return 'sale\\camp\\price\\PriceList';
     }
     return 'sale\\price\\PriceList';
