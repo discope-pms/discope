@@ -9,22 +9,21 @@ namespace sale\booking;
 
 class Contact extends \identity\Partner {
 
-    public static function getName() {
-        return "Contact";
-    }
-
-    public static function getDescription() {
-        return "Booking contacts are persons involved in the organisation of a booking.";
-    }
-
     /** @deprecated */
     public function getTable() {
         return self::getModelTable();
     }
 
     public static function getModelTable() {
-        // force table name to use distinct tables and ID columns
         return 'sale_booking_contact';
+    }
+
+    public static function getName() {
+        return "Contact";
+    }
+
+    public static function getDescription() {
+        return "Booking contacts are persons involved in the organisation of a booking.";
     }
 
     public static function getColumns() {

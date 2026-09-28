@@ -10,22 +10,21 @@ use equal\data\DataGenerator;
 
 class CenterOffice extends \identity\Establishment {
 
-    public static function getName() {
-        return 'Center management Office';
-    }
-
-    public static function getDescription() {
-        return 'Allow support for management of Centers by distinct Offices.';
-    }
-
     /** @deprecated */
     public function getTable() {
         return self::getModelTable();
     }
 
     public static function getModelTable() {
-        // force table name to use distinct tables and ID columns
         return 'lodging_identity_centeroffice';
+    }
+
+    public static function getName() {
+        return 'Center management Office';
+    }
+
+    public static function getDescription() {
+        return 'Allow support for management of Centers by distinct Offices.';
     }
 
     public static function getColumns() {

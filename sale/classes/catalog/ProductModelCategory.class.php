@@ -12,7 +12,12 @@ use equal\orm\Model;
 
 class ProductModelCategory extends Model {
 
-    public function getTable(): string{
+    /** @deprecated */
+    public function getTable() {
+        return self::getModelTable();
+    }
+
+    public static function getModelTable() {
         return 'sale_product_rel_productmodel_category';
     }
 

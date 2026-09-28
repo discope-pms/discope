@@ -60,7 +60,7 @@ if(count($missing_columns)) {
 
 // Resolve every row to one concrete ORM model before opening a transaction.
 $classify = static function (array $row) : string {
-    return 'core\\setting\\SettingValue';
+    return 'discope\\setting\\SettingValue';
 };
 
 // Group only rows whose discriminator must change.
