@@ -101,7 +101,7 @@
                                 "description": "",
                                 "route": "/",
                                 "context": {
-                                    "entity": "sale\\customer\\CustomerType",
+                                    "entity": "identity\\IdentityType",
                                     "view": "list.default"
                                 }
                             }
