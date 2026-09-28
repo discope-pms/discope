@@ -57,8 +57,47 @@ if(count($missing_columns)) {
     throw new Exception('missing_columns:' . implode(',', $missing_columns), EQ_ERROR_INVALID_CONFIG);
 }
 
+// Load and validate the related records used for classification.
+$loadRows = static function (string $related_table, array $related_fields) use($db) : array {
+    if(!in_array($related_table, $db->getTables(), true)) {
+        throw new Exception('missing_table:' . $related_table, EQ_ERROR_INVALID_CONFIG);
+    }
+    $missing_columns = array_values(array_diff($related_fields, $db->getTableColumns($related_table)));
+    if(count($missing_columns)) {
+        throw new Exception(
+            'missing_columns:' . $related_table . ':' . implode(',', $missing_columns),
+            EQ_ERROR_INVALID_CONFIG
+        );
+    }
+    $related_rows = [];
+    $result = $db->getRecords($related_table, $related_fields);
+    while($row = $db->fetchArray($result)) {
+        $related_rows[] = $row;
+    }
+    return $related_rows;
+};
+
+$camp_product_ids = [];
+foreach($loadRows('sale_catalog_product', ['id', 'is_camp']) as $product) {
+    if(!empty($product['is_camp'])) {
+        $camp_product_ids[(int) $product['id']] = true;
+    }
+}
+
+$camp_price_list_ids = [];
+foreach($loadRows('sale_price_price', ['price_list_id', 'product_id']) as $price) {
+    $price_list_id = (int) ($price['price_list_id'] ?? 0);
+    $product_id = (int) ($price['product_id'] ?? 0);
+    if($price_list_id && isset($camp_product_ids[$product_id])) {
+        $camp_price_list_ids[$price_list_id] = true;
+    }
+}
+
 // Resolve every row to one concrete ORM model before opening a transaction.
-$classify = static function (array $row) : string {
+$classify = static function (array $row) use($camp_price_list_ids) : string {
+    if(isset($camp_price_list_ids[(int) ($row['id'] ?? 0)])) {
+        return 'sale\\camp\\price\\PriceList';
+    }
     return 'sale\\price\\PriceList';
 };
 
