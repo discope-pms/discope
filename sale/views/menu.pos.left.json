@@ -53,7 +53,7 @@
                         "icon": "attach_money",
                         "description": "",
                         "context": {
-                            "entity": "sale\\catalog\\PriceList",
+                            "entity": "sale\\price\\PriceList",
                             "view": "list.default",
                             "domain": [["is_active", "=", true], ["price_list_category_id", "in", "user.center_offices_ids"]]
                         }
