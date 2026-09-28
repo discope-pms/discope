@@ -108,7 +108,7 @@ if(count($model_ids)) {
 }
 
 // Re-read the table and verify the final discriminator of every row.
-$result = $db->getRecords($table, $required_columns);
+$result = $db->getRecords($table, $columns_to_load);
 while($row = $db->fetchArray($result)) {
     if(($row['model'] ?? null) !== $classify($row)) {
         throw new Exception('model_migration_verification_failed', EQ_ERROR_UNKNOWN);
