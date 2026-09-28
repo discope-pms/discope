@@ -55,6 +55,7 @@ $required_columns = [
     'id',
     'model',
     'product_model_id',
+    'is_camp',
 ];
 $missing_columns = array_values(array_diff($required_columns, $columns));
 if(count($missing_columns)) {
@@ -97,6 +98,9 @@ foreach($loadAllRows('sale_product_rel_productmodel_category', ['productmodel_id
 
 // Resolve every row to one concrete ORM model before opening a transaction.
 $classify = static function (array $row) use($pos_model_ids) : string {
+    if(!empty($row['is_camp'])) {
+        return 'sale\\camp\\catalog\\Product';
+    }
     if(isset($pos_model_ids[(int) ($row['product_model_id'] ?? 0)])) {
         return 'sale\\catalog\\PosProduct';
     }
