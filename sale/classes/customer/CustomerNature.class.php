@@ -38,7 +38,7 @@ class CustomerNature extends Model {
 
             'customer_type_id' => [
                 'type'              => 'many2one',
-                'foreign_object'    => 'sale\customer\CustomerType',
+                'foreign_object'    => 'identity\IdentityType',
                 'description'       => "The customer type the nature relates to.",
                 'required'          => true
             ]

@@ -108,7 +108,7 @@ class Partner extends Model {
             // if partner is a customer, it can be assigned a customer type
             'customer_type_id' => [
                 'type'              => 'many2one',
-                'foreign_object'    => 'sale\customer\CustomerType',
+                'foreign_object'    => 'identity\IdentityType',
                 'description'       => 'Type of customer (map with rate classes).',
                 'visible'           => ['relationship', '=', 'customer'],
                 'default'           => 1                                                // default is 'individual'
