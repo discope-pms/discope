@@ -10,6 +10,10 @@ namespace sale\camp;
 
 class GuardianImported extends Guardian {
 
+    public static function getModelScope(): ?string {
+        return Guardian::getType();
+    }
+
     public static function getDescription(): string {
         return "Override of camp Guardian to add data fetched from CPA Lathus API.";
     }

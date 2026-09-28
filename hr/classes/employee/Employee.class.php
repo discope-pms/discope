@@ -33,7 +33,8 @@ class Employee extends \identity\Partner {
             'relationship' => [
                 'type'              => 'string',
                 'default'           => 'employee',
-                'description'       => 'Force relationship to Employee'
+                'description'       => 'Force relationship to Employee',
+                'readonly'          => true
             ],
 
             'date_start' => [

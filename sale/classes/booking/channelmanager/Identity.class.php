@@ -13,6 +13,10 @@ namespace sale\booking\channelmanager;
  */
 class Identity extends \identity\Identity {
 
+    public static function getModelScope(): ?string {
+        return \identity\Identity::getType();
+    }
+
     public static function getColumns() {
         return [
 

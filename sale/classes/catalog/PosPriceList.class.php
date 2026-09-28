@@ -9,6 +9,10 @@ namespace sale\catalog;
 
 class PosPriceList extends \sale\price\PriceList {
 
+    public static function getModelScope(): ?string {
+        return null;
+    }
+
     public static function getColumns() {
         return [
             'prices_ids' => [

@@ -9,6 +9,10 @@ namespace sale\booking\channelmanager;
 
 class Booking extends \sale\booking\Booking {
 
+    public static function getModelScope(): ?string {
+        return \sale\booking\Booking::getType();
+    }
+
     public static function getDescription() {
         return "This class is essentially a mimic of lodging Booking, but all events are disabled so that it allows arbitrary changes are values.
         It also contains specific values for mapping booking with OTA reservations.";

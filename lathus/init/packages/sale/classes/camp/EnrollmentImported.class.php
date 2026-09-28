@@ -10,6 +10,10 @@ namespace sale\camp;
 
 class EnrollmentImported extends Enrollment {
 
+    public static function getModelScope(): ?string {
+        return Enrollment::getType();
+    }
+
     public static function getDescription(): string {
         return "Override of camp Enrollment to add data fetched from CPA Lathus API.";
     }

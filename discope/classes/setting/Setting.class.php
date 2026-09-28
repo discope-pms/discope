@@ -9,6 +9,10 @@ namespace discope\setting;
 
 class Setting extends \core\setting\Setting {
 
+    public static function getModelScope(): ?string {
+        return null;
+    }
+
     public static function getColumns() {
         return [
 

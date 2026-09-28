@@ -10,6 +10,10 @@ namespace sale\camp;
 
 class InstitutionImported extends Institution {
 
+    public static function getModelScope(): ?string {
+        return Institution::getType();
+    }
+
     public static function getDescription(): string {
         return "Override of camp Institution to add data fetched from CPA Lathus API.";
     }

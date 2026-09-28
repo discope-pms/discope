@@ -9,6 +9,10 @@ namespace sale\booking\channelmanager;
 
 class Payment extends \sale\booking\Payment {
 
+    public static function getModelScope(): ?string {
+        return \sale\booking\Payment::getType();
+    }
+
     public static function getColumns() {
 
         return [

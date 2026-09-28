@@ -14,6 +14,10 @@ use sale\booking\SojournProductModelRentalUnitAssignement;
 
 class BookingLineGroup extends \sale\booking\BookingLineGroup {
 
+    public static function getModelScope(): ?string {
+        return \sale\booking\BookingLineGroup::getType();
+    }
+
     public static function getName() {
         return "Booking line group";
     }

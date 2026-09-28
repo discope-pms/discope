@@ -9,6 +9,10 @@ namespace sale\booking\channelmanager;
 
 class BookingLine extends \sale\booking\BookingLine {
 
+    public static function getModelScope(): ?string {
+        return \sale\booking\BookingLine::getType();
+    }
+
     public static function getName() {
         return "Booking line";
     }

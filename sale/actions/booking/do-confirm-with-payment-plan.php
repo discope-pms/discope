@@ -13,7 +13,7 @@ use sale\booking\Contract;
 use sale\booking\ContractLine;
 use sale\booking\ContractLineGroup;
 use sale\booking\Funding;
-use sale\booking\PaymentPlan;
+use sale\pay\PaymentPlan;
 
 list($params, $providers) = announce([
     'description'   => "Sets booking as confirmed, creates contract and generates payment plan.",
@@ -27,7 +27,7 @@ list($params, $providers) = announce([
         'payment_plan_id' => [
             'description'       => 'The payment plan to use to create the fundings.',
             'type'              => 'many2one',
-            'foreign_object'    => 'sale\booking\PaymentPlan',
+            'foreign_object'    => 'sale\pay\PaymentPlan',
             'required'          => true
         ]
     ],
