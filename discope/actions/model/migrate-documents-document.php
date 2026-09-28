@@ -54,9 +54,7 @@ if(!in_array('model', $columns, true)) {
 
 $required_columns = [
     'id',
-    'model',
-    'ticket_id',
-    'ticket_entry_id',
+    'model'
 ];
 $missing_columns = array_values(array_diff($required_columns, $columns));
 if(count($missing_columns)) {
@@ -65,7 +63,8 @@ if(count($missing_columns)) {
 
 // Resolve every row to one concrete ORM model before opening a transaction.
 $classify = static function (array $row) : string {
-    if(!empty($row['ticket_id']) || !empty($row['ticket_entry_id'])) {
+    // #memo - support package isn't enabled on all instances
+    if(isset($row['ticket_id'], $row['ticket_entry_id']) && (!empty($row['ticket_id']) || !empty($row['ticket_entry_id']))) {
         return 'support\\TicketAttachment';
     }
     return 'documents\\Document';
@@ -74,7 +73,14 @@ $classify = static function (array $row) : string {
 // Group only rows whose discriminator must change.
 $model_ids = [];
 $row_count = 0;
-$result = $db->getRecords($table, $required_columns);
+$columns_to_load = $required_columns;
+if(in_array('ticket_id', $columns)) {
+    $columns_to_load[] = 'ticket_id';
+}
+if(in_array('ticket_entry_id', $columns)) {
+    $columns_to_load[] = 'ticket_entry_id';
+}
+$result = $db->getRecords($table, $columns_to_load);
 while($row = $db->fetchArray($result)) {
     ++$row_count;
     $model = $classify($row);
