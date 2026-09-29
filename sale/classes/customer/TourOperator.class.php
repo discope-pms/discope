@@ -9,6 +9,10 @@ namespace sale\customer;
 
 class TourOperator extends Customer {
 
+    public static function getModelScope(): ?string {
+        return Customer::getType();
+    }
+
     public static function getName() {
         return 'Tour Operator';
     }

@@ -71,7 +71,7 @@ $classify = static function (array $row) : string {
         case 'employee':
             return 'hr\\employee\\Employee';
         case 'customer':
-            return !empty($row['is_tour_operator']) ? 'sale\\customer\\TourOperator' : 'sale\\customer\\Customer';
+            return 'sale\\customer\\Customer';
         case 'provider':
             return 'sale\\provider\\Provider';
         case 'payer':
