@@ -43,7 +43,7 @@ list($params, $providers) = announce([
 // init local vars with inputs
 list($context, $cron) = [ $providers['context'], $providers['cron'] ];
 
-$booking = Booking::id($params['id'])->read(['center_id', 'contacts_ids' => ['partner_identity_id' => ['email']]])->first(true);
+$booking = Booking::id($params['id'])->read(['center_id' => ['template_category_id'], 'contacts_ids' => ['partner_identity_id' => ['email']]])->first(true);
 
 if(!$booking) {
     throw new Exception("unknown_booking", QN_ERROR_UNKNOWN_OBJECT);
@@ -88,7 +88,7 @@ foreach($booking['contacts_ids'] as $contact) {
 $signature = '';
 try {
     $data = eQual::run('get', 'identity_center-signature', [
-        'center_id'     => $booking['center_id'],
+        'center_id'     => $booking['center_id']['id'],
         'lang'          => $params['lang']
     ]);
     $signature = (isset($data['signature']))?$data['signature']:'';
