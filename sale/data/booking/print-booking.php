@@ -391,6 +391,8 @@ if(is_null($output)) {
     }
 
 
+    $hasFooter = false;
+
     /*
         retrieve templates
     */
