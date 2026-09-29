@@ -1712,8 +1712,8 @@ class BookingLine extends Model {
         foreach($self as $id => $line) {
             $free_qty = 0;
 
-            if(!$line['product_id']['is_freebie_allowed'] || $line['qty_accounting_method'] !== 'person') {
-                // product is excluded from freebies: no free quantity
+            if(!$line['product_id'] || !$line['product_id']['is_freebie_allowed'] || $line['qty_accounting_method'] !== 'person') {
+                // line has no product or product is excluded from freebies: no free quantity
                 $result[$id] = 0;
                 continue;
             }
@@ -1983,7 +1983,7 @@ class BookingLine extends Model {
         $result = [];
         $self->read(['product_id' => ['product_model_id' => ['qty_accounting_method']]]);
         foreach($self as $id => $line) {
-            $result[$id] = $line['product_id']['product_model_id']['qty_accounting_method'];
+            $result[$id] = $line['product_id']['product_model_id']['qty_accounting_method'] ?? null;
         }
 
         return $result;
