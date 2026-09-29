@@ -126,10 +126,10 @@ foreach($result as $rental_unit_id => $dates) {
                     $result[$rental_unit_id][$date_index][$c_index][$key] = $value;
                 }
             }
-            $result[$rental_unit_id][$date_index][$c_index]['booking_id'] = ($consumption['booking_id']) ? $bookings[$consumption['booking_id']]->toArray() : null;
-            $result[$rental_unit_id][$date_index][$c_index]['customer_id'] = ($consumption['customer_id']) ? $customers[$consumption['customer_id']]->toArray() : null;
-            $result[$rental_unit_id][$date_index][$c_index]['rental_unit_id'] = ($consumption['rental_unit_id']) ? $rental_units[$consumption['rental_unit_id']]->toArray() : null;
-            $result[$rental_unit_id][$date_index][$c_index]['repairing_id'] = ($consumption['repairing_id']) ? $repairings[$consumption['repairing_id']]->toArray() : null;
+            $result[$rental_unit_id][$date_index][$c_index]['booking_id'] = isset($consumption['booking_id'], $bookings[$consumption['booking_id']]) ? $bookings[$consumption['booking_id']]->toArray() : null;
+            $result[$rental_unit_id][$date_index][$c_index]['customer_id'] = isset($consumption['customer_id'], $customers[$consumption['customer_id']]) ? $customers[$consumption['customer_id']]->toArray() : null;
+            $result[$rental_unit_id][$date_index][$c_index]['rental_unit_id'] = isset($consumption['rental_unit_id'], $rental_units[$consumption['rental_unit_id']]) ? $rental_units[$consumption['rental_unit_id']]->toArray() : null;
+            $result[$rental_unit_id][$date_index][$c_index]['repairing_id'] = isset($consumption['repairing_id'], $repairings[$consumption['repairing_id']]) ? $repairings[$consumption['repairing_id']]->toArray() : null;
 
             $result[$rental_unit_id][$date_index][$c_index]['date'] = date('c', $consumption['date']);
             $result[$rental_unit_id][$date_index][$c_index]['date_from'] = date('c', $item['date_from']);
