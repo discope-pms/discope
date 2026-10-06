@@ -17,14 +17,12 @@ use sale\catalog\Product;
 [$params, $providers] = eQual::announce([
     'description'   => "Creates an export archive containing all emitted invoices that haven't been exported yet (for external accounting software).",
     'params'        => [
-
         'center_office_id' => [
             'type'              => 'many2one',
             'foreign_object'    => 'identity\CenterOffice',
             'description'       => 'Management Group to which the center belongs.',
             'required'          => true
         ],
-
         'journal_type' => [
             'type'              => 'string',
             'description'       => "The type of journal to export for the center office.",
@@ -34,7 +32,6 @@ use sale\catalog\Product;
             ],
             'default'           => 'sales'
         ]
-
     ],
     'access'        => [
         'groups'        => ['finance.default.user'],

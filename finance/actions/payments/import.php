@@ -1,7 +1,7 @@
 <?php
 /*
     This file is part of the Discope property management software.
-    Author: Yesbabylon SRL, 2020-2022
+    Author: Yesbabylon SRL, 2020-2026
     License: GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 
@@ -9,13 +9,13 @@ use identity\CenterOffice;
 use sale\booking\BankStatement;
 use sale\booking\BankStatementLine;
 
-list($params, $providers) = eQual::announce([
+[$params, $providers] = eQual::announce([
     'description'   => "Import a Bank statements file and return the list of created statements. Already existing statements are ignored.",
     'help'          => "This controller must be called using POST requests (experience shows that HTTP header quickly reaches the nginx max-header limit).",
     'params'        => [
         'data' =>  [
-            'description'   => 'TXT file holding the data to import as statements.',
             'type'          => 'file',
+            'description'   => 'TXT file holding the data to import as statements.',
             'required'      => true
         ]
     ],
@@ -28,11 +28,14 @@ list($params, $providers) = eQual::announce([
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'     => ['context', 'orm', 'auth']
+    'providers'     => ['context', 'auth']
 ]);
 
-
-list($context, $orm, $auth) = [$providers['context'], $providers['orm'], $providers['auth']];
+/**
+ * @var \equal\php\Context                  $context
+ * @var \equal\auth\AuthenticationManager   $auth
+ */
+['context' => $context, 'auth' => $auth] = $providers;
 
 $user_id = $auth->userId();
 
@@ -124,7 +127,8 @@ foreach($statements as $statement) {
     $result[] = $bank_statement;
 }
 
-$context->httpResponse()
-        ->status(200)
-        ->body($result)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(200)
+    ->body($result)
+    ->send();

@@ -1,7 +1,7 @@
 <?php
 /*
     This file is part of the Discope property management software <https://github.com/discope-pms/discope>
-    Some Rights Reserved, Discope PMS, 2020-2024
+    Some Rights Reserved, Discope PMS, 2020-2026
     Original author(s): Yesbabylon SRL
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
@@ -28,8 +28,8 @@ class Invoice extends Model {
     }
 
     public static function getColumns() {
-
         return [
+
             'name' => [
                 'type'              => 'alias',
                 'alias'             => "number"
@@ -240,7 +240,7 @@ class Invoice extends Model {
 
             'accounting_entries_ids' => [
                 'type'              => 'one2many',
-                'foreign_object'    => AccountingEntry::getType(),
+                'foreign_object'    => 'finance\accounting\AccountingEntry',
                 'foreign_field'     => 'invoice_id',
                 'description'       => 'Accounting entries relating to the lines of the invoice.',
                 'ondetach'          => 'delete'
@@ -310,7 +310,7 @@ class Invoice extends Model {
 
             'center_office_id' => [
                 'type'              => 'many2one',
-                'foreign_object'    => \identity\CenterOffice::getType(),
+                'foreign_object'    => 'identity\CenterOffice',
                 'description'       => 'Office the invoice relates to (for center management).',
                 'required'          => true
             ],
@@ -599,46 +599,46 @@ class Invoice extends Model {
         return $result;
     }
 
-    public static function calcBalance($om, $ids, $lang) {
+    public static function calcBalance($self) {
         $result = [];
-        $invoices = $om->read(self::getType(), $ids, ['booking_id', 'type', 'status', 'is_deposit', 'fundings_ids', 'price'], $lang);
-        foreach($invoices as $id => $invoice) {
+        $self->read(['booking_id', 'type', 'status', 'is_deposit', 'fundings_ids', 'price']);
+        foreach($self as $id => $invoice) {
             if($invoice['status'] == 'cancelled') {
                 $result[$id] = 0;
             }
             else {
                 if($invoice['is_deposit'] || $invoice['type'] == 'credit_note') {
-                    $fundings = $om->read(Funding::getType(), $invoice['fundings_ids'], ['paid_amount'], $lang);
-                    if($fundings > 0) {
-                        $result[$id] = $invoice['price'];
-                        if($invoice['type'] == 'credit_note') {
-                            $result[$id] = -$result[$id];
-                        }
-                        foreach($fundings as $fid => $funding) {
-                            $result[$id] -= $funding['paid_amount'];
-                        }
-                        $result[$id] = round($result[$id], 2);
+                    $fundings = Funding::ids($invoice['fundings_ids'])
+                        ->read(['paid_amount'])
+                        ->get(true);
+
+                    $result[$id] = $invoice['price'];
+                    if($invoice['type'] == 'credit_note') {
+                        $result[$id] = -$result[$id];
                     }
+                    foreach($fundings as $funding) {
+                        $result[$id] -= $funding['paid_amount'];
+                    }
+                    $result[$id] = round($result[$id], 2);
                 }
                 else {
-                    $fundings_ids = $om->search(Funding::getType(), [ ['booking_id', '=', $invoice['booking_id'] ],  ]);
-                    if($fundings_ids > 0) {
-                        $fundings = $om->read(Funding::getType(), $fundings_ids, ['type', 'invoice_id', 'paid_amount'], $lang);
-                        if($fundings > 0) {
-                            $result[$id] = $invoice['price'];
-                            foreach($fundings as $fid => $funding) {
-                                // #memo - all paid amount must be considered, even negative ones
-                                if(/*$funding['type'] == 'invoice' &&*/ $funding['invoice_id'] != $id) {
-                                    continue;
-                                }
-                                $result[$id] -= $funding['paid_amount'];
-                            }
-                            $result[$id] = round($result[$id], 2);
+                    $fundings = Funding::search(['booking_id', '=', $invoice['booking_id']])
+                        ->read(['type', 'invoice_id', 'paid_amount'])
+                        ->get(true);
+
+                    $result[$id] = $invoice['price'];
+                    foreach($fundings as $funding) {
+                        // #memo - all paid amount must be considered, even negative ones
+                        if(/*$funding['type'] == 'invoice' &&*/ $funding['invoice_id'] != $id) {
+                            continue;
                         }
+                        $result[$id] -= $funding['paid_amount'];
                     }
+                    $result[$id] = round($result[$id], 2);
                 }
             }
         }
+
         return $result;
     }
 
@@ -757,12 +757,12 @@ class Invoice extends Model {
         return $result;
     }
 
-    public static function onupdateInvoiceLinesIds($om, $oids, $values, $lang) {
-        $om->update(__CLASS__, $oids, ['price' => null, 'total' => null]);
+    public static function onupdateInvoiceLinesIds($self) {
+        $self->update(['price' => null, 'total' => null]);
     }
 
-    public static function onupdateInvoiceLineGroupsIds($om, $oids, $values, $lang) {
-        $om->update(__CLASS__, $oids, ['price' => null, 'total' => null]);
+    public static function onupdateInvoiceLineGroupsIds($self) {
+        $self->update(['price' => null, 'total' => null]);
     }
 
     /**
