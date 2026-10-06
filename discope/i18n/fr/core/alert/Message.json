@@ -45,13 +45,13 @@
             "help": ""
         },
         "controller": {
-            "label": "Controleur",
-            "description": "Controleur a invoquer.",
+            "label": "Contrôleur",
+            "description": "Contrôleur a invoquer.",
             "help": ""
         },
         "params": {
             "label": "Paramètres",
-            "description": "Paramètres à transmettre au controleur.",
+            "description": "Paramètres à transmettre au contrôleur.",
             "help": ""
         }
     },
