@@ -62,8 +62,8 @@ class InvoiceLineGroup extends Model {
         $self->read(['invoice_id']);
 
         $map_invoices_ids = [];
-        foreach($self as $line) {
-            $map_invoices_ids[$line['invoice_id']] = true;
+        foreach($self as $group) {
+            $map_invoices_ids[$group['invoice_id']] = true;
         }
 
         Invoice::ids(array_keys($map_invoices_ids))
