@@ -58,14 +58,14 @@ $auth->su();
 $office = CenterOffice::id($params['center_office_id'])->read(['id'])->first(true);
 
 if(!$office) {
-    throw new Exception("unknown_center_office", QN_ERROR_UNKNOWN_OBJECT);
+    throw new Exception("unknown_center_office", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
 // retrieve the journal of miscellaneous operations
 $journal = AccountingJournal::search([['center_office_id', '=', $params['center_office_id']], ['type', '=', 'miscellaneous']])->read(['id', 'code', 'index'])->first(true);
 
 if(!$journal) {
-    throw new Exception("unknown_center_office", QN_ERROR_UNKNOWN_OBJECT);
+    throw new Exception("unknown_center_office", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
 /*
@@ -459,11 +459,11 @@ foreach($payments as $payment) {
     else {
         if($payment['psp_type'] != 'stripe') {
             // #todo - send an email to admin
-            throw new Exception('non_supported_psp', QN_ERROR_UNKNOWN);
+            throw new Exception('non_supported_psp', EQ_ERROR_UNKNOWN);
         }
         if(is_null($payment['psp_fee_amount']) || $payment['psp_fee_amount'] <= 0) {
             // #todo - send an email to admin
-            // throw new Exception('invalid_psp_fee', QN_ERROR_UNKNOWN);
+            // throw new Exception('invalid_psp_fee', EQ_ERROR_UNKNOWN);
         }
 
         // entry 1 : amount minus fees to temp account
@@ -554,7 +554,7 @@ $tmpfile = tempnam(sys_get_temp_dir(), "zip");
 $zip = new ZipArchive();
 if($zip->open($tmpfile, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true) {
     // could not create the ZIP archive
-    throw new Exception('Unable to create a ZIP file.', QN_ERROR_UNKNOWN);
+    throw new Exception('Unable to create a ZIP file.', EQ_ERROR_UNKNOWN);
 }
 
 // embed schema files
@@ -574,7 +574,7 @@ $data = file_get_contents($tmpfile);
 unlink($tmpfile);
 
 if($data === false) {
-    throw new Exception('Unable to retrieve ZIP file content.', QN_ERROR_UNKNOWN);
+    throw new Exception('Unable to retrieve ZIP file content.', EQ_ERROR_UNKNOWN);
 }
 
 // create the export archive

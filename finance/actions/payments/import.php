@@ -41,14 +41,14 @@ $user_id = $auth->userId();
 
 if($user_id <= 0) {
     // restricted to identified users
-    throw new Exception('unknown_user', QN_ERROR_NOT_ALLOWED);
+    throw new Exception('unknown_user', EQ_ERROR_NOT_ALLOWED);
 }
 
 // parse the CODA data
 $data = eQual::run('get', 'sale_booking_payments_coda-parse', ['data' => $params['data']]);
 
 if(empty($data)) {
-    throw new Exception('invalid_file', QN_ERROR_INVALID_PARAM);
+    throw new Exception('invalid_file', EQ_ERROR_INVALID_PARAM);
 }
 
 $result = [];
@@ -62,7 +62,7 @@ foreach($statements as $statement) {
     $center_office = CenterOffice::search(['bank_account_iban', '=', trim($iban)])->read(['id'])->first(true);
 
     if(!$center_office) {
-        throw new Exception('unknown_account_number', QN_ERROR_INVALID_PARAM);
+        throw new Exception('unknown_account_number', EQ_ERROR_INVALID_PARAM);
     }
 
     $fields = [
@@ -84,7 +84,7 @@ foreach($statements as $statement) {
         ->first(true);
 
     if($bank_statement) {
-        throw new Exception('already_imported', QN_ERROR_CONFLICT_OBJECT);
+        throw new Exception('already_imported', EQ_ERROR_CONFLICT_OBJECT);
     }
 
     // unique constraint on ['date', 'old_balance', 'new_balance'] will apply
@@ -118,10 +118,10 @@ foreach($statements as $statement) {
         }
     }
     catch(Exception $e) {
-        trigger_error('APP::faulty statement: '.$e->getMessage(), QN_REPORT_ERROR);
+        trigger_error('APP::faulty statement: '.$e->getMessage(), EQ_REPORT_ERROR);
         // rollback
         BankStatement::id($bank_statement['id'])->delete(true);
-        throw new Exception('import_error', QN_ERROR_UNKNOWN);
+        throw new Exception('import_error', EQ_ERROR_UNKNOWN);
     }
 
     $result[] = $bank_statement;

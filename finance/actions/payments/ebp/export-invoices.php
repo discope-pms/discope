@@ -67,7 +67,7 @@ $generateZip = function($files) {
     $tmp_file = tempnam(sys_get_temp_dir(), 'zip');
     $zip = new ZipArchive();
     if($zip->open($tmp_file, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true) {
-        throw new Exception('Unable to create a ZIP file.', QN_ERROR_UNKNOWN);
+        throw new Exception('Unable to create a ZIP file.', EQ_ERROR_UNKNOWN);
     }
 
     foreach($files as $file_name => $file_data) {
@@ -80,7 +80,7 @@ $generateZip = function($files) {
     unlink($tmp_file);
 
     if($data === false) {
-        throw new Exception("Unable to retrieve ZIP file content.", QN_ERROR_UNKNOWN);
+        throw new Exception("Unable to retrieve ZIP file content.", EQ_ERROR_UNKNOWN);
     }
 
     return $data;
