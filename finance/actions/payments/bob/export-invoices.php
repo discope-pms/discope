@@ -17,14 +17,12 @@ use sale\catalog\Product;
 [$params, $providers] = eQual::announce([
     'description'   => "Creates an export archive containing all emitted invoices that haven't been exported yet (for external accounting software).",
     'params'        => [
-
         'center_office_id' => [
             'type'              => 'many2one',
             'foreign_object'    => 'identity\CenterOffice',
             'description'       => 'Management Group to which the center belongs.',
             'required'          => true
         ],
-
         'journal_type' => [
             'type'              => 'string',
             'description'       => "The type of journal to export for the center office.",
@@ -34,7 +32,6 @@ use sale\catalog\Product;
             ],
             'default'           => 'sales'
         ]
-
     ],
     'access'        => [
         'groups'        => ['finance.default.user'],
@@ -103,7 +100,7 @@ $office = CenterOffice::id($params['center_office_id'])
     ->first();
 
 if(!$office) {
-    throw new Exception("unknown_center_office", QN_ERROR_UNKNOWN_OBJECT);
+    throw new Exception("unknown_center_office", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
 $journal = AccountingJournal::search([
@@ -114,7 +111,7 @@ $journal = AccountingJournal::search([
     ->first(true);
 
 if(!$journal) {
-    throw new Exception("unknown_accounting_journal", QN_ERROR_UNKNOWN_OBJECT);
+    throw new Exception("unknown_accounting_journal", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
 $domain = [
@@ -219,7 +216,7 @@ foreach($invoices as $index => $invoice) {
         unset($invoices[$index]);
     }
     elseif(!$invoice['has_orders'] && !isset($invoice['booking_id'])) {
-        trigger_error("APP::Ignoring invalid invoice : missing booking info for invoice {$invoice['name']} [{$invoice['id']}]", QN_REPORT_WARNING);
+        trigger_error("APP::Ignoring invalid invoice : missing booking info for invoice {$invoice['name']} [{$invoice['id']}]", EQ_REPORT_WARNING);
         unset($invoices[$index]);
     }
     // #memo - for cancelled invoices and orders invoices, it is ok not to have funding
@@ -416,7 +413,7 @@ foreach($invoices as $invoice) {
         }
         elseif($line['price'] != 0.0) {
             // #memo - this should not occur! - products shouldn't be embedded to invoices if there is no accounting rule
-            trigger_error("APP::No related price found for non-null amount for line {$line['name']} [{$line['product_id']}] with price [{$line['price_id']}] of invoice {$invoice['name']} [{$invoice['id']}]", QN_REPORT_WARNING);
+            trigger_error("APP::No related price found for non-null amount for line {$line['name']} [{$line['product_id']}] with price [{$line['price_id']}] of invoice {$invoice['name']} [{$invoice['id']}]", EQ_REPORT_WARNING);
             // remove invoice from processed invoices, and skip all lines
             unset($invoices_data[$invoice['id']]);
             // #todo - dispatch an alert that relates to a dedicated controller
@@ -587,7 +584,7 @@ if(count($invoices_data)) {
     $zip = new ZipArchive();
     if($zip->open($tmpfile, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true) {
         // could not create the ZIP archive
-        throw new Exception('Unable to create a ZIP file.', QN_ERROR_UNKNOWN);
+        throw new Exception('Unable to create a ZIP file.', EQ_ERROR_UNKNOWN);
     }
 
     // embed schema files
@@ -607,7 +604,7 @@ if(count($invoices_data)) {
     unlink($tmpfile);
 
     if($data === false) {
-        throw new Exception('Unable to retrieve ZIP file content.', QN_ERROR_UNKNOWN);
+        throw new Exception('Unable to retrieve ZIP file content.', EQ_ERROR_UNKNOWN);
     }
 
     // switch to root user
