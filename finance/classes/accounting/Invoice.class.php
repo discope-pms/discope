@@ -767,6 +767,8 @@ class Invoice extends Model {
 
     /**
      * Handler triggered after a status change occurred.
+     *
+     * # todo - use getWorkflow with policies to replace onupdateStatus and canupdate
      */
     public static function onupdateStatus($om, $oids, $values, $lang) {
         // a number must be assigned to the invoice (if not already set)
@@ -830,6 +832,8 @@ class Invoice extends Model {
      * @param  array                      $values     Associative array holding the new values to be assigned.
      * @param  string                     $lang       Language in which multilang fields are being updated.
      * @return array                      Returns an associative array mapping fields with their error messages. En empty array means that object has been successfully processed and can be updated.
+     *
+     * # todo - use getWorkflow with policies to replace canupdate (see onupdateStatus)
      */
     public static function canupdate($om, $oids, $values, $lang='en') {
         $allowed_fields = ['customer_ref', 'payment_status', 'is_paid', 'is_exported', 'funding_id', 'reversed_invoice_id'];
@@ -865,6 +869,8 @@ class Invoice extends Model {
      * @param  \equal\orm\ObjectManager    $om         ObjectManager instance.
      * @param  array                       $oids       List of objects identifiers.
      * @return array                       Returns an associative array mapping fields with their error messages. An empty array means that object has been successfully processed and can be deleted.
+     *
+     * # todo - use getWorkflow with policies to replace canupdate (see onupdateStatus)
      */
     public static function candelete($om, $oids) {
         $res = $om->read(get_called_class(), $oids, ['status', 'type']);
@@ -890,6 +896,8 @@ class Invoice extends Model {
      * @param  array                       $values     (unused)
      * @param  string                      $lang       Language code in which to process the request.
      * @return array                       Returns an associative array mapping fields with their error messages. An empty array means that object has been successfully processed and can be deleted.
+     *
+     * # todo - use $self instead of $om
      */
     public static function _generateAccountingEntries($om, $oids, $values, $lang) {
         $result = [];
