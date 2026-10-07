@@ -1,9 +1,10 @@
 <?php
 /*
     This file is part of Symbiose Community Edition <https://github.com/yesbabylon/symbiose>
-    Some Rights Reserved, Yesbabylon SRL, 2020-2021
+    Some Rights Reserved, Yesbabylon SRL, 2020-2026
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
+
 namespace hr\absence;
 
 class Absence extends \equal\orm\Model {
@@ -96,14 +97,15 @@ class Absence extends \equal\orm\Model {
     }
 
 
-    public static function calcDuration($orm, $oids, $lang) {
+    public static function calcDuration($self) {
         $result = [];
-        $res = $orm->read(self::getType(), $oids, ['measure_unit', 'qty'], $lang);
-        foreach($res as $oid => $odata) {
+        $self->read(['measure_unit', 'qty']);
+        foreach($self as $id => $absence) {
             // #todo - settings / HR : number of working hours within a day
             $hours_per_day = 7.6;
-            $result[$oid] =  ($odata['measure_unit'] == 'fullday')?$odata['qty']*$hours_per_day:$odata['qty'];
+            $result[$id] =  ($absence['measure_unit'] == 'fullday') ? ($absence['qty'] * $hours_per_day) : $absence['qty'];
         }
+
         return $result;
     }
 

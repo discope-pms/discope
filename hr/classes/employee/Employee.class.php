@@ -1,7 +1,7 @@
 <?php
 /*
     This file is part of Symbiose Community Edition <https://github.com/yesbabylon/symbiose>
-    Some Rights Reserved, Yesbabylon SRL, 2020-2025
+    Some Rights Reserved, Yesbabylon SRL, 2020-2026
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 
@@ -151,13 +151,11 @@ class Employee extends \identity\Partner {
 
     public static function getActions() {
         return array_merge(parent::getActions(), [
-
                 'unassign_activities' => [
                     'description'   => "Unassign future activities that are outside the employee's contract dates interval.",
                     'policies'      => [],
                     'function'      => 'doUnassignActivities'
                 ]
-
             ]
         );
     }
