@@ -1106,9 +1106,12 @@ class Identity extends Model {
     }
 
     public static function canupdate($self, $values) {
+        $duplicate_fields = ['has_duplicate_clue', 'duplicate_clue_identity_id', 'duplicate_identity_id', 'is_duplicate'];
+        $updates_duplicate_fields_only = empty(array_diff(array_keys($values), $duplicate_fields));
+
         $self->read(['is_readonly', 'is_duplicate']);
         foreach($self as $identity) {
-            if($identity['is_readonly']) {
+            if($identity['is_readonly'] && !$updates_duplicate_fields_only) {
                 return ['id' => ['non_updateable_identity' => 'Static identities cannot be updated.']];
             }
             if(isset($values['has_duplicate_clue']) && $values['has_duplicate_clue'] && $identity['is_duplicate']) {
