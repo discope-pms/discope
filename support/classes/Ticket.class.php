@@ -1,11 +1,13 @@
 <?php
 /*
     This file is part of the Discope property management software <https://github.com/discope-pms/discope>
-    Some Rights Reserved, Discope PMS, 2020-2024
+    Some Rights Reserved, Discope PMS, 2020-2026
     Original author(s): Yesbabylon SRL
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
+
 namespace support;
+
 use equal\orm\Model;
 
 
@@ -17,6 +19,7 @@ class Ticket extends Model {
 
     public static function getColumns() {
         return [
+
             'name' => [
                 'type'              => 'string',
                 'description'       => "Short description of the support request.",
@@ -37,8 +40,7 @@ class Ticket extends Model {
                     'waiting',
                     'closed'
                 ],
-                'default'           => 'draft',
-                'onupdate'          => 'onupdateStatus'
+                'default'           => 'draft'
             ],
 
             'type' => [
@@ -88,8 +90,7 @@ class Ticket extends Model {
             'assignee_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'identity\User',
-                'description'       => 'Person that is handling the ticket (who will provide an answer or perform an action regarding it).',
-                'onupdate'          => 'onupdateAssigneeId'
+                'description'       => 'Person that is handling the ticket (who will provide an answer or perform an action regarding it).'
             ],
 
             'attachments_ids' => [
@@ -104,6 +105,7 @@ class Ticket extends Model {
 
     /**
      * Used to intercept ticket submission and create a first entry.
+     * #todo - refactoring to not use $orm (Warning: Collection does not allow to set creator at creation)
     */
     public static function onbeforeupdate($om, $ids, $values, $lang) {
         $tickets = $om->read(self::getType(), $ids, ['creator', 'status', 'description', 'environment', 'attachments_ids']);
@@ -128,16 +130,16 @@ class Ticket extends Model {
         }
     }
 
-    public static function onupdateAssigneeId($om, $oids, $values, $lang) {
-    }
-
     /**
      * Upon description update, we store the User-Agent header from the request into the `environment` field.
      */
-    public static function onupdateDescription($om, $oids, $values, $lang) {
-        $context = $om->getContainer()->get('context');
+    public static function onupdateDescription($self) {
+        /** @var \equal\php\Context $context */
+        ['context' => $context] = \eQual::inject(['context']);
+
         $request = $context->getHttpRequest();
-        $om->update(self::getType(), $oids, ['environment' => $request->getHeader('User-Agent')]);
+
+        $self->update(['environment' => $request->getHeader('User-Agent')]);
     }
 
     public static function getConstraints() {
