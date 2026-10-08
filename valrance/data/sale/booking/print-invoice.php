@@ -1,7 +1,7 @@
 <?php
 /*
     This file is part of the Discope property management software <https://github.com/discope-pms/discope>
-    Some Rights Reserved, Discope PMS, 2020-2025
+    Some Rights Reserved, Discope PMS, 2020-2026
     Original author(s): Yesbabylon SRL
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
@@ -74,10 +74,9 @@ use discope\setting\Setting;
 ]);
 
 /**
- * @var \equal\php\Context          $context
- * @var \equal\orm\ObjectManager    $orm
+ * @var \equal\php\Context $context
  */
-['context' => $context, 'orm' => $orm] = $providers;
+['context' => $context] = $providers;
 
 $getLabels = function($lang, $default_labels = []) {
     $global_view_i18n_file_path = sprintf('%s/packages/sale/i18n/%s/_parts/labels.json', EQ_BASEDIR, $lang);
@@ -891,7 +890,8 @@ $canvas->page_text(530, $canvas->get_height() - 35, "p. {PAGE_NUM} / {PAGE_COUNT
 // get generated PDF raw binary
 $output = $dompdf->output();
 
-$context->httpResponse()
+$context
+    ->httpResponse()
     // ->header('Content-Disposition', 'attachment; filename="document.pdf"')
     ->header('Content-Disposition', 'inline; filename="document.pdf"')
     ->body($output)

@@ -36,13 +36,13 @@ use sale\price\PriceList;
         'charset'           => 'utf-8',
         'accept-origin'     => '*'
     ],
-    'providers'     => ['context', 'orm']
+    'providers'     => ['context']
 ]);
 
 /**
  * @var \equal\php\Context  $context
  */
-['context' => $context, 'orm' => $orm] = $provider;
+['context' => $context] = $provider;
 
 $price_list = PriceList::id($params['price_list_id'])
     ->read(['id', 'name'])
@@ -214,6 +214,6 @@ foreach($new_prices_data as $prices_data) {
     }
 }
 
-$context->httpResponse()
-        ->status(200)
-        ->send();
+$context
+    ->httpResponse()
+    ->send();

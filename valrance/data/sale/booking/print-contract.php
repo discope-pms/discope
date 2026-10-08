@@ -1,7 +1,7 @@
 <?php
 /*
     This file is part of the Discope property management software <https://github.com/discope-pms/discope>
-    Some Rights Reserved, Discope PMS, 2020-2024
+    Some Rights Reserved, Discope PMS, 2020-2026
     Original author(s): Yesbabylon SRL
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
@@ -31,7 +31,7 @@ use sale\booking\BookingLineGroupAgeRangeAssignment;
 use sale\booking\BookingMeal;
 use sale\booking\SojournProductModelRentalUnitAssignement;
 
-list($params, $providers) = announce([
+[$params, $providers] = eQual::announce([
     'description'   => "Render a contract given its ID as a PDF document, for Valrance.",
     'params'        => [
         'id' => [
@@ -39,43 +39,45 @@ list($params, $providers) = announce([
             'type'          => 'integer',
             'required'      => true
         ],
-        'view_id' =>  [
+        'view_id' => [
             'description'   => 'The identifier of the view <type.name>.',
             'type'          => 'string',
             'default'       => 'print.default'
         ],
-        'mode' =>  [
+        'mode' => [
             'description'   => 'Mode in which document has to be rendered: simple or detailed.',
             'type'          => 'string',
             'selection'     => ['simple', 'grouped', 'detailed'],
             'default'       => 'grouped'
         ],
-        'lang' =>  [
+        'lang' => [
             'description'   => 'Language in which labels and multilang field have to be returned (2 letters ISO 639-1).',
             'type'          => 'string',
             'default'       => constant('DEFAULT_LANG')
         ],
-        'output' =>  [
+        'output' => [
             'description'   => 'Output format of the document.',
             'type'          => 'string',
             'selection'     => ['pdf', 'html'],
             'default'       => 'pdf'
         ]
     ],
-    'constants'             => ['DEFAULT_LANG', 'L10N_LOCALE'],
-    'access' => [
-        'visibility'        => 'protected',
-        'groups'            => ['booking.default.user'],
+    'access'        => [
+        'visibility'    => 'protected',
+        'groups'        => ['booking.default.user'],
     ],
     'response'      => [
-        'content-type'      => 'application/pdf',
-        'accept-origin'     => '*'
+        'content-type'  => 'application/pdf',
+        'accept-origin' => '*'
     ],
-    'providers'     => ['context', 'orm']
+    'constants'     => ['DEFAULT_LANG', 'L10N_LOCALE'],
+    'providers'     => ['context']
 ]);
 
-
-list($context, $orm) = [$providers['context'], $providers['orm']];
+/**
+ * @var \equal\php\Context $context
+ */
+['context' => $context] = $providers;
 
 $getLabels = function($lang, $default_labels = []) {
     $global_view_i18n_file_path = sprintf('%s/packages/sale/i18n/%s/_parts/labels.json', EQ_BASEDIR, $lang);
@@ -1593,11 +1595,9 @@ $canvas->page_text(530, $canvas->get_height() - 35, "p. {PAGE_NUM} / {PAGE_COUNT
 // get generated PDF raw binary
 $output = $dompdf->output();
 
-$context->httpResponse()
-        // ->header('Content-Disposition', 'attachment; filename="document.pdf"')
-        ->header('Content-Disposition', 'inline; filename="document.pdf"')
-        ->body($output)
-        ->send();
-
-
-
+$context
+    ->httpResponse()
+    // ->header('Content-Disposition', 'attachment; filename="document.pdf"')
+    ->header('Content-Disposition', 'inline; filename="document.pdf"')
+    ->body($output)
+    ->send();
