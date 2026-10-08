@@ -1,10 +1,12 @@
 <?php
 /*
     This file is part of the Discope property management software.
-    Author: Yesbabylon SRL, 2020-2022
+    Author: Yesbabylon SRL, 2020-2026
     License: GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
+
 namespace identity;
+
 use equal\orm\Model;
 
 class CenterOfficeContact extends Model {
@@ -27,7 +29,6 @@ class CenterOfficeContact extends Model {
     }
 
     public static function getColumns() {
-
         return [
 
             'name' => [

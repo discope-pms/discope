@@ -1,9 +1,11 @@
 <?php
 /*
     This file is part of the Discope property management software.
-    Author: Yesbabylon SRL, 2020-2024
+    Author: Yesbabylon SRL, 2020-2026
     License: GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
+
+use identity\Identity;
 
 [$params, $providers] = eQual::announce([
     'description'   => "Identify and mark duplicate identities.",
@@ -27,29 +29,33 @@
 ]);
 
 /**
- * @var \equal\php\Context          $context
- * @var \equal\orm\ObjectManager    $orm
+ * @var \equal\php\Context $context
  */
-['context' => $context, 'orm' => $orm] = $providers;
+['context' => $context] = $providers;
 
 if(!is_null($params['id'])) {
-    $orm->callonce('identity\Identity', 'reCalcIsDuplicate', [$params['id']]);
+    Identity::id($params['id'])->do('re-calc-is-duplicate');
 }
 else {
     $start = 0;
-    $offset = $limit = 1000;
-    $identities_ids = [];
-    while($start == 0 || !empty($identities_ids)) {
-        $identities_ids = $orm->search('identity\Identity', null, ['id' => 'asc'], $start, $limit);
-        if($identities_ids > 0 && count($identities_ids)) {
-            $orm->read('identity\Identity', $identities_ids, ['is_duplicate']);
-        }
+    $limit = 1000;
 
-        $start = $limit;
-        $limit += $offset;
-    }
+    do {
+        $identities = Identity::search(
+            [],
+            [
+                'sort'  => ['id' => 'asc'],
+                'start' => $start,
+                'limit' => $limit
+            ])
+            ->read(['is_duplicate'])
+            ->get();
+
+        $start += $limit;
+    } while(count($identities) === $limit);
 }
 
-$context->httpResponse()
-        ->status(204)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(204)
+    ->send();

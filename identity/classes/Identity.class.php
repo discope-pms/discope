@@ -1,17 +1,16 @@
 <?php
 /*
     This file is part of the Discope property management software <https://github.com/discope-pms/discope>
-    Some Rights Reserved, Discope PMS, 2020-2024
+    Some Rights Reserved, Discope PMS, 2020-2026
     Original author(s): Yesbabylon SRL
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
+
 namespace identity;
 
-use documents\Document;
 use equal\data\DataGenerator;
 use equal\orm\Model;
 use sale\booking\Booking;
-use sale\booking\Invoice;
 use discope\setting\Setting;
 
 /**
@@ -31,6 +30,7 @@ class Identity extends Model {
 
     public static function getColumns() {
         return [
+
             'name' => [
                 'type'             => 'alias',
                 'alias'            => 'display_name'
@@ -744,8 +744,7 @@ class Identity extends Model {
                 'foreign_object'    => 'documents\Document',
                 'description'       => 'The document containing the logo associated with the identity.',
                 'visible'           => ['type' ,'<>' , 'I']
-            ],
-
+            ]
 
         ];
     }
@@ -808,21 +807,23 @@ class Identity extends Model {
      * For organisations the display name is the legal name
      * For individuals, the display name is the concatenation of first and last names
      */
-    public static function calcDisplayName($om, $oids, $lang) {
+    public static function calcDisplayName($self) {
         $result = [];
 
         $person_format = Setting::get_value('identity', 'organization', 'identity.person.name_format', '%s{firstname} %s{lastname}');
         $entity_format = Setting::get_value('identity', 'organization', 'identity.entity.name_format', '%s{short_name} %s{legal_name}');
 
-        $res = $om->read(self::getType(), $oids, ['type_id', 'firstname', 'lastname', 'legal_name', 'short_name', 'address_city']);
-        foreach($res as $oid => $odata) {
-            $name = '';
-            if( isset($odata['type_id'])  ) {
-                $address_city = !empty($odata['address_city']) ? $odata['address_city'] : '';
+        $identity_type_individual = IdentityType::search(['code', '=', 'I'])->first();
 
-                if( $odata['type_id'] == 1  ) {
-                    $firstname = !empty($odata['firstname']) ? ucfirst($odata['firstname']) : '';
-                    $lastname = !empty($odata['lastname']) ? mb_strtoupper($odata['lastname']) : '';
+        $self->read(['type_id', 'firstname', 'lastname', 'legal_name', 'short_name', 'address_city']);
+        foreach($self as $id => $identity) {
+            $name = '';
+            if(isset($identity['type_id'])) {
+                $address_city = !empty($identity['address_city']) ? $identity['address_city'] : '';
+
+                if($identity['type_id'] === $identity_type_individual['id']) {
+                    $firstname = !empty($identity['firstname']) ? ucfirst($identity['firstname']) : '';
+                    $lastname = !empty($identity['lastname']) ? mb_strtoupper($identity['lastname']) : '';
 
                     $name = Setting::parse_format($person_format, [
                         'firstname'     => $firstname,
@@ -832,9 +833,9 @@ class Identity extends Model {
 
                     $name = trim($name);
                 }
-                if( $odata['type_id'] != 1 || empty($name) ) {
-                    $short_name = !empty($odata['short_name']) ? $odata['short_name'] : '';
-                    $legal_name = !empty($odata['legal_name']) ? $odata['legal_name'] : '';
+                if($identity['type_id'] !== $identity_type_individual['id'] || empty($name)) {
+                    $short_name = !empty($identity['short_name']) ? $identity['short_name'] : '';
+                    $legal_name = !empty($identity['legal_name']) ? $identity['legal_name'] : '';
 
                     $name = Setting::parse_format($entity_format, [
                         'short_name'    => $short_name,
@@ -845,132 +846,135 @@ class Identity extends Model {
                     $name = trim($name);
                 }
             }
-            $result[$oid] = $name;
+
+            $result[$id] = $name;
         }
         return $result;
     }
 
-    public static function onupdatePhone($om, $oids, $values, $lang) {
-        $identities = $om->read(self::getType(), $oids, ['partners_ids']);
-        foreach($identities as $oid => $odata) {
-            $om->update('identity\Partner', $odata['partners_ids'], [ 'phone' => null ], $lang);
+    public static function onupdatePhone($self) {
+        $self->read(['partners_ids']);
+        foreach($self as $id => $identity) {
+            Partner::ids($identity['partners_ids'])->update(['phone' => null]);
         }
     }
 
-    public static function onupdateMobile($om, $oids, $values, $lang) {
-        $identities = $om->read(self::getType(), $oids, ['partners_ids']);
-        foreach($identities as $oid => $odata) {
-            $om->update('identity\Partner', $odata['partners_ids'], [ 'mobile' => null ], $lang);
+    public static function onupdateMobile($self) {
+        $self->read(['partners_ids']);
+        foreach($self as $id => $identity) {
+            Partner::ids($identity['partners_ids'])->update(['mobile' => null]);
         }
     }
 
-    public static function onupdateEmail($om, $oids, $values, $lang) {
-        $identities = $om->read(self::getType(), $oids, ['partners_ids']);
-        foreach($identities as $oid => $odata) {
-            $om->update('identity\Partner', $odata['partners_ids'], [ 'email' => null ], $lang);
+    public static function onupdateEmail($self) {
+        $self->read(['partners_ids']);
+        foreach($self as $id => $identity) {
+            Partner::ids($identity['partners_ids'])->update(['email' => null]);
         }
     }
 
-    public static function onupdateName($om, $oids, $values, $lang) {
-        $om->callonce(self::getType(), 'reCalcIsDuplicate', $oids);
+    public static function onupdateName($self) {
+        $self
+            ->do('re-calc-is-duplicate')
+            ->update(['display_name' => null]);
 
-        $om->update(self::getType(), $oids, [ 'display_name' => null ], $lang);
-        $res = $om->read(self::getType(), $oids, ['partners_ids']);
-        $partners_ids = [];
-        foreach($res as $oid => $odata) {
-            $partners_ids = array_merge($partners_ids, $odata['partners_ids']);
-        }
-        // force re-computing of related partners names
-        $om->update('identity\Partner', $partners_ids, [ 'name' => null ], $lang);
-        $om->read('identity\Partner', $partners_ids, ['name'], $lang);
-    }
+        $map_partners_ids = [];
 
-    public static function onupdateTypeId($om, $oids, $values, $lang) {
-        $res = $om->read(self::getType(), $oids, ['type_id', 'type_id.code', 'partners_ids']);
-        if($res > 0) {
-            $partners_ids = [];
-            foreach($res as $oid => $odata) {
-                $values = [ 'type' => $odata['type_id.code'], 'display_name' => null];
-                if($odata['type_id'] == 1 ) {
-                    $values['legal_name'] = '';
-                }
-                else {
-                    $values['firstname'] = '';
-                    $values['lastname'] = '';
-                }
-                $partners_ids = array_merge($partners_ids, $odata['partners_ids']);
-                $om->update(self::getType(), $oid, $values, $lang);
+        $self->read(['partners_ids']);
+        foreach($self as $identity) {
+            foreach($identity['partners_ids'] as $partner_id) {
+                $map_partners_ids[$partner_id] = true;
             }
-            $om->read(self::getType(), $oids, ['display_name'], $lang);
-            // force re-computing of related partners names
-            $om->update('identity\Partner', $partners_ids, [ 'name' => null ], $lang);
         }
+
+        // force re-computing of related partners names
+        Partner::ids(array_keys($map_partners_ids))
+            ->update(['name' => null])
+            ->read(['name']);
+    }
+
+    public static function onupdateTypeId($self) {
+        $identity_type_individual = IdentityType::search(['code', '=', 'I'])->first();
+
+        $partners_ids = [];
+
+        $self->read(['partners_ids', 'type_id' => ['code']]);
+        foreach($self as $id => $identity) {
+            $values = [
+                'type'          => $identity['type_id']['code'],
+                'display_name'  => null
+            ];
+
+            if($identity['type_id']['id'] === $identity_type_individual['id']) {
+                $values['legal_name'] = '';
+            }
+            else {
+                $values['firstname'] = '';
+                $values['lastname'] = '';
+            }
+
+            $partners_ids = array_merge($partners_ids, $identity['partners_ids']);
+
+            /** @var \equal\orm\ObjectManager $orm */
+            ['orm' => $orm] = \eQual::inject(['orm']);
+
+            $orm->update(Identity::getType(), $id, $values);
+        }
+
+        $self->read(['display_name']);
+
+        // force re-computing of related partners names
+        Partner::ids($partners_ids)->update(['name' => null]);
     }
 
     /**
      * When lang_id is updated, perform cascading through the partners to update related lang_id
      */
-    public static function onupdateLangId($om, $oids, $values, $lang) {
-        $res = $om->read(self::getType(), $oids, ['partners_ids', 'lang_id']);
-
-        if($res > 0 && count($res)) {
-            foreach($res as $oid => $odata) {
-                $om->update('identity\Partner', $odata['partners_ids'], ['lang_id' => $odata['lang_id']]);
-            }
+    public static function onupdateLangId($self) {
+        $self->read(['partners_ids', 'lang_id']);
+        foreach($self as $identity) {
+            Partner::ids($identity['partners_ids'])->update(['lang_id' => $identity['lang_id']]);
         }
     }
 
     /**
      * When a reference partner is given, add it to the identity's contacts list.
      */
-    public static function onupdateReferencePartnerId($om, $oids, $values, $lang) {
-        $identities = $om->read(self::getType(), $oids, ['reference_partner_id', 'reference_partner_id.partner_identity_id', 'contacts_ids.partner_identity_id'], $lang);
+    public static function onupdateReferencePartnerId($self) {
+        $self->read([
+            'contacts_ids'          => ['partner_identity_id'],
+            'reference_partner_id'  => ['partner_identity_id']
+        ]);
+        foreach($self as $id => $identity) {
+            $map_contacts_partner_identities_ids = [];
+            foreach($identity['contacts_ids'] as $contact) {
+                $map_contacts_partner_identities_ids[$contact['partner_identity_id']] = true;
+            }
 
-        if($identities > 0) {
-            foreach($identities as $oid => $identity) {
-                if(isset($identity['reference_partner_id.partner_identity_id'])
-                    && !in_array($identity['reference_partner_id.partner_identity_id'], array_map( function($a) { return $a['partner_identity_id']; }, (array) $identity['contacts_ids.partner_identity_id']))
-                ) {
-                    // create a contact with the customer as 'booking' contact
-                    $om->create('identity\Partner', [
-                        'owner_identity_id'     => $oid,
-                        'partner_identity_id'   => $identity['reference_partner_id.partner_identity_id'],
-                        'relationship'          => 'contact'
-                    ]);
-                }
+            if(isset($identity['reference_partner_id']['partner_identity_id']) && !in_array($identity['reference_partner_id']['partner_identity_id'], array_keys($map_contacts_partner_identities_ids))) {
+                // create a contact with the customer as 'booking' contact
+                Partner::create([
+                    'owner_identity_id'     => $id,
+                    'partner_identity_id'   => $identity['reference_partner_id']['partner_identity_id'],
+                    'relationship'          => 'contact'
+                ]);
             }
         }
     }
 
-    /**
-     * On update address do re-calc is duplicate
-     *
-     * @param  \equal\orm\ObjectManager $om     Object Manager instance.
-     * @param  int[]                    $ids    List of objects identifiers.
-     * @param  array                    $values Associative array holding the new values to be assigned.
-     * @param  string                   $lang   Language in which multilang fields are being updated.
-     * @return void
-     */
-    public static function onupdateAddress($om, $ids, $values, $lang) {
-        $om->callonce(self::getType(), 'reCalcIsDuplicate', $ids);
+    public static function onupdateAddress($self) {
+        $self->do('re-calc-is-duplicate');
     }
 
-    /**
-     * Signature for single object change from views.
-     *
-     * @param  object   $om        Object Manager instance.
-     * @param  array    $event     Associative array holding changed fields as keys, and their related new values.
-     * @param  array    $values    Copy of the current (partial) state of the object (fields depend on the view).
-     * @param  string   $lang      Language (char 2) in which multilang field are to be processed.
-     * @return array    Associative array mapping fields with their resulting values.
-     */
-    public static function onchange($om, $event, $values, $lang='en') {
+    public static function onchange($event, $values, $lang='en') {
         $result = [];
 
         if(isset($event['type_id'])) {
-            $types = $om->read('identity\IdentityType', $event['type_id'], ['code']);
-            if($types > 0) {
-                $type = reset($types);
+            $type = IdentityType::id($event['type_id'])
+                ->read(['code'])
+                ->first();
+
+            if($type) {
                 $result['type'] = $type['code'];
             }
         }
@@ -982,7 +986,8 @@ class Identity extends Model {
 
         foreach($duplicate_identity_fields_sets as $duplicate_identity_fields) {
             if( count(array_intersect_key($event, array_flip($duplicate_identity_fields))) > 0
-                || (isset($event['has_duplicate_clue']) && $event['has_duplicate_clue']) ) {
+                || (isset($event['has_duplicate_clue']) && $event['has_duplicate_clue'])
+            ) {
                 $domain = [];
                 foreach($duplicate_identity_fields as $field) {
                     $value = $event[$field] ?? $values[$field];
@@ -995,12 +1000,10 @@ class Identity extends Model {
                 $duplicate_identity = null;
                 if(!empty($domain)) {
                     $domain[] = ['id', '<>', $values['id']];
-                    $identity_ids = $om->search('identity\Identity', $domain);
 
-                    if($identity_ids > 0 && count($identity_ids)) {
-                        $identities = $om->read('identity\Identity', [$identity_ids[0]], ['id', 'name']);
-                        $duplicate_identity = reset($identities);
-                    }
+                    $duplicate_identity = Identity::search($domain)
+                        ->read(['name'])
+                        ->first();
                 }
 
                 $result['has_duplicate_clue'] = !is_null($duplicate_identity);
@@ -1016,7 +1019,7 @@ class Identity extends Model {
             $list = self::getCitiesByZip($event['address_zip'], $values['address_country'], $lang);
             if($list) {
                 $result['address_city'] = [
-                    'value' => '',
+                    'value'     => '',
                     'selection' => $list
                 ];
             }
@@ -1102,111 +1105,77 @@ class Identity extends Model {
         return '';
     }
 
-    /**
-     * Check whether an object can be updated, and perform some additional operations if necessary.
-     * This method can be overridden to define a more precise set of tests.
-     *
-     * @param  object   $om         ObjectManager instance.
-     * @param  array    $oids       List of objects identifiers.
-     * @param  array    $values     Associative array holding the new values to be assigned.
-     * @param  string   $lang       Language in which multilang fields are being updated.
-     * @return array    Returns an associative array mapping fields with their error messages. En empty array means that object has been successfully processed and can be updated.
-     */
-    public static function canupdate($om, $oids, $values, $lang='en') {
-        $identities = $om->read(self::getType(), $oids, ['is_readonly', 'is_duplicate'], $lang);
-        foreach($identities as $identity) {
+    public static function canupdate($self, $values) {
+        $self->read(['is_readonly', 'is_duplicate']);
+        foreach($self as $identity) {
             if($identity['is_readonly']) {
                 return ['id' => ['non_updateable_identity' => 'Static identities cannot be updated.']];
             }
-
             if(isset($values['has_duplicate_clue']) && $values['has_duplicate_clue'] && $identity['is_duplicate']) {
                 return ['has_duplicate_clue' => ['might_be_duplicate' => 'Cannot save possible duplicate without unchecking.']];
             }
-
         }
 
         if(isset($values['type_id'])) {
-            $identities = $om->read(self::getType(), $oids, [ 'firstname', 'lastname', 'legal_name' ], $lang);
-            foreach($identities as $oid => $identity) {
-                if($values['type_id'] == 1) {
-                    $firstname = '';
-                    $lastname = '';
-                    if(isset($values['firstname'])) {
-                        $firstname = $values['firstname'];
-                    }
-                    else {
-                        $firstname = $identity['firstname'];
-                    }
-                    if(isset($values['lastname'])) {
-                        $lastname = $values['lastname'];
-                    }
-                    else {
-                        $lastname = $identity['lastname'];
-                    }
+            $identity_type_individual = IdentityType::search(['code', '=', 'I'])->first();
 
+            $self->read(['firstname', 'lastname', 'legal_name']);
+            foreach($self as $identity) {
+                if($values['type_id'] === $identity_type_individual['id']) {
+                    $firstname = $values['firstname'] ?? $identity['firstname'];
                     if(!strlen($firstname) ) {
                         return ['firstname' => ['missing' => 'Firstname cannot be empty for natural person.']];
                     }
+
+                    $lastname = $values['lastname'] ?? $identity['lastname'];
                     if(!strlen($lastname) ) {
                         return ['lastname' => ['missing' => 'Lastname cannot be empty for natural person.']];
                     }
                 }
                 else {
-                    $legal_name = '';
-                    if(isset($values['legal_name'])) {
-                        $legal_name = $values['legal_name'];
-                    }
-                    else {
-                        $legal_name = $identity['legal_name'];
-                    }
+                    $legal_name = $values['legal_name'] ?? $identity['legal_name'];
                     if(!strlen($legal_name)) {
                         return ['legal_name' => ['missing' => 'Legal name cannot be empty for legal person.']];
                     }
                 }
             }
         }
-        return parent::canupdate($om, $oids, $values, $lang);
+
+        return parent::canupdate($self);
     }
 
-    /**
-     * Check whether the identity can be deleted.
-     *
-     * @param  \equal\orm\ObjectManager    $om        ObjectManager instance.
-     * @param  array                       $ids       List of objects identifiers.
-     * @return array                       Returns an associative array mapping fields with their error messages. An empty array means that object has been successfully processed and can be deleted.
-     */
-    public static function candelete($om, $ids) {
-        $identities = $om->read(self::getType(), $ids, [ 'bookings_ids' ]);
-
-        if($identities > 0) {
-            foreach($identities as $id => $identity) {
-                if($identity['bookings_ids'] && count($identity['bookings_ids']) > 0) {
-                    return ['bookings_ids' => ['non_removable_identity' => 'Identities relating to one or more bookings cannot be deleted.']];
-                }
+    public static function candelete($self) {
+        $self->read(['bookings_ids']);
+        foreach($self as $identity) {
+            if(count($identity['bookings_ids']) > 0) {
+                return ['bookings_ids' => ['non_removable_identity' => 'Identities relating to one or more bookings cannot be deleted.']];
             }
         }
-        return parent::candelete($om, $ids);
+
+        return parent::candelete($self);
     }
 
     public static function getConstraints() {
+        $identity_type_individual = IdentityType::search(['code', '=', 'I'])->first();
+
         return [
             'legal_name' =>  [
                 'too_short' => [
                     'message'       => 'Legal name must be minimum 2 chars long.',
-                    'function'      => function ($legal_name, $values) {
-                        return !( strlen($legal_name) < 2 && isset($values['type_id']) && $values['type_id'] != 1 );
+                    'function'      => function($legal_name, $values) use($identity_type_individual) {
+                        return !( strlen($legal_name) < 2 && isset($values['type_id']) && $values['type_id'] !== $identity_type_individual['id'] );
                     }
                 ],
                 'too_long' => [
                     'message'       => 'Legal name must be maximum 70 chars long.',
-                    'function'      => function ($legal_name, $values) {
-                        return !( strlen($legal_name) > 70 && isset($values['type_id']) && $values['type_id'] != 1 );
+                    'function'      => function($legal_name, $values) use($identity_type_individual) {
+                        return !( strlen($legal_name) > 70 && isset($values['type_id']) && $values['type_id'] !== $identity_type_individual['id'] );
                     }
                 ],
                 'invalid_chars' => [
                     'message'       => 'Legal name must contain only naming glyphs.',
-                    'function'      => function ($legal_name, $values) {
-                        if( isset($values['type_id']) && $values['type_id'] == 1 ) {
+                    'function'      => function($legal_name, $values) use($identity_type_individual) {
+                        if( isset($values['type_id']) && $values['type_id'] === $identity_type_individual['id'] ) {
                             return true;
                         }
                         // authorized : a-z, 0-9, '/', '-', ',', '.', ''', '&'
@@ -1217,14 +1186,14 @@ class Identity extends Model {
             'firstname' =>  [
                 'too_short' => [
                     'message'       => 'Firstname must be 2 chars long at minimum.',
-                    'function'      => function ($firstname, $values) {
-                        return !( strlen($firstname) < 2 && isset($values['type_id']) && $values['type_id'] == 1 );
+                    'function'      => function($firstname, $values) use($identity_type_individual) {
+                        return !( strlen($firstname) < 2 && isset($values['type_id']) && $values['type_id'] == $identity_type_individual['id'] );
                     }
                 ],
                 'invalid_chars' => [
                     'message'       => 'Firstname must contain only naming glyphs.',
-                    'function'      => function ($firstname, $values) {
-                        if( isset($values['type_id']) && $values['type_id'] != 1 ) {
+                    'function'      => function($firstname, $values) use($identity_type_individual) {
+                        if( isset($values['type_id']) && $values['type_id'] != $identity_type_individual['id'] ) {
                             return true;
                         }
                         return (bool) (preg_match('/^[\w\'\-,.][^0-9_!¡?÷?¿\/\\+=@#$%ˆ&*(){}|~<>;:[\]]{1,}$/u', $firstname));
@@ -1234,14 +1203,14 @@ class Identity extends Model {
             'lastname' =>  [
                 'too_short' => [
                     'message'       => 'Lastname must be 2 chars long at minimum.',
-                    'function'      => function ($lastname, $values) {
-                        return !( strlen($lastname) < 2 && isset($values['type_id']) && $values['type_id'] == 1 );
+                    'function'      => function ($lastname, $values) use($identity_type_individual) {
+                        return !( strlen($lastname) < 2 && isset($values['type_id']) && $values['type_id'] === $identity_type_individual['id'] );
                     }
                 ],
                 'invalid_chars' => [
                     'message'       => 'Lastname must contain only naming glyphs.',
-                    'function'      => function ($lastname, $values) {
-                        if( isset($values['type_id']) && $values['type_id'] != 1 ) {
+                    'function'      => function ($lastname, $values) use($identity_type_individual) {
+                        if( isset($values['type_id']) && $values['type_id'] !== $identity_type_individual['id'] ) {
                             return true;
                         }
                         return (bool) (preg_match('/^[\w\'\-,.][^0-9_!¡?÷?¿\/\\+=@#$%ˆ&*(){}|~<>;:[\]]{1,}$/u', $lastname));
@@ -1251,15 +1220,31 @@ class Identity extends Model {
         ];
     }
 
-    public static function reCalcIsDuplicate($om, $ids, $values, $lang) {
-        $om->update(self::getType(), $ids, ['is_duplicate' => null, 'duplicate_identity_id' => null]);
-        $om->read(self::getType(), $ids, ['is_duplicate']);
+    public static function getActions() {
+        return [
+            're-calc-is-duplicate' => [
+                'description'   => 'Triggers a re-calculation of the is_duplicate field value.',
+                'policies'      => [],
+                'function'      => 'doReCalcIsDuplicate'
+            ]
+        ];
     }
 
-    public static function getDuplicateIdentityId($om, $ids, $values, $lang) {
+    protected static function doReCalcIsDuplicate($self) {
+        $self
+            ->update(['is_duplicate' => null, 'duplicate_identity_id' => null])
+            ->read(['is_duplicate']);
+    }
+
+    protected static function getDuplicateIdentityId($ids) {
         $result = [];
+
         $duplicate_identity_fields = ['legal_name', 'firstname', 'lastname', 'address_city', 'address_state', 'address_country'];
-        $identities = $om->read(self::getType(), $ids, $duplicate_identity_fields, $lang);
+
+        $identities = Identity::ids($ids)
+            ->read($duplicate_identity_fields)
+            ->get();
+
         foreach($identities as $id => $identity) {
             if(empty($identity['legal_name']) && empty($identity['firstname']) && empty($identity['lastname'])) {
                 continue;
@@ -1278,10 +1263,10 @@ class Identity extends Model {
                     $domain[] = ['is_duplicate', '=', false];
                 }
 
-                $identity_ids = $om->search('identity\Identity', $domain);
+                $duplicate_identity = Identity::search($domain)->first();
 
-                if($identity_ids > 0 && count($identity_ids)) {
-                    $result[$id] = $identity_ids[0];
+                if($duplicate_identity) {
+                    $result[$id] = $duplicate_identity['id'];
                 }
             }
         }
@@ -1289,26 +1274,30 @@ class Identity extends Model {
         return $result;
     }
 
-    public static function calcIsDuplicate($om, $ids, $lang) {
+    public static function calcIsDuplicate($self) {
         $result = [];
-
-        $duplicate_identity_ids = $om->call(self::getType(), 'getDuplicateIdentityId', $ids);
+        $ids = $self->ids();
+        $duplicate_identity_ids = self::getDuplicateIdentityId($ids);
         foreach($ids as $id) {
             if(!isset($duplicate_identity_ids[$id])) {
                 $result[$id] = false;
             }
             else {
                 $result[$id] = true;
-                $om->update(self::getType(), [$id], ['duplicate_identity_id' => $duplicate_identity_ids[$id]], $lang);
+
+                /** @var \equal\orm\ObjectManager $orm */
+                ['orm' => $orm] = \eQual::inject(['orm']);
+
+                $orm->update(Identity::getType(), $id, ['duplicate_identity_id' => $duplicate_identity_ids[$id]]);
             }
         }
 
         return $result;
     }
 
-    public static function onupdateIsDuplicate($om, $ids, $values, $lang) {
+    public static function onupdateIsDuplicate($self, $values) {
         if(isset($values['is_duplicate']) && !$values['is_duplicate']) {
-            $om->update(self::getType(), $ids, ['duplicate_identity_id' => null, 'has_duplicate_clue' => false], $lang);
+            $self->update(['duplicate_identity_id' => null, 'has_duplicate_clue' => false]);
         }
     }
 
