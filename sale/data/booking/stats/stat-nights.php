@@ -66,7 +66,7 @@ list($params, $providers) = eQual::announce([
 list($context, $orm, $adapter, $auth) = [ $providers['context'], $providers['orm'], $providers['adapt'] , $providers['auth']];
 
 // #memo - we consider all bookings for which at least one sojourn has an intersection with the given period
-if($params['center_id'] || $params['all_centers']) {
+if((isset($params['center_id']) && $params['center_id']) || $params['all_centers']) {
     $domain = [
             ['date_from', '<=', $params['date_to']],
             ['date_to', '>=', $params['date_from']],
