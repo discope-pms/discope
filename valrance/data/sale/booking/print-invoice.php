@@ -109,7 +109,7 @@ $parent = get_parent_class($entity);
 
 $file = EQ_BASEDIR."/packages/$package/views/$class_path.{$params['view_id']}.html";
 if(!file_exists($file)) {
-    throw new Exception("unknown_view_id", QN_ERROR_UNKNOWN_OBJECT);
+    throw new Exception("unknown_view_id", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
 $fields = [
@@ -341,7 +341,7 @@ $invoice = Invoice::id($params['id'])
     ->first(true);
 
 if(is_null($invoice)) {
-    throw new Exception("unknown_invoice", QN_ERROR_UNKNOWN_OBJECT);
+    throw new Exception("unknown_invoice", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
 /*
@@ -350,7 +350,7 @@ if(is_null($invoice)) {
 
 $booking = $invoice['booking_id'];
 if(is_null($booking)) {
-    throw new Exception("unknown_booking", QN_ERROR_UNKNOWN_OBJECT);
+    throw new Exception("unknown_booking", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
 // nb_pers are used to inject in GroupingCode name
@@ -833,7 +833,7 @@ catch(Exception $exception) {
 
 try {
 
-    $loader = new TwigFilesystemLoader(QN_BASEDIR."/packages/{$package}/views/");
+    $loader = new TwigFilesystemLoader(EQ_BASEDIR."/packages/{$package}/views/");
 
     $twig = new TwigEnvironment($loader);
     /**  @var ExtensionInterface **/
@@ -850,8 +850,8 @@ try {
     $html = $template->render($values);
 }
 catch(Exception $e) {
-    trigger_error("ORM::error while parsing template - ".$e->getMessage(), QN_REPORT_DEBUG);
-    throw new Exception("template_parsing_issue", QN_ERROR_INVALID_CONFIG);
+    trigger_error("ORM::error while parsing template - ".$e->getMessage(), EQ_REPORT_DEBUG);
+    throw new Exception("template_parsing_issue", EQ_ERROR_INVALID_CONFIG);
 }
 
 if($params['output'] == 'html') {
@@ -871,7 +871,7 @@ $options = new DompdfOptions();
 $options->set('isRemoteEnabled', true);
 $dompdf = new Dompdf($options);
 // if external fonts are involved, tell dompdf to store them in /bin
-$options->setFontDir(QN_BASEDIR.'/bin');
+$options->setFontDir(EQ_BASEDIR.'/bin');
 $dompdf->setPaper('A4', 'portrait');
 
 // remove utf8mb4 chars (emojis)
