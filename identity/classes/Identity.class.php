@@ -1242,7 +1242,7 @@ class Identity extends Model {
         $duplicate_identity_fields = ['legal_name', 'firstname', 'lastname', 'address_city', 'address_state', 'address_country'];
 
         $identities = Identity::ids($ids)
-            ->read($duplicate_identity_fields)
+            ->read(array_merge(['created'], $duplicate_identity_fields))
             ->get();
 
         foreach($identities as $id => $identity) {
@@ -1258,7 +1258,7 @@ class Identity extends Model {
             }
 
             if(!empty($domain)) {
-                $domain[] = ['id', '<', $id];
+                $domain[] = ['created', '<', $identity['created']];
                 if(count($ids) == 1) {
                     $domain[] = ['is_duplicate', '=', false];
                 }

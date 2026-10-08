@@ -35,7 +35,7 @@ if($user_id <= 0) {
 $ids = $orm->search('identity\User', ['id', '=', $user_id]);
 // make sure the User object is available
 if(!count($ids)) {
-    throw new Exception('unexpected_error', QN_ERROR_INVALID_USER);
+    throw new Exception('unexpected_error', EQ_ERROR_INVALID_USER);
 }
 
 // user has always READ right on its own object
