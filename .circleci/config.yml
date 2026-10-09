@@ -211,5 +211,4 @@ workflows:
   build_and_test:
     jobs:
       - php_8-3
-      - php_8-3_equal_2-0-2
       - php_8-4
