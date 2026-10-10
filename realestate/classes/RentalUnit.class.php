@@ -1,14 +1,14 @@
 <?php
 /*
     This file is part of the Discope property management software <https://github.com/discope-pms/discope>
-    Some Rights Reserved, Discope PMS, 2020-2024
+    Some Rights Reserved, Discope PMS, 2020-2026
     Original author(s): Yesbabylon SRL
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
+
 namespace realestate;
 
 use equal\orm\Model;
-use identity\Center;
 
 class RentalUnit extends Model {
 
@@ -18,6 +18,7 @@ class RentalUnit extends Model {
 
     public static function getColumns() {
         return [
+
             'name' => [
                 'type'              => 'string',
                 'description'       => "Name of the rental unit.",
@@ -292,66 +293,43 @@ class RentalUnit extends Model {
         ];
     }
 
-    public static function canupdate($om, $ids, $values, $lang='en') {
-
-        foreach($ids as $id) {
+    public static function canupdate($self, $values) {
+        foreach($self->ids() as $id) {
             if(isset($values['parent_id'])) {
-                $descendants_ids = [];
-                $rental_units_ids = [$id];
-                for($i = 0; $i < 2; ++$i) {
-                    $units = $om->read(self::getType(), $rental_units_ids, ['children_ids']);
-                    if($units > 0) {
-                        $rental_units_ids = [];
-                        foreach($units as $id => $unit) {
-                            if(count($unit['children_ids'])) {
-                                foreach($unit['children_ids'] as $uid) {
-                                    $rental_units_ids[] = $uid;
-                                    $descendants_ids[] = $uid;
-                                }
-                            }
-                        }
-                    }
-                }
-                if(in_array($values['parent_id'], $descendants_ids)) {
+                // #memo - recursion is prevented by the ORM
+                $children_ids = self::computeChildrenRentalUnitsIds($id);
+
+                if(in_array($values['parent_id'], $children_ids)) {
                     return ['parent_id' => ['child_cannot_be_parent' => 'Selected parent cannot be amongst rental unit children.']];
                 }
             }
+
             if(isset($values['children_ids'])) {
-                $ancestors_ids = [];
-                $parent_unit_id = $id;
-                for($i = 0; $i < 2; ++$i) {
-                    $units = $om->read(self::getType(), $parent_unit_id, ['parent_id']);
-                    if($units > 0) {
-                        foreach($units as $id => $unit) {
-                            if(isset($unit['parent_id']) && $unit['parent_id'] > 0) {
-                                $parent_unit_id = $unit['parent_id'];
-                                $ancestors_ids[] = $unit['parent_id'];
-                            }
-                        }
-                    }
-                }
-                foreach($values['children_ids'] as $assignment) {
-                    if($assignment > 0) {
-                        if(in_array($assignment, $ancestors_ids)) {
-                            return ['children_ids' => ['parent_cannot_be_child' => "Selected children cannot be amongst rental unit parents ({$assignment})."]];
-                        }
+                foreach($values['children_ids'] as $child_id) {
+                    // #memo - recursion is prevented by the ORM
+                    $parents_ids = self::computeParentsRentalUnitsIds($id);
+
+                    if(in_array($child_id, $parents_ids)) {
+                        return ['children_ids' => ['parent_cannot_be_child' => "Selected children cannot be amongst rental unit parents ({$child_id})."]];
                     }
                 }
             }
         }
+
         return [];
     }
 
-    public static function onupdateParentId($om, $ids, $values, $lang) {
-        $om->update(self::getType(), $ids, ['has_parent' => null, 'display_in_planning' => null]);
+    public static function onupdateParentId($self) {
+        $self->update(['has_parent' => null, 'display_in_planning' => null]);
     }
 
-    public static function calcHasParent($om, $oids, $lang) {
+    public static function calcHasParent($self) {
         $result = [];
-        $units = $om->read(__CLASS__, $oids, ['parent_id'], $lang);
-        foreach($units as $uid => $unit) {
-            $result[$uid] = (bool) (!is_null($unit['parent_id']) && $unit['parent_id'] > 0);
+        $self->read(['parent_id']);
+        foreach($self as $id => $unit) {
+            $result[$id] = !is_null($unit['parent_id']) && $unit['parent_id'] > 0;
         }
+
         return $result;
     }
 
@@ -366,7 +344,6 @@ class RentalUnit extends Model {
 
     public static function getConstraints() {
         return [
-
             'capacity' =>  [
                 'lte_zero' => [
                     'message'       => 'Capacity must be a positive value.',
@@ -375,7 +352,6 @@ class RentalUnit extends Model {
                     }
                 ]
             ],
-
             'extra' => [
                 'lt_zero' => [
                     'message'       => 'Extra capacity must be a greater than or equal to zero.',
@@ -390,40 +366,7 @@ class RentalUnit extends Model {
                     }
                 ]
             ]
-
         ];
-    }
-
-    public static function getConsumptions($om, $rental_unit_id, $date_from, $date_to) {
-        $result = [];
-
-        // #memo - a consumption always spans on a single day
-        $consumptions_ids = $om->search(\sale\booking\Consumption::getType(), [
-            ['date', '>=', $date_from],
-            ['date', '<=', $date_to],
-            ['rental_unit_id', '=', $rental_unit_id]
-        ], ['date' => 'asc']);
-
-        if($consumptions_ids > 0 && count($consumptions_ids)) {
-            $consumptions = $om->read(\sale\booking\Consumption::getType(), $consumptions_ids, [
-                'id',
-                'date',
-                'rental_unit_id',
-                'schedule_from',
-                'schedule_to'
-            ]);
-
-            foreach($consumptions as $id => $consumption) {
-                $consumption_from = $consumption['date_from'] + $consumption['schedule_from'];
-                $consumption_to = $consumption['date_to'] + $consumption['schedule_to'];
-                // keep all consumptions for which intersection is not empty
-                if(max($date_from, $consumption_from) < min($date_to, $consumption_to)) {
-                    $result[$id] = $consumption;
-                }
-            }
-        }
-
-        return $result;
     }
 
     public static function generateName() {
@@ -457,7 +400,7 @@ class RentalUnit extends Model {
         while(!empty($stack)) {
             $current_id = array_pop($stack);
 
-            $rentalUnit = self::id($current_id)->read(['id', 'children_ids'])->first();
+            $rentalUnit = self::id($current_id)->read(['children_ids'])->first();
             if(!$rentalUnit) {
                 continue;
             }
@@ -470,6 +413,24 @@ class RentalUnit extends Model {
             }
         }
         // remove the parent Rental Unit itself
+        unset($visited[$id]);
+        return array_keys($visited);
+    }
+
+    private static function computeParentsRentalUnitsIds($id) {
+        $visited = [$id => true];
+        $stack = [$id];
+
+        while(!empty($stack)) {
+            $current_id = array_pop($stack);
+
+            $rentalUnit = self::id($current_id)->read(['parent_id'])->first();
+            if(isset($rentalUnit['parent_id']) && !isset($visited[$rentalUnit['parent_id']])) {
+                $visited[$rentalUnit['parent_id']] = true;
+                $stack[] = $rentalUnit['parent_id'];
+            }
+        }
+        // remove the child Rental Unit itself
         unset($visited[$id]);
         return array_keys($visited);
     }

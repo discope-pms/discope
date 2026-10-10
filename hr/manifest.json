@@ -2,6 +2,7 @@
     "name": "hr",
     "depends_on": [
         "core",
-        "identity"
+        "identity",
+        "sale"
     ]
 }

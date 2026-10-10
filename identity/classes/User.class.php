@@ -1,9 +1,10 @@
 <?php
 /*
     This file is part of Symbiose Community Edition <https://github.com/yesbabylon/symbiose>
-    Some Rights Reserved, Yesbabylon SRL, 2020-2021
+    Some Rights Reserved, Yesbabylon SRL, 2020-2026
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
+
 namespace identity;
 
 class User extends \core\User {
@@ -86,21 +87,24 @@ class User extends \core\User {
         return $result;
     }
 
-    public static function onupdateCenterOfficesIds($om, $oids, $values, $lang) {
+    public static function onupdateCenterOfficesIds($self) {
+        $self->read(['centers_ids', 'center_offices_ids' => ['centers_ids']]);
+        foreach($self as $id => $user) {
+            // pass-1 remove previous centers_ids
+            User::id($id)->update([
+                'centers_ids' => array_map(function($id) { return "-{$id}";}, $user['centers_ids'])
+            ]);
 
-        $users = $om->read(__CLASS__, $oids, ['centers_ids', 'center_offices_ids.centers_ids'], $lang);
-        if($users > 0) {
-
-            foreach($users as $uid => $user) {
-                // pass-1 remove previous centers_ids
-                $om->update(__CLASS__, $uid, ['centers_ids' => array_map(function($id) { return "-{$id}";}, $user['centers_ids'])], $lang);
-                // pass-2 add new centers_ids
-                $centers_ids = [];
-                foreach((array) $user['center_offices_ids.centers_ids'] as $oid => $office) {
-                    $centers_ids = array_merge($centers_ids, $office['centers_ids']);
-                }
-                $om->update(__CLASS__, $uid, ['centers_ids' => $centers_ids], $lang);
+            // pass-2 add new centers_ids
+            $centers_ids = [];
+            foreach($user['center_offices_ids'] as $office) {
+                $centers_ids = array_merge(
+                    $centers_ids,
+                    $office['centers_ids']
+                );
             }
+
+            User::id($id)->update(['centers_ids' => $centers_ids]);
         }
     }
 
