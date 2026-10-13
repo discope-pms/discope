@@ -1,7 +1,7 @@
 <?php
 /*
     This file is part of the Discope property management software <https://github.com/discope-pms/discope>
-    Some Rights Reserved, Discope PMS, 2020-2024
+    Some Rights Reserved, Discope PMS, 2020-2026
     Original author(s): Yesbabylon SRL
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
@@ -64,10 +64,13 @@ use sale\booking\BookingMeal;
         'content-type'      => 'application/pdf',
         'accept-origin'     => '*'
     ],
-    'providers'     => ['context', 'orm']
+    'providers'     => ['context']
 ]);
 
-list($context, $orm) = [$providers['context'], $providers['orm']];
+/**
+ * @var \equal\php\Context $context
+ */
+['context' => $context] = $providers;
 
 /**
  * Methods
@@ -145,10 +148,10 @@ $package = array_shift($parts);
 $class_path = implode('/', $parts);
 $parent = get_parent_class($entity);
 
-$file = QN_BASEDIR."/packages/{$package}/views/{$class_path}.{$params['view_id']}.html";
+$file = EQ_BASEDIR."/packages/{$package}/views/{$class_path}.{$params['view_id']}.html";
 
 if(!file_exists($file)) {
-    throw new Exception("unknown_view_id", QN_ERROR_UNKNOWN_OBJECT);
+    throw new Exception("unknown_view_id", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
 $days_languages = [
@@ -319,7 +322,7 @@ $booking = Booking::id($params['id'])->read($fields, $params['lang'])->first(tru
 
 
 if(!$booking) {
-    throw new Exception("unknown_contract", QN_ERROR_UNKNOWN_OBJECT);
+    throw new Exception("unknown_contract", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
 // nb_pers are used to inject in GroupingCode name
@@ -1204,7 +1207,7 @@ if($has_activity){
 */
 
 try {
-    $loader = new TwigFilesystemLoader(QN_BASEDIR."/packages/{$package}/views/");
+    $loader = new TwigFilesystemLoader(EQ_BASEDIR."/packages/{$package}/views/");
 
     $twig = new TwigEnvironment($loader);
     /**  @var ExtensionInterface **/
@@ -1221,8 +1224,8 @@ try {
     $html = $template->render($values);
 }
 catch(Exception $e) {
-    trigger_error("ORM::error while parsing template - ".$e->getMessage(), QN_REPORT_DEBUG);
-    throw new Exception("template_parsing_issue", QN_ERROR_INVALID_CONFIG);
+    trigger_error("ORM::error while parsing template - ".$e->getMessage(), EQ_REPORT_DEBUG);
+    throw new Exception("template_parsing_issue", EQ_ERROR_INVALID_CONFIG);
 }
 
 if($params['output'] == 'html') {
@@ -1255,8 +1258,9 @@ $canvas->page_text(530, $canvas->get_height() - 35, "p. {PAGE_NUM} / {PAGE_COUNT
 // get generated PDF raw binary
 $output = $dompdf->output();
 
-$context->httpResponse()
-        // ->header('Content-Disposition', 'attachment; filename="document.pdf"')
-        ->header('Content-Disposition', 'inline; filename="document.pdf"')
-        ->body($output)
-        ->send();
+$context
+    ->httpResponse()
+    // ->header('Content-Disposition', 'attachment; filename="document.pdf"')
+    ->header('Content-Disposition', 'inline; filename="document.pdf"')
+    ->body($output)
+    ->send();

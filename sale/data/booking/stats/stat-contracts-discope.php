@@ -295,7 +295,7 @@ foreach($bookings as $booking) {
         'nb_rental_units'   => $booking_nb_rental_units,
         'nb_pers_nights'    => $count_nb_pers_nights,
         'nb_room_nights'    => $count_nb_room_nights,
-        'rate_class'        => $booking['customer_id']['rate_class_id']['name'],
+        'rate_class'        => $booking['customer_id']['rate_class_id']['name'] ?? '',
         'customer_name'     => $booking['customer_identity_id']['name'],
         'customer_lang'     => $booking['customer_identity_id']['lang_id']['name'],
         'customer_zip'      => $booking['customer_identity_id']['address_zip'],
