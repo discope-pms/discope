@@ -98,7 +98,7 @@ class Contact extends \identity\Partner {
         ];
     }
 
-    public static function onchange($om, $event, $values, $lang='en') {
+    public static function onchange($self, $event) {
         $result = [];
         if(isset($event['type'])) {
             $result['is_direct_contact'] = ($event['type'] == "guest_list");

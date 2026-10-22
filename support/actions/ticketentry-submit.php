@@ -1,14 +1,15 @@
 <?php
 /*
     This file is part of the Discope property management software <https://github.com/discope-pms/discope>
-    Some Rights Reserved, Discope PMS, 2020-2024
+    Some Rights Reserved, Discope PMS, 2020-2026
     Original author(s): Yesbabylon SRL
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
+
 use support\TicketEntry;
 use support\Ticket;
 
-list($params, $providers) = announce([
+[$params, $providers] = eQual::announce([
     'description'   => 'Submit a ticket entry and mark it as \'sent\'.',
     'params'        => [
         'id' => [
@@ -17,23 +18,22 @@ list($params, $providers) = announce([
             'required'      => true
         ]
     ],
+    'access'        => [
+        'visibility'    => 'protected'
+    ],
     'response'      => [
         'content-type'  => 'application/json',
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'access' => [
-        'visibility'    => 'protected'
-    ],
-    'providers'     => [ 'context', 'report', 'auth' ]
+    'providers'     => ['context', 'auth']
 ]);
 
 /**
- * @var \equal\php\Context                $context
- * @var \equal\error\Reporter             $reporter
- * @var \equal\auth\AuthenticationManager $auth
+ * @var \equal\php\Context                  $context
+ * @var \equal\auth\AuthenticationManager   $auth
  */
-list($context, $reporter, $auth) = [ $providers['context'], $providers['report'], $providers['auth'] ];
+['context' => $context, 'auth' => $auth] = $providers;
 
 // retrieve the user making the submission
 $user_id = $auth->userId();
@@ -41,11 +41,11 @@ $user_id = $auth->userId();
 $entry = TicketEntry::id($params['id'])->read(['id', 'creator', 'status', 'ticket_id'])->first();
 
 if(!$entry) {
-    throw new Exception('unknown_ticket_entry', QN_ERROR_UNKNOWN);
+    throw new Exception('unknown_ticket_entry', EQ_ERROR_UNKNOWN);
 }
 
 if($entry['status'] != 'draft') {
-    throw new Exception('invalid_status', QN_ERROR_INVALID_PARAM);
+    throw new Exception('invalid_status', EQ_ERROR_INVALID_PARAM);
 }
 
 TicketEntry::id($params['id'])->update(['status' => 'sent']);

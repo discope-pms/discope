@@ -173,15 +173,13 @@ use sale\customer\AgeRange;
         'expires'       => (60*60*1)
         */
     ],
-    'providers'     => ['context', 'orm', 'adapt']
+    'providers'     => ['context']
 ]);
 
 /**
- * @var \equal\php\Context                      $context
- * @var \equal\orm\ObjectManager                $orm
- * @var \equal\data\adapt\DataAdapterProvider   $adapter_provider
+ * @var \equal\php\Context $context
  */
-['context' => $context, 'orm' => $orm, 'adapt' => $adapter_provider] = $providers;
+['context' => $context] = $providers;
 
 $bookings = Booking::search([
     ['date_from', '>=', $params['date_from']],
