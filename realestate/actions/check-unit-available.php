@@ -1,18 +1,19 @@
 <?php
 /*
     This file is part of the Discope property management software <https://github.com/discope-pms/discope>
-    Some Rights Reserved, Discope PMS, 2020-2024
+    Some Rights Reserved, Discope PMS, 2020-2026
     Original author(s): Yesbabylon SRL
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
+
 use realestate\RentalUnit;
 use sale\booking\Consumption;
 
-list($params, $providers) = announce([
+[$params, $providers] = eQual::announce([
     'description'   => "Verify that the rental unit is not assigned to a booking. This check is meant to be called by plan-repair (called from Planning).",
     'params'        => [
         'id' =>  [
-            'description'       => 'Identifier of the rental unit the check against emptyness.',
+            'description'       => 'Identifier of the rental unit the check against emptiness.',
             'type'              => 'integer',
             'required'          => true
         ],
@@ -21,15 +22,14 @@ list($params, $providers) = announce([
             'type'              => 'date',
             'required'          => true
         ],
-
         'date_to' =>  [
             'description'       => 'End date of the time interval.',
             'type'              => 'date',
             'required'          => true
-        ],
+        ]
     ],
-    'access' => [
-        'groups'            => ['booking.default.user'],
+    'access'        => [
+        'groups'        => ['booking.default.user'],
     ],
     'response'      => [
         'content-type'  => 'application/json',
@@ -42,13 +42,13 @@ list($params, $providers) = announce([
 /**
  * @var \equal\php\Context                  $context
  */
-list($context) = [ $providers['context']];
+['context' => $context] = $providers;
 
 
 $rental_unit = RentalUnit::id($params['id']) ->read(['id'])->first(true);
 
 if(!$rental_unit) {
-    throw new Exception("unknown_rental_unit", QN_ERROR_UNKNOWN_OBJECT);
+    throw new Exception("unknown_rental_unit", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
 $result = Consumption::search([
@@ -56,9 +56,10 @@ $result = Consumption::search([
         ['date', '<=', $params['date_to']] ,
         ['rental_unit_id' , '=' , $rental_unit['id']],
         ['is_rental_unit' , '=', true]
-    ])->get(true);
+    ])
+    ->get(true);
 
-$context->httpResponse()
-    ->status(200)
+$context
+    ->httpResponse()
     ->body($result)
     ->send();

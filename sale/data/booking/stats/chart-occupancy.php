@@ -136,7 +136,7 @@ if($params['all_centers']) {
     }
     $centers_ids = (array) $user['centers_ids'];
 }
-elseif($params['center_id'] && $params['center_id'] > 0) {
+elseif(isset($params['center_id']) && $params['center_id'] > 0) {
     $centers_ids = (array) $params['center_id'];
 }
 
@@ -189,7 +189,7 @@ if($centers_ids) {
                 'rental_unit_id',
                 'center_id',
                 'schedule_to',
-                'booking_id.status'
+                'booking_id' => ['status']
             ])
             ->get(true);
         $date_index = $occupanciesGetDateIndex($d, $params['range_interval']);
@@ -197,7 +197,7 @@ if($centers_ids) {
         foreach($consumptions as $consumption) {
 
             // do not consider consumptions of quote bookings
-            if($consumption['booking_id.status'] == 'quote') {
+            if($consumption['booking_id']['status'] == 'quote') {
                 continue;
             }
             // do not consider bookings last day (that marks the unit as occupied until checkout time but must not be considered as a 'night')

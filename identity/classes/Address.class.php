@@ -1,15 +1,15 @@
 <?php
 /*
     This file is part of the Discope property management software <https://github.com/discope-pms/discope>
-    Some Rights Reserved, Discope PMS, 2020-2024
+    Some Rights Reserved, Discope PMS, 2020-2026
     Original author(s): Yesbabylon SRL
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
+
 namespace identity;
 
 use discope\setting\Setting;
 use equal\orm\Model;
-
 
 class Address extends Model {
 
@@ -23,6 +23,7 @@ class Address extends Model {
 
     public static function getColumns() {
         return [
+
             'display_name' => [
                 'type'             => 'alias',
                 'alias'            => 'name'
@@ -48,7 +49,7 @@ class Address extends Model {
                 'type'              => 'many2one',
                 'foreign_object'    => 'identity\Identity',
                 'description'       => 'The identity that the address relates to.',
-                'onupdate'          => 'onupdateIdentityId'
+                'dependents'        => ['identity_name']
             ],
 
             'role' => [
@@ -63,31 +64,31 @@ class Address extends Model {
             'address_street' => [
                 'type'              => 'string',
                 'description'       => 'Street and number.',
-                'onupdate'          => 'onupdateAddress'
+                'dependents'        => ['name']
             ],
 
             'address_dispatch' => [
                 'type'              => 'string',
-                'description'       => 'Optional info for mail dispatch (appartment, box, floor, ...).',
-                'onupdate'          => 'onupdateAddress'
+                'description'       => 'Optional info for mail dispatch (appartement, box, floor, ...).',
+                'dependents'        => ['name']
             ],
 
             'address_city' => [
                 'type'              => 'string',
                 'description'       => 'City.',
-                'onupdate'          => 'onupdateAddress'
+                'dependents'        => ['name']
             ],
 
             'address_zip' => [
                 'type'              => 'string',
                 'description'       => 'Postal code.',
-                'onupdate'          => 'onupdateAddress'
+                'dependents'        => ['name']
             ],
 
             'address_state' => [
                 'type'              => 'string',
                 'description'       => 'State or region.',
-                'onupdate'          => 'onupdateAddress'
+                'dependents'        => ['name']
             ],
 
             'address_country' => [
@@ -95,36 +96,29 @@ class Address extends Model {
                 'usage'             => 'country/iso-3166:2',
                 'description'       => 'Country.',
                 'default'           => Setting::get_value('identity', 'organization', 'country_default', 'BE'),
-                'onupdate'          => 'onupdateAddress'
-            ],
-
+                'dependents'        => ['name']
+            ]
 
         ];
     }
 
-    public static function calcIdentityName($om, $oids, $lang) {
+    public static function calcIdentityName($self) {
         $result = [];
-        $res = $om->read(__CLASS__, $oids, ['identity_id.name']);
-        foreach($res as $oid => $odata) {
-            $result[$oid] = $odata['identity_id.name'];
+        $self->read(['identity_id' => ['name']]);
+        foreach($self as $id => $address) {
+            $result[$id] = $address['identity_id']['name'] ?? null;
         }
+
         return $result;
     }
 
-    public static function calcName($om, $oids, $lang) {
+    public static function calcName($self) {
         $result = [];
-        $res = $om->read(__CLASS__, $oids, ['address_street', 'address_city', 'address_zip', 'address_country' ]);
-        foreach($res as $oid => $odata) {
-            $result[$oid] = "{$odata['address_street']} {$odata['address_zip']} {$odata['address_city']}";
+        $self->read(['address_street', 'address_city', 'address_zip', 'address_country']);
+        foreach($self as $id => $address) {
+            $result[$id] = "{$address['address_street']} {$address['address_zip']} {$address['address_city']}";
         }
+
         return $result;
-    }
-
-    public static function onupdateIdentityId($om, $oids, $values, $lang) {
-        $om->update(__CLASS__, $oids, [ 'identity_name' => null ], $lang);
-    }
-
-    public static function onupdateAddress($om, $oids, $values, $lang) {
-        $om->update(__CLASS__, $oids, [ 'display_name' => null ], $lang);
     }
 }

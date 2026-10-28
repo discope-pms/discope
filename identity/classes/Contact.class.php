@@ -1,10 +1,11 @@
 <?php
 /*
     This file is part of the Discope property management software <https://github.com/discope-pms/discope>
-    Some Rights Reserved, Discope PMS, 2020-2024
+    Some Rights Reserved, Discope PMS, 2020-2026
     Original author(s): Yesbabylon SRL
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
+
 namespace identity;
 
 class Contact extends \identity\Partner {
@@ -14,7 +15,6 @@ class Contact extends \identity\Partner {
     }
 
     public static function getColumns() {
-
         return [
 
             'relationship' => [
@@ -28,8 +28,8 @@ class Contact extends \identity\Partner {
                 'type'              => 'string',
                 'selection'         => [
                     'booking',          // person that is in charge of handling the booking details
-                    'invoice',          // person to who the invoice of the booking must be sent
-                    'contract',         // person to who the contract(s) must be sent
+                    'invoice',          // person to whom the booking's invoice must be sent
+                    'contract',         // person to whom the contract(s) must be sent
                     'sojourn'           // person that will be present during the sojourn (beneficiary)
                 ],
                 'description'       => 'The kind of contact, based on its responsibilities.',
@@ -38,5 +38,4 @@ class Contact extends \identity\Partner {
 
         ];
     }
-
 }
