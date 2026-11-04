@@ -21,16 +21,6 @@
                                                 }
                                             }
                                         ]
-                                    },
-                                    {
-                                        "width": "50%",
-                                        "items": [
-                                            {
-                                                "type": "field",
-                                                "value": "type",
-                                                "width": "50%"
-                                            }
-                                        ]
                                     }
                                 ]
                             },
@@ -42,12 +32,7 @@
                                             {
                                                 "type": "field",
                                                 "value": "date",
-                                                "width": "50%"
-                                            },
-                                            {
-                                                "type": "field",
-                                                "value": "extref_AT_id",
-                                                "width": "50%"
+                                                "width": "100%"
                                             }
                                         ]
                                     }

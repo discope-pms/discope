@@ -6,37 +6,37 @@
         "name": {
             "label": "Nom",
             "description": "Code mnémo du modèle.",
-            "help": ""
+            "help": "Nom affiché pour identifier l'employé."
         },
         "activity_product_models_ids": {
             "label": "Modèles de produit",
             "description": "Les modèles de produits dont l'employé peut être responsable.",
-            "help": ""
+            "help": "Sélectionnez les activités autorisées pour cet employé."
         },
         "partner_events_ids": {
             "label": "Événements planning",
-            "description": "Événements planning comme: formation, absence, congé ou récupération.",
-            "help": ""
+            "description": "Événements de planning : formations, absences ou congés.",
+            "help": "Consultez les événements planifiés pour cet employé."
         },
         "date_start": {
             "label": "Début contrat",
             "description": "Date de début du contrat actuel.",
-            "help": ""
+            "help": "Indiquez le premier jour du contrat actuel."
         },
         "date_end": {
             "label": "Fin contrat",
             "description": "Date de fin du contrat actuel.",
-            "help": ""
+            "help": "Indiquez le dernier jour du contrat, s'il est connu."
         },
         "is_active": {
             "label": "Actif",
             "description": "Est-ce que l'employé est actif actuellement.",
-            "help": ""
+            "help": "Activez cette option si l'employé travaille actuellement."
         },
         "role_id": {
             "label": "Rôle",
             "description": "Le rôle de l'employé.",
-            "help": ""
+            "help": "Sélectionnez le rôle attribué à l'employé."
         }
     },
     "view": {
@@ -60,9 +60,6 @@
                 },
                 "section.partner-event-sets": {
                     "label": "Séries d'événements"
-                },
-                "section.mails": {
-                    "label": "E-mails"
                 }
             }
         },

@@ -22,6 +22,19 @@ class Employee extends \identity\Partner {
     public static function getColumns() {
         return [
 
+            'owner_identity_id' => [
+                'type'              => 'many2one',
+                'foreign_object'    => 'identity\Identity',
+                'description'       => 'Organisation to which the employee belongs.',
+                'default'           => 1
+            ],
+
+            'partner_position' => [
+                'type'              => 'string',
+                'description'       => 'Position of the employee within the organisation.',
+                'visible'           => [ ['relationship', '=', 'contact'] ]
+            ],
+
             'role_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'hr\employee\Role',
@@ -33,7 +46,7 @@ class Employee extends \identity\Partner {
             'relationship' => [
                 'type'              => 'string',
                 'default'           => 'employee',
-                'description'       => 'Force relationship to Employee',
+                'description'       => 'Force relationship to Employee.',
                 'readonly'          => true
             ],
 
@@ -110,7 +123,7 @@ class Employee extends \identity\Partner {
                 'type'              => 'one2many',
                 'foreign_object'    => 'sale\camp\CampGroup',
                 'foreign_field'     => 'second_employee_id',
-                'description'       => "Camps groups the employee is responsible of as a secondary employee."
+                'description'       => "Camp groups assigned to the employee as a substitute."
             ]
 
         ];
