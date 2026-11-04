@@ -6,57 +6,57 @@
         "legal_name": {
             "label": "Nom légal",
             "description": "Nom affiché dans l'en-tête des documents officiels.",
-            "help": ""
+            "help": "Indiquez le nom officiel affiché sur les documents."
         },
         "code": {
             "label": "Code équipe de gestion",
             "description": "Code unique de l'équipe (1 chiffre hexa).",
-            "help": ""
+            "help": "Saisissez le chiffre hexadécimal unique de l'équipe."
         },
         "contacts_ids": {
             "label": "Contacts",
             "description": "List of contactsattached to the office.",
-            "help": ""
+            "help": "Consultez les contacts rattachés à l'équipe de gestion."
         },
         "centers_ids": {
             "label": "Centres",
             "description": "Liste des centres faisant partie du groupe.",
-            "help": ""
+            "help": "Consultez les centres rattachés à l'équipe de gestion."
         },
         "bank_account_iban": {
             "label": "IBAN",
             "description": "Numéro de compte bancaire au format international.",
-            "help": ""
+            "help": "Indiquez l'IBAN utilisé par l'équipe de gestion."
         },
         "bank_account_bic": {
             "label": "BIC",
             "description": "Numéro d'identification de la banque.",
-            "help": ""
+            "help": "Indiquez le code BIC de la banque associée."
         },
         "phone": {
             "label": "Téléphone",
             "description": "Numéro de téléphone de contact officiel.",
-            "help": ""
+            "help": "Indiquez le numéro de téléphone officiel de l'équipe."
         },
         "email": {
             "label": "Email",
             "description": "Adresse e-mail de contact officielle.",
-            "help": ""
+            "help": "Indiquez l'adresse e-mail principale de l'équipe."
         },
         "email_alt": {
             "label": "Email secondaire",
             "description": "Adresse e-mail de contact officielle.",
-            "help": ""
+            "help": "Indiquez une adresse e-mail secondaire si nécessaire."
         },
         "email_bcc": {
             "label": "Email de service",
             "description": "Adressee pour réception des copies des messages envoyés.",
-            "help": ""
+            "help": "Indiquez l'adresse qui reçoit une copie des messages envoyés."
         },
         "address_street": {
             "label": "Rue",
             "description": "Rue et numéro de l'adresse du centre de gestion.",
-            "help": ""
+            "help": "Indiquez la rue et le numéro de l'équipe de gestion."
         },
         "address_dispatch": {
             "label": "Complément d'adresse",
@@ -66,22 +66,22 @@
         "address_city": {
             "label": "Ville",
             "description": "Ville dans laquelle se situe le centre de gestion.",
-            "help": ""
+            "help": "Indiquez la ville de l'équipe de gestion."
         },
         "address_zip": {
             "label": "Code postal",
             "description": "Code Postal.",
-            "help": ""
+            "help": "Indiquez le code postal de l'équipe de gestion."
         },
         "address_state": {
             "label": "État",
             "description": "État ou région.",
-            "help": ""
+            "help": "Indiquez l'état ou la région si nécessaire."
         },
         "address_country": {
             "label": "Pays",
             "description": "Pays dans lequel se situe le centre de gestion.",
-            "help": ""
+            "help": "Sélectionnez le pays de l'équipe de gestion."
         },
         "docs_default_mode": {
             "label": "Mode par défaut des documents",
@@ -90,33 +90,33 @@
                 "grouped": "groupé",
                 "detailed": "détaillé"
             },
-            "description": "Mode de précision (simple, groupé, détaillé) à utiliser par défaut.",
-            "help": ""
+            "description": "Mode documentaire utilisé par défaut.",
+            "help": "Choisissez le niveau de détail appliqué aux documents."
         },
         "rentalunits_manual_assignment": {
             "label": "Assignation manuelle des unités locatives",
             "description": "Force l'assignation manuelle des unités locatives.",
-            "help": ""
+            "help": "Activez cette option pour attribuer manuellement les unités."
         },
         "checkedout_revert_to_quote": {
             "label": "Repasser en devis depuis 'En cours' ou 'Terminée'",
-            "description": "Autoriser de repasser en devis depuis les status 'En cours' ou 'Terminée'.",
-            "help": ""
+            "description": "Retour au devis depuis une réservation en cours ou terminée.",
+            "help": "Activez cette option pour permettre le retour au statut devis."
         },
         "freebies_manual_assignment": {
             "label": "Gratuités manuelles",
             "description": "Force l'assignation manuelle des gratuités.",
-            "help": ""
+            "help": "Activez cette option pour attribuer manuellement les gratuités."
         },
         "accounting_journals_ids": {
             "label": "Journaux comptables",
             "description": "Journaux comptables du centre de gestion.",
-            "help": ""
+            "help": "Consultez les journaux comptables liés à l'équipe."
         },
         "product_favorites_ids": {
             "label": "Produits favoris",
             "description": "Liste des produits favoris du centre de gestion.",
-            "help": ""
+            "help": "Consultez les produits favoris de l'équipe de gestion."
         }
     },
     "view": {

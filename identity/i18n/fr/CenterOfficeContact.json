@@ -6,7 +6,7 @@
         "email": {
             "label": "Email",
             "description": "Adressse email de contact.",
-            "help": ""
+            "help": "Indiquez l'adresse e-mail utilisée pour ce contact."
         },
         "type": {
             "label": "Type",
@@ -16,7 +16,7 @@
                 "contract": "contrat",
                 "invoice": "facture"
             },
-            "help": ""
+            "help": "Choisissez le type de document associé à ce contact."
         }
     },
     "view": {

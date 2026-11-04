@@ -78,7 +78,7 @@ class Identity extends Model {
             'description' => [
                 'type'              => 'string',
                 'usage'             => 'text/plain',
-                'description'       => 'A short reminder to help user identify the targeted person and its specifics.'
+                'description'       => 'Short note identifying the person and their specifics.'
             ],
 
             'bank_account_iban' => [
@@ -90,7 +90,7 @@ class Identity extends Model {
 
             'bank_account_bic' => [
                 'type'              => 'string',
-                'description'       => "Identifier of the Bank related to the Identity's bank account, when set.",
+                'description'       => "BIC identifier for the identity's bank account, if any.",
                 'visible'           => [ ['has_parent', '=', false] ]
             ],
 
@@ -112,7 +112,7 @@ class Identity extends Model {
             ],
             'short_name' => [
                 'type'              => 'string',
-                'description'       => 'Usual name to be used as a memo for identifying the organisation (acronym or short name).',
+                'description'       => 'Usual acronym or short name identifying the organisation.',
                 'visible'           => [ ['type', '<>', 'I'] ],
                 'onupdate'          => 'onupdateName',
                 'generation'        => 'generateShortName'
@@ -173,7 +173,7 @@ class Identity extends Model {
                 'type'              => 'many2one',
                 'foreign_object'    => 'identity\Identity',
                 'domain'            => ['type', '<>', 'I'],
-                'description'       => 'Parent company of which the organisation is a branch (department), if any.',
+                'description'       => 'Parent company of this branch or department, if any.',
                 'visible'           => [ ['has_parent', '=', true] ]
             ],
 
@@ -210,7 +210,7 @@ class Identity extends Model {
                 'foreign_object'    => 'identity\Contact',
                 'foreign_field'     => 'owner_identity_id',
                 'domain'            => [ ['partner_identity_id', '<>', 'object.id'] ],
-                'description'       => 'List of contacts related to the organisation (not necessarily employees), if any.'
+                'description'       => 'Contacts related to the organisation, if any.'
             ],
 
             'accounting_account' => [
@@ -566,7 +566,7 @@ class Identity extends Model {
                 'type'              => 'many2one',
                 'foreign_object'    => 'identity\Partner',
                 'domain'            => ['relationship', '=', 'contact'],
-                'description'       => 'Contact (natural person) that can legally represent the organisation.',
+                'description'       => 'Contact legally entitled to represent the organisation.',
                 'onupdate'          => 'onupdateReferencePartnerId',
                 'visible'           => [ ['type', '<>', 'I'], ['type', '<>', 'SE'] ]
             ],
@@ -646,7 +646,6 @@ class Identity extends Model {
             'customer_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\customer\Customer',
-                'foreign_field'     => 'partner_identity_id',
                 'description'       => 'Customer associated to this identity, if any.'
             ],
 
@@ -734,7 +733,7 @@ class Identity extends Model {
 
             'is_readonly' => [
                 'type'              => 'boolean',
-                'description'       => 'Is the identity readonly, used for static identities that should not be updated trivially.',
+                'description'       => 'Whether this static identity may be edited.',
                 'default'           => false,
                 'readonly'          => true
             ],

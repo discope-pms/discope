@@ -6,22 +6,22 @@
 		"name": {
 			"label": "Nom",
 			"description": "Nom de l'utilisateur.",
-			"help": ""
+			"help": "Utilisez un nom permettant d'identifier rapidement l'adresse."
 		},
 		"display_name": {
 			"label": "Nom d'affichage",
 			"description": "Le nom d'affichage de l'adresse.",
-			"help": ""
+			"help": "Ce nom est affiché dans les listes et les sélections d'adresses."
 		},
 		"identity_name": {
 			"label": "Nom d'affichage de l'identité",
 			"description": "Nom d'affichage de l'identité associée.",
-			"help": ""
+			"help": "Ce nom rappelle l'identité associée à l'adresse."
 		},
 		"identity_id": {
 			"label": "Identité",
 			"description": "L'identité à laquelle l'adresse se rapporte.",
-			"help": ""
+			"help": "Sélectionnez l'identité à laquelle appartient cette adresse."
 		},
 		"role": {
 			"label": "Role",
@@ -32,12 +32,12 @@
 				"delivery": "livraison",
 				"other": "autre"
 			},
-			"help": ""
+			"help": "Choisissez l'usage principal de cette adresse."
 		},
 		"address_street": {
 			"label": "Rue d'adresse",
 			"description": "Rue et numéro.",
-			"help": ""
+			"help": "Indiquez la rue et le numéro de bâtiment."
 		},
 		"address_dispatch": {
 			"label": "Complément d'adresse",
@@ -47,22 +47,22 @@
 		"address_city": {
 			"label": "Ville",
 			"description": "Ville.",
-			"help": ""
+			"help": "Indiquez la ville de l'adresse."
 		},
 		"address_zip": {
 			"label": "Code Postal",
 			"description": "Code Postal.",
-			"help": ""
+			"help": "Indiquez le code postal de l'adresse."
 		},
 		"address_state": {
 			"label": "État ou région",
 			"description": "État ou région.",
-			"help": ""
+			"help": "Indiquez l'état ou la région si nécessaire."
 		},
 		"address_country": {
 			"label": "Pays",
 			"description": "Pays.",
-			"help": ""
+			"help": "Sélectionnez le pays de l'adresse."
 		}
 	},
 	"view": {

@@ -7,6 +7,8 @@
 */
 namespace identity;
 
+use discope\setting\Setting;
+
 class Center extends \identity\Establishment {
 
     public static function getName() {
@@ -34,9 +36,10 @@ class Center extends \identity\Establishment {
 
             'use_office_details' => [
                 'type'              => 'boolean',
-                'description'       => "Use the Center Group contact details in booking communications (instead of the ones of the center)?",
-                'default'           => 'defaultFromSetting',
-                'setting_default'   => false
+                'description'       => 'Use office contact details in booking communications.',
+                'default'           => function() {
+                    return Setting::get_value('identity', 'default', 'center.use_office_details', false);
+                }
             ],
 
             /*
@@ -152,8 +155,9 @@ class Center extends \identity\Establishment {
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\customer\Customer',
                 'description'       => 'Default customer for sales at POS.',
-                'default'           => 'defaultFromSetting',
-                'setting_default'   => null
+                'default'           => function() {
+                    return Setting::get_value('identity', 'default', 'center.pos_default_customer_id');
+                }
             ],
 
             'extref_property_id' => [
@@ -164,8 +168,9 @@ class Center extends \identity\Establishment {
             'has_citytax_school' => [
                 'type'              => 'boolean',
                 'description'       => "The center has the tourist tax for school stays?",
-                'default'           => 'defaultFromSetting',
-                'setting_default'   => false
+                'default'           => function() {
+                    return Setting::get_value('identity', 'default', 'center.has_citytax_school', false);
+                }
             ],
 
             'consumptions_meters_ids' => [

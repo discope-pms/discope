@@ -39,7 +39,7 @@ class Partner extends Model {
             'owner_identity_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'identity\Identity',
-                'description'       => 'The identity organisation which the targeted identity is a partner of.',
+                'description'       => 'Organisation for which the targeted identity is a partner.',
                 'default'           => 1
             ],
 
@@ -77,7 +77,7 @@ class Partner extends Model {
             // if partner is a contact, keep its 'position' within the
             'partner_position' => [
                 'type'              => 'string',
-                'description'       => 'Position of the contact (natural person) within the target organisation (legal person), e.g. \'director\', \'CEO\', \'Regional manager\'.',
+                'description'       => "Contact's position within the target organisation.",
                 'visible'           => [ ['relationship', '=', 'contact'] ]
             ],
 

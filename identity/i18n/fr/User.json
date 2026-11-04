@@ -6,57 +6,57 @@
 		"name": {
 			"label": "Nom de l'utilisateur",
 			"description": "Le nom d'affichage de l'utilisateur.",
-			"help": ""
+			"help": "Indiquez le nom affiché pour cet utilisateur."
 		},
 		"identity_id": {
 			"label": "Identité",
 			"description": "Le contact lié à l'utilisateur.",
-			"help": ""
+			"help": "Sélectionnez l'identité associée au compte utilisateur."
 		},
 		"login": {
 			"label": "Email",
-			"description": "",
-			"help": ""
+			"description": "Adresse e-mail utilisée pour la connexion.",
+			"help": "Indiquez l'adresse e-mail utilisée pour se connecter."
 		},
 		"language": {
 			"label": "Langue préférée",
 			"description": "Utilisée pour les interfaces utilisateur.",
-			"help": ""
+			"help": "Sélectionnez la langue de l'interface utilisateur."
 		},
 		"validated": {
 			"label": "Validé",
 			"description": "Compte validé ?",
-			"help": ""
+			"help": "Activez cette option lorsque le compte est validé."
 		},
 		"groups_ids": {
 			"label": "Groupes",
-			"description": "",
-			"help": ""
+			"description": "Groupes auxquels appartient l'utilisateur.",
+			"help": "Sélectionnez les groupes attribués à l'utilisateur."
 		},
 		"organisation_id": {
 			"label": "Organisation",
 			"description": "L'organisation à laquelle appartient l'utilisateur.",
-			"help": ""
+			"help": "Sélectionnez l'organisation de l'utilisateur."
 		},
 		"centers_ids": {
 			"label": "Centres",
-			"description": "",
-			"help": ""
+			"description": "Centres accessibles à l'utilisateur.",
+			"help": "Sélectionnez les centres accessibles à l'utilisateur."
 		},
 		"center_offices_ids": {
 			"label": "Équipes de gestion",
-			"description": "",
-			"help": ""
+			"description": "Équipes de gestion accessibles à l'utilisateur.",
+			"help": "Sélectionnez les équipes accessibles à l'utilisateur."
 		},
 		"setting_values_ids": {
 			"label": "Préférences",
-			"description": "",
-			"help": ""
+			"description": "Préférences propres à l'utilisateur.",
+			"help": "Configurez les préférences propres à l'utilisateur."
 		},
 		"permissions_ids":{
 			"label": "Permissions",
-			"description": "",
-			"help": ""
+			"description": "Permissions accordées à l'utilisateur.",
+			"help": "Sélectionnez les permissions accordées à l'utilisateur."
 		}
 	},
 	"view": {

@@ -6,7 +6,7 @@
         "center_office_id": {
             "label": "Equipe de gestion",
             "description": "Equipe de gestion du centre.",
-            "help": ""
+            "help": "Sélectionnez l'équipe chargée de la gestion du centre."
         },
         "use_office_details": {
             "label": "Coordonnées de l'Equipe de gestion?",
@@ -16,67 +16,67 @@
         "code_alpha": {
             "label": "Mnémo",
             "description": "Code alpha du centre (2 lettres majuscules).",
-            "help": ""
+            "help": "Saisissez un code unique composé de deux lettres majuscules."
         },
         "manager_id": {
             "label": "Gérant",
             "description": "Personne de référence pour la gérance, le cas échéant.",
-            "help": ""
+            "help": "Sélectionnez la personne responsable de la gestion du centre."
         },
         "organisation_id": {
             "label": "Organisation",
             "description": "Organisation mère du Centre.",
-            "help": ""
+            "help": "Sélectionnez l'organisation à laquelle appartient le centre."
         },
         "price_list_category_id": {
             "label": "Catégorie de liste de prix",
             "description": "Catégorie de liste de prix utilisée par le centre.",
-            "help": ""
+            "help": "Sélectionnez la catégorie de tarifs applicable au centre."
         },
         "discount_list_category_id": {
             "label": "Catégorie de liste de remise",
             "description": "Catégorie de liste de remise utilisée par le centre.",
-            "help": ""
+            "help": "Sélectionnez la catégorie de remises applicable au centre."
         },
         "autosale_list_category_id": {
             "label": "Catégorie de produits automatiques",
             "description": "Catégorie de produits automatiques utilisée par le centre.",
-            "help": ""
+            "help": "Sélectionnez la catégorie de ventes automatiques du centre."
         },
         "season_category_id": {
             "label": "Catégorie de saison",
             "description": "Catégorie de saison utilisée par le centre.",
-            "help": ""
+            "help": "Sélectionnez la catégorie de saisons applicable au centre."
         },
         "template_category_id": {
             "label": "Catégorie de modèles de documents",
             "description": "Catégorie de modèles (templates) utilisée par le centre.",
-            "help": ""
+            "help": "Sélectionnez la catégorie de modèles utilisée par le centre."
         },
         "categories_ids": {
             "label": "Catégories",
             "description": "Catégories auxquelles appartient le centre, le cas échéant.",
-            "help": ""
+            "help": "Sélectionnez les catégories auxquelles appartient le centre."
         },
         "rental_units_ids": {
             "label": "Unités locatives",
             "description": "List of rental units of the center.",
-            "help": ""
+            "help": "Consultez les unités locatives rattachées au centre."
         },
         "product_families_ids": {
             "label": "Produit de familles",
             "description": "Produits pour les familles du centre.",
-            "help": ""
+            "help": "Sélectionnez les familles de produits proposées par le centre."
         },
         "pos_default_customer_id": {
             "label": "Client caisse",
             "description": "Client à utiliser par défaut pour les points de vente (caisse).",
-            "help": ""
+            "help": "Sélectionnez le client utilisé par défaut pour les ventes en caisse."
         },
         "has_citytax_school": {
             "label": "Taxe de séjour scolaire?",
-            "description": "Le centre applique la taxe de séjour pour les séjours scolaires ?.",
-            "help": ""
+            "description": "Application de la taxe de séjour aux séjours scolaires.",
+            "help": "Activez cette option si la taxe s'applique aux séjours scolaires."
         }
     },
     "view": {

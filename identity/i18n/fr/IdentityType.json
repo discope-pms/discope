@@ -6,17 +6,17 @@
 		"name": {
 			"label": "Nom",
 			"description": "Nom de l'utilisateur.",
-			"help": ""
+			"help": "Indiquez le nom du type d'identité."
 		},
 		"code": {
 			"label": "Code",
 			"description": "Le code du type d'identité.",
-			"help": ""
+			"help": "Indiquez le code unique du type d'identité."
 		},
 		"description": {
 			"label": "Description",
 			"description": "Description.",
-			"help": ""
+			"help": "Décrivez l'usage de ce type d'identité."
 		}
 	},
 	"view": {

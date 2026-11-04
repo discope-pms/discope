@@ -6,12 +6,12 @@
         "name": {
             "label": "Nom",
             "description": "Identité de l'utilisateur.",
-            "help": ""
+            "help": "Ce nom permet d'identifier rapidement l'identité."
         },
         "display_name": {
             "label": "Nom d'affichage",
             "description": "Nom d'affichage de l'identité.",
-            "help": ""
+            "help": "Ce nom calculé est utilisé dans les listes et sélections."
         },
         "type": {
             "label": "Type",
@@ -23,17 +23,17 @@
                 "NP": "Association à but non lucratif",
                 "PA": "Administration publique"
             },
-            "help": ""
+            "help": "Ce code est déterminé par le type détaillé de l'identité."
         },
         "type_id": {
             "label": "Type",
-            "description": "",
-            "help": ""
+            "description": "Type détaillé de l'identité.",
+            "help": "Sélectionnez la catégorie correspondant à l'identité."
         },
         "legal_name": {
             "label": "Nom légal",
             "description": "Nom complet de l'Identité.",
-            "help": ""
+            "help": "Indiquez le nom officiel complet de l'organisation."
         },
         "short_name": {
             "label": "Nom usuel",
@@ -43,52 +43,52 @@
         "has_parent": {
             "label": "Département ou filiale",
             "description": "Cette identité est un département d'une organisation.",
-            "help": ""
+            "help": "Activez cette option si l'identité dépend d'une organisation."
         },
         "has_vat": {
             "label": "Assujetti TVA",
             "description": "Cette organisation a-t-elle un numéro de TVA ?",
-            "help": ""
+            "help": "Activez cette option si l'organisation est assujettie à la TVA."
         },
         "vat_number": {
             "label": "Numéro de TVA",
             "description": "Numéro d'identification à la TVA.",
-            "help": ""
+            "help": "Indiquez le numéro de TVA officiel de l'organisation."
         },
         "registration_number": {
             "label": "Numéro d'entreprise",
             "description": "Numéro d'enregistrement commercial (numéro d'entreprise).",
-            "help": ""
+            "help": "Indiquez le numéro officiel d'enregistrement de l'organisation."
         },
         "citizen_identification": {
             "label": "Numéro de registre national",
             "description": "Numéro de registre national (facultatif).",
-            "help": ""
+            "help": "Indiquez le numéro de registre national si nécessaire."
         },
         "children_ids": {
             "label": "Filiales",
             "description": "Les organisations appartenant à l'entreprise, le cas échéant.",
-            "help": ""
+            "help": "Consultez les filiales ou départements de l'organisation."
         },
         "parent_id": {
             "label": "Organisation mère",
             "description": "Société mère dont l'organisation est une filiale, le cas échéant.",
-            "help": ""
+            "help": "Sélectionnez l'organisation mère de cette identité."
         },
         "employees_ids": {
             "label": "Employés",
             "description": "Liste des employés de l'organisation.",
-            "help": ""
+            "help": "Consultez les employés liés à l'organisation."
         },
         "customers_ids": {
             "label": "Clients",
             "description": "Liste des clients de l'organisation.",
-            "help": ""
+            "help": "Consultez les clients liés à l'organisation."
         },
         "providers_ids": {
             "label": "Fournisseurs",
             "description": "Liste des prestataires de l'organisation, le cas échéant.",
-            "help": ""
+            "help": "Consultez les fournisseurs liés à l'organisation."
         },
         "contacts_ids": {
             "label": "Contacts",
@@ -98,7 +98,7 @@
         "address_street": {
             "label": "Rue",
             "description": "Rue et numéro.",
-            "help": ""
+            "help": "Indiquez la rue et le numéro de l'adresse principale."
         },
         "address_dispatch": {
             "label": "Complément d'adresse",
@@ -108,42 +108,289 @@
         "address_city": {
             "label": "Ville",
             "description": "Ville.",
-            "help": ""
+            "help": "Indiquez la ville de l'adresse principale."
         },
         "address_zip": {
             "label": "Code Postal",
             "description": "Code Postal.",
-            "help": ""
+            "help": "Indiquez le code postal de l'adresse principale."
         },
         "address_state": {
             "label": "État",
             "description": "État ou région.",
-            "help": ""
+            "help": "Indiquez l'état ou la région si nécessaire."
         },
         "address_country": {
             "label": "Pays",
             "description": "Pays.",
-            "help": ""
+            "selection": {
+                "AF": "Afghanistan",
+                "AX": "Îles Åland",
+                "AL": "Albanie",
+                "DZ": "Algérie",
+                "AS": "Samoa américaines",
+                "AD": "Andorre",
+                "AO": "Angola",
+                "AI": "Anguilla",
+                "AQ": "Antarctique",
+                "AG": "Antigua-et-Barbuda",
+                "AR": "Argentine",
+                "AM": "Arménie",
+                "AW": "Aruba",
+                "AU": "Australie",
+                "AT": "Autriche",
+                "AZ": "Azerbaïdjan",
+                "BS": "Bahamas",
+                "BH": "Bahreïn",
+                "BD": "Bangladesh",
+                "BB": "Barbade",
+                "BY": "Biélorussie",
+                "BE": "Belgique",
+                "BZ": "Belize",
+                "BJ": "Bénin",
+                "BM": "Bermudes",
+                "BT": "Bhoutan",
+                "BO": "Bolivie",
+                "BA": "Bosnie-Herzégovine",
+                "BW": "Botswana",
+                "BV": "Île Bouvet",
+                "BR": "Brésil",
+                "IO": "Territoire britannique de l'océan Indien",
+                "BN": "Brunei",
+                "BG": "Bulgarie",
+                "BF": "Burkina Faso",
+                "BI": "Burundi",
+                "KH": "Cambodge",
+                "CM": "Cameroun",
+                "CA": "Canada",
+                "CV": "Cap-Vert",
+                "KY": "Îles Caïmans",
+                "CF": "République centrafricaine",
+                "TD": "Tchad",
+                "CL": "Chili",
+                "CN": "Chine",
+                "CX": "Île Christmas",
+                "CC": "Îles Cocos",
+                "CO": "Colombie",
+                "KM": "Comores",
+                "CG": "Congo",
+                "CD": "République démocratique du Congo",
+                "CK": "Îles Cook",
+                "CR": "Costa Rica",
+                "CI": "Côte d'Ivoire",
+                "HR": "Croatie",
+                "CU": "Cuba",
+                "CY": "Chypre",
+                "CZ": "Tchéquie",
+                "DK": "Danemark",
+                "DJ": "Djibouti",
+                "DM": "Dominique",
+                "DO": "République dominicaine",
+                "EC": "Équateur",
+                "EG": "Égypte",
+                "SV": "Salvador",
+                "GQ": "Guinée équatoriale",
+                "ER": "Érythrée",
+                "EE": "Estonie",
+                "ET": "Éthiopie",
+                "FK": "Îles Malouines",
+                "FO": "Îles Féroé",
+                "FJ": "Fidji",
+                "FI": "Finlande",
+                "FR": "France",
+                "GF": "Guyane française",
+                "PF": "Polynésie française",
+                "TF": "Terres australes françaises",
+                "GA": "Gabon",
+                "GM": "Gambie",
+                "GE": "Géorgie",
+                "DE": "Allemagne",
+                "GH": "Ghana",
+                "GI": "Gibraltar",
+                "GR": "Grèce",
+                "GL": "Groenland",
+                "GD": "Grenade",
+                "GP": "Guadeloupe",
+                "GU": "Guam",
+                "GT": "Guatemala",
+                "GG": "Guernesey",
+                "GN": "Guinée",
+                "GW": "Guinée-Bissau",
+                "GY": "Guyana",
+                "HT": "Haïti",
+                "HM": "Îles Heard-et-MacDonald",
+                "VA": "Vatican",
+                "HN": "Honduras",
+                "HK": "Hong Kong",
+                "HU": "Hongrie",
+                "IS": "Islande",
+                "IN": "Inde",
+                "ID": "Indonésie",
+                "IR": "Iran",
+                "IQ": "Irak",
+                "IE": "Irlande",
+                "IM": "Île de Man",
+                "IL": "Israël",
+                "IT": "Italie",
+                "JM": "Jamaïque",
+                "JP": "Japon",
+                "JE": "Jersey",
+                "JO": "Jordanie",
+                "KZ": "Kazakhstan",
+                "KE": "Kenya",
+                "KI": "Kiribati",
+                "KR": "Corée du Sud",
+                "KW": "Koweït",
+                "KG": "Kirghizistan",
+                "LA": "Laos",
+                "LV": "Lettonie",
+                "LB": "Liban",
+                "LS": "Lesotho",
+                "LR": "Liberia",
+                "LY": "Libye",
+                "LI": "Liechtenstein",
+                "LT": "Lituanie",
+                "LU": "Luxembourg",
+                "MO": "Macao",
+                "MK": "Macédoine du Nord",
+                "MG": "Madagascar",
+                "MW": "Malawi",
+                "MY": "Malaisie",
+                "MV": "Maldives",
+                "ML": "Mali",
+                "MT": "Malte",
+                "MH": "Îles Marshall",
+                "MQ": "Martinique",
+                "MR": "Mauritanie",
+                "MU": "Maurice",
+                "YT": "Mayotte",
+                "MX": "Mexique",
+                "FM": "Micronésie",
+                "MD": "Moldavie",
+                "MC": "Monaco",
+                "MN": "Mongolie",
+                "ME": "Monténégro",
+                "MS": "Montserrat",
+                "MA": "Maroc",
+                "MZ": "Mozambique",
+                "MM": "Myanmar",
+                "NA": "Namibie",
+                "NR": "Nauru",
+                "NP": "Népal",
+                "NL": "Pays-Bas",
+                "AN": "Antilles néerlandaises",
+                "NC": "Nouvelle-Calédonie",
+                "NZ": "Nouvelle-Zélande",
+                "NI": "Nicaragua",
+                "NE": "Niger",
+                "NG": "Nigeria",
+                "NU": "Niue",
+                "NF": "Île Norfolk",
+                "MP": "Îles Mariannes du Nord",
+                "NO": "Norvège",
+                "OM": "Oman",
+                "PK": "Pakistan",
+                "PW": "Palaos",
+                "PS": "Territoires palestiniens",
+                "PA": "Panama",
+                "PG": "Papouasie-Nouvelle-Guinée",
+                "PY": "Paraguay",
+                "PE": "Pérou",
+                "PH": "Philippines",
+                "PN": "Pitcairn",
+                "PL": "Pologne",
+                "PT": "Portugal",
+                "PR": "Porto Rico",
+                "QA": "Qatar",
+                "RE": "La Réunion",
+                "RO": "Roumanie",
+                "RU": "Russie",
+                "RW": "Rwanda",
+                "BL": "Saint-Barthélemy",
+                "SH": "Sainte-Hélène",
+                "KN": "Saint-Christophe-et-Niévès",
+                "LC": "Sainte-Lucie",
+                "MF": "Saint-Martin",
+                "PM": "Saint-Pierre-et-Miquelon",
+                "VC": "Saint-Vincent-et-les-Grenadines",
+                "WS": "Samoa",
+                "SM": "Saint-Marin",
+                "ST": "Sao Tomé-et-Principe",
+                "SA": "Arabie saoudite",
+                "SN": "Sénégal",
+                "RS": "Serbie",
+                "SC": "Seychelles",
+                "SL": "Sierra Leone",
+                "SG": "Singapour",
+                "SK": "Slovaquie",
+                "SI": "Slovénie",
+                "SB": "Îles Salomon",
+                "SO": "Somalie",
+                "ZA": "Afrique du Sud",
+                "GS": "Géorgie du Sud-et-les Îles Sandwich du Sud",
+                "ES": "Espagne",
+                "LK": "Sri Lanka",
+                "SD": "Soudan",
+                "SR": "Suriname",
+                "SJ": "Svalbard et Jan Mayen",
+                "SZ": "Eswatini",
+                "SE": "Suède",
+                "CH": "Suisse",
+                "SY": "Syrie",
+                "TW": "Taïwan",
+                "TJ": "Tadjikistan",
+                "TZ": "Tanzanie",
+                "TH": "Thaïlande",
+                "TL": "Timor oriental",
+                "TG": "Togo",
+                "TK": "Tokelau",
+                "TO": "Tonga",
+                "TT": "Trinité-et-Tobago",
+                "TN": "Tunisie",
+                "TR": "Turquie",
+                "TM": "Turkménistan",
+                "TC": "Îles Turques-et-Caïques",
+                "TV": "Tuvalu",
+                "UG": "Ouganda",
+                "UA": "Ukraine",
+                "AE": "Émirats arabes unis",
+                "GB": "Royaume-Uni",
+                "US": "États-Unis",
+                "UM": "Îles mineures éloignées des États-Unis",
+                "UY": "Uruguay",
+                "UZ": "Ouzbékistan",
+                "VU": "Vanuatu",
+                "VE": "Venezuela",
+                "VN": "Viêt Nam",
+                "VG": "Îles Vierges britanniques",
+                "VI": "Îles Vierges des États-Unis",
+                "WF": "Wallis-et-Futuna",
+                "EH": "Sahara occidental",
+                "YE": "Yémen",
+                "ZM": "Zambie",
+                "ZW": "Zimbabwe"
+            },
+            "help": "Sélectionnez le pays de l'adresse principale."
         },
         "email": {
             "label": "Email",
             "description": "Adresse e-mail principale.",
-            "help": ""
+            "help": "Indiquez l'adresse e-mail principale de l'identité."
         },
         "phone": {
             "label": "Numéro de téléphone",
             "description": "Numéro de téléphone.",
-            "help": ""
+            "help": "Indiquez le numéro de téléphone principal de l'identité."
         },
         "website": {
             "label": "Site Web officiel",
             "description": "URL du site Web officiel de l'organisation, le cas échéant.",
-            "help": ""
+            "help": "Indiquez l'adresse complète du site officiel."
         },
         "addresses_ids": {
             "label": "Adresses",
             "description": "Liste des adresses liées à l'identité.",
-            "help": ""
+            "help": "Consultez les autres adresses associées à l'identité."
         },
         "reference_partner_id": {
             "label": "Personne de référence",
@@ -153,17 +400,17 @@
         "user_id": {
             "label": "Utilisateur",
             "description": "Utilisateur associé à cette identité.",
-            "help": ""
+            "help": "Consultez le compte utilisateur associé à l'identité."
         },
         "firstname": {
             "label": "Prénom",
             "description": "Nom complet du contact (doit être une personne, pas un rôle).",
-            "help": ""
+            "help": "Indiquez le prénom officiel de la personne."
         },
         "lastname": {
             "label": "Nom",
             "description": "Nom.",
-            "help": ""
+            "help": "Indiquez le nom de famille officiel de la personne."
         },
         "gender": {
             "label": "Genre",
@@ -173,7 +420,7 @@
                 "F": "Féminin",
                 "X": "Non-binaire"
             },
-            "help": ""
+            "help": "Sélectionnez le genre de la personne."
         },
         "title": {
             "label": "Titre",
@@ -185,27 +432,27 @@
                 "Mr": "Monsieur",
                 "Pr": "Professeur"
             },
-            "help": ""
+            "help": "Sélectionnez le titre de civilité de la personne."
         },
         "date_of_birth": {
             "label": "Date de naissance",
             "description": "Date de naissance de la personne.",
-            "help": ""
+            "help": "Indiquez la date de naissance de la personne."
         },
         "lang_id": {
             "label": "Langue",
             "description": "Langue parlée préférée.",
-            "help": ""
+            "help": "Sélectionnez la langue de communication préférée."
         },
         "bank_account_iban": {
             "label": "IBAN",
             "description": "Compte bancaire.",
-            "help": ""
+            "help": "Indiquez l'IBAN du compte bancaire de l'identité."
         },
         "bank_account_bic": {
             "label": "BIC",
             "description": "Identifiant BIC lié au compte.",
-            "help": ""
+            "help": "Indiquez le code BIC de la banque associée."
         },
         "description": {
             "label": "Observations",
@@ -215,32 +462,32 @@
         "flag_latepayer": {
             "label": "Mauvais payeur",
             "description": "Le client est un payeur lent ou difficile.",
-            "help": ""
+            "help": "Activez cette alerte pour signaler un paiement difficile."
         },
         "flag_damage": {
             "label": "Attention dégâts",
             "description": "Le client a déjà occasionné des dégâts lors de ses réservations.",
-            "help": ""
+            "help": "Activez cette alerte si le client a occasionné des dégâts."
         },
         "flag_nuisance": {
             "label": "Attention nuisances",
-            "description": "Le client a déjà occasionné des nuisances lors de ses réservations.",
-            "help": ""
+            "description": "Historique de nuisances du client.",
+            "help": "Activez cette alerte si le client a occasionné des nuisances."
         },
         "flag_trusted": {
             "label": "Client de confiance",
             "description": "Le client est considéré comme de confiance.",
-            "help": ""
+            "help": "Activez cette option pour signaler un client de confiance."
         },
         "email_secondary": {
             "label": "Email secondaire",
             "description": "Adresse e-mail secondaire.",
-            "help": ""
+            "help": "Indiquez une seconde adresse e-mail si nécessaire."
         },
         "invoices_ids": {
             "label": "Factures",
-            "description": "Le client a déjà occasionné des nuisances lors de ses réservations",
-            "help": ""
+            "description": "Factures liées à l'identité en tant que client.",
+            "help": "Consultez les factures associées à cette identité."
         },
         "has_duplicate_clue": {
             "label": "Risque de doublon",
@@ -254,26 +501,28 @@
         },
         "duplicate_identity_id": {
             "label": "Doublon de",
-            "description": "Identité dont cette identité est un doublon."
+            "description": "Identité dont cette identité est un doublon.",
+            "help": "Sélectionnez l'identité originale correspondant au doublon."
         },
         "is_duplicate": {
             "label": "Est un doublon",
-            "description": "Identité qui est un doublon."
+            "description": "Identité qui est un doublon.",
+            "help": "Cette valeur indique si une identité originale a été trouvée."
         },
         "is_ota": {
             "label": "Origine OTA",
             "description": "Est-ce que l'identité est originaire d'un OTA.",
-            "help": ""
+            "help": "Activez cette option si l'identité provient d'une OTA."
         },
         "logo_document_id": {
             "label": "Document",
             "description": "Le document contenant le logo associé à l'organisation.",
-            "help": ""
+            "help": "Sélectionnez le document contenant le logo de l'organisation."
         },
         "accounting_account": {
             "label": "Code Comptable",
             "description": "Code unique identifiant le compte comptable associé.",
-            "help": ""
+            "help": "Ce code identifie le compte comptable associé à l'identité."
         }
     },
     "view": {

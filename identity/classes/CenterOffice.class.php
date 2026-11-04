@@ -6,6 +6,7 @@
 */
 namespace identity;
 
+use discope\setting\Setting;
 use equal\data\DataGenerator;
 
 class CenterOffice extends \identity\Establishment {
@@ -82,8 +83,9 @@ class CenterOffice extends \identity\Establishment {
                     'detailed'
                 ],
                 'description'       => 'Default mode to use when rendering official documents.',
-                'default'           => 'defaultFromSetting',
-                'setting_default'   => 'simple'
+                'default'           => function() {
+                    return Setting::get_value('identity', 'default', 'center_office.docs_default_mode', 'simple');
+                }
             ],
 
             'printer_type' => [
@@ -93,27 +95,30 @@ class CenterOffice extends \identity\Establishment {
                     'iso-a4'
                 ],
                 'description'       => 'Printer format to be used for PoS tickets.',
-                'default'           => 'defaultFromSetting',
-                'setting_default'   => 'iso-a4'
+                'default'           => function() {
+                    return Setting::get_value('identity', 'default', 'center_office.printer_type', 'iso-a4');
+                }
             ],
 
             'rentalunits_manual_assignment' => [
                 'type'              => 'boolean',
-                'description'       => 'Flag for forcing manual assignment of the rental units during booking.',
-                'default'           => 'defaultFromSetting',
-                'setting_default'   => false
+                'description'       => 'Force manual assignment of rental units during booking.',
+                'default'           => function() {
+                    return Setting::get_value('identity', 'default', 'center_office.rentalunits_manual_assignment', false);
+                }
             ],
 
             'freebies_manual_assignment' => [
                 'type'              => 'boolean',
-                'description'       => 'Deprecated. Flag for forcing manual assignment of the freebies during booking.',
-                'default'           => 'defaultFromSetting',
-                'setting_default'   => false
+                'description'       => 'Deprecated: force manual assignment of booking freebies.',
+                'default'           => function() {
+                    return Setting::get_value('identity', 'default', 'center_office.freebies_manual_assignment', false);
+                }
             ],
 
             'checkedout_revert_to_quote' => [
                 'type'              => 'boolean',
-                'description'       => "Allow to revert a Booking status from checkedin/checkedout to quote.",
+                'description'       => 'Allow reverting checked-in or checked-out bookings to quotes.',
                 'default'           => false
             ],
 
@@ -157,7 +162,7 @@ class CenterOffice extends \identity\Establishment {
                 'rel_table'         => 'identity_center_office_rel_sale_booking_task_model',
                 'rel_foreign_key'   => 'task_models_id',
                 'rel_local_key'     => 'center_office_id',
-                'description'       => "Follow up tasks models that are associated with the center office.",
+                'description'       => 'Follow-up task models associated with the center office.',
                 'help'              => "When a booking is created for a center office, follow up tasks are generated depending on its associated models."
             ],
 
@@ -168,7 +173,7 @@ class CenterOffice extends \identity\Establishment {
                 'rel_table'         => 'identity_center_office_rel_sale_camp_task_model',
                 'rel_foreign_key'   => 'task_models_id',
                 'rel_local_key'     => 'center_office_id',
-                'description'       => "Follow up tasks models that are associated with the center office.",
+                'description'       => 'Camp follow-up task models associated with the center office.',
                 'help'              => "When a camp enrollment is created for a center office, follow up tasks are generated depending on its associated models."
             ],
 
