@@ -6,12 +6,12 @@
         "name": {
             "label": "Nom",
             "description": "Code mnémo du modèle.",
-            "help": ""
+            "help": "Nom calculé à partir de la catégorie, du type et du code du modèle."
         },
         "category_id": {
             "label": "Catégorie",
             "description": "La catégorie à laquelle appartient le modèle.",
-            "help": ""
+            "help": "Sélectionnez la catégorie à laquelle appartient le modèle."
         },
         "type": {
             "label": "Type",
@@ -25,7 +25,7 @@
                 "planning": "planning",
                 "camp": "camp"
             },
-            "help": ""
+            "help": "Sélectionnez le contexte dans lequel le modèle sera utilisé."
         }
     },
     "view": {

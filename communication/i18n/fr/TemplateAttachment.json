@@ -5,28 +5,28 @@
     "model": {
         "name": {
             "label": "Nom",
-            "description": "",
-            "help": ""
+            "description": "Code de la pièce jointe.",
+            "help": "Indiquez un nom permettant d'identifier la pièce jointe."
         },
         "template_id": {
             "label": "Template",
-            "description": "",
-            "help": ""
+            "description": "Modèle auquel appartient la pièce jointe.",
+            "help": "Sélectionnez le modèle auquel associer la pièce jointe."
         },
         "document_id": {
             "label": "Document",
-            "description": "",
-            "help": ""
+            "description": "Document utilisé comme pièce jointe.",
+            "help": "Sélectionnez le document à joindre aux communications générées."
         },
         "lang_id": {
             "label": "Langue",
-            "description": "",
-            "help": ""
+            "description": "Langue du document joint.",
+            "help": "Sélectionnez la langue dans laquelle ce document doit être utilisé."
         },
         "attachment_type": {
             "label": "Type",
-            "description": "",
-            "help": "",
+            "description": "Type de destinataire auquel la pièce jointe est destinée.",
+            "help": "Sélectionnez les destinataires pour lesquels la pièce jointe doit être utilisée.",
             "selection": {
                 "all": "Tous",
                 "schools": "Écoles",

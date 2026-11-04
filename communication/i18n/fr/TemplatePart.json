@@ -5,18 +5,18 @@
     "model": {
         "name": {
             "label": "Nom",
-            "description": "",
-            "help": ""
+            "description": "Code de la partie de modèle.",
+            "help": "Indiquez un nom permettant d'identifier cette partie du modèle."
         },
         "template_id": {
             "label": "Modèle",
-            "description": "",
-            "help": ""
+            "description": "Modèle auquel appartient cette partie.",
+            "help": "Sélectionnez le modèle auquel associer cette partie."
         },
         "value": {
             "label": "Valeur",
-            "description": "",
-            "help": ""
+            "description": "Contenu HTML de la partie du modèle.",
+            "help": "Saisissez le contenu de cette partie du modèle au format HTML."
         }
     },
     "view": {

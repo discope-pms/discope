@@ -6,12 +6,12 @@
         "name": {
             "label": "Nom",
             "description": "Etiquette courte pour faciliter l'identification de la catégorie.",
-            "help": ""
+            "help": "Indiquez un nom court permettant d'identifier la catégorie."
         },
         "templates_ids": {
             "label": "Modèles",
             "description": "Modèles liés à cette catégorie.",
-            "help": ""
+            "help": "Liste des modèles associés à cette catégorie."
         }
     },
     "view": {
