@@ -63,7 +63,7 @@ class ExportingTask extends Model {
 
             'is_temp' => [
                 'type'              => 'boolean',
-                'description'       => "Flag marking the tasks lines resulting documents as Document (false) or DocumentTemp (true).",
+                'description'       => "Whether generated documents are temporary.",
                 'default'           => false
             ],
 
@@ -76,7 +76,7 @@ class ExportingTask extends Model {
                     'failing'
                 ],
                 'default'           => 'idle',
-                'description'       => 'Current status of the processing (to avoid concurrent executions).',
+                'description'       => 'Current task processing status.',
                 'help'              => "Remains `running` while all lines haven't been processed."
             ]
 

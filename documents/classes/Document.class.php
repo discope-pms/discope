@@ -43,7 +43,7 @@ class Document extends Model {
 
             'readable_size' => [
                 'type'              => 'computed',
-                'description'       => 'Readable size',
+                'description'       => 'Readable size.',
                 'function'          => 'calcReadableSize',
                 'result_type'       => 'string',
                 'store'             => true,

@@ -1,5 +1,6 @@
 {
     "name": "Exporting Task",
+    "description": "List of exporting tasks.",
     "header": {
         "actions": {
             "ACTION.CREATE" : false

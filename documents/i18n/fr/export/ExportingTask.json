@@ -6,22 +6,22 @@
         "name": {
             "label": "Nom",
             "description": "Nom du document.",
-            "help": ""
+            "help": "Saisissez le nom de la tâche d'export."
         },
         "download_link": {
             "label": "Lien téléchargement",
             "description": "Lien de téléchargement du document.",
-            "help": ""
+            "help": "Utilisez ce lien pour télécharger le document généré."
         },
         "is_exported": {
             "label": "Exporté",
             "description": "L'export a été téléchargé.",
-            "help": ""
+            "help": "Indique si l'export a déjà été téléchargé."
         },
         "is_temp": {
             "label": "Temporaire",
             "description": "Les documents générés doivent-ils être temporaires.",
-            "help": ""
+            "help": "Activez cette option pour générer des documents temporaires."
         },
         "status": {
             "label": "Status",
@@ -32,7 +32,7 @@
                 "ready": "Terminée",
                 "failing": "Échouée"
             },
-            "help": ""
+            "help": "Indique l'état actuel de la tâche d'export."
         }
     },
     "view": {

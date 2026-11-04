@@ -12,12 +12,12 @@
                 "payments": "règlements",
                 "camps_enrollments": "inscriptions camps"
             },
-            "help": ""
+            "help": "Sélectionnez le type de données à exporter."
         },
         "is_exported": {
             "label": "Téléchargé?",
             "description": "L'archive a-t-elle déjà été téléchargée ?",
-            "help": ""
+            "help": "Indique si l'archive a déjà été téléchargée."
         }
     },
     "view": {

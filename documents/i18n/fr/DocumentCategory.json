@@ -6,27 +6,27 @@
         "name": {
             "label": "Nom",
             "description": "Nom de la catégorie.",
-            "help": ""
+            "help": "Saisissez le nom de la catégorie."
         },
         "parent_id":{
             "label": "Parent",
             "description": "La catégorie parente.",
-            "help":""
+            "help":"Sélectionnez la catégorie parente."
         },
         "documents_ids":{
             "label": "Document",
             "description": "Le document auquel la catégorie se rapporte.",
-            "help":""
+            "help":"Liste les documents de cette catégorie."
         },
         "children_ids":{
             "label":"Enfants",
             "description":"Les catégories enfants.",
-            "help":""
+            "help":"Liste les sous-catégories de cette catégorie."
         },
         "path":{
             "label":"Path",
             "description":"Chemin d'accès.",
-            "help":""
+            "help":"Indique le chemin complet de la catégorie."
         }
     },
     "view": {

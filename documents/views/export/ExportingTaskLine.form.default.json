@@ -1,5 +1,6 @@
 {
     "name": "Exporting Task Line",
+    "description": "View and manage an exporting task line.",
     "layout": {
         "groups": [
             {

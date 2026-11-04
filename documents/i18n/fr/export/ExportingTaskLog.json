@@ -3,20 +3,15 @@
     "plural": "Logs tâches d'export",
     "description": "Vue par défaut pour la liste des logs de tâche d'export.",
     "model": {
-        "name": {
-            "label": "Nom",
-            "description": "Nom du log de tâche d'export.",
-            "help": ""
-        },
         "task_id": {
             "label": "Tâche d'export",
             "description": "Tâche d'export du log.",
-            "help": ""
+            "help": "Sélectionnez la tâche d'export associée au log."
         },
         "task_line_id": {
             "label": "Ligne tâche d'export",
             "description": "Tâche d'export de la ligne du log.",
-            "help": ""
+            "help": "Sélectionnez la ligne de tâche associée au log."
         },
         "status": {
             "label": "Status",
@@ -25,12 +20,12 @@
                 "success": "Succès",
                 "error": "Erreurs"
             },
-            "help": ""
+            "help": "Indique le résultat de l'exécution de la tâche."
         },
         "log": {
             "label": "Contenu log",
             "description": "Le contenu du log.",
-            "help": ""
+            "help": "Consultez la valeur renvoyée par le contrôleur."
         }
     },
     "view": {

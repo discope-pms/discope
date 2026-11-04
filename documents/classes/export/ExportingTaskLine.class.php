@@ -37,7 +37,7 @@ class ExportingTaskLine extends Model {
 
             'controller' => [
                 'type'              => 'string',
-                'description'       => "Full notation of the action controller to invoke (ex. core_example_action)."
+                'description'       => "Action controller to invoke (for example, core_example_action)."
             ],
 
             'params' => [
@@ -76,7 +76,7 @@ class ExportingTaskLine extends Model {
                     'failing'
                 ],
                 'default'           => 'idle',
-                'description'       => "Current status of the processing (to avoid concurrent executions)."
+                'description'       => "Current task-line processing status."
             ]
 
         ];

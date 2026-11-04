@@ -45,7 +45,7 @@ class ExportingTaskLog extends Model {
             'log' => [
                 'type'              => 'string',
                 'usage'             => 'text/plain',
-                'description'       => "The value returned at the execution of the controller targeted by the Task."
+                'description'       => "Value returned by the task controller."
             ]
 
         ];

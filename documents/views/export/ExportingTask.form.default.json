@@ -1,5 +1,6 @@
 {
     "name": "Exporting Task",
+    "description": "View and manage an exporting task.",
     "actions": [
         {
             "id": "action.retry",

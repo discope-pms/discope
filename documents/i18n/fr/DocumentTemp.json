@@ -6,57 +6,57 @@
         "name": {
             "label": "Nom",
             "description": "Nom du document.",
-            "help": ""
+            "help": "Saisissez le nom du document temporaire."
         },
         "data": {
             "label": "Données",
             "description": "Données binaires brutes du document.",
-            "help": ""
+            "help": "Contient les données binaires du document temporaire."
         },
         "type": {
             "label": "Type de média",
             "description": "Identifiant de format de données.",
-            "help": ""
+            "help": "Indique le type de média du document temporaire."
         },
         "size": {
             "label": "Taille",
             "description": "Taille du fichier (en octets).",
-            "help": ""
+            "help": "Indique la taille du document temporaire en octets."
         },
         "readable_size": {
             "label": "Taille",
             "description": "Taille du document (format simplifié).",
-            "help": ""
+            "help": "Affiche la taille du document temporaire dans un format lisible."
         },
         "hash": {
             "label": "Clé",
             "description": "Clé de hash unique du document.",
-            "help": ""
+            "help": "Identifie le document temporaire de manière unique."
         },
         "link": {
             "label": "Lien",
             "description": "Lien direct du document.",
-            "help": ""
+            "help": "Permet d'accéder directement au document temporaire."
         },
         "public": {
             "label": "Public",
             "description": "Le document est accessible par tous.",
-            "help": ""
+            "help": "Activez cette option pour rendre le document temporaire public."
         },
         "category_id": {
             "label": "Catégorie",
             "description": "Catégorie dans laquelle se trouve le document.",
-            "help": ""
+            "help": "Sélectionnez la catégorie du document temporaire."
         },
         "preview_image": {
             "label": "Aperçu",
             "description": "Vignette d'aperçu du document.",
-            "help": ""
+            "help": "Affiche une vignette d'aperçu du document temporaire."
         },
         "template_attachments_ids": {
             "label": "Pièces jointes",
             "description": "Pièces jointes utilisant le document.",
-            "help": ""
+            "help": "Liste les pièces jointes qui utilisent ce document temporaire."
         }
     },
     "view": {

@@ -1,5 +1,6 @@
 {
     "name": "Exporting Task Line",
+    "description": "List of exporting task lines.",
     "layout": {
         "items": [
             {

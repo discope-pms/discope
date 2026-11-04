@@ -6,37 +6,37 @@
         "name": {
             "label": "Nom",
             "description": "Nom de la ligne de tâche d'export.",
-            "help": ""
+            "help": "Saisissez le nom de la ligne de tâche."
         },
         "exporting_task_id": {
             "label": "Tâche d'export",
             "description": "Tâche d'export de la ligne.",
-            "help": ""
+            "help": "Sélectionnez la tâche d'export parente."
         },
         "pid": {
             "label": "PID",
             "description": "Identifiant processus.",
-            "help": ""
+            "help": "Indique l'identifiant du processus en cours."
         },
         "controller": {
             "label": "Controleur",
             "description": "Contrôleur a invoquer.",
-            "help": ""
+            "help": "Saisissez le contrôleur à invoquer."
         },
         "params": {
             "label": "Paramètres",
             "description": "Paramètres à transmettre au contrôleur.",
-            "help": ""
+            "help": "Saisissez les paramètres transmis au contrôleur."
         },
         "document_id": {
             "label": "Document",
             "description": "Le document généré.",
-            "help": ""
+            "help": "Indique le document généré par cette ligne."
         },
         "document_temp_id": {
             "label": "Document temporaire",
             "description": "Le document temporaire généré.",
-            "help": ""
+            "help": "Indique le document temporaire généré par cette ligne."
         },
         "status": {
             "label": "Status",
@@ -47,7 +47,7 @@
                 "ready": "Terminée",
                 "failing": "Échouée"
             },
-            "help": ""
+            "help": "Indique l'état actuel de la ligne de tâche."
         }
     },
     "view": {
