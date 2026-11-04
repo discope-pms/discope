@@ -5,13 +5,13 @@
     "model": {
         "name": {
             "label": "Libellé",
-            "description": "",
-            "help": ""
+            "description": "Libellé du compte comptable.",
+            "help": "Indiquez le libellé du compte comptable."
         },
         "code": {
             "label": "Code",
-            "description": "",
-            "help": ""
+            "description": "Code unique du compte comptable.",
+            "help": "Indiquez le code du compte comptable."
         },
         "nature": {
             "label": "Nature",
@@ -20,12 +20,12 @@
                 "B" : "Bilan",
                 "M" : "Gestion"
             },
-            "help": ""
+            "help": "Sélectionnez la nature comptable du compte."
         },
         "account_chart_id": {
             "label": "Plan comptable",
             "description": "Type d'opération auquel cette règle se rapporte.",
-            "help": ""
+            "help": "Sélectionnez le plan comptable auquel appartient ce compte."
         },
         "type": {
             "label": "Type",
@@ -50,17 +50,17 @@
                 "cost_of_sale" : "Pertes et Profits>Dépense>Coût des ventes",
                 "off_balance" : "Autre>Hors bilan"
             },
-            "help": ""
+            "help": "Sélectionnez la catégorie comptable du compte."
         },
         "analytic_section_id": {
             "label": "Section analytique",
             "description": "Code la section analytique attachée.",
-            "help": ""
+            "help": "Sélectionnez la section analytique associée au compte."
         },
         "is_visible": {
             "label": "Visible?",
             "description": "Permet de masquer le compte dans les listes.",
-            "help": ""
+            "help": "Décochez cette option pour masquer le compte dans les listes."
         }
     },
     "view": {       

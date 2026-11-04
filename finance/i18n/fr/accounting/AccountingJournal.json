@@ -6,22 +6,22 @@
         "name": {
             "label": "Nom",
             "description": "Nom du journal comptable.",
-            "help": ""
+            "help": "Indiquez un nom permettant d'identifier le journal comptable."
         },
         "description": {
             "label": "Description",
             "description": "Description du rôle du journal.",
-            "help": ""
+            "help": "Décrivez brièvement le rôle du journal comptable."
         },
         "code": {
             "label": "Code du journal",
-            "description": "",
-            "help": ""
+            "description": "Code unique du journal comptable.",
+            "help": "Indiquez le code du journal comptable."
         },
         "organisation_id": {
             "label": "Organisation",
-            "description": "",
-            "help": ""
+            "description": "Organisation à laquelle appartient le journal comptable.",
+            "help": "Sélectionnez l'organisation propriétaire du journal."
         },
         "type": {
             "label": "Type",
@@ -33,13 +33,13 @@
                 "bank_cash": "journal de trésorerie",
                 "miscellaneous": "journal des opérations diverses"
             },
-            "description": "",
-            "help": ""
+            "description": "Nature des opérations enregistrées dans le journal.",
+            "help": "Sélectionnez le type du journal comptable."
         },
         "center_office_id": {
             "label": "Équipe de gestion",
             "description": "Centre de gestion auquel appartient le journal.",
-            "help": ""
+            "help": "Sélectionnez l'équipe de gestion responsable du journal."
         }
     },
     "view": {

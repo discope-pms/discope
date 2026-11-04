@@ -6,22 +6,22 @@
         "name": {
             "label": "Nom",
             "description": "Nom de la section analytique.",
-            "help": ""
+            "help": "Indiquez un nom permettant d'identifier la section analytique."
         },
         "code": {
             "label": "Code",
             "description": "Code unique identifiant la section.",
-            "help": ""
+            "help": "Indiquez le code unique de la section analytique."
         },
         "label": {
             "label": "Label",
             "description": "Brève description de la rubrique.",
-            "help": ""
+            "help": "Décrivez brièvement le contenu de la section analytique."
         },
         "analytic_chart_id": {
             "label": "Tableau analytique",
             "description": "Le plan comptable auquel la ligne appartient.",
-            "help": ""
+            "help": "Sélectionnez le plan analytique auquel appartient la section."
         }
     },
     "view": {

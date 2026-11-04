@@ -6,12 +6,12 @@
 		"name": {
 			"label": "Nom",
 			"description": "Nom de la règle comptable.",
-			"help": ""
+			"help": "Indiquez un nom permettant d'identifier la règle comptable."
 		},
 		"description": {
 			"label": "Description",
 			"description": "Brève description de la règle pour servir de mémo.",
-			"help": ""
+			"help": "Décrivez brièvement l'objectif de la règle comptable."
 		},
 		"type": {
 			"label": "Type",
@@ -20,22 +20,22 @@
 				"purchase": "achat",
 				"sale": "vente"
 			},
-			"help": ""
+			"help": "Sélectionnez le type d'opération auquel la règle s'applique."
 		},
 		"vat_rule_id": {
 			"label": "Règle de TVA",
 			"description": "Règle de TVA à laquelle cette ligne est liée.",
-			"help": ""
+			"help": "Sélectionnez la règle de TVA associée."
 		},
 		"accounting_rule_line_ids": {
 			"label": "Lignes liées à cette règle",
 			"description": "Lignes liées à cette règle.",
-			"help": ""
+			"help": "Ajoutez les lignes d'imputation de la règle comptable."
 		},
 		"code_legacy": {
 			"label": "Code Historique",
-			"description": "",
-			"help": ""
+			"description": "Ancien code utilisé pour identifier la règle comptable.",
+			"help": "Indiquez le code historique de la règle, le cas échéant."
 		}
 	},
 	"view": {

@@ -1,4 +1,7 @@
 {
+    "name": "Facture",
+    "plural": "Factures",
+    "description": "Une facture est un document comptable relatif à une vente.",
     "model": {
         "type": {
             "label": "Type",
@@ -7,12 +10,12 @@
                 "invoice": "facture",
                 "credit_note": "avoir"
             },
-            "help": ""
+            "help": "Sélectionnez le type de document comptable."
         },
         "reversed_invoice_id": {
             "label": "Facture liée",
             "description": "La facture symétrique (facture annulée ou avoir).",
-            "help": ""
+            "help": "Consultez la facture ou la note de crédit liée."
         }
     },
     "view": {

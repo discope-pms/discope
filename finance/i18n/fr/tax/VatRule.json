@@ -6,12 +6,12 @@
 		"name": {
 			"label": "Nom",
 			"description": "Nom de la règle TVA.",
-			"help": ""
+			"help": "Indiquez un nom permettant d'identifier la règle de TVA."
 		},
 		"rate": {
 			"label": "Taux",
 			"description": "Taux de TVA de la règle.",
-			"help": ""
+			"help": "Indiquez le taux de TVA à appliquer."
 		},
 		"type": {
 			"label": "Type",
@@ -20,7 +20,7 @@
 				"purchase": "achat",
 				"sale": "vente"
 			},
-			"help": ""
+			"help": "Sélectionnez le type d'opération auquel la règle s'applique."
 		}
 	},
 	"view": {

@@ -40,12 +40,6 @@
             },
             {
                 "type": "field",
-                "label": "Free qty",
-                "value": "free_qty",
-                "width": "10%"
-            },
-            {
-                "type": "field",
                 "label": "Disc.%",
                 "value": "discount",
                 "width": "10%"

@@ -38,7 +38,7 @@ class InvoiceLine extends Model {
             'invoice_line_group_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'finance\accounting\InvoiceLineGroup',
-                'description'       => "Group the line relates to (in turn, groups relate to their invoice).",
+                'description'       => "Group containing this invoice line.",
                 'ondelete'          => 'cascade'
             ],
 
@@ -104,7 +104,7 @@ class InvoiceLine extends Model {
                 'type'              => 'computed',
                 'result_type'       => 'float',
                 'usage'             => 'amount/money:2',
-                'description'       => "Total tax-excluded price of the line without the discount applied.",
+                'description'       => "Tax-excluded line total before discount.",
                 'function'          => 'calcTotalNoDiscount',
                 'store'             => false
             ],
@@ -130,7 +130,7 @@ class InvoiceLine extends Model {
             'downpayment_invoice_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'finance\accounting\Invoice',
-                'description'       => "Downpayment invoice (set when the line refers to an invoiced downpayment.)"
+                'description'       => "Downpayment invoice linked to this line."
             ]
 
         ];

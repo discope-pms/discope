@@ -6,17 +6,17 @@
         "name": {
             "label": "Nom",
             "description": "Nom du plan comptable.",
-            "help": ""
+            "help": "Indiquez un nom permettant d'identifier le plan comptable."
         },
         "organisation_id": {
             "label": "Organisation",
             "description": "L'organisation à laquelle appartient l'organigramme.",
-            "help": ""
+            "help": "Sélectionnez l'organisation propriétaire du plan comptable."
         },
         "account_chart_lines_ids": {
             "label": "Comptes",
             "description": "Comptes relatifs au plan comptable.",
-            "help": ""
+            "help": "Ajoutez les comptes qui composent ce plan comptable."
         }        
     },
     "view": {

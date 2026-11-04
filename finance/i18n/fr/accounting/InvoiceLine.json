@@ -6,57 +6,52 @@
 		"invoice_id": {
 			"label": "Facture",
 			"description": "Facture à laquelle la ligne est liée.",
-			"help": ""
+			"help": "Sélectionnez la facture à laquelle appartient la ligne."
 		},
 		"invoice_line_group_id": {
 			"label": "Groupe",
 			"description": "Groupe de lignes de facture.",
-			"help": ""
+			"help": "Sélectionnez le groupe contenant cette ligne."
 		},
 		"product_id": {
 			"label": "Produit",
 			"description": "Le produit (SKU) auquel la ligne se rapporte.",
-			"help": ""
+			"help": "Sélectionnez le produit facturé."
 		},
 		"price": {
 			"label": "Prix TVAC",
 			"description": "Montant TTC associé à la ligne.",
-			"help": ""
+			"help": "Montant TVAC calculé pour la ligne."
 		},
 		"total": {
 			"label": "Total HTVA",
 			"description": "Montant HT associé à la ligne.",
-			"help": ""
+			"help": "Montant HTVA calculé pour la ligne."
 		},
         "unit_price": {
             "label": "P.U. ",
             "description": "Le prix unitaire du produit lié à la ligne.",
-            "help": ""
+            "help": "Prix unitaire appliqué au produit."
         },
         "price_id": {
             "label": "Prix",
             "description": "Le prix de la ligne.",
-            "help": ""
+            "help": "Sélectionnez le tarif appliqué à la ligne."
         },
         "vat_rate": {
             "label": "Taux TVA",
             "description": "Le taux de TVA appliqué.",
-            "help": ""
+            "help": "Taux de TVA appliqué au produit."
         },
         "qty": {
             "label": "Quantité",
             "description": "La quantité du produit.",
-            "help": ""
-        },
-        "free_qty": {
-            "label": "Gratuité",
-            "description": "Nombre d'unités accordées gratuitement.",
-            "help": ""
+            "help": "Indiquez la quantité facturée."
         },
         "discount": {
             "label": "Remise",
             "description": "La remise appliquée au total.",
-            "help": ""
+            "help": "Indiquez le taux de remise appliqué à la ligne."
         }
 	},
 	"view": {

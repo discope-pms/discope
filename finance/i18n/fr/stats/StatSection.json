@@ -6,22 +6,22 @@
         "name": {
             "label": "Nom",
             "description": "Nom de la section des statistiques.",
-            "help": ""
+            "help": "Indiquez un nom permettant d'identifier la section statistique."
         },
         "code": {
             "label": "Taux",
             "description": "Code unique identifiant la section.",
-            "help": ""
+            "help": "Indiquez le code unique de la section statistique."
         },
         "label": {
             "label": "Type",
             "description": "Brève description de la rubrique.",
-            "help": ""
+            "help": "Décrivez brièvement le contenu de la section statistique."
         },
         "stat_chart_id": {
             "label": "Type",
             "description": "The stats chart the line belongs to.",
-            "help": ""
+            "help": "Sélectionnez le plan statistique auquel appartient la section."
         }
     },
     "view": {

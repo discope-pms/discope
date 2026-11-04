@@ -6,27 +6,27 @@
         "name": {
             "label": "Nom",
             "description": "Étiquette pour le groupe.",
-            "help": ""
+            "help": "Indiquez un nom permettant d'identifier l'écriture comptable."
         },
         "invoice_id": {
             "label": "Facture",
             "description": "Facture à laquelle la ligne est liée.",
-            "help": ""
+            "help": "Sélectionnez la facture à laquelle appartient cette écriture."
         },
         "account_id": {
             "label": "Identifiant du compte",
-            "description": "",
-            "help": ""
+            "description": "Compte auquel l'écriture comptable est imputée.",
+            "help": "Sélectionnez le compte à utiliser pour cette écriture."
         },
         "debit": {
             "label": "Débit",
-            "description": "",
-            "help": ""
+            "description": "Montant porté au débit du compte.",
+            "help": "Indiquez le montant à débiter."
         },
         "credit": {
             "label": "Crédit",
-            "description": "",
-            "help": ""
+            "description": "Montant porté au crédit du compte.",
+            "help": "Indiquez le montant à créditer."
         }
     },
     "view": {

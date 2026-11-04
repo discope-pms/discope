@@ -37,7 +37,7 @@ class Invoice extends Model {
 
             'name_old' => [
                 'type'              => 'string',
-                'description'       => "Previous invoice number for invoice emitted before numbering change (as of february 2023)."
+                'description'       => "Invoice number used before the February 2023 numbering change."
             ],
 
             'customer_ref' => [
@@ -64,7 +64,7 @@ class Invoice extends Model {
 
             'status' => [
                 'type'              => 'string',
-                'description'       => "Current status of the invoice, either proforma, invoice or cancelled.",
+                'description'       => "Current invoice status: proforma, invoice, or cancelled.",
                 'selection'         => [
                     'proforma',             // draft invoice (no number yet)
                     'invoice',              // final invoice (with unique number and accounting entries)
@@ -95,7 +95,7 @@ class Invoice extends Model {
 
             'number' => [
                 'type'              => 'string',
-                'description'       => "Number of the invoice, according to organization logic (@see config/invoicing).",
+                'description'       => "Invoice number assigned according to organization settings.",
                 'default'          => '[proforma]',
             ],
 
@@ -111,7 +111,7 @@ class Invoice extends Model {
             'reversed_invoice_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'finance\accounting\Invoice',
-                'description'       => "Symmetrical link between credit note and cancelled invoice, if any.",
+                'description'       => "Linked credit note or cancelled invoice, when applicable.",
                 'visible'           => [[['status', '=', 'cancelled']], [['type', '=', 'credit_note']]]
             ],
 
@@ -260,7 +260,7 @@ class Invoice extends Model {
                 'result_type'       => 'float',
                 'function'          => 'calcAccountingTotal',
                 'usage'             => 'amount/money:4',
-                'description'       => 'Total tax-excluded price to record for accounting related outputs.',
+                'description'       => 'Tax-excluded total recorded in accounting outputs.',
                 'store'             => true
             ],
 
@@ -270,7 +270,7 @@ class Invoice extends Model {
                 'function'          => 'calcDisplayPrice',
                 'usage'             => 'amount/money:2',
                 'store'             => true,
-                'description'       => "Final tax-included amount used for display (inverted for credit notes)."
+                'description'       => "Displayed tax-included total, inverted for credit notes."
             ],
 
             'funding_id' => [
@@ -317,7 +317,7 @@ class Invoice extends Model {
 
             'has_orders' => [
                 'type'              => 'boolean',
-                'description'       => 'Flag marking that the invoice originates from one or more orders (PoS).',
+                'description'       => 'Whether the invoice originates from one or more PoS orders.',
                 'default'           => false
             ],
 

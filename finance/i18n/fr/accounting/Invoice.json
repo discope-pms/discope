@@ -6,12 +6,12 @@
         "name": {
             "label": "Numéro",
             "description": "Numéro de facture.",
-            "help": ""
+            "help": "Le numéro est attribué lors de l'émission de la facture."
         },
         "customer_ref": {
             "label": "Référence client",
-            "description": "Référence à indiquer sur la facture (si renseignée par le client).",
-            "help": ""
+            "description": "Référence demandée par le client à afficher sur la facture.",
+            "help": "Indiquez la référence communiquée par le client."
         },
         "status": {
             "label": "Statut",
@@ -21,7 +21,7 @@
                 "invoice": "facture",
                 "cancelled": "annulée"
             },
-            "help": ""
+            "help": "Consultez l'état actuel de la facture."
         },
         "type": {
             "label": "Type",
@@ -30,7 +30,7 @@
                 "invoice": "facture",
                 "credit_note": "note de crédit"
             },
-            "help": ""
+            "help": "Sélectionnez le type de document comptable."
         },
         "number": {
             "label": "Numéro de la facture",
@@ -40,12 +40,12 @@
         "is_paid": {
             "label": "Payée",
             "description": "Indicateur pour marquer la facture comme entièrement payée.",
-            "help": ""
+            "help": "Indique si la facture a été entièrement payée."
         },
         "date": {
             "label": "Date",
             "description": "Date de création de la facture.",
-            "help": ""
+            "help": "Indiquez la date d'émission de la facture."
         },
         "partner_id": {
             "label": "Destinataire",
@@ -55,47 +55,47 @@
         "organisation_id": {
             "label": "Organisation émettrice",
             "description": "Organisation à l'origine de la facture.",
-            "help": ""
+            "help": "Sélectionnez l'organisation qui émet la facture."
         },
         "price": {
             "label": "Prix",
             "description": "Montant TVAC de la facture.",
-            "help": ""
+            "help": "Montant total TVAC calculé pour la facture."
         },
         "total": {
             "label": "Total",
             "description": "Total HTVA de la facture.",
-            "help": ""
+            "help": "Montant total HTVA calculé pour la facture."
         },
         "due_date": {
             "label": "Échéance",
             "description": "Date limité avant laquelle le montant est dû.",
-            "help": ""
+            "help": "Date limite à laquelle le paiement est attendu."
         },
         "invoice_lines_ids": {
             "label": "Lignes de facture",
             "description": "Lignes de vente de la facture.",
-            "help": ""
+            "help": "Ajoutez les produits et quantités facturés."
         },
         "accounting_entries_ids": {
             "label": "Écritures comptables",
             "description": "Lignes d'écriture comptables de la facture.",
-            "help": ""
+            "help": "Consultez les écritures comptables générées pour la facture."
         },
         "reversed_invoice_id": {
             "label": "Facture liée",
             "description": "La facture symétrique (facture annulée ou note de crédit).",
-            "help": ""
+            "help": "Consultez la facture ou la note de crédit liée."
         },
         "center_office_id": {
             "label": "Équipe de gestion",
             "description": "Le centre de gestion à l'origine de la facture.",
-            "help": ""
+            "help": "Sélectionnez l'équipe de gestion qui émet la facture."
         },
         "display_price": {
             "label": "Total",
             "description": "Montant total de la facture.",
-            "help": ""
+            "help": "Montant total affiché pour la facture."
         },
         "balance": {
             "label": "Solde",
@@ -105,17 +105,17 @@
         "accounting_price": {
             "label": "Total",
             "description": "Montant total de la facture.",
-            "help": ""
+            "help": "Montant total enregistré en comptabilité."
         },
         "is_deposit": {
             "label": "Facture d'acompte",
             "description": "La facture est une facture d'acompte.",
-            "help": ""
+            "help": "Indique si la facture correspond à un acompte."
         },
         "is_exported": {
             "label": "Exportée",
-            "description": "La facture a été exportée",
-            "help": ""
+            "description": "La facture a été exportée.",
+            "help": "Indique si la facture a déjà été exportée."
         }
     },
     "view": {

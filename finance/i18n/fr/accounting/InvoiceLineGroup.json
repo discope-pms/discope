@@ -6,12 +6,12 @@
 		"name": {
 			"label": "Nom",
 			"description": "Étiquette pour le groupe.",
-			"help": ""
+			"help": "Indiquez un nom permettant d'identifier le groupe."
 		},
 		"invoice_id": {
 			"label": "Facture",
 			"description": "Facture à laquelle la ligne est liée.",
-			"help": ""
+			"help": "Sélectionnez la facture à laquelle appartient le groupe."
 		}
 	},
 	"view": {

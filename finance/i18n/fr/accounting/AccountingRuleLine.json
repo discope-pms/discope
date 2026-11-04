@@ -6,12 +6,12 @@
         "name":{
             "label":"Code", 
             "description": "Code de la ligne à servir de mémo.",
-            "help": ""
+            "help": "Indiquez un code permettant d'identifier la ligne."
         },
         "account":{
             "label":"Compte", 
             "description": "Code du compte concerné.",
-            "help": ""
+            "help": "Indiquez le code du compte à imputer."
         },
         "share":{
             "label":"Part de la ligne", 
@@ -21,7 +21,7 @@
         "accounting_rule_id":{
             "label":"Règle comptable", 
             "description": "Règle comptable à laquelle cette ligne est liée.",
-            "help": ""
+            "help": "Sélectionnez la règle comptable à laquelle appartient la ligne."
         }
     },
     "view": {

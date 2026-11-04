@@ -6,12 +6,12 @@
         "name": {
             "label": "Nom",
             "description": "Nom du plan comptable analytique.",
-            "help": ""
+            "help": "Indiquez un nom permettant d'identifier le plan analytique."
         },
         "organisation_id": {
             "label": "Organisation",
             "description": "The organisation the chart belongs to.",
-            "help": ""
+            "help": "Sélectionnez l'organisation propriétaire du plan analytique."
         }
     },
     "view": {

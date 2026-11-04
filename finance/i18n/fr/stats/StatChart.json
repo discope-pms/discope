@@ -6,12 +6,12 @@
         "name": {
             "label": "Nom",
             "description": "Nom du Plan statistique.",
-            "help": ""
+            "help": "Indiquez un nom permettant d'identifier le plan statistique."
         },
         "organisation_id": {
             "label": "Organisation",
             "description": "L'organisation à laquelle appartient l'organigramme.",
-            "help": ""
+            "help": "Sélectionnez l'organisation propriétaire du plan statistique."
         }
     },
     "view": {
