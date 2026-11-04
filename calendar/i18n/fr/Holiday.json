@@ -5,33 +5,33 @@
     "model": {
         "name": {
             "label": "Libellé",
-            "description": "",
-            "help": ""
+            "description": "Motif du congé ou du jour férié.",
+            "help": "Indiquez le libellé du congé ou du jour férié."
         },
         "date_from": {
             "label": "Date / Du",
             "description": "Date / premier jour du congé.",
-            "help": ""
+            "help": "Sélectionnez la date de début du congé."
         },
         "date_to": {
             "label": "Au",
             "description": "Dernier jour du congé.",
-            "help": ""
+            "help": "Sélectionnez la date de fin du congé."
         },
         "is_single_day": {
             "label": "Un seul jour ?",
             "description": "Le congé est-il un jour unique?",
-            "help": ""
+            "help": "Activez cette option si le congé ne dure qu'un seul jour."
         },
         "holiday_year_id": {
             "label": "Année",
             "description": "Année sur laquelle porte le congé.",
-            "help": ""
+            "help": "Sélectionnez l'année d'éphémérides à laquelle appartient le congé."
         },
         "year": {
             "label": "Année",
             "description": "Année sur laquelle porte le congé.",
-            "help": ""
+            "help": "Année calculée à partir de l'année d'éphémérides sélectionnée."
         },
         "type": {
             "label": "Type",
@@ -41,7 +41,7 @@
                 "public_holiday" : "Congé officiel"
 
             },
-            "help": ""
+            "help": "Sélectionnez s'il s'agit d'un congé scolaire ou d'un jour férié."
         }
         
     },

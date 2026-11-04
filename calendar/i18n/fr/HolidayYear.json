@@ -5,13 +5,13 @@
     "model": {
         "name": {
             "label": "Libellé",
-            "description": "",
-            "help": ""
+            "description": "Libellé de la liste annuelle des éphémérides.",
+            "help": "Indiquez le libellé permettant d'identifier cette année d'éphémérides."
         },
         "year": {
             "label": "Année",
             "description": "Année de listes d'éphémérides.",
-            "help": ""
+            "help": "Indiquez l'année correspondant à cette liste d'éphémérides."
         }        
     },
     "view": {       
