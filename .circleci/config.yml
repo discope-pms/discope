@@ -98,17 +98,17 @@ jobs:
       # run static analysis
       - run: ~/repo/vendor/bin/phpstan analyse --no-progress --level=1 --memory-limit=-1 --configuration=packages/phpstan.neon
       # run package consistency check
-      - run: php run.php --do=test_package-consistency --level=error --package=calendar
-      - run: php run.php --do=test_package-consistency --level=error --package=communication
-      - run: php run.php --do=test_package-consistency --level=error --package=discope
-      - run: php run.php --do=test_package-consistency --level=error --package=documents
-      - run: php run.php --do=test_package-consistency --level=error --package=finance
-      - run: php run.php --do=test_package-consistency --level=error --package=hr
-      - run: php run.php --do=test_package-consistency --level=error --package=identity
-      - run: php run.php --do=test_package-consistency --level=error --package=kaleo
-      - run: php run.php --do=test_package-consistency --level=error --package=lathus
-      - run: php run.php --do=test_package-consistency --level=error --package=sale
-      - run: php run.php --do=test_package-consistency --level=error --package=stats
+      - run: php run.php --do=test_package-consistency --level=* --package=calendar
+      - run: php run.php --do=test_package-consistency --level=* --package=communication
+      - run: php run.php --do=test_package-consistency --level=* --package=discope
+      - run: php run.php --do=test_package-consistency --level=* --package=documents
+      - run: php run.php --do=test_package-consistency --level=* --package=finance
+      - run: php run.php --do=test_package-consistency --level=* --package=hr
+      - run: php run.php --do=test_package-consistency --level=* --package=identity
+      - run: php run.php --do=test_package-consistency --level=* --package=kaleo
+      - run: php run.php --do=test_package-consistency --level=* --package=lathus
+      - run: php run.php --do=test_package-consistency --level=* --package=sale
+      - run: php run.php --do=test_package-consistency --level=* --package=stats
       # stock package not used yet
       # - run: php run.php --do=test_package-consistency --level=error --package=stock
       - run: php run.php --do=test_package-consistency --level=error --package=support
