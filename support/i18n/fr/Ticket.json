@@ -5,15 +5,13 @@
     "model": {
         "name": {
             "label": "Sujet",
-            "description": "Motif principal du ticket."
-        },
-        "created": {
-            "label": "Créé le",
-            "description": "Date de création du ticket."
+            "description": "Motif principal du ticket.",
+            "help": "Indiquez brièvement le motif de la demande."
         },
         "type": {
             "label": "Type",
             "description": "Le type renseigne la nature de l'action requise.",
+            "help": "Sélectionnez la nature de la demande.",
             "selection": {
                 "incident": "Incident",
                 "question": "Question",
@@ -23,6 +21,7 @@
         "priority": {
             "label": "Priorité",
             "description": "Niveau d'importance du ticket.",
+            "help": "Sélectionnez le niveau d'importance de la demande.",
             "selection": {
                 "1": "Basse",
                 "2": "Moyenne",
@@ -33,6 +32,7 @@
         "status": {
             "label": "Statut",
             "description": "Statut du ticket.",
+            "help": "Utilisez ce champ pour suivre l'avancement du ticket.",
             "selection": {
                 "draft": "Brouillon",
                 "open": "Ouvert",
@@ -43,15 +43,18 @@
         },
         "environment": {
             "label": "Environnement",
-            "description": "Environnement de utilisateur à l'origine du message."
+            "description": "Environnement de utilisateur à l'origine du message.",
+            "help": "Informations techniques collectées automatiquement lors de l'envoi."
         },
         "assignee_id": {
             "label": "Assigné à",
-            "description": "Personne en charge du suivi du ticket."
+            "description": "Personne en charge du suivi du ticket.",
+            "help": "Sélectionnez la personne responsable du traitement du ticket."
         },
         "attachments_ids": {
             "label": "Pièces jointes",
-            "description": "Documents associés au ticket."
+            "description": "Documents associés au ticket.",
+            "help": "Ajoutez les documents utiles au traitement du ticket."
         }
     },
     "view": {

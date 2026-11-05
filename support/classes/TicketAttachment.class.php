@@ -22,7 +22,7 @@ class TicketAttachment extends \documents\Document {
             'category_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'documents\DocumentCategory',
-                'description'       => 'Category of the document (default to \'support\')',
+                'description'       => 'Category of the document (defaults to \'support\').',
                 'default'           =>  2
             ],
 
