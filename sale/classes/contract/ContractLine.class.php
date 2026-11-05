@@ -29,7 +29,7 @@ class ContractLine extends Model {
 
             'description' => [
                 'type'              => 'string',
-                'description'       => "Complementary description of the line. If set, replaces the product name.",
+                'description'       => "Complementary description of the line.",
                 'default'           => ''
             ],
 
@@ -87,7 +87,7 @@ class ContractLine extends Model {
                 'type'              => 'computed',
                 'result_type'       => 'float',
                 'usage'             => 'amount/money:2',
-                'description'       => "Total tax-excluded price of the line without the discount applied.",
+                'description'       => "Total tax-excluded price of the line without the discount.",
                 'store'             => false,
                 'function'          => 'calcTotalNoDiscount'
             ],

@@ -45,7 +45,7 @@ class PartnerPlanningSummary extends Model {
 
             'sent_qty' => [
                 'type'              => 'integer',
-                'description'       => "Specifies how many times this planning summary has already been sent.",
+                'description'       => "How many times this planning summary has already been sent.",
                 'default'           => 0
             ],
 
@@ -80,7 +80,7 @@ class PartnerPlanningSummary extends Model {
             'mail_remarks' => [
                 'type'          => 'string',
                 'usage'         => 'text/plain',
-                'description'   => "Additional remarks added to the mail when the planning summary is sent.",
+                'description'   => "Additional remarks in the planning summary email.",
                 'dependencies'  => ['mail_content']
             ],
 

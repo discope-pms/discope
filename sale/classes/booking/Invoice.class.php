@@ -51,7 +51,7 @@ class Invoice extends \finance\accounting\Invoice {
             'reversed_invoice_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\booking\Invoice',
-                'description'       => "Symmetrical link between credit note and cancelled invoice, if any.",
+                'description'       => "Symmetrical link between credit note and cancelled invoice.",
                 'visible'           => [[['status', '=', 'cancelled']], [['type', '=', 'credit_note']]]
             ],
 

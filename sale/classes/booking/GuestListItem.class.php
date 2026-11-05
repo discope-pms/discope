@@ -50,7 +50,7 @@ class GuestListItem extends Model {
 
             'is_coordinator' => [
                 'type'              => 'boolean',
-                'description'       => 'The guest is the coordinator',
+                'description'       => 'The guest is the coordinator.',
                 'default'           => false
             ],
 
@@ -107,7 +107,7 @@ class GuestListItem extends Model {
 
             'address_zip' => [
                 'type'              => 'string',
-                'description'       => 'Postal code for the address of the guest"'
+                'description'       => 'Postal code for the guest address.'
             ],
 
             'address_city' => [

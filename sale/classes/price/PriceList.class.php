@@ -61,7 +61,7 @@ class PriceList extends Model {
                 'type'              => 'computed',
                 'result_type'       => 'boolean',
                 'function'          => 'calcIsActive',
-                'description'       => "Is the pricelist currently applicable? ",
+                'description'       => "Whether the price list is currently applicable.",
                 'help'              => "When this flag is set to true, it means the list is eligible for future bookings. i.e. with a 'date_to' in the future and 'published'.",
                 'store'             => true,
                 'readonly'          => true

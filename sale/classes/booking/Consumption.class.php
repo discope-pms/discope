@@ -92,7 +92,7 @@ class Consumption extends Model {
             'time_slot_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\booking\TimeSlot',
-                'description'       => 'Indicator of the moment of the day when the consumption occurs (from schedule).'
+                'description'       => 'Time of day when the consumption occurs.'
             ],
 
             'date' => [
@@ -123,7 +123,7 @@ class Consumption extends Model {
                     'link',          // rental unit is a child of another booked unit or cannot be partially booked (i.e. parent unit)
                     'part'           // rental unit is the parent of another booked unit and can partially booked (non-blocking: only for info on the planning)
                 ],
-                'description'       => 'The reason the unit is reserved (mostly applies to accomodations).',
+                'description'       => 'Reason why the unit is reserved.',
                 'default'           => 'book',
                 'readonly'          => true
             ],
@@ -160,7 +160,7 @@ class Consumption extends Model {
 
             'disclaimed' => [
                 'type'              => 'boolean',
-                'description'       => 'Delivery is planed by the customer has explicitly renounced to it.',
+                'description'       => 'Whether the customer explicitly declined delivery.',
                 'default'           => false
             ],
 
@@ -190,7 +190,7 @@ class Consumption extends Model {
 
             'is_accomodation' => [
                 'type'              => 'boolean',
-                'description'       => 'Does the consumption relate to an accomodation (from rental unit)?',
+                'description'       => 'Whether the consumption relates to accommodation.',
                 'visible'           => ['is_rental_unit', '=', true],
                 'default'           => false
             ],

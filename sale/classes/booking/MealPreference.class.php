@@ -25,7 +25,7 @@ class MealPreference extends Model {
             'booking_line_group_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\booking\BookingLineGroup',
-                'description'       => 'Group the line relates to (in turn, groups relate to their booking).',
+                'description'       => 'Group the line relates to.',
                 'ondelete'          => 'cascade',
                 'required'          => true
             ],
@@ -55,7 +55,7 @@ class MealPreference extends Model {
                     'allergen_free'
                 ],
                 'default'           => 'regular',
-                'description'       => "Meal preference or indication (allergy, aversion, intolerance, beliefs)."
+                'description'       => "Meal preference or dietary indication."
             ],
 
             'qty' => [

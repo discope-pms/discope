@@ -33,7 +33,7 @@ class BookingInspection extends \equal\orm\Model {
             'booking_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\booking\Booking',
-                'description'       => 'The booking inspection relates to inspecting the condition of the booking, such as meter index or remarks.',
+                'description'       => 'Booking whose condition is inspected.',
                 'required'          => true,
                 'ondelete'          => 'cascade'
             ],
@@ -80,14 +80,14 @@ class BookingInspection extends \equal\orm\Model {
             'description' => [
                 'type'              => 'string',
                 'usage'             => 'text/plain',
-                'description'       => "Reason or comments about the booking inspection, if any (for internal use)."
+                'description'       => "Reason or comments about the booking inspection, if any."
             ],
 
             'consumptions_meters_readings_ids' => [
                 'type'              => 'one2many',
                 'foreign_object'    => 'sale\booking\ConsumptionMeterReading',
                 'foreign_field'     => 'booking_inspection_id',
-                'description'       => 'List of consumption meter readings related to the booking inspection.',
+                'description'       => 'Meter readings related to the booking inspection.',
                 'ondetach'          => 'delete'
             ],
 

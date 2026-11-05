@@ -20,7 +20,7 @@ class CompositionItem extends Model {
                 'result_type'       => 'string',
                 'function'          => 'calcName',
                 'store'             => true,
-                'description'       => 'The display name of the person (concatenation of first and last names).'
+                'description'       => 'The display name of the person.'
             ],
 
             'firstname' => [
@@ -114,7 +114,7 @@ class CompositionItem extends Model {
 
             'is_coordinator' => [
                 'type'              => 'boolean',
-                'description'       => 'The person is the coordinator',
+                'description'       => 'The person is the coordinator.',
                 'default'           => false
             ]
 

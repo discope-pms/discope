@@ -90,12 +90,12 @@ class BookingHistoryEntry extends Model {
 
             'nb_nights' => [
                 'type'           => 'integer',
-                'description'    => 'Quantity of nights between "M_Resa.Date_Debut" and "M_Resa.Date_Fin".'
+                'description'    => 'Historic night count from the M_Resa dates.'
             ],
 
             'nb_rental_units' => [
                 'type'           => 'integer',
-                'description'    => 'Historic qty of rental units, found in historic data "M_Resa_Compo".'
+                'description'    => 'Historic qty of rental units.'
             ],
 
             'nb_pers_nights' => [
@@ -135,7 +135,7 @@ class BookingHistoryEntry extends Model {
 
             'customer_language_code' => [
                 'type'           => 'string',
-                'description'    => 'Historic customer language code "R_Client.Langue_Client"'
+                'description'    => 'Historic customer language code "R_Client.Langue_Client".'
             ],
 
             'customer_rate_class_id' => [

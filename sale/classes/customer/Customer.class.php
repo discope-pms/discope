@@ -32,7 +32,7 @@ class Customer extends \identity\Partner {
             'relationship' => [
                 'type'              => 'string',
                 'default'           => 'customer',
-                'description'       => 'Force relationship to Customer',
+                'description'       => 'Force relationship to Customer.',
                 'readonly'          => true
             ],
 
@@ -76,7 +76,7 @@ class Customer extends \identity\Partner {
             'ref_account' => [
                 'type'              => 'string',
                 'usage'             => 'uri/urn.iban',
-                'description'       => 'Bank account number for identifying the customer in external accounting softwares.',
+                'description'       => 'Bank account number used to identify the customer.',
                 'readonly'          => true
             ],
 

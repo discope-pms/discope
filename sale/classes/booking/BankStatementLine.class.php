@@ -35,7 +35,7 @@ class BankStatementLine extends \sale\pay\BankStatementLine {
             'customer_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\customer\Customer',
-                'description'       => 'The customer the line relates to, if known (set at status change).',
+                'description'       => 'The customer the line relates to, if known.',
                 'readonly'          => true
             ],
 

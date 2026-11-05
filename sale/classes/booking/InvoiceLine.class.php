@@ -23,14 +23,14 @@ class InvoiceLine extends \finance\accounting\InvoiceLine {
             'invoice_line_group_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\booking\InvoiceLineGroup',
-                'description'       => 'Group the line relates to (in turn, groups relate to their invoice).',
+                'description'       => 'Group the line relates to.',
                 'ondelete'          => 'cascade'
             ],
 
             'downpayment_invoice_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\booking\Invoice',
-                'description'       => 'Downpayment invoice (set when the line refers to an invoiced downpayment.)'
+                'description'       => 'Downpayment invoice.'
             ],
 
             'is_supply' => [

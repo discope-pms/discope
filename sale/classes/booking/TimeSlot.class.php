@@ -60,7 +60,7 @@ class TimeSlot extends Model {
                     'D',
                     'EV'
                 ],
-                'description'       => 'Represents the code associated with the ID of the time slot'
+                'description'       => 'Represents the code associated with the ID of the time slot.'
             ],
 
             'is_meal' => [

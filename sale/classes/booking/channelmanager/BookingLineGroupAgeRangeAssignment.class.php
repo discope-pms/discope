@@ -28,7 +28,7 @@ class BookingLineGroupAgeRangeAssignment extends \sale\booking\BookingLineGroupA
             'booking_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\booking\channelmanager\Booking',
-                'description'       => 'The booking the line relates to (for consistency, lines should be accessed using the group they belong to).',
+                'description'       => 'The booking the line relates to.',
                 'ondelete'          => 'cascade'
             ],
 
@@ -42,7 +42,7 @@ class BookingLineGroupAgeRangeAssignment extends \sale\booking\BookingLineGroupA
 
             'qty' => [
                 'type'              => 'integer',
-                'description'       => 'Number of persons assigned to the age range for related booking group.',
+                'description'       => 'People assigned to the age range for related booking group.',
                 'default'           => 1
             ],
 

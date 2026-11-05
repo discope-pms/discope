@@ -33,13 +33,13 @@ class BookingLine extends \sale\booking\BookingLine {
             'qty_vars' => [
                 'type'              => 'string',
                 'usage'             => 'text/plain',
-                'description'       => 'JSON array holding qty variation deltas (for \'by person\' products), if any.',
+                'description'       => 'JSON array holding qty variation deltas, if any.',
             ],
 
             'booking_line_group_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\booking\channelmanager\BookingLineGroup',
-                'description'       => 'Group the line relates to (in turn, groups relate to their booking).',
+                'description'       => 'Group the line relates to.',
                 'required'          => true,
                 'ondelete'          => 'cascade'
             ],
@@ -47,7 +47,7 @@ class BookingLine extends \sale\booking\BookingLine {
             'booking_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\booking\channelmanager\Booking',
-                'description'       => 'The booking the line relates to (for consistency, lines should be accessed using the group they belong to).',
+                'description'       => 'The booking the line relates to.',
                 'required'          => true,
                 'ondelete'          => 'cascade'
             ],

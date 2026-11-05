@@ -104,7 +104,7 @@ class Payment extends \sale\pay\Payment {
 
             'psp_type' => [
                 'type'              => 'string',
-                'description'       => 'Identification string of the payment service provider (ex. \'stripe\').'
+                'description'       => 'Identifier of the payment service provider (ex. \'stripe\').'
             ],
 
             'psp_ref' => [

@@ -50,7 +50,7 @@ class Booking extends \sale\booking\Booking {
             'customer_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\customer\Customer',
-                'description'       => "The customer whom the booking relates to (depends on selected identity)."
+                'description'       => "The customer the booking relates to."
             ],
 
             'customer_identity_id' => [

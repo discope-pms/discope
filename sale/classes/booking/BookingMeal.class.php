@@ -51,7 +51,7 @@ class BookingMeal extends Model {
 
             'is_self_provided' => [
                 'type'              => 'boolean',
-                'description'       => "Is the meal provided by the customer, not related to a booking line?",
+                'description'       => "Whether the meal is provided by the customer.",
                 'default'           => false
             ],
 

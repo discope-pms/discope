@@ -30,7 +30,7 @@ class BookingLineGroup extends \sale\booking\BookingLineGroup {
         return [
             'is_sojourn' => [
                 'type'              => 'boolean',
-                'description'       => 'Does the group spans over several nights and relate to accommodations?',
+                'description'       => 'Whether the group covers a multi-night accommodation.',
                 'default'           => false
             ],
 
@@ -126,7 +126,7 @@ class BookingLineGroup extends \sale\booking\BookingLineGroup {
             'booking_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\booking\channelmanager\Booking',
-                'description'       => 'Booking the line relates to (for consistency, lines should be accessed using the group they belong to).',
+                'description'       => 'Booking the line relates to.',
                 'required'          => true,
                 'ondelete'          => 'cascade'
             ],

@@ -18,7 +18,7 @@ class BookingPoint extends Model {
             'name' => [
                 'type'              => 'computed',
                 'result_type'       => 'string',
-                'description'       => 'The computed name is based on the booking and customer',
+                'description'       => 'The computed name is based on the booking and customer.',
                 'function'          => 'calcName',
                 'store'             => true,
                 'instant'           => true
@@ -29,7 +29,6 @@ class BookingPoint extends Model {
                 'foreign_object'    => 'sale\booking\Booking',
                 'description'       => 'Reference to the booking this entry is associated with.',
                 'help'              => 'This field is not marked as required to allow non-null initial points (from history).',
-                'unique'            => true,
                 'ondelete'          => 'cascade',
                 'dependents'        =>  ['customer_id', 'name']
             ],
@@ -49,7 +48,7 @@ class BookingPoint extends Model {
                 'store'             => true,
                 'instant'           => true,
                 'relation'          => ['booking_id' => 'customer_id'],
-                'description'       => "Customer associated with the booking, determined based on the selected identity."
+                'description'       => "Customer associated with the booking."
             ],
 
             'nb_paying_pers' => [
@@ -77,7 +76,7 @@ class BookingPoint extends Model {
             'is_applicable' => [
                 'type'              => 'computed',
                 'result_type'       => 'boolean',
-                'description'       => 'Flag telling if the points can be applied (origin booking is invoiced).',
+                'description'       => 'Whether the points can be applied (origin booking is invoiced).',
                 'function'          => 'calcIsApplicable',
                 'store'             => false
             ],
@@ -85,7 +84,7 @@ class BookingPoint extends Model {
             'applicable_points_value' => [
                 'type'              => 'computed',
                 'result_type'       => 'float',
-                'description'       => 'Number of points earned from the target booking that are currently applicable.',
+                'description'       => 'Points from the booking that are currently applicable.',
                 'store'             => false,
                 'function'          => 'calcApplicablePointsValue'
             ],

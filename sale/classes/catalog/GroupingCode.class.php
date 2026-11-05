@@ -29,13 +29,13 @@ class GroupingCode extends Model {
                     'Supply',
                 ],
                 */
-                'description'       => 'Represents the code associated with the ID of the group code',
+                'description'       => 'Represents the code associated with the ID of the group code.',
                 'help'              => 'User must be free to create arbitrary codes'
             ],
 
             'has_age_range' => [
                 'type'        => 'boolean',
-                'description' => 'Indicates whether the grouping code is assigned to a specific age range.',
+                'description' => 'Whether the grouping code is assigned to a specific age range.',
                 'default'     => false
             ],
 

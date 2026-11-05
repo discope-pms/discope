@@ -35,7 +35,7 @@ class BookingTypeAttribution extends Model {
             'sojourn_type_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\booking\SojournType',
-                'description'       => "The sojourn type the booking must match for the booking type to be applied.",
+                'description'       => "Required sojourn type for the booking type.",
                 'help'              => "If empty no check is done on the booking's sojourn type."
             ],
 

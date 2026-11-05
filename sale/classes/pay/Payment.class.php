@@ -93,7 +93,7 @@ class Payment extends Model {
 
             'is_manual' => [
                 'type'              => 'boolean',
-                'description'       => 'Payment was created manually at the checkout directly in the booking (not through cashdesk). Can also be a payment from a bank check for enrollments and bookings.',
+                'description'       => 'Whether the payment was created manually at checkout.',
                 'default'           => false
             ],
 

@@ -123,7 +123,7 @@ class Enrollment extends Model {
                 ],
                 'function'          => 'calcPaymentStatus',
                 'store'             => true,
-                'description'       => "Current status of the payments. Depends on the status of the enrollment.",
+                'description'       => "Current payment status based on the enrollment status.",
                 'help'              => "'Due' means we are expecting some money for the enrollment (at the moment, at least one due funding has not been fully received). 'Paid' means that everything expected (all payments) has been received."
             ],
 

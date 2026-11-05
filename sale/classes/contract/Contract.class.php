@@ -34,7 +34,7 @@ class Contract extends Model {
 
             'description' => [
                 'type'              => 'string',
-                'description'       => "Short description about the reason of the contract (i.e. the object of the agreement)."
+                'description'       => "Short description about the reason of the contract."
             ],
 
             'status' => [

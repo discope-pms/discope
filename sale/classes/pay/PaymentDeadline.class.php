@@ -23,7 +23,7 @@ class PaymentDeadline extends Model {
             'code' => [
                 'type'              => 'string',
                 'usage'             => 'numeric/integer:3',
-                'description'       => '3 digits code to serve in payment references.',
+                'description'       => 'Three-digit code used in payment references.',
                 'required'          => true
             ],
 

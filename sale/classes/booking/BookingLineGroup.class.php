@@ -93,7 +93,7 @@ class BookingLineGroup extends Model {
 
             'is_sojourn' => [
                 'type'              => 'boolean',
-                'description'       => 'Does the group spans over several nights and relate to accommodations?',
+                'description'       => 'Whether the group covers a multi-night accommodation.',
                 'default'           => false,
                 'onupdate'          => 'onupdateIsSojourn'
             ],
@@ -107,7 +107,7 @@ class BookingLineGroup extends Model {
 
             'is_extra' => [
                 'type'              => 'boolean',
-                'description'       => 'Group relates to sales made off-contract. (ex. point of sale)',
+                'description'       => 'Group relates to sales made off-contract. (ex. point of sale).',
                 'default'           => false
             ],
 
@@ -128,7 +128,7 @@ class BookingLineGroup extends Model {
             'has_schedulable_services' => [
                 'type'              => 'computed',
                 'result_type'       => 'boolean',
-                'description'       => 'Flag marking the group as holding at least one schedulable service.',
+                'description'       => 'Whether the group contains a schedulable service.',
                 'function'          => 'calcHasSchedulableServices'
             ],
 
@@ -217,13 +217,13 @@ class BookingLineGroup extends Model {
                 'type'              => 'one2many',
                 'foreign_object'    => 'sale\booking\BookingPriceAdapter',
                 'foreign_field'     => 'booking_line_group_id',
-                'description'       => 'Price adapters that apply to all lines of the group (based on group settings).'
+                'description'       => 'Price adapters that apply to all lines of the group.'
             ],
 
             'booking_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\booking\Booking',
-                'description'       => 'Booking the line relates to (for consistency, lines should be accessed using the group they belong to).',
+                'description'       => 'Booking the line relates to.',
                 'required'          => true,
                 'ondelete'          => 'cascade'         // delete group when parent booking is deleted
             ],
@@ -383,7 +383,7 @@ class BookingLineGroup extends Model {
 
             'make_beds' => [
                 'type'              => 'boolean',
-                'description'       => "Does the group include a product related to bed-making at the beginning of the stay?",
+                'description'       => "Whether beds must be made at the start of the stay.",
                 'help'              => "Bed linens are always provided when make_beds is true.",
                 'default'           => false
             ],

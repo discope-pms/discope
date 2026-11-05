@@ -24,7 +24,7 @@ class BankCheck extends Model {
 
             'bank_check_number' => [
                 'type'              => 'string',
-                'description'       => 'The official unique number assigned to the bank check by the issuing bank.',
+                'description'       => 'The unique number of the bank check by the issuing bank.',
                 'dependents'        => ['name']
             ],
 
@@ -44,7 +44,7 @@ class BankCheck extends Model {
 
             'has_signature' => [
                 'type'              => 'boolean',
-                'description'       => "The bank check has the signature",
+                'description'       => "Whether the bank check is signed.",
                 'default'           => false
             ],
 
@@ -68,17 +68,17 @@ class BankCheck extends Model {
             'bank_check_description' => [
                 'type'              => 'string',
                 'usage'             => 'text/plain',
-                'description'       => "'A detailed description or note related to this bank check."
+                'description'       => "A detailed description or note related to this bank check."
             ],
 
             'deposit_number' => [
                 'type'              => 'string',
-                'description'       => 'The official deposit number provided by the bank, used to track all associated checks.',
+                'description'       => 'The deposit number from the bank.',
             ],
 
             'is_voucher' => [
                 'type'              => 'boolean',
-                'description'       => "The check is the voucher",
+                'description'       => "Whether the check is a voucher.",
                 'default'           => false
             ],
 
@@ -93,7 +93,7 @@ class BankCheck extends Model {
                 'result_type'       => 'many2one',
                 'function'          => 'calcEnrollmentId',
                 'foreign_object'    => 'sale\camp\Enrollment',
-                'description'       => "The enrollment associated with the bank check, if applicable (computed field).",
+                'description'       => "The enrollment linked to the bank check, if applicable.",
                 'instant'           => true,
                 'store'             => true
             ]

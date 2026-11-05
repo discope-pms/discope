@@ -46,7 +46,7 @@ class Product extends Model {
 
             'label' => [
                 'type'              => 'string',
-                'description'       => 'Human readable mnemo for identifying the product. Allows duplicates.',
+                'description'       => 'Human readable mnemo for identifying the product.',
                 'required'          => true,
                 'onupdate'          => 'onupdateLabel'
             ],
@@ -193,7 +193,7 @@ class Product extends Model {
             'is_billable' => [
                 'type'              => 'computed',
                 'result_type'       => 'boolean',
-                'description'       => "Indicates whether the activity is billable (generates a service line in invoicing).",
+                'description'       => "Whether the activity generates an invoice service line.",
                 'relation'          => ['product_model_id' => 'is_billable'],
                 'instant'           => true,
                 'store'             => true
@@ -244,7 +244,7 @@ class Product extends Model {
 
             'allow_price_adaptation' => [
                 'type'              => 'boolean',
-                'description'       => 'Flag telling if price adaptation can be applied on the variants (or children for packs).',
+                'description'       => 'Whether price adaptation can be applied on the variants.',
                 'default'           => true,
                 'visible'           => ['is_pack', '=', true],
             ],
@@ -291,7 +291,7 @@ class Product extends Model {
                 'result_type'       => 'many2one',
                 'foreign_object'    => 'sale\catalog\GroupingCode',
                 'relation'          => ['product_model_id' => 'grouping_code_id'],
-                'description'       => "Specific GroupingCode this Product related to, if any",
+                'description'       => "Grouping code related to this product, if any.",
                 'instant'           => true,
                 'store'             => true
             ],
@@ -313,7 +313,7 @@ class Product extends Model {
                     'clsh-full-4-days',
                     'clsh-day',
                 ],
-                'description'       => "The type of camp product (non CLSH: full, weekend and Saturday morning | CLSH: full '5 or 4 days' and day).",
+                'description'       => "Camp product type.",
                 'help'              => "Allows to distinguish how the products of camps should be used.",
                 'default'           => 'full',
                 'visible'           => [ ['is_camp', '=', true] ]

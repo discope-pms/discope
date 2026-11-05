@@ -66,14 +66,14 @@ class Booking extends Model {
 
             'customer_reference' => [
                 'type'              => 'string',
-                'description'       => "Code or short string given by the customer as own reference, if any.",
+                'description'       => "Code or short string given by the customer as own reference.",
                 'default'           => ''
             ],
 
             'customer_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\customer\Customer',
-                'description'       => "The customer whom the booking relates to (depends on selected identity).",
+                'description'       => "The customer the booking relates to.",
                 'onupdate'          => 'onupdateCustomerId'
             ],
 
@@ -95,7 +95,7 @@ class Booking extends Model {
             'customer_nature_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\customer\CustomerNature',
-                'description'       => 'Nature of the customer (synced with customer) for views convenience.',
+                'description'       => 'Customer nature synchronized for use in views.',
                 'onupdate'          => 'onupdateCustomerNatureId',
                 'required'          => true
             ],
@@ -136,7 +136,7 @@ class Booking extends Model {
             'status_before_revert_to_quote' => [
                 'type'              => 'string',
                 'selection'         => ['checkedin', 'checkedout'],
-                'description'       => "The status of the booking before it was reverted to quote from checkedin or checkedout status."
+                'description'       => "Booking status before it was reverted to quote."
             ],
 
             'total' => [
@@ -205,7 +205,7 @@ class Booking extends Model {
 
             'has_contract' => [
                 'type'              => 'boolean',
-                'description'       => "Has a contract been generated yet? Flag is reset in case of changes before the sojourn.",
+                'description'       => "Whether a contract has already been generated.",
                 'default'           => false
             ],
 
@@ -315,7 +315,7 @@ class Booking extends Model {
             'external_data' => [
                 'type'              => 'string',
                 'usage'             => 'text/xml',
-                'description'       => "External data given to create/update booking from channel manager."
+                'description'       => "External booking data from the channel manager."
             ],
 
             'guarantee_id' => [
@@ -327,7 +327,7 @@ class Booking extends Model {
 
             'date_expiry' => [
                 'type'              => 'date',
-                'description'       => 'Reservation expiration date in Option',
+                'description'       => 'Reservation expiration date in Option.',
                 'visible'           => [["status", "=", "option"],["is_noexpiry", "=", false]],
                 'default'           => time()
             ],
@@ -364,7 +364,7 @@ class Booking extends Model {
                 ],
                 'function'          => 'calcPaymentStatus',
                 'store'             => true,
-                'description'       => "Current status of the payments. Depends on the status of the booking.",
+                'description'       => "Current payment status based on the booking status.",
                 'help'              => "'Due' means we are expecting some money for the booking (at the moment, at least one due funding has not been fully received). 'Paid' means that everything expected (all payments) has been received."
             ],
 
@@ -378,7 +378,7 @@ class Booking extends Model {
                 'type'              => 'computed',
                 'result_type'       => 'string',
                 'function'          => 'calcPaymentReference',
-                'description'       => 'Structured reference for identifying payments relating to the Booking.',
+                'description'       => 'Structured reference for booking payments.',
                 'store'             => true
             ],
 
@@ -460,7 +460,7 @@ class Booking extends Model {
             'sojourn_type_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\booking\SojournType',
-                'description'       => 'Default sojourn type of the booking (set according to booking center).'
+                'description'       => 'Default sojourn type of the booking.'
             ],
 
             'sojourn_product_models_ids' => [
@@ -539,7 +539,7 @@ class Booking extends Model {
             'is_locked' => [
                 'type'              => 'computed',
                 'result_type'       => 'boolean',
-                'description'       => 'A booking can be locked to prevent updating the sale price of contracted products.',
+                'description'       => 'Whether contracted product sale prices are locked.',
                 'function'          => 'calcIsLocked'
             ],
 
@@ -562,7 +562,7 @@ class Booking extends Model {
             'guest_list_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\booking\GuestList',
-                'description'       => 'Guest List associated to booking'
+                'description'       => 'Guest list associated to booking.'
             ],
 
             'guest_list_items_ids' => [
@@ -596,7 +596,7 @@ class Booking extends Model {
             'activity_weeks_descriptions' => [
                 'type'              => 'string',
                 'usage'             => 'text/json',
-                'description'       => "JSON description of activities per week, for week planning document."
+                'description'       => "JSON description of activities per week."
             ],
 
             'tasks_ids' => [

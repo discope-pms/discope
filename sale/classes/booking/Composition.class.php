@@ -25,7 +25,7 @@ class Composition extends Model {
                 'function'          => 'calcDisplayName',
                 'result_type'       => 'string',
                 'store'             => true,
-                'description'       => 'Composition name is based on the related booking (customer and date).'
+                'description'       => 'Composition name is based on the related booking.'
             ],
 
             'booking_id' => [

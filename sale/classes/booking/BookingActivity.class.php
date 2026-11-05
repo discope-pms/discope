@@ -52,7 +52,7 @@ class BookingActivity extends Model {
 
             'is_virtual' => [
                 'type'              => 'boolean',
-                'description'       => "Is the activity related to another for a fullday activity or an activity with a duration.",
+                'description'       => "Whether the activity is virtual for full-day planning.",
                 'help'              => "If true the activity is 'virtual' and no booking_line has a direct link to it. This activity will be mainly used for the planning.",
                 'default'           => false
             ],
@@ -129,8 +129,7 @@ class BookingActivity extends Model {
                 'description'       => "Camp the activity is organised for.",
                 'store'             => true,
                 'relation'          => ['camp_group_id' => 'camp_id'],
-                'readonly'          => true,
-                'ondelete'          => 'cascade'
+                'readonly'          => true
             ],
 
             'camp_group_id' => [
@@ -178,7 +177,7 @@ class BookingActivity extends Model {
                 'rel_table'         => 'sale_booking_bookingactivity_rel_sale_provider_providers',
                 'rel_foreign_key'   => 'provider_id',
                 'rel_local_key'     => 'booking_activity_id',
-                'description'       => 'The assigned providers for the activity, if required by product model.'
+                'description'       => 'The assigned providers for the activity.'
             ],
 
             'qty' => [
@@ -192,13 +191,13 @@ class BookingActivity extends Model {
 
             'counter' => [
                 'type'              => 'integer',
-                'description'       => "The number of the activity in the booking sojourn, is it the first or second or ... activity of the same type in the sojourn.",
+                'description'       => "The number of the activity in the booking sojourn.",
                 'default'           => 1
             ],
 
             'counter_total' => [
                 'type'              => 'integer',
-                'description'       => "The total of this type of activity in the booking sojourn for the group.",
+                'description'       => "Total activities of this type in the booking group.",
                 'default'           => 1
             ],
 
@@ -282,7 +281,7 @@ class BookingActivity extends Model {
             'has_provider' => [
                 'type'              => 'computed',
                 'result_type'       => 'boolean',
-                'description'       => "Does the activity need one or multiple providers to be assigned to it?",
+                'description'       => "Whether the activity needs assigned providers.",
                 'store'             => true,
                 'instant'           => true,
                 'relation'          => ['product_model_id' => 'has_provider']

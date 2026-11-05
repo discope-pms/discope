@@ -55,7 +55,7 @@ class AgeRange extends Model {
 
             'is_sporty' => [
                 'type'              => 'boolean',
-                'description'       => "Indicates whether the age range relates to higher nutritional needs (athletes).",
+                'description'       => "Whether the age range relates to higher nutritional needs.",
                 'default'           => false
             ],
 
@@ -76,7 +76,7 @@ class AgeRange extends Model {
                 'rel_table'       => 'sale_catalog_product_model_rel_sale_customer_age_ranges',
                 'rel_foreign_key' => 'product_model_id',
                 'rel_local_key'   => 'age_range_id',
-                'description'     => "Specifies the product models associated with particular age ranges, which may influence applicable discounts or eligibility conditions."
+                'description'     => "Product models associated with the age range."
             ]
         ];
     }

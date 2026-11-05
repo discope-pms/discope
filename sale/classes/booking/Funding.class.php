@@ -38,7 +38,7 @@ class Funding extends \sale\pay\Funding {
                 'type'              => 'computed',
                 'result_type'       => 'many2one',
                 'foreign_object'    => 'identity\Identity',
-                'description'       => "The identity of the customer whom the booking's funding relates to.",
+                'description'       => "The customer identity the booking's funding relates to.",
                 'store'             => true,
                 'relation'          => ['booking_id' => 'customer_identity_id']
             ],
@@ -56,7 +56,7 @@ class Funding extends \sale\pay\Funding {
             'due_amount' => [
                 'type'              => 'float',
                 'usage'             => 'amount/money:2',
-                'description'       => 'Amount expected for the funding (computed based on VAT incl. price).',
+                'description'       => 'Amount expected for the funding.',
                 'required'          => true,
                 'onupdate'          => 'onupdateDueAmount'
             ],
@@ -76,7 +76,7 @@ class Funding extends \sale\pay\Funding {
                 'type'              => 'computed',
                 'result_type'       => 'float',
                 'usage'             => 'amount/money:2',
-                'description'       => "Total amount that has been received (can be greater than due_amount).",
+                'description'       => "Amount that has been received (can be greater than due_amount).",
                 'function'          => 'calcPaidAmount',
                 'store'             => true,
                 'instant'           => true

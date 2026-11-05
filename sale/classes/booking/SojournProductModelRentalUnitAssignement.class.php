@@ -33,7 +33,7 @@ class SojournProductModelRentalUnitAssignement extends Model {
             'booking_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\booking\Booking',
-                'description'       => 'The booking the line relates to (for consistency, lines should be accessed using the group they belong to).',
+                'description'       => 'The booking the line relates to.',
                 'ondelete'          => 'cascade'         // delete assignment when parent booking is deleted
             ],
 
@@ -55,7 +55,7 @@ class SojournProductModelRentalUnitAssignement extends Model {
 
             'qty' => [
                 'type'              => 'integer',
-                'description'       => 'Number of persons assigned to the rental unit for related booking line.',
+                'description'       => 'People assigned to the rental unit for related booking line.',
                 'default'           => 1,
                 'onupdate'          => 'onupdateQty'
             ],
@@ -86,7 +86,7 @@ class SojournProductModelRentalUnitAssignement extends Model {
             'is_accomodation' => [
                 'type'              => 'computed',
                 'result_type'       => 'boolean',
-                'description'       => 'Flag marking the assignment as an accommodation (from rental unit)).',
+                'description'       => 'Whether the assignment represents accommodation.',
                 'function'          => 'calcIsAccomodation',
                 'store'             => true
             ],
@@ -101,7 +101,7 @@ class SojournProductModelRentalUnitAssignement extends Model {
 
             'extra_qty' => [
                 'type'              => 'integer',
-                'description'       => 'Number of extra persons assigned to the rental unit for related booking line.',
+                'description'       => 'Extra people assigned to the rental unit.',
                 'default'           => 0,
                 'onupdate'          => 'onupdateExtraQty'
             ]

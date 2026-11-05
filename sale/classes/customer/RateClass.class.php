@@ -50,7 +50,7 @@ class RateClass extends Model {
                 'rel_table'         => 'sale_booking_type_attribution_rel_sale_rate_class',
                 'rel_local_key'     => 'rate_class_id',
                 'rel_foreign_key'   => 'booking_type_attribution_id',
-                'description'       => "The booking type attributions that may apply if booking customer has rate class."
+                'description'       => "Booking type attributions for the customer rate class."
             ]
 
         ];

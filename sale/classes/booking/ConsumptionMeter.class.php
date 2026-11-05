@@ -62,7 +62,7 @@ class ConsumptionMeter extends \equal\orm\Model {
 
             'coefficient' => [
                 'type'              => 'float',
-                'description'       => 'The coefficient established in the meter to calculate the consumed consumption',
+                'description'       => 'Coefficient used to calculate consumption.',
                 'default'           => 1
             ],
 
@@ -97,7 +97,7 @@ class ConsumptionMeter extends \equal\orm\Model {
 
             'meter_ean' => [
                 'type'              => 'string',
-                'description'       => 'The code identifying  for the European Article Numbering of the consumption meter.',
+                'description'       => 'European Article Number of the consumption meter.',
                 'visible'           => ['has_ean' , '=', true]
             ],
 

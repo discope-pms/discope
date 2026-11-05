@@ -35,14 +35,14 @@ class BookingLine extends Model {
 
             'description' => [
                 'type'              => 'string',
-                'description'       => 'Complementary description of the line. If set, replaces the product name.',
+                'description'       => 'Complementary description of the line.',
                 'default'           => ''
             ],
 
             'booking_line_group_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\booking\BookingLineGroup',
-                'description'       => 'Group the line relates to (in turn, groups relate to their booking).',
+                'description'       => 'Group the line relates to.',
                 'onupdate'          => 'onupdateBookingLineGroupId',
                 'ondelete'          => 'cascade',        // delete line when parent group is deleted
                 'required'          => true              // must be set at creation
@@ -51,7 +51,7 @@ class BookingLine extends Model {
             'booking_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\booking\Booking',
-                'description'       => 'The booking the line relates to (for consistency, lines should be accessed using the group they belong to).',
+                'description'       => 'The booking the line relates to.',
                 'required'          => true,
                 'ondelete'          => 'cascade'
             ],
@@ -92,7 +92,7 @@ class BookingLine extends Model {
                 'type'              => 'one2many',
                 'foreign_object'    => 'sale\booking\BookingPriceAdapter',
                 'foreign_field'     => 'booking_line_id',
-                'description'       => 'All price adapters: auto and manual discounts applied on the line.',
+                'description'       => 'Automatic and manual discounts applied to the line.',
                 'onupdate'          => 'onupdatePriceAdaptersIds'
             ],
 
@@ -142,7 +142,7 @@ class BookingLine extends Model {
 
             'order' => [
                 'type'              => 'integer',
-                'description'       => 'Order by which the line have to be sorted when presented visually.',
+                'description'       => 'Display order of the line.',
                 'default'           => 1
             ],
 
@@ -201,13 +201,13 @@ class BookingLine extends Model {
 
             'has_manual_unit_price' => [
                 'type'              => 'boolean',
-                'description'       => 'Flag indicating that the unit price has been set manually and must not be reset in case of price reset.',
+                'description'       => 'Whether the unit price was set manually.',
                 'default'           => false
             ],
 
             'has_manual_vat_rate' => [
                 'type'              => 'boolean',
-                'description'       => 'Flag indicating that the vat rate price has been set manually and must not be reset in case of price reset.',
+                'description'       => 'Whether the VAT rate was set manually.',
                 'default'           => false
             ],
 
@@ -215,7 +215,7 @@ class BookingLine extends Model {
                 'type'              => 'computed',
                 'result_type'       => 'float',
                 'usage'             => 'amount/money:2',
-                'description'       => "Total tax-excluded price of the line without the discount applied.",
+                'description'       => "Tax-excluded line total before discount.",
                 'function'          => 'calcTotalNoDiscount',
                 'store'             => false
             ],
@@ -299,7 +299,7 @@ class BookingLine extends Model {
             'qty_vars' => [
                 'type'              => 'string',
                 'usage'             => 'text/plain',
-                'description'       => 'JSON array holding qty variation deltas (for \'by person\' products), if any.',
+                'description'       => 'JSON array holding qty variation deltas, if any.',
                 'onupdate'          => 'onupdateQtyVars'
             ],
 
@@ -344,7 +344,7 @@ class BookingLine extends Model {
             'booking_activity_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\booking\BookingActivity',
-                'description'       => 'Main Booking Activity this line relates to (non virtual activity).',
+                'description'       => 'Main booking activity this line relates to.',
                 'help'              => 'If the line refers to a transport/supply, it means that the transport/supply is needed for a specific activity.',
                 'onupdate'          => 'onupdateBookingActivityId'
             ],
@@ -353,7 +353,7 @@ class BookingLine extends Model {
                 'type'              => 'one2many',
                 'foreign_object'    => 'sale\booking\BookingActivity',
                 'foreign_field'     => 'activity_booking_line_id',
-                'description'       => 'All Booking Activities this line relates to (non virtual activity and virtual activities).'
+                'description'       => 'All booking activities this line relates to.'
             ],
 
             'booking_meals_ids' => [

@@ -33,7 +33,7 @@ class Price extends Model {
                 'result_type'       => 'float',
                 'function'          => 'calcPriceVat',
                 'usage'             => 'amount/money:4',
-                'description'       => "Tax included price. This field is used to allow encoding prices VAT incl.",
+                'description'       => "Tax included price.",
                 'store'             => true,
                 'onupdate'          => 'onupdatePriceVat'
             ],
@@ -70,7 +70,7 @@ class Price extends Model {
             'accounting_rule_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'finance\accounting\AccountingRule',
-                'description'       => "Selling accounting rule. If set, overrides the rule of the product this price is assigned to.",
+                'description'       => "Selling accounting rule overriding the product rule.",
                 'onupdate'          => 'onupdateAccountingRuleId'
             ],
 
@@ -107,7 +107,7 @@ class Price extends Model {
             'rate_class_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\customer\RateClass',
-                'description'       => 'The rate class that applies to the price, defining variations based on the target audience.',
+                'description'       => 'Rate class defining price variations by target audience.',
                 'visible'           => ['has_rate_class', '=', true]
             ],
 

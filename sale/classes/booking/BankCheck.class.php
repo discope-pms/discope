@@ -31,7 +31,7 @@ class BankCheck extends \sale\pay\BankCheck  {
                 'result_type'       => 'many2one',
                 'function'          => 'calcBookingId',
                 'foreign_object'    => 'sale\booking\Booking',
-                'description'       => 'The booking associated with the bank check, if applicable (computed field).',
+                'description'       => 'The booking linked to the bank check, if applicable.',
                 'instant'           => true,
                 'store'             => true
             ],

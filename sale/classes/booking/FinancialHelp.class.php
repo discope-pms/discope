@@ -24,7 +24,7 @@ class FinancialHelp extends Model {
             'description' => [
                 'type'              => 'string',
                 'usage'             => 'text/plain',
-                'description'       => "More information about the financial help and the organisation who's responsible for it."
+                'description'       => "Details about the financial help and responsible organisation."
             ],
 
             'status' => [
@@ -59,7 +59,6 @@ class FinancialHelp extends Model {
                 'usage'             => 'amount/money:2',
                 'description'       => "The total amount of the financial help.",
                 'required'          => true,
-                'min'               => 0,
                 'dependents'        => ['remaining_amount']
             ],
 

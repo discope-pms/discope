@@ -34,7 +34,7 @@ class BookingLineGroupAgeRangeAssignment extends Model {
             'booking_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\booking\Booking',
-                'description'       => 'The booking the line relates to (for consistency, lines should be accessed using the group they belong to).',
+                'description'       => 'The booking the line relates to.',
                 'ondelete'          => 'cascade'
             ],
 
@@ -48,14 +48,14 @@ class BookingLineGroupAgeRangeAssignment extends Model {
 
             'qty' => [
                 'type'              => 'integer',
-                'description'       => 'Number of persons assigned to the age range for related booking group.',
+                'description'       => 'People assigned to the age range for related booking group.',
                 'default'           => 1,
                 'onupdate'          => 'onupdateQty'
             ],
 
             'free_qty' => [
                 'type'              => 'integer',
-                'description'       => "Quantity of freebies for the booking lines with a product linked to this age range.",
+                'description'       => "Free places for this age range in the booking group.",
                 'default'           => 0
             ],
 
@@ -86,7 +86,7 @@ class BookingLineGroupAgeRangeAssignment extends Model {
             'is_sporty' => [
                 'type'              => 'computed',
                 'result_type'       => 'boolean',
-                'description'       => "Indicates whether the age range assignment relates to higher nutritional needs (athletes).",
+                'description'       => "Whether the age range has higher nutritional needs.",
                 'store'             => true,
                 'relation'          => ['age_range_id' => ['is_sporty']]
             ]

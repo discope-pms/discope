@@ -34,7 +34,7 @@ class CampModel extends Model {
             'employee_ratio' => [
                 'type'              => 'integer',
                 'usage'             => 'number/integer{1,50}',
-                'description'       => "The quantity of children one employee can handle alone, max_children for one camp group.",
+                'description'       => "Number of children one employee can supervise alone.",
                 'default'           => 12
             ],
 

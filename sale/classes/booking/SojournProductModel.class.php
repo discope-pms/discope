@@ -33,7 +33,7 @@ class SojournProductModel extends Model {
             'booking_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\booking\Booking',
-                'description'       => 'The booking the line relates to (for consistency, lines should be accessed using the group they belong to).',
+                'description'       => 'The booking the line relates to.',
                 'ondelete'          => 'cascade'         // delete assignment when parent booking is deleted
             ],
 

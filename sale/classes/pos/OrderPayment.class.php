@@ -115,7 +115,7 @@ class OrderPayment extends Model {
                 'foreign_object'    => 'sale\booking\Payment',
                 'foreign_field'     => 'order_payment_id',
                 'ondetach'          => 'null',
-                'description'       => 'The payments relating to the OrderPayment (o2o : list length should be 1 or 0).'
+                'description'       => 'The payments relating to the OrderPayment.'
             ],
 
             'is_exported' => [

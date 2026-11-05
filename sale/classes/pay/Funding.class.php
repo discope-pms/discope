@@ -36,7 +36,7 @@ class Funding extends Model {
                     'in_process',
                     'paid',
                 ],
-                'description'       => 'The current processing status of the funding',
+                'description'       => 'The current processing status of the funding.',
                 'default'           => 'pending'
             ],
 
@@ -67,7 +67,7 @@ class Funding extends Model {
             'due_amount' => [
                 'type'              => 'float',
                 'usage'             => 'amount/money:2',
-                'description'       => "Amount expected for the funding (computed based on VAT incl. price).",
+                'description'       => "Amount expected for the funding.",
                 'required'          => true,
                 'onupdate'          => 'onupdateDueAmount'
             ],
@@ -88,7 +88,7 @@ class Funding extends Model {
                 'type'              => 'computed',
                 'result_type'       => 'float',
                 'usage'             => 'amount/money:2',
-                'description'       => "Total amount that has been received (can be greater than due_amount).",
+                'description'       => "Amount that has been received (can be greater than due_amount).",
                 'function'          => 'calcPaidAmount',
                 'store'             => true
             ],
@@ -97,7 +97,7 @@ class Funding extends Model {
                 'type'              => 'computed',
                 'result_type'       => 'float',
                 'usage'             => 'amount/money:2',
-                'description'       => "Total amount that has not been received yet (0 if more received than what was due).",
+                'description'       => "Amount that has not been received yet.",
                 'store'             => false,
                 'function'          => 'calcRemainingAmount'
             ],

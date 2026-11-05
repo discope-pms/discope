@@ -151,7 +151,7 @@ class OrderPaymentPart extends \equal\orm\Model {
             // #todo - check if still necessary (only used in 2023)
             'psp_type' => [
                 'type'              => 'string',
-                'description'       => 'Identification string of the payment service provider (ex. \'stripe\').'
+                'description'       => 'Identifier of the payment service provider (ex. \'stripe\').'
             ],
 
             // #todo - check if still necessary (only used in 2023)

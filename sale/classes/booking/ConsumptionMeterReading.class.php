@@ -24,14 +24,14 @@ class ConsumptionMeterReading extends \equal\orm\Model {
             'booking_inspection_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\booking\BookingInspection',
-                'description'       => "The booking inspection corresponds to the consumption meter reading.",
+                'description'       => "Booking inspection related to the meter reading.",
                 'required'          => true,
             ],
 
             'consumption_meter_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\booking\ConsumptionMeter',
-                'description'       => 'The meter ID relates to the consumption meter reading in the booking.',
+                'description'       => 'Consumption meter related to the reading.',
                 'required'          => true
             ],
 
@@ -70,7 +70,7 @@ class ConsumptionMeterReading extends \equal\orm\Model {
                 'type'              => 'computed',
                 'result_type'       => 'float',
                 'usage'             => 'number/real',
-                'description'       => 'The index value is formatted with a comma starting from the third digit',
+                'description'       => 'Index formatted with a comma from the third digit.',
                 'function'          => 'calcDisplayValue',
                 'store'             => true
             ],

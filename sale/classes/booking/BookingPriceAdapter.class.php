@@ -56,7 +56,7 @@ class BookingPriceAdapter extends Model {
                     'amount',
                     'freebie'
                 ],
-                'description'       => 'Type of manual discount (fixed amount or percentage of the price).',
+                'description'       => 'Manual discount type: fixed amount or percentage.',
                 'visible'           => ['is_manual_discount', '=', true],
                 'default'           => 'percent',
                 'onupdate'          => 'onupdateValue'

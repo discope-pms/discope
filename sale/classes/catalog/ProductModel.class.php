@@ -133,13 +133,13 @@ class ProductModel extends Model {
 
             'schedule_default_value' => [
                 'type'              => 'string',
-                'description'       => "Default value of the schedule according to type (time: '9:00', timerange: '9:00-10:00').",
+                'description'       => "Default value of the schedule according to type.",
                 'visible'           => [ ['type', '=', 'service'], ['service_type', '=', 'schedulable'] ]
             ],
 
             'schedule_offset' => [
                 'type'              => 'integer',
-                'description'       => 'Default number of days to set-off the service from a sojourn start date.',
+                'description'       => 'Day offset for the service from a sojourn start date.',
                 'default'           => 0,
                 'visible'           => [ ['type', '=', 'service'], ['service_type', '=', 'schedulable'] ]
             ],
@@ -235,7 +235,7 @@ class ProductModel extends Model {
 
             'qty_accounting_method' => [
                 'type'              => 'string',
-                'description'       => 'The way the product quantity has to be computed (per unit [default], per person, or per accommodation [resource]).',
+                'description'       => 'How the product quantity has to be computed.',
                 'selection'         => [
                     'person',           // depends on the number of people
                     'accomodation',     // depends on the number of nights
@@ -253,7 +253,7 @@ class ProductModel extends Model {
 
             'is_repeatable' => [
                 'type'              => 'boolean',
-                'description'       => 'Model relates to a consumption that is repeated each day of the sojourn.',
+                'description'       => 'Whether consumption repeats each day of the stay.',
                 'default'           => false,
                 'visible'           => [ 'has_duration', '=', false ]
             ],
@@ -274,7 +274,7 @@ class ProductModel extends Model {
 
             'is_meal' => [
                 'type'              => 'boolean',
-                'description'       => 'Is the product a meal? (meals might be part of the board / included services of the stay).',
+                'description'       => 'Whether the product is a meal.',
                 'default'           => false,
                 'visible'           => [ ['type', '=', 'service'], ['is_rental_unit', '=', false] , ['is_snack', '=', false], ['is_activity', '=', false], ['is_transport', '=', false], ['is_supply', '=', false], ['is_camp', '=', false] ] ,
                 'dependents'        => [ 'products_ids' => 'is_meal']
@@ -298,7 +298,7 @@ class ProductModel extends Model {
 
             'is_transport' => [
                 'type'              => 'boolean',
-                'description'       => 'Indicates whether the product is an activity transport service (transport to and back from an activity).',
+                'description'       => 'Whether the product is an activity transport service.',
                 'default'           => false,
                 'visible'           => [ ['type', '=', 'service'], ['is_rental_unit', '=', false], ['is_snack', '=', false], ['is_meal', '=', false], ['is_activity', '=', false], ['is_supply', '=', false], ['is_camp', '=', false] ] ,
                 'dependents'        => [ 'products_ids'  => 'is_transport' ]
@@ -306,7 +306,7 @@ class ProductModel extends Model {
 
             'is_supply' => [
                 'type'              => 'boolean',
-                'description'       => 'Indicates whether the product is an activity supply service (supply to rent for an activity).',
+                'description'       => 'Whether the product is an activity supply service.',
                 'default'           => false,
                 'visible'           => [ ['type', '=', 'service'], ['is_rental_unit', '=', false], ['is_snack', '=', false], ['is_meal', '=', false], ['is_activity', '=', false], ['is_transport', '=', false], ['is_camp', '=', false] ] ,
                 'dependents'        => [ 'products_ids'  => 'is_supply' ]
@@ -379,7 +379,7 @@ class ProductModel extends Model {
                     '#D500F9', // violet néon
                     '#304FFE'  // bleu cobalt
                 ],
-                'description'       => 'Arbitrary color to use for the activity when rendering the employee\'s planning.'
+                'description'       => 'Activity color used in the employee\'s planning.'
             ],
 
             'has_activity_duration' => [
@@ -414,7 +414,7 @@ class ProductModel extends Model {
             'transport_product_model_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\catalog\ProductModel',
-                'description'       => 'References the transport product model associated with the activity.',
+                'description'       => 'The transport product model associated with the activity.',
                 'visible'           => [ ['type', '=', 'service'], ['is_activity', '=', true], ['has_transport_required', '=', true] ]
             ],
 
@@ -456,7 +456,7 @@ class ProductModel extends Model {
 
             'is_fullday' => [
                 'type'              => 'boolean',
-                'description'       => 'Indicates whether the animation lasts the full day. If true, assignments must include both AM and PM; otherwise, only one of them.',
+                'description'       => 'Whether the animation lasts the full day.',
                 'default'           => false,
                 'visible'           => [ ['type', '=', 'service'], ['is_activity', '=', true] ],
                 'dependents'        => [ 'products_ids' => 'is_fullday' ]
@@ -464,7 +464,7 @@ class ProductModel extends Model {
 
             'is_billable' => [
                 'type'              => 'boolean',
-                'description'       => 'Indicates whether the activity is billable (generates a service line in invoicing).',
+                'description'       => 'Whether the activity generates an invoice service line.',
                 'default'           => true,
                 'visible'           => [ ['type', '=', 'service'], ['is_activity', '=', true] ],
                 'dependents'        => [ 'products_ids' => 'is_billable' ]
@@ -472,7 +472,7 @@ class ProductModel extends Model {
 
             'has_staff_required' => [
                 'type'              => 'boolean',
-                'description'       => 'Indicates whether the activity requires dedicated staff to be assigned.',
+                'description'       => 'Whether the activity requires dedicated staff to be assigned.',
                 'help'              => 'This field has no effect for non-activities.',
                 'default'           => true,
                 'visible'           => [ ['type', '=', 'service'], ['is_activity', '=', true] ]
@@ -485,12 +485,12 @@ class ProductModel extends Model {
                 'rel_table'         => 'sale_catalog_product_model_rel_hr_employee',
                 'rel_foreign_key'   => 'employee_id',
                 'rel_local_key'     => 'activity_id',
-                'description'       => "Employees eligible to be assigned activities associated with this product model."
+                'description'       => "Employees eligible for activities of this product model."
             ],
 
             'has_rental_unit' => [
                 'type'              => 'boolean',
-                'description'       => "Indicates whether the activity requires the assignation of a rental unit.",
+                'description'       => "Whether the activity requires a rental unit.",
                 'default'           => false,
                 'visible'           => [ ['type', '=', 'service'], ['is_activity', '=', true] ],
                 'onupdate'          => 'onupdateHasRentalUnit'
@@ -510,14 +510,14 @@ class ProductModel extends Model {
 
             'has_age_range' => [
                 'type'              => 'boolean',
-                'description'       => "Indicates whether the product model has age-based participation restrictions.",
+                'description'       => "Whether the product model has age restrictions.",
                 'default'           => false,
                 'visible'           => [ ['type', '=', 'service'], ['is_activity', '=', true] ]
             ],
 
             'age_minimum' => [
                 'type'              => 'integer',
-                'description'       => "Specifies the minimum age required to participate in the activity.",
+                'description'       => "The minimum age required to participate in the activity.",
                 'visible'           => [ ['type', '=', 'service'], ['is_activity', '=', true] , ['has_age_range', '=', true]]
             ],
 
@@ -528,7 +528,7 @@ class ProductModel extends Model {
                 'rel_table'         => 'sale_catalog_product_model_rel_sale_customer_age_ranges',
                 'rel_foreign_key'   => 'age_range_id',
                 'rel_local_key'     => 'product_model_id',
-                'description'       => "Defines the applicable age ranges for the product model, ensuring age-specific eligibility for activities or services.",
+                'description'       => "Applicable age ranges for the product model.",
                 'visible'           => [ ['type', '=', 'service'], ['is_activity', '=', true] , ['has_age_range', '=', true]]
             ],
 
@@ -541,7 +541,7 @@ class ProductModel extends Model {
 
             'rental_unit_assignement' => [
                 'type'              => 'string',
-                'description'       => 'The way the product is assigned to a rental unit (a specific unit, a specific category, or based on capacity match).',
+                'description'       => 'How the product is assigned to a rental unit.',
                 'selection'         => [
                     'unit',             // only one specific rental unit can be assigned to the products
                     'category',         // only rental units of the specified category can be assigned to the products
@@ -567,7 +567,7 @@ class ProductModel extends Model {
 
             'capacity' => [
                 'type'              => 'integer',
-                'description'       => 'Capacity implied by the service (used for filtering rental units).',
+                'description'       => 'Capacity implied by the service.',
                 'default'           => 1
             ],
 
@@ -582,14 +582,14 @@ class ProductModel extends Model {
             'rental_unit_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'realestate\RentalUnit',
-                'description'       => "Specific Rental Unit this Product related to, if any",
+                'description'       => "Rental unit related to this product, if any.",
                 'visible'           => [ ['is_rental_unit', '=', true], ['rental_unit_assignement', '=', 'unit'] ],
                 'onupdate'          => 'onupdateRentalUnitId'
             ],
 
             'allow_price_adaptation' => [
                 'type'              => 'boolean',
-                'description'       => 'Flag telling if price adaptation can be applied on the variants (or children for packs).',
+                'description'       => 'Whether price adaptation can be applied on the variants.',
                 'default'           => true,
                 'visible'           => ['is_pack', '=', true],
                 'onupdate'          => 'onupdateAllowPriceAdaptation'
@@ -612,7 +612,7 @@ class ProductModel extends Model {
             'grouping_code_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\catalog\GroupingCode',
-                'description'       => "Specific GroupingCode this Product Model related to, if any",
+                'description'       => "Grouping code related to this product model, if any.",
                 'onupdate'          => 'onupdateGroupingCode'
             ],
 
