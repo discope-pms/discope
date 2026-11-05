@@ -1,7 +1,7 @@
 <?php
 /*
     This file is part of the Discope property management software.
-    Author: Yesbabylon SRL, 2020-2022
+    Author: Yesbabylon SRL, 2020-2026
     License: GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 
@@ -9,7 +9,7 @@ use equal\data\DataFormatter;
 use identity\Center;
 
 // announce script and fetch parameters values
-list($params, $providers) = announce([
+[$params, $providers] = eQual::announce([
     'description' => "Generate the HTML email signature for a Center, in a given language.",
     'params'      => [
         'center_id' => [
@@ -24,36 +24,42 @@ list($params, $providers) = announce([
             'default'       => constant('DEFAULT_LANG')
         ]
     ],
-    'constants'   => ['DEFAULT_LANG'],
     'access'      => [
-      'visibility'          => 'public',
-      'groups'              => ['booking.default.user'],
+      'visibility'      => 'public',
+      'groups'          => ['booking.default.user'],
     ],
     'response'    => [
-        'content-type'      => 'application/json',
-        'charset'           => 'utf-8',
-        'accept-origin'     => '*'
+        'content-type'  => 'application/json',
+        'charset'       => 'utf-8',
+        'accept-origin' => '*'
     ],
+    'constants'   => ['DEFAULT_LANG'],
     'providers'   => ['context']
 ]);
 
-list($context) = [ $providers['context'] ];
+/**
+ * @var \equal\php\Context $context
+ */
+['context' => $context] = $providers;
 
 $signature = '';
 
 $center = Center::id($params['center_id'])
-                ->read([
-                    'organisation_id' => ['website'],
-                    'center_office_id' => ['signature', 'phone', 'fax', 'email', 'address_street', 'address_city', 'address_zip'],
-                    'use_office_details',
-                    'address_street',
-                    'address_city',
-                    'address_zip',
-                    'phone',
-                    'fax',
-                    'email'
-                ], $params['lang'])
-                ->first(true);
+    ->read(
+        [
+            'use_office_details',
+            'address_street',
+            'address_city',
+            'address_zip',
+            'phone',
+            'fax',
+            'email',
+            'organisation_id'       => ['website'],
+            'center_office_id'      => ['signature', 'phone', 'fax', 'email', 'address_street', 'address_city', 'address_zip'],
+        ],
+        $params['lang']
+    )
+    ->first(true);
 
 if($center && count($center)) {
 
@@ -105,6 +111,7 @@ if($center && count($center)) {
   }
 }
 
-$context->httpResponse()
-        ->body(['signature' => $signature])
-        ->send();
+$context
+    ->httpResponse()
+    ->body(['signature' => $signature])
+    ->send();

@@ -25,10 +25,9 @@ use hr\employee\Employee;
 ]);
 
 /**
- * @var \equal\php\Context          $context
- * @var \equal\orm\ObjectManager    $orm
+ * @var \equal\php\Context $context
  */
-['context' => $context, 'orm' => $orm] = $providers;
+['context' => $context] = $providers;
 
 $employees = Employee::search([
     [
@@ -44,6 +43,7 @@ $employees = Employee::search([
     ->update(['is_active' => false]);
 
 
-$context->httpResponse()
-        ->status(200)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(200)
+    ->send();

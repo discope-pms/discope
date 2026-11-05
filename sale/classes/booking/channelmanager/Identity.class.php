@@ -1,12 +1,12 @@
 <?php
 /*
     This file is part of the Discope property management software <https://github.com/discope-pms/discope>
-    Some Rights Reserved, Discope PMS, 2020-2024
+    Some Rights Reserved, Discope PMS, 2020-2026
     Original author(s): Yesbabylon SRL
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
-namespace sale\booking\channelmanager;
 
+namespace sale\booking\channelmanager;
 
 /**
  * This class overrides the fields on which specific usage constraints are applied, in order to remove those and allow arbitrary values.
@@ -44,25 +44,25 @@ class Identity extends \identity\Identity {
                 'type'              => 'string',
                 'description'       => 'Country.',
                 'onupdate'          => 'onupdateAddressCountry'
-            ],
+            ]
 
         ];
     }
 
-    public static function onupdateAddressCountry($orm, $ids, $values, $lang) {
+    public static function onupdateAddressCountry($self, $values) {
         if(isset($values['address_country'])) {
             if(in_array($values['address_country'], ['be', 'Belgium', 'belgium', 'belgique', 'Belgique', 'Belgie', 'België', 'belgie', 'belgië'])) {
-                $orm->update(self::getType(), $ids, ['address_country' => 'BE'], $lang);
+                $self->update(['address_country' => 'BE']);
             }
         }
         elseif(isset($values['address_country'])) {
             if(in_array($values['address_country'], ['nl', 'The Netherlands', 'the netherlands', 'netherlands', 'Netherlands'])) {
-                $orm->update(self::getType(), $ids, ['address_country' => 'NL'], $lang);
+                $self->update(['address_country' => 'NL']);
             }
         }
         elseif(isset($values['address_country'])) {
             if(in_array($values['address_country'], ['fr', 'France', 'france'])) {
-                $orm->update(self::getType(), $ids, ['address_country' => 'FR'], $lang);
+                $self->update(['address_country' => 'FR']);
             }
         }
     }
@@ -71,5 +71,4 @@ class Identity extends \identity\Identity {
     public static function getConstraints() {
         return [];
     }
-
 }

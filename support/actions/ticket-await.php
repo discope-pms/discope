@@ -1,13 +1,14 @@
 <?php
 /*
     This file is part of the Discope property management software <https://github.com/discope-pms/discope>
-    Some Rights Reserved, Discope PMS, 2020-2024
+    Some Rights Reserved, Discope PMS, 2020-2026
     Original author(s): Yesbabylon SRL
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
+
 use support\Ticket;
 
-list($params, $providers) = announce([
+[$params, $providers] = eQual::announce([
     'description'   => 'Mark  ticket as \'waiting\' for external event or dependency.',
     'params'        => [
         'id' => [
@@ -16,32 +17,31 @@ list($params, $providers) = announce([
             'required'      => true
         ]
     ],
+    'access' => [
+        'visibility'    => 'protected'
+    ],
     'response'      => [
         'content-type'  => 'application/json',
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'access' => [
-        'visibility'    => 'protected'
-    ],
-    'providers'     => [ 'context', 'report' ]
+    'providers'     => ['context']
 ]);
 
 /**
- * @var \equal\php\Context                $context
- * @var \equal\error\Reporter             $reporter
+ * @var \equal\php\Context $context
  */
-list($context, $reporter) = [ $providers['context'], $providers['report'] ];
+['context' => $context] = $providers;
 
 
 $ticket = Ticket::id($params['id'])->read(['id', 'status'])->first();
 
 if(!$ticket) {
-    throw new Exception('unknown_ticket', QN_ERROR_UNKNOWN);
+    throw new Exception('unknown_ticket', EQ_ERROR_UNKNOWN);
 }
 
 if(!in_array($ticket['status'], ['open', 'pending'])) {
-    throw new Exception('invalid_status', QN_ERROR_INVALID_PARAM);
+    throw new Exception('invalid_status', EQ_ERROR_INVALID_PARAM);
 }
 
 Ticket::id($params['id'])->update(['status' => 'waiting']);

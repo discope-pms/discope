@@ -21,14 +21,13 @@ use hr\employee\Employee;
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'     => ['context', 'orm']
+    'providers'     => ['context']
 ]);
 
 /**
- * @var \equal\php\Context          $context
- * @var \equal\orm\ObjectManager    $orm
+ * @var \equal\php\Context $context
  */
-['context' => $context, 'orm' => $orm] = $providers;
+['context' => $context] = $providers;
 
 $employees = Employee::search([
     [
@@ -45,6 +44,7 @@ $employees = Employee::search([
     ->update(['is_active' => true]);
 
 
-$context->httpResponse()
-        ->status(200)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(200)
+    ->send();
