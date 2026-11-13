@@ -124,6 +124,9 @@
         "amount": {
             "excessive_amount": "Le montant du paiement ne peut pas être supérieur à celui de la ligne d'extrait.",
             "update_not_allowed": "Le montant du paiement ne peut pas être modifié."
+        },
+        "funding_id": {
+            "invalid_center_office": "Le financement et la ligne d'extrait bancaire doivent appartenir à la même équipe de gestion."
         }
     }
 }

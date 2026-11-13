@@ -285,6 +285,41 @@ class Payment extends \sale\pay\Payment {
     }
 
     /**
+     * Check whether a bank statement line and a funding belong to the same center office.
+     */
+    private static function hasCompatibleCenterOffice($om, $statement_line_id, $funding_id, $lang): bool {
+        if(!$statement_line_id || !$funding_id) {
+            return true;
+        }
+
+        $statement_lines = $om->read(BankStatementLine::getType(), $statement_line_id, ['center_office_id'], $lang);
+        $fundings = $om->read(Funding::getType(), $funding_id, ['center_office_id'], $lang);
+
+        if(empty($statement_lines) || empty($fundings)) {
+            return true;
+        }
+
+        $statement_line = reset($statement_lines);
+        $funding = reset($fundings);
+
+        return $statement_line['center_office_id'] == $funding['center_office_id'];
+    }
+
+    /**
+     * Check whether a payment can be created.
+     */
+    public static function cancreate($om, $values, $lang) {
+        if(
+            isset($values['statement_line_id'], $values['funding_id'])
+            && !self::hasCompatibleCenterOffice($om, $values['statement_line_id'], $values['funding_id'], $lang)
+        ) {
+            return ['funding_id' => ['invalid_center_office' => 'The funding and bank statement line must belong to the same center office.']];
+        }
+
+        return parent::cancreate($om, $values, $lang);
+    }
+
+    /**
      * Check whether the payment can be updated, and perform some additional operations if necessary.
      * This method can be overridden to define a more precise set of tests.
      *
@@ -295,6 +330,18 @@ class Payment extends \sale\pay\Payment {
      * @return array    Returns an associative array mapping fields with their error messages. En empty array means that object has been successfully processed and can be updated.
      */
     public static function canupdate($om, $ids, $values, $lang='en') {
+        if(isset($values['statement_line_id']) || isset($values['funding_id'])) {
+            $payments = $om->read(self::getType(), $ids, ['statement_line_id', 'funding_id'], $lang);
+            foreach($payments as $payment) {
+                $statement_line_id = $values['statement_line_id'] ?? $payment['statement_line_id'];
+                $funding_id = $values['funding_id'] ?? $payment['funding_id'];
+
+                if(!self::hasCompatibleCenterOffice($om, $statement_line_id, $funding_id, $lang)) {
+                    return ['funding_id' => ['invalid_center_office' => 'The funding and bank statement line must belong to the same center office.']];
+                }
+            }
+        }
+
         /*
         // #memo - we cannot prevent payment assignment based on the expected amount of the funding: if amount received is higher, it will be accounted to the amount paid and regulated at the invoicing of the booking.
         if(isset($values['funding_id'])) {
