@@ -326,7 +326,11 @@ $tests = [
 
         'act' => function ($booking_id) {
             try {
-                eQual::run('do', 'sale_booking_guests_list_invite', ['id' => $booking_id]);
+                eQual::run('do', 'sale_booking_guests_list_invite', [
+                    'id'        => $booking_id,
+                    'title'     => 'The email subject',
+                    'message'   => '<p>The email message</p>'
+                ]);
             }
             catch(Exception $e) {
                 return false;
