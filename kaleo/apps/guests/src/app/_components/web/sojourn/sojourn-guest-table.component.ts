@@ -28,6 +28,7 @@ export class SojournGuestTableComponent implements OnInit  {
     public guestListExtended: GuestListItemExtended[];
     public countryOptions: { [key: string]: string } = countries;
     public citizenIdentificationInputDisabled: { [key: number]: boolean } = {};
+    public hasCoordinator = false;
 
     constructor() {
     }
@@ -63,6 +64,14 @@ export class SojournGuestTableComponent implements OnInit  {
                     date_of_birth_string: dateString
                 });
             });
+
+            let hasCoordinator = false;
+            this.guestList.forEach(guest => {
+                if(guest.is_coordinator) {
+                    hasCoordinator = true;
+                }
+            });
+            this.hasCoordinator = hasCoordinator;
         }
     }
 
