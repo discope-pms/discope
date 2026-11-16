@@ -26,12 +26,12 @@ use sale\customer\Customer;
         'date_from' => [
             'type'              => 'date',
             'description'       => "Output: Day of arrival / Input: Date interval lower limit (defaults to first day of previous month).",
-            'default'           => mktime(0, 0, 0, date("m")-1, 1)
+            'default'           => fn() => mktime(0, 0, 0, date("m")-1, 1)
         ],
         'date_to' => [
             'type'              => 'date',
             'description'       => "Output: Day of departure / Input: Date interval upper limit (defaults to last day of previous month).",
-            'default'           => mktime(0, 0, 0, date("m"), 0)
+            'default'           => fn() => mktime(0, 0, 0, date("m"), 0)
         ],
         'organisation_id' => [
             'type'              => 'many2one',
@@ -538,14 +538,14 @@ use sale\customer\Customer;
 ]);
 
 /**
- * @var \equal\php\Context                  $context
- * @var \equal\orm\ObjectManager            $orm
- * @var \equal\data\adapt\AdapterProvider   $adapter_provider
+ * @var \equal\php\Context                      $context
+ * @var \equal\orm\ObjectManager                $orm
+ * @var \equal\data\adapt\DataAdapterProvider   $dap
  */
-['context' => $context, 'orm' => $orm, 'adapt' => $adapter_provider] = $providers;
+['context' => $context, 'orm' => $orm, 'adapt' => $dap] = $providers;
 
-/** @var $adapter \equal\data\adapt\DataAdapterJson */
-$adapter = $adapter_provider->get('json');
+/** @var \equal\data\adapt\DataAdapterJson $adapter */
+$adapter = $dap->get('json');
 
 // #memo - we consider all bookings for which at least one sojourn finishes during the given period
 // #memo - only date_to matters: we collect all bookings that finished during the selection period (this is also the way stats are done in the accounting software)
@@ -645,6 +645,7 @@ if(!empty($domain)){
     $bookings = Booking::search($domain, ['sort'  => ['date_from' => 'asc']])
         ->read([
             'id',
+            'status',
             'created',
             'name',
             'date_from',
@@ -762,6 +763,7 @@ foreach($bookings as $booking) {
         'center_type'       => $booking['center_id']['sojourn_type_id']['name'],
         'booking'           => $booking['name'],
         'type'              => $booking['type_id']['name'],
+        'status'            => $booking['status'],
         'created'           => $adapter->adaptOut($booking['created'], 'date'),
         'created_aamm'      => date('Y-m', $booking['created']),
         'date_from'         => $adapter->adaptOut($booking['date_from'], 'date'),

@@ -166,6 +166,12 @@
                 "type": "field",
                 "value": "price_vati",
                 "width": "20%"
+            },
+            {
+                "type": "field",
+                "value": "status",
+                "width": "15%",
+                "visible": false
             }
         ]
     }
