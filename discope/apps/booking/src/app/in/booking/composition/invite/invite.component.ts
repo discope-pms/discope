@@ -607,6 +607,8 @@ export class BookingCompositionInviteComponent implements OnInit, AfterContentIn
             const response:any = await this.api.call('?do=sale_booking_guests_list_invite', {
                 id: this.booking_id,
                 email: this.recipient,
+                title: this.title,
+                message: this.message,
                 recipients_emails: this.recipients,
                 lang: this.lang
             });
