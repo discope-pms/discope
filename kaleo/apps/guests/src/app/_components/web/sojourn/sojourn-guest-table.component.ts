@@ -52,7 +52,7 @@ export class SojournGuestTableComponent implements OnInit  {
             });
 
             let guestListExtended: GuestListItemExtended[] = [];
-            this.guestList.forEach(guest => {
+            this.guestList.reverse().forEach(guest => {
                 let dateString: string|null = null;
                 if(guest.date_of_birth) {
                     const date_of_birth = (typeof guest.date_of_birth == 'string') ? (new Date(guest.date_of_birth)) : (new Date(guest.date_of_birth * 1000));
@@ -74,6 +74,10 @@ export class SojournGuestTableComponent implements OnInit  {
             });
             this.hasCoordinator = hasCoordinator;
         }
+    }
+
+    public trackGuest(_index: number, guest: GuestListItemExtended): number {
+        return guest.id;
     }
 
     private isLessThanFifteenYearsOld(dateOfBirth: Date|null) {
