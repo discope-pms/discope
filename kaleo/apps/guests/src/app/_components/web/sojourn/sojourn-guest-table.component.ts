@@ -52,7 +52,7 @@ export class SojournGuestTableComponent implements OnInit  {
             });
 
             let guestListExtended: GuestListItemExtended[] = [];
-            this.guestList.reverse().forEach(guest => {
+            this.guestList.slice().reverse().forEach(guest => {
                 let dateString: string|null = null;
                 if(guest.date_of_birth) {
                     const date_of_birth = (typeof guest.date_of_birth == 'string') ? (new Date(guest.date_of_birth)) : (new Date(guest.date_of_birth * 1000));
