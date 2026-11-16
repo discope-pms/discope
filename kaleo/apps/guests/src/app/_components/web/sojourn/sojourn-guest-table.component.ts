@@ -179,7 +179,7 @@ export class SojournGuestTableComponent implements OnInit  {
         values[field] = value;
 
         if(field === 'is_coordinator') {
-            this.checkHasCoordinator();
+            setTimeout(() => this.checkHasCoordinator(), 300);
         }
 
         this.updateGuestListItem.emit({ id, values });
