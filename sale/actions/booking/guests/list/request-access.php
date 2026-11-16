@@ -1,15 +1,16 @@
 <?php
 /*
     This file is part of the Discope property management software.
-    Author: Yesbabylon SRL, 2020-2024
+    Author: Yesbabylon SRL, 2020-2026
     License: GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
+
 use core\Mail;
-use equal\email\Email;
 use communication\Template;
+use equal\email\EmailMessage;
 use sale\booking\Booking;
 
-list($params, $providers) = eQual::announce([
+[$params, $providers] = eQual::announce([
     'description'	=>	"Send an email with a one-time access link to the provided email address, if allowed for given booking.",
     'params' 		=>	[
         'booking_id' =>  [
@@ -133,14 +134,16 @@ if(isset($trailer_notices[$params['lang']])) {
 }
 
 // build Email envelope
-$message = new Email();
-$message->setTo($params['email'])
-        ->setSubject($subject)
-        ->setContentType("text/html")
-        ->setBody($body);
+$message = new EmailMessage();
+$message
+    ->setTo($params['email'])
+    ->setSubject($subject)
+    ->setContentType("text/html")
+    ->setBody($body);
 
 // send instant email
 Mail::send($message, 'sale\booking\Booking', $params['booking_id']);
 
-$context->httpResponse()
-        ->send();
+$context
+    ->httpResponse()
+    ->send();

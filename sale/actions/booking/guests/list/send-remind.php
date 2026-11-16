@@ -1,15 +1,16 @@
 <?php
 /*
     This file is part of the Discope property management software.
-    Author: Yesbabylon SRL, 2020-2024
+    Author: Yesbabylon SRL, 2020-2026
     License: GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
+
+use equal\email\EmailMessage;
 use sale\booking\Booking;
 use core\Mail;
-use equal\email\Email;
 use communication\Template;
 
-list($params, $providers) = eQual::announce([
+[$params, $providers] = eQual::announce([
     'description'   => "Send an email to remind them to send the guest list.",
     'params'        => [
         'id' =>  [
@@ -33,14 +34,13 @@ list($params, $providers) = eQual::announce([
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'     => ['context', 'dispatch']
+    'providers'     => ['context']
 ]);
 
 /**
- * @var \equal\php\Context                  $context
- * @var \equal\dispatch\Dispatcher          $dispatch
+ * @var \equal\php\Context $context
  */
-['context' => $context, 'dispatch' => $dispatch] = $providers['context'];
+['context' => $context] = $providers['context'];
 
 $booking = Booking::id($params['id'])
     ->read([
@@ -102,8 +102,9 @@ try {
 }
 catch(Exception $e) {}
 
-$message = new Email();
-$message->setTo($params['email'])
+$message = new EmailMessage();
+$message
+    ->setTo($params['email'])
     ->setReplyTo($booking['center_office_id']['email'])
     ->setSubject($title)
     ->setContentType('text/html')
@@ -116,6 +117,7 @@ if(strlen($bcc)) {
 
 Mail::queue($message, 'sale\booking\Booking', $booking['id']);
 
-$context->httpResponse()
-        ->body(['id' => $booking['id']])
-        ->send();
+$context
+    ->httpResponse()
+    ->body(['id' => $booking['id']])
+    ->send();

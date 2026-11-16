@@ -1,17 +1,17 @@
 <?php
 /*
     This file is part of the Discope property management software.
-    Author: Yesbabylon SRL, 2020-2024
+    Author: Yesbabylon SRL, 2020-2026
     License: GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 
 use communication\Template;
 use core\Mail;
-use equal\email\Email;
+use equal\email\EmailMessage;
 use sale\booking\Booking;
 use sale\booking\GuestList;
 
-list($params, $providers) = eQual::announce([
+[$params, $providers] = eQual::announce([
     'description'   => "Invite the customer to complete the guests list. If the guests list does not exist, it will be created.",
     'params'        => [
         'id' => [
@@ -29,7 +29,7 @@ list($params, $providers) = eQual::announce([
         'lang' =>  [
             'description'   => 'Language of the reminder which is defined by the responsible.',
             'type'          => 'string',
-            // #memo - lang impact the template selection and is set to DEFAULT_LANG if not provided andno lang is set on customer
+            // #memo - lang impact the template selection and is set to DEFAULT_LANG if not provided and no lang is set on customer
             // 'default'       => constant('DEFAULT_LANG')
         ],
     ],
@@ -93,6 +93,9 @@ $getTemplatePartValueByName = function($parts, $part_name) {
     return null;
 };
 
+/**
+ * Action
+ */
 
 $booking = Booking::id($params['id'])
     ->read([
@@ -199,8 +202,9 @@ try {
 }
 catch(Exception $e) {}
 
-$message = new Email();
-$message->setTo($contact['email'])
+$message = new EmailMessage();
+$message
+    ->setTo($contact['email'])
     ->setSubject($subject)
     ->setContentType('text/html')
     ->setBody($body);
@@ -215,6 +219,7 @@ $cron->schedule(
         [ 'id' => $booking['id']]
     );
 
-$context->httpResponse()
-        ->status(204)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(204)
+    ->send();
