@@ -9,7 +9,7 @@
         </th>
         <td mat-cell *matCellDef="let element">
             <mat-checkbox
-                    [ngModel]="selectionGuests[element.id]"
+                    [checked]="selectionGuests[element.id]"
                     [disabled]="disabled"
                     (change)="selectionGuestChange(element.id)">
             </mat-checkbox>
@@ -51,7 +51,7 @@
         </th>
         <td mat-cell *matCellDef="let element" class="is_coordinator">
             <mat-slide-toggle
-                    [checked]="element.is_coordinator"
+                    [ngModel]="element.is_coordinator"
                     [disabled]="disabled"
                     (change)="updateToggleFieldValue(element.id, 'is_coordinator', $event)">
             </mat-slide-toggle>
