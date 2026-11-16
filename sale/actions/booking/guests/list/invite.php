@@ -26,6 +26,17 @@ use sale\booking\GuestList;
             'type'              => 'string',
             'usage'             => 'email'
         ],
+        'title' =>  [
+            'description'       => 'Title of the message.',
+            'type'              => 'string',
+            'required'          => true
+        ],
+        'message' => [
+            'description'       => 'Body of the message.',
+            'type'              => 'string',
+            'usage'             => 'text/html',
+            'required'          => true
+        ],
         'lang' =>  [
             'description'       => 'Language of the reminder which is defined by the responsible.',
             'type'              => 'string',
@@ -157,57 +168,27 @@ if(!isset($params['lang']) || !$params['lang']) {
     }
 }
 
-$template = Template::search([
-        // common category [KA - 6]
-        ['category_id', '=', 6],
-        ['type', '=', 'contract'],
-        ['code', '=', 'guestslist_invite']
-    ])
-    ->read(['parts_ids' => ['name', 'value']], $params['lang'])
-    ->first(true);
-
-if(is_null($template)) {
-    throw new Exception("unknown_template", QN_ERROR_UNKNOWN_OBJECT);
-}
-
-$subject = $getTemplatePartValueByName($template['parts_ids'], 'subject');
-$body = $getTemplatePartValueByName($template['parts_ids'], 'body');
-
-if(is_null($subject) || is_null($body)) {
-    throw new Exception('invalid_template', QN_ERROR_INVALID_PARAM);
-}
-
-// remove paragraph html tags, if any
-$subject = strip_tags($subject);
-
-$data = [
-    'booking'   => $booking['name'],
-    'center'    => $booking['center_id']['name'],
-    'date_from' => date('d/m/Y', $booking['date_from']),
-    'date_to'   => date('d/m/Y', $booking['date_to'])
-];
-foreach($data as $key => $val) {
-    $subject = str_replace('{'.$key.'}', $val, $subject);
-}
-
-$url = constant('BACKEND_URL').'/guests/#/request/'.$booking['id'].'?lang='.$params['lang'];
-$body = str_replace('{link}', "<a href=\"$url\">$url</a>", $body);
-
+// generate signature
+$signature = '';
 try {
     $data = eQual::run('get', 'identity_center-signature', [
-        'center_id' => $booking['center_id']['id'],
-        'lang'      => $params['lang']
+        'center_id'     => $booking['center_id']['id'],
+        'lang'          => $params['lang']
     ]);
-    $body .= $data['signature'] ?? '';
+    $signature = (isset($data['signature']))?$data['signature']:'';
 }
-catch(Exception $e) {}
+catch(Exception $e) {
+    // ignore errors
+}
+
+$params['message'] .= $signature;
 
 $message = new EmailMessage();
 $message
     ->setTo($contact['email'])
-    ->setSubject($subject)
+    ->setSubject($params['title'])
     ->setContentType('text/html')
-    ->setBody($body);
+    ->setBody($params['message']);
 
 Mail::queue($message, 'sale\booking\Booking', $booking['id']);
 
