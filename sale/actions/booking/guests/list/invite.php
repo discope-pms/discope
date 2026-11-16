@@ -27,10 +27,10 @@ use sale\booking\GuestList;
             'usage'             => 'email'
         ],
         'lang' =>  [
-            'description'   => 'Language of the reminder which is defined by the responsible.',
-            'type'          => 'string',
+            'description'       => 'Language of the reminder which is defined by the responsible.',
+            'type'              => 'string',
             // #memo - lang impact the template selection and is set to DEFAULT_LANG if not provided and no lang is set on customer
-            // 'default'       => constant('DEFAULT_LANG')
+            // 'default'           => constant('DEFAULT_LANG')
         ],
     ],
     'access'        => [

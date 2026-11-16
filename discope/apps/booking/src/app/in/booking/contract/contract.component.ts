@@ -385,7 +385,7 @@ export class BookingContractComponent implements OnInit, AfterContentInit {
 
                         const environment:any = await this.env.getEnv();
                         let guestlist_link = environment.backend_url.replace(/\/$/g, '') + '/guests/#/request/' + this.booking_id + '?lang=' + this.lang;
-                        body = body.replace("{guestlist_link}", guestlist_link);
+                        body = body.replace("{guestlist_link}", `<a href="${guestlist_link}">${guestlist_link}</a>`);
 
                         this.vm.message.formControl.setValue(body);
                         this.message = body;
