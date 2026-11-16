@@ -188,7 +188,7 @@ foreach($data as $key => $val) {
 }
 
 $url = constant('BACKEND_URL').'/guests/#/request/'.$booking['id'].'?lang='.$params['lang'];
-$body = str_replace('{link}', "<p><a href=\"$url\">$url</a></p>", $body);
+$body = str_replace('{link}', "<a href=\"$url\">$url</a>", $body);
 
 try {
     $data = eQual::run('get', 'identity_center-signature', [
