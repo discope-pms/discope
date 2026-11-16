@@ -16,7 +16,7 @@
                         "id": "stats.turnover",
                         "icon": "business",
                         "type": "parent",
-                        "label": "Chiffre d’affaires",
+                        "label": "Chiffre d'affaires",
                         "description": "",
                         "children": [
                             {
