@@ -65,7 +65,13 @@ export class SojournGuestTableComponent implements OnInit  {
                 });
             });
 
-            this.checkHasCoordinator();
+            let hasCoordinator = false;
+            this.guestList.forEach(guest => {
+                if(guest.is_coordinator) {
+                    hasCoordinator = true;
+                }
+            });
+            this.hasCoordinator = hasCoordinator;
         }
     }
 
@@ -178,20 +184,6 @@ export class SojournGuestTableComponent implements OnInit  {
         // @ts-ignore
         values[field] = value;
 
-        if(field === 'is_coordinator') {
-            setTimeout(() => this.checkHasCoordinator(), 300);
-        }
-
         this.updateGuestListItem.emit({ id, values });
-    }
-
-    private checkHasCoordinator() {
-        let hasCoordinator = false;
-        this.guestList.forEach(guest => {
-            if(guest.is_coordinator) {
-                hasCoordinator = true;
-            }
-        });
-        this.hasCoordinator = hasCoordinator;
     }
 }
