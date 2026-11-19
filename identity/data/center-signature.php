@@ -1,7 +1,7 @@
 <?php
 /*
     This file is part of the Discope property management software.
-    Author: Yesbabylon SRL, 2020-2022
+    Some Rights Reserved, Discope PMS, 2020-2026
     License: GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 
@@ -9,7 +9,7 @@ use equal\data\DataFormatter;
 use identity\Center;
 
 // announce script and fetch parameters values
-list($params, $providers) = announce([
+[$params, $providers] = eQual::announce([
     'description' => "Generate the HTML email signature for a Center, in a given language.",
     'params'      => [
         'center_id' => [
@@ -17,7 +17,7 @@ list($params, $providers) = announce([
             'type'          => 'integer',
             'required'      => true
         ],
-        'lang' =>  [
+        'lang' => [
             'description'   => 'Language to use for multilang contents.',
             'type'          => 'string',
             'usage'         => 'language/iso-639',
@@ -37,7 +37,10 @@ list($params, $providers) = announce([
     'providers'   => ['context']
 ]);
 
-list($context) = [ $providers['context'] ];
+/**
+ * @var \equal\php\Context $context
+ */
+['context' => $context] = $providers;
 
 $signature = '';
 
@@ -105,6 +108,7 @@ if($center && count($center)) {
   }
 }
 
-$context->httpResponse()
-        ->body(['signature' => $signature])
-        ->send();
+$context
+    ->httpResponse()
+    ->body(['signature' => $signature])
+    ->send();

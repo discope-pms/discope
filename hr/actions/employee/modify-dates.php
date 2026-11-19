@@ -8,7 +8,6 @@
 
 use discope\setting\Setting;
 use hr\employee\Employee;
-use sale\booking\BookingActivity;
 
 [$params, $providers] = eQual::announce([
     'description'   => "Modifies employee contracts dates.",
@@ -25,12 +24,16 @@ use sale\booking\BookingActivity;
             'type'              => 'date',
             'description'       => 'Date of the first day of work.',
             'required'          => true,
-            'default'           => function($id) {
+            'default'           => function($id = 0) {
+                if($id <= 0) {
+                    return null;
+                }
+
                 $employee = Employee::id($id)
                     ->read(['date_start'])
                     ->first();
 
-                return $employee['date_start'];
+                return $employee['date_start'] ?? null;
             }
         ],
 
@@ -38,12 +41,16 @@ use sale\booking\BookingActivity;
             'type'              => 'boolean',
             'description'       => 'Has an end date.',
             'required'          => true,
-            'default'           => function($id) {
+            'default'           => function($id = 0) {
+                if($id <= 0) {
+                    return null;
+                }
+
                 $employee = Employee::id($id)
                     ->read(['date_end'])
                     ->first();
 
-                return (bool) $employee['date_end'];
+                return (bool) $employee['date_end'] ?? null;
             }
         ],
 
@@ -52,12 +59,16 @@ use sale\booking\BookingActivity;
             'description'       => 'Date of the last day of work.',
             'help'              => 'Date at which the contract ends (known in advance for fixed-term or unknown for permanent).',
             'required'          => true,
-            'default'           => function($id) {
+            'default'           => function($id = 0) {
+                if($id <= 0) {
+                    return null;
+                }
+
                 $employee = Employee::id($id)
                     ->read(['date_end'])
                     ->first();
 
-                return $employee['date_end'];
+                return $employee['date_end'] ?? null;
             },
             'visible'           => ['has_date_end', '=', true]
         ],
@@ -83,7 +94,7 @@ use sale\booking\BookingActivity;
 ]);
 
 /**
- * @var \equal\php\Context  $context
+ * @var \equal\php\Context $context
  */
 ['context' => $context] = $providers;
 
@@ -96,8 +107,8 @@ if(!$employee) {
 }
 
 if(isset($params['date_end'])) {
-    if($params['date_end'] < $params['date_from']) {
-        throw new Exception("date_to_invalid", EQ_ERROR_INVALID_PARAM);
+    if($params['date_end'] < $params['date_start']) {
+        throw new Exception("date_end_invalid", EQ_ERROR_INVALID_PARAM);
     }
 }
 
@@ -120,6 +131,7 @@ if($params['unassign_activities']) {
     Employee::id($employee['id'])->do('unassign_activities');
 }
 
-$context->httpResponse()
-        ->status(200)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(200)
+    ->send();

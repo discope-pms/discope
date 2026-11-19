@@ -1,9 +1,10 @@
 <?php
 /*
     This file is part of Symbiose Community Edition <https://github.com/yesbabylon/symbiose>
-    Some Rights Reserved, Yesbabylon SRL, 2020-2021
+    Some Rights Reserved, Discope PMS, 2020-2026
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
+
 namespace hr\employee;
 
 class Role extends \equal\orm\Model {
@@ -42,5 +43,4 @@ class Role extends \equal\orm\Model {
 
         ];
     }
-
 }
