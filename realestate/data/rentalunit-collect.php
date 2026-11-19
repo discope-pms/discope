@@ -1,7 +1,7 @@
 <?php
 /*
     This file is part of the Discope property management software <https://github.com/discope-pms/discope>
-    Some Rights Reserved, Discope PMS, 2020-2024
+    Some Rights Reserved, Discope PMS, 2020-2026
     Original author(s): Yesbabylon SRL
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
@@ -10,11 +10,11 @@ use equal\orm\Domain;
 use identity\Center;
 use identity\User;
 
-list($params, $providers) = eQual::announce([
+[$params, $providers] = eQual::announce([
     'description'   => 'Advanced search for rental units: retrieves a collection of reports based on specified parameters.',
     'extends'       => 'core_model_collect',
     'params'        => [
-        'entity'    =>  [
+        'entity'    => [
             'description'       => 'Entity type being queried.',
             'type'              => 'string',
             'default'           => 'realestate\RentalUnit'
@@ -83,15 +83,14 @@ list($params, $providers) = eQual::announce([
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'     => [ 'context', 'orm', 'auth' ]
+    'providers'     => [ 'context', 'auth' ]
 ]);
 
 /**
- * @var \equal\php\Context                  $context
- * @var \equal\orm\ObjectManager            $orm
+ * @var \equal\php\Context $context
  * @var \equal\auth\AuthenticationManager   $auth
  */
-['context' => $context, 'orm' => $orm, 'auth' => $auth] = $providers;
+['context' => $context, 'auth' => $auth] = $providers;
 
 $domain = [];
 
@@ -144,6 +143,7 @@ $params['domain'] = (new Domain($params['domain']))
 
 $result = eQual::run('get', 'model_collect', $params, true);
 
-$context->httpResponse()
-        ->body($result)
-        ->send();
+$context
+    ->httpResponse()
+    ->body($result)
+    ->send();
