@@ -90,7 +90,7 @@ class Ticket extends Model {
             'assignee_id' => [
                 'type'              => 'many2one',
                 'foreign_object'    => 'identity\User',
-                'description'       => 'Person that is handling the ticket (who will provide an answer or perform an action regarding it).'
+                'description'       => 'Person responsible for handling and answering the ticket.'
             ],
 
             'attachments_ids' => [
