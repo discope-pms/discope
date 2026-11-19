@@ -12,7 +12,7 @@ use sale\customer\RateClass;
 use sale\price\Price;
 use sale\price\PriceList;
 
-[$params, $provider] = eQual::announce([
+[$params, $providers] = eQual::announce([
     'description'   => "Update prices 2026-2027 for packs.",
     'params'        => [
         'price_list_id' => [
@@ -36,13 +36,13 @@ use sale\price\PriceList;
         'charset'           => 'utf-8',
         'accept-origin'     => '*'
     ],
-    'providers'     => ['context', 'orm']
+    'providers'     => ['context']
 ]);
 
 /**
- * @var \equal\php\Context  $context
+ * @var \equal\php\Context $context
  */
-['context' => $context, 'orm' => $orm] = $provider;
+['context' => $context] = $providers;
 
 $price_list = PriceList::id($params['price_list_id'])
     ->read(['id', 'name'])
@@ -214,6 +214,7 @@ foreach($new_prices_data as $prices_data) {
     }
 }
 
-$context->httpResponse()
-        ->status(200)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(200)
+    ->send();

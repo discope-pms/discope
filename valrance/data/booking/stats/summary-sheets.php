@@ -1,7 +1,7 @@
 <?php
 /*
     This file is part of the Discope property management software.
-    Author: Yesbabylon SRL, 2020-2026
+    Some Rights Reserved, Discope PMS, 2020-2026
     License: GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 
@@ -173,15 +173,14 @@ use sale\customer\AgeRange;
         'expires'       => (60*60*1)
         */
     ],
-    'providers'     => ['context', 'orm', 'adapt']
+    'providers'     => ['context', 'adapt']
 ]);
 
 /**
  * @var \equal\php\Context                      $context
- * @var \equal\orm\ObjectManager                $orm
  * @var \equal\data\adapt\DataAdapterProvider   $adapter_provider
  */
-['context' => $context, 'orm' => $orm, 'adapt' => $adapter_provider] = $providers;
+['context' => $context, 'adapt' => $adapter_provider] = $providers;
 
 $bookings = Booking::search([
     ['date_from', '>=', $params['date_from']],
@@ -635,7 +634,8 @@ foreach($bookings as $id => $booking) {
     ];
 }
 
-$context->httpResponse()
-        ->header('X-Total-Count', count($result))
-        ->body($result)
-        ->send();
+$context
+    ->httpResponse()
+    ->header('X-Total-Count', count($result))
+    ->body($result)
+    ->send();
