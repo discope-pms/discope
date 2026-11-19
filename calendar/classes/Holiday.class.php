@@ -1,11 +1,13 @@
 <?php
 /*
     This file is part of the Discope property management software <https://github.com/discope-pms/discope>
-    Some Rights Reserved, Discope PMS, 2020-2024
+    Some Rights Reserved, Discope PMS, 2020-2026
     Original author(s): Yesbabylon SRL
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
+
 namespace calendar;
+
 use equal\orm\Model;
 
 class Holiday extends Model {
@@ -15,7 +17,7 @@ class Holiday extends Model {
     }
 
     public static function getDescription() {
-        return "Holidays allow to list public holidays and school vacations occuring within a given year.";
+        return "Holidays allow to list public holidays and school vacations occurring within a given year.";
     }
 
     public static function getColumns() {
@@ -99,5 +101,4 @@ class Holiday extends Model {
             }
         }
     }
-
 }
