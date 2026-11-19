@@ -113,7 +113,7 @@ class Establishment extends Model {
 
             'bank_account_bic' => [
                 'type'              => 'string',
-                'description'       => 'Identitifer of the Bank related to the bank account.'
+                'description'       => 'Identifier of the Bank related to the bank account.'
             ],
 
             'analytic_section_id' => [

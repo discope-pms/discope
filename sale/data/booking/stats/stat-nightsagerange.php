@@ -100,14 +100,18 @@ $map_rate_class = RateClass::search()
     ->read(['name', 'description'])
     ->get();
 
+$map_rate_class[0] = ['name' => '', 'description' => ''];
+
 $map_customer_nature = CustomerNature::search()
     ->read(['code', 'description'])
     ->get();
 
+$map_customer_nature[0] = ['name' => '', 'description' => ''];
+
 $domain = [];
 
 // #memo - we consider all bookings for which at least one sojourn intersects the given period
-if($params['center_id'] || $params['center_office_id']) {
+if((isset($params['center_id']) && $params['center_id']) || (isset($params['center_office_id']) && $params['center_office_id'])) {
     $domain = [
         ['state', 'in', ['instance', 'archive']],
         ['date_from', '<=', $params['date_to']], // #memo - if date_to is 05/08 we want the night from 05/08 -> 06/08
@@ -162,8 +166,8 @@ if($params['rate_class_id'] && $params['rate_class_id'] > 0) {
 $map_centers = [];
 foreach($bookings as $booking) {
     $center_id = $booking['center_id']['id'];
-    $rate_class_id = $booking['customer_id']['rate_class_id'];
-    $customer_nature_id =  $booking['customer_id']['customer_nature_id'];
+    $rate_class_id = $booking['customer_id']['rate_class_id'] ?? 0;
+    $customer_nature_id =  $booking['customer_id']['customer_nature_id'] ?? 0;
 
     if(!isset($map_centers[$center_id])) {
         $map_centers[$center_id] = [];

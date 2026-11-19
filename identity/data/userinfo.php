@@ -37,14 +37,15 @@ if(!count($ids)) {
     throw new Exception('unexpected_error', EQ_ERROR_INVALID_USER);
 }
 // user has always READ right on its own object
-$user = User::ids($ids)
+$user = User::id($user_id)
     ->read([
         'id',
         'login',
-        'groups_ids'  => ['name', 'display_name'],
-        'identity_id' => ['firstname', 'lastname'],
         'language',
-        'organisation_id'
+        'organisation_id',
+        'organisation_id',
+        'groups_ids'        => ['name', 'display_name'],
+        'identity_id'       => ['firstname', 'lastname'],
     ])
     ->adapt('json')
     ->first(true);

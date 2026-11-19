@@ -239,22 +239,15 @@ class Partner extends Model {
         }
     }
 
-    /**
-     * Signature for single object change from views.
-     *
-     * @param  Object   $om        Object Manager instance.
-     * @param  Array    $event     Associative array holding changed fields as keys, and their related new values.
-     * @param  Array    $values    Copy of the current (partial) state of the object (fields depend on the view).
-     * @param  String   $lang      Language (char 2) in which multilang field are to be processed.
-     * @return Array    Associative array mapping fields with their resulting values.
-     */
     public static function onchange($om, $event, $values, $lang='en') {
         $result = [];
 
         if(isset($event['partner_identity_id'])) {
-            $identities = $om->read('identity\Identity', $event['partner_identity_id'], ['name']);
-            if($identities > 0) {
-                $identity = reset($identities);
+            $identity = Identity::id($event['partner_identity_id'])
+                ->read(['name'])
+                ->first();
+
+            if($identity) {
                 $result['name'] = $identity['name'];
             }
         }
