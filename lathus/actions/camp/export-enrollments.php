@@ -13,7 +13,9 @@ use sale\camp\Camp;
 use sale\camp\Enrollment;
 
 [$params, $providers] = eQual::announce([
-    'description'   => "Create an financial export of ended camps' enrollments.",
+    'description'   => "Create a financial Export of ended camps enrollments.",
+    'help'          => "The generated export includes enrollments of ended camps that have not yet been exported.
+        The generated Export Document follows the AIGA software specifications.",
     'params'        => [
         'year' => [
             'type'          => 'integer',
@@ -46,18 +48,18 @@ $end_year = strtotime("last day of December {$params['year']}");
 $now = time();
 
 $year_camps_ids = Camp::search([
-    ['date_from', '>=', $start_year],
-    ['date_to', '<', $end_year]
-])
+        ['date_from', '>=', $start_year],
+        ['date_to', '<', $end_year]
+    ])
     ->ids();
 
 $enrollment = Enrollment::search(
-    [
-        ['is_exported', '=', true],
-        ['camp_id', 'in', $year_camps_ids]
-    ],
-    ['sort' => ['export_number' => 'desc']]
-)
+        [
+            ['is_exported', '=', true],
+            ['camp_id', 'in', $year_camps_ids]
+        ],
+        ['sort' => ['export_number' => 'desc']]
+    )
     ->read(['export_number'])
     ->first();
 
@@ -67,14 +69,15 @@ if(!empty($enrollment['export_number'])) {
 }
 
 $camps = Camp::search(
-    [
-        ['id', 'in', $year_camps_ids],
-        ['date_to', '<', $now]
-    ],
-    ['sort' => ['sojourn_number' => 'asc']]
-)
+        [
+            ['id', 'in', $year_camps_ids],
+            ['date_to', '<', $now]
+        ],
+        ['sort' => ['sojourn_number' => 'asc']]
+    )
     ->read([
         'date_from',
+        'accounting_code',
         'enrollments_ids' => [
             '@domain' => [
                 ['is_exported', '=', false],
@@ -108,9 +111,11 @@ $camps = Camp::search(
 
 $has_enrollments_to_export = false;
 foreach($camps as $camp) {
-    if(count($camp['enrollments_ids']) > 0) {
-        $has_enrollments_to_export = true;
-        break;
+    foreach($camp['enrollments_ids'] as $enrollment) {
+        if(round((float) $enrollment['price'], 2) !== 0.0) {
+            $has_enrollments_to_export = true;
+            break 2;
+        }
     }
 }
 if(!$has_enrollments_to_export) {
@@ -121,7 +126,7 @@ $default_accounting_rule_lines = [['account' => '70680000', 'share' => 1]];
 $default_analytic_account = 'A980084';
 
 $writing_number = 0;
-$maps_exported_enrollments_numbers = [];
+$map_exported_enrollments_numbers = [];
 $lines = [];
 
 try {
@@ -135,11 +140,19 @@ try {
         }
 
         foreach($camp['enrollments_ids'] as $enrollment) {
+            // AIGA rejects zero-value invoices: keep the enrollment pending so it can be corrected later.
+            if(round((float) $enrollment['price'], 2) === 0.0) {
+                continue;
+            }
+
             $export_number++;
             $writing_number++;
             $writing_line = 0;
 
-            $customer_accounting_account = '411C4526';
+            $customer_accounting_account = trim($camp['accounting_code']);
+            if(!str_starts_with($customer_accounting_account, 'C411C')) {
+                $customer_accounting_account = 'C'.$customer_accounting_account;
+            }
 
             $enrollment_number = Setting::parse_format('C%2d{year}/%04d{sequence}', [
                 'year'      => $params['year'],
@@ -200,7 +213,7 @@ try {
                 ];
             }
 
-            $maps_exported_enrollments_numbers[$enrollment['id']] = $export_number;
+            $map_exported_enrollments_numbers[$enrollment['id']] = $export_number;
         }
     }
 
@@ -212,7 +225,8 @@ try {
         'analytic_account'      => ['length' => 10],
         'journal_account'       => ['length' => 3],
         'file_type'             => ['length' => 3],
-        'file_number'           => ['length' => 15],
+        'file_number'           => ['length' => 14],
+        'amount_sign'           => ['length' => 1],
         'amount'                => ['length' => 15],
         'writing_label'         => ['length' => 50],
         'due_date'              => ['length' => 8],
@@ -225,6 +239,8 @@ try {
     $formatted_lines = [];
     foreach($lines as $line) {
         $line['writing_label'] = substr(TextTransformer::toAscii($line['writing_label']), 0, $format_config['writing_label']['length']);
+        $line['amount_sign'] = str_starts_with($line['amount'], '-') ? '-' : '';
+        $line['amount'] = ltrim($line['amount'], '-');
 
         $formatted_line = [];
         foreach(array_keys($format_config) as $key) {
@@ -237,8 +253,8 @@ try {
     $result = implode(PHP_EOL, $formatted_lines);
 }
 catch(Exception $e) {
-    if(!empty($maps_exported_enrollments_numbers)) {
-        Enrollment::ids(array_keys($maps_exported_enrollments_numbers))->update([
+    if(!empty($map_exported_enrollments_numbers)) {
+        Enrollment::ids(array_keys($map_exported_enrollments_numbers))->update([
             'is_exported'   => false,
             'export_number' => null
         ]);
@@ -276,18 +292,18 @@ if(!empty($result)) {
     try {
         // create the export archive
         $export = Export::create([
-            'center_office_id'  => 1,
-            'export_type'       => 'camps_enrollments',
-            'object_class'      => Enrollment::getType(),
-            'object_ids'        => json_encode(array_keys($maps_exported_enrollments_numbers))
-        ])
+                'center_office_id'  => 1,
+                'export_type'       => 'camps_enrollments',
+                'object_class'      => Enrollment::getType(),
+                'object_ids'        => json_encode(array_keys($map_exported_enrollments_numbers))
+            ])
             // #memo - read computed name before onupdateDate to not trigger the error "Document name required"
             ->read(['name'])
             ->update(['data' => $data])
             ->first();
 
         // set enrollments as exported
-        foreach($maps_exported_enrollments_numbers as $enrollment_id => $export_number) {
+        foreach($map_exported_enrollments_numbers as $enrollment_id => $export_number) {
             Enrollment::id($enrollment_id)->update([
                 'is_exported'   => true,
                 'export_number' => $export_number
@@ -301,7 +317,7 @@ if(!empty($result)) {
         }
 
         // set enrollments as not exported
-        Enrollment::ids(array_keys($maps_exported_enrollments_numbers))->update([
+        Enrollment::ids(array_keys($map_exported_enrollments_numbers))->update([
             'is_exported'   => false,
             'export_number' => null
         ]);
