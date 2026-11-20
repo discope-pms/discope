@@ -111,11 +111,9 @@ $camps = Camp::search(
 
 $has_enrollments_to_export = false;
 foreach($camps as $camp) {
-    foreach($camp['enrollments_ids'] as $enrollment) {
-        if(round((float) $enrollment['price'], 2) !== 0.0) {
-            $has_enrollments_to_export = true;
-            break 2;
-        }
+    if(count($camp['enrollments_ids']) > 0) {
+        $has_enrollments_to_export = true;
+        break;
     }
 }
 if(!$has_enrollments_to_export) {
@@ -140,11 +138,6 @@ try {
         }
 
         foreach($camp['enrollments_ids'] as $enrollment) {
-            // AIGA rejects zero-value invoices: keep the enrollment pending so it can be corrected later.
-            if(round((float) $enrollment['price'], 2) === 0.0) {
-                continue;
-            }
-
             $export_number++;
             $writing_number++;
             $writing_line = 0;
@@ -225,8 +218,7 @@ try {
         'analytic_account'      => ['length' => 10],
         'journal_account'       => ['length' => 3],
         'file_type'             => ['length' => 3],
-        'file_number'           => ['length' => 14],
-        'amount_sign'           => ['length' => 1],
+        'file_number'           => ['length' => 15],
         'amount'                => ['length' => 15],
         'writing_label'         => ['length' => 50],
         'due_date'              => ['length' => 8],
@@ -239,8 +231,6 @@ try {
     $formatted_lines = [];
     foreach($lines as $line) {
         $line['writing_label'] = substr(TextTransformer::toAscii($line['writing_label']), 0, $format_config['writing_label']['length']);
-        $line['amount_sign'] = str_starts_with($line['amount'], '-') ? '-' : '';
-        $line['amount'] = ltrim($line['amount'], '-');
 
         $formatted_line = [];
         foreach(array_keys($format_config) as $key) {

@@ -9,7 +9,7 @@
 $tests = [
     '0010' => [
         'description'   => 'Validate the fixed-width AIGA camp enrollment export format.',
-        'help'          => 'Checks the supplied reference layout, corrected examples, per-camp customer accounts and zero amount exclusion.',
+        'help'          => 'Checks the supplied reference layout, corrected examples, per-camp customer accounts and zero amount inclusion.',
         'arrange'       => function() {
             $format_config = [
                 'writing_number'        => ['length' => 6, 'pad_type' => STR_PAD_LEFT],
@@ -19,8 +19,7 @@ $tests = [
                 'analytic_account'      => ['length' => 10],
                 'journal_account'       => ['length' => 3],
                 'file_type'             => ['length' => 3],
-                'file_number'           => ['length' => 14],
-                'amount_sign'           => ['length' => 1],
+                'file_number'           => ['length' => 15],
                 'amount'                => ['length' => 15],
                 'writing_label'         => ['length' => 50],
                 'due_date'              => ['length' => 8],
@@ -89,9 +88,6 @@ $tests = [
             ] = $data;
 
             $format_line = function(array $line) use($format_config): string {
-                $line['amount_sign'] = str_starts_with($line['amount'], '-') ? '-' : '';
-                $line['amount'] = ltrim($line['amount'], '-');
-
                 $formatted_line = [];
                 foreach($format_config as $key => $config) {
                     $formatted_line[] = str_pad(
@@ -114,9 +110,9 @@ $tests = [
                 'formatted_customer_line'        => $formatted_customer_line,
                 'formatted_product_line'         => $formatted_product_line,
                 'second_camp_customer_account'   => 'C'.'411C5123',
-                'zero_amount_is_exportable'      => round(0.0, 2) !== 0.0,
-                'rounded_zero_is_exportable'     => round(0.004, 2) !== 0.0,
-                'non_zero_amount_is_exportable'  => round(0.01, 2) !== 0.0
+                'zero_amount'                    => sprintf('%.02f', 0.0),
+                'rounded_zero_amount'            => sprintf('%.02f', 0.004),
+                'zero_counterpart_amount'        => sprintf('%.02f', -1 * (0.0 * 1))
             ];
         },
         'assert'        => function($data) {
@@ -144,10 +140,13 @@ $tests = [
                 && substr($data['formatted_customer_line'], 20, 11) === 'C411C4476  '
                 && substr($data['formatted_product_line'], 20, 11) === '70680000   '
                 && substr($data['formatted_product_line'], 31, 10) === 'A980084   '
+                && substr($data['formatted_customer_line'], 62, 6) === '401.00'
+                && substr($data['formatted_product_line'], 61, 1) === ' '
+                && substr($data['formatted_product_line'], 62, 7) === '-401.00'
                 && $data['second_camp_customer_account'] === 'C411C5123'
-                && $data['zero_amount_is_exportable'] === false
-                && $data['rounded_zero_is_exportable'] === false
-                && $data['non_zero_amount_is_exportable'] === true
+                && $data['zero_amount'] === '0.00'
+                && $data['rounded_zero_amount'] === '0.00'
+                && $data['zero_counterpart_amount'] === '0.00'
             );
         },
         'rollback'      => function() {
