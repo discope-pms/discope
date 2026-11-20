@@ -127,16 +127,16 @@ $tests = [
             foreach($data['expected_lines'] as $line) {
                 if(
                     str_contains($line, "\t")
-                    || mb_strlen($line, 'UTF-8') !== $data['expected_line_length']
+                    || strlen($line) !== $data['expected_line_length']
                 ) {
                     return false;
                 }
             }
 
             return (
-                trim(mb_substr($data['expected_lines'][0], 20, 11, 'UTF-8')) === 'C411C4476'
-                && trim(mb_substr($data['expected_lines'][1], 31, 10, 'UTF-8')) === 'A980084'
-                && mb_substr($data['expected_lines'][0], 41, 3, 'UTF-8') === 'VAC'
+                trim(substr($data['expected_lines'][0], 20, 11)) === 'C411C4476'
+                && trim(substr($data['expected_lines'][1], 31, 10)) === 'A980084'
+                && substr($data['expected_lines'][0], 41, 3) === 'VAC'
                 && $data['formatted_customer_line'] === $data['expected_lines'][0]
                 && $data['formatted_product_line'] === $data['expected_lines'][1]
                 && strlen($data['formatted_customer_line']) === 168
