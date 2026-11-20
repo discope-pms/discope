@@ -202,6 +202,9 @@ export class AppComponent implements OnInit  {
                 }
             });
 
+            // #memo - to handle modification detection
+            this.booking = JSON.parse(JSON.stringify(this.booking));
+
             this.updateFormStatus();
         }
     }

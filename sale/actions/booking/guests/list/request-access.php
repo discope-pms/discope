@@ -1,15 +1,16 @@
 <?php
 /*
     This file is part of the Discope property management software.
-    Author: Yesbabylon SRL, 2020-2024
+    Author: Yesbabylon SRL, 2020-2026
     License: GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
+
 use core\Mail;
-use equal\email\Email;
 use communication\Template;
+use equal\email\EmailMessage;
 use sale\booking\Booking;
 
-list($params, $providers) = eQual::announce([
+[$params, $providers] = eQual::announce([
     'description'	=>	"Send an email with a one-time access link to the provided email address, if allowed for given booking.",
     'params' 		=>	[
         'booking_id' =>  [
@@ -123,24 +124,26 @@ foreach($template['parts_ids'] as $part) {
 }
 
 $trailer_notices = [
-        'fr'    => "<p>Ceci est un message automatique envoyé de la part de <strong>Kaleo ASBL</strong> suite à une demande utilisant votre adresse email.</p><p>Si vous n'êtes pas à l'origine de ce message, vous pouvez simplement l'ignorer. En cas d'envois non sollicités répétés, vous pouvez nous contacter via <a href=\"mailto:info@kaleo-asbl.be\">info@kaleo-asbl.be</a>.</p>",
-        'en'    => "<p>This is an automatic message sent on behalf of <strong>Kaleo ASBL</strong> following a request using your email address.</p><p>If you did not initiate this message, you can simply ignore it. In case of repeated unsolicited messages, you can contact us at <a href=\"mailto:info@kaleo-asbl.be\">info@kaleo-asbl.be</a>.</p>",
-        'nl'    => "<p>Dit is een automatisch bericht verzonden namens <strong>Kaleo VZW</strong> naar aanleiding van een verzoek met uw e-mailadres.</p><p>Als u niet de afzender van dit bericht bent, kunt u het gewoon negeren. Bij herhaaldelijke ongewenste berichten kunt u contact met ons opnemen via <a href=\"mailto:info@kaleo-asbl.be\">info@kaleo-asbl.be</a>.</p>"
+        'fr'    => "<p><small>Ceci est un message automatique envoyé de la part de <strong>Kaleo ASBL</strong> suite à une demande utilisant votre adresse email.</small></p><p><small>Si vous n'êtes pas à l'origine de ce message, vous pouvez simplement l'ignorer. En cas d'envois non sollicités répétés, vous pouvez nous contacter via <a href=\"mailto:info@kaleo-asbl.be\">info@kaleo-asbl.be</a>.</small></p>",
+        'en'    => "<p><small>This is an automatic message sent on behalf of <strong>Kaleo ASBL</strong> following a request using your email address.</small></p><p><small>If you did not initiate this message, you can simply ignore it. In case of repeated unsolicited messages, you can contact us at <a href=\"mailto:info@kaleo-asbl.be\">info@kaleo-asbl.be</a>.</small></p>",
+        'nl'    => "<p><small>Dit is een automatisch bericht verzonden namens <strong>Kaleo VZW</strong> naar aanleiding van een verzoek met uw e-mailadres.</small></p><p><small>Als u niet de afzender van dit bericht bent, kunt u het gewoon negeren. Bij herhaaldelijke ongewenste berichten kunt u contact met ons opnemen via <a href=\"mailto:info@kaleo-asbl.be\">info@kaleo-asbl.be</a>.</small></p>"
     ];
 
 if(isset($trailer_notices[$params['lang']])) {
-    $body .= '<p></p><small>'.$trailer_notices[$params['lang']].'</small>';
+    $body .= '<p></p>'.$trailer_notices[$params['lang']];
 }
 
 // build Email envelope
-$message = new Email();
-$message->setTo($params['email'])
-        ->setSubject($subject)
-        ->setContentType("text/html")
-        ->setBody($body);
+$message = new EmailMessage();
+$message
+    ->setTo($params['email'])
+    ->setSubject($subject)
+    ->setContentType("text/html")
+    ->setBody($body);
 
 // send instant email
 Mail::send($message, 'sale\booking\Booking', $params['booking_id']);
 
-$context->httpResponse()
-        ->send();
+$context
+    ->httpResponse()
+    ->send();

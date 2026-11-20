@@ -28,6 +28,7 @@ export class SojournGuestTableComponent implements OnInit  {
     public guestListExtended: GuestListItemExtended[];
     public countryOptions: { [key: string]: string } = countries;
     public citizenIdentificationInputDisabled: { [key: number]: boolean } = {};
+    public hasCoordinator = false;
 
     constructor() {
     }
@@ -50,7 +51,7 @@ export class SojournGuestTableComponent implements OnInit  {
                 this.citizenIdentificationInputDisabled[guest.id] = guest.address_country !== 'BE' || isLessThan15YearOld;
             });
 
-            this.guestListExtended = [];
+            let guestListExtended: GuestListItemExtended[] = [];
             this.guestList.forEach(guest => {
                 let dateString: string|null = null;
                 if(guest.date_of_birth) {
@@ -58,12 +59,25 @@ export class SojournGuestTableComponent implements OnInit  {
                     dateString = date_of_birth.toISOString().split('T')[0];
                 }
 
-                this.guestListExtended.push({
+                guestListExtended.push({
                     ...guest,
                     date_of_birth_string: dateString
                 });
             });
+            this.guestListExtended = guestListExtended;
+
+            let hasCoordinator = false;
+            this.guestList.forEach(guest => {
+                if(guest.is_coordinator) {
+                    hasCoordinator = true;
+                }
+            });
+            this.hasCoordinator = hasCoordinator;
         }
+    }
+
+    public trackGuest(_index: number, guest: GuestListItemExtended): number {
+        return guest.id;
     }
 
     private isLessThanFifteenYearsOld(dateOfBirth: Date|null) {

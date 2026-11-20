@@ -1,7 +1,7 @@
 <?php
 /*
     This file is part of the Discope property management software.
-    Author: Yesbabylon SRL, 2020-2022
+    Some Rights Reserved, Discope PMS, 2020-2026
     License: GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 
@@ -9,11 +9,11 @@ use equal\orm\Domain;
 use identity\Contact;
 use identity\Identity;
 
-list($params, $providers) = announce([
+[$params, $providers] = eQual::announce([
     'description'   => 'Advanced search for Identities: returns a collection of Identities according to extra paramaters.',
     'extends'       => 'core_model_collect',
     'params'        => [
-        'entity' =>  [
+        'entity' => [
             'description'       => 'Full name (including namespace) of the class to look into (e.g. \'core\\User\').',
             'type'              => 'string',
             'default'           => 'identity\Identity'
@@ -46,14 +46,13 @@ list($params, $providers) = announce([
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'     => [ 'context', 'orm' ]
+    'providers'     => [ 'context' ]
 ]);
 
 /**
  * @var \equal\php\Context $context
- * @var \equal\orm\ObjectManager $orm
  */
-list($context, $orm) = [ $providers['context'], $providers['orm'] ];
+['context' => $context] = $providers;
 
 
 $domain = $params['domain'];
@@ -119,6 +118,7 @@ $params['domain'] = $domain;
 
 $result = eQual::run('get', 'model_collect', $params, true);
 
-$context->httpResponse()
-        ->body($result)
-        ->send();
+$context
+    ->httpResponse()
+    ->body($result)
+    ->send();

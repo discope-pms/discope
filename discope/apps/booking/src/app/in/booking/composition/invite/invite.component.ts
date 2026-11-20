@@ -317,8 +317,8 @@ export class BookingCompositionInviteComponent implements OnInit, AfterContentIn
                             body = body + '<p>{link}</p>';
                         }
                         const environment:any = await this.env.getEnv();
-                        let url = environment.backend_url.replace(/\/$/g, '') + '/guests/#/request/' + this.booking_id + '?lang=' + this.lang;
-                        body = body.replace("{link}", url);
+                        let guestlist_link = environment.backend_url.replace(/\/$/g, '') + '/guests/#/request/' + this.booking_id + '?lang=' + this.lang;
+                        body = body.replace("{link}", `<a href="${guestlist_link}">${guestlist_link}</a>`);
                         this.vm.message.formControl.setValue(body);
                         this.message = body;
                     }
@@ -607,6 +607,8 @@ export class BookingCompositionInviteComponent implements OnInit, AfterContentIn
             const response:any = await this.api.call('?do=sale_booking_guests_list_invite', {
                 id: this.booking_id,
                 email: this.recipient,
+                title: this.title,
+                message: this.message,
                 recipients_emails: this.recipients,
                 lang: this.lang
             });

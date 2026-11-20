@@ -1,4 +1,4 @@
-<table mat-table [dataSource]="guestListExtended.reverse()" class="guests-table">
+<table mat-table [dataSource]="guestListExtended.reverse()" [trackBy]="trackGuest" class="guests-table">
     <ng-container matColumnDef="select">
         <th mat-header-cell *matHeaderCellDef>
             <mat-checkbox
@@ -45,9 +45,13 @@
     </ng-container>
 
     <ng-container matColumnDef="is_coordinator">
-        <th class="header-cell is_coordinator" mat-header-cell *matHeaderCellDef>{{ 'GUEST_TABLE_COL_TITLE_COORDINATOR' | translate }}</th>
+        <th class="header-cell is_coordinator" mat-header-cell *matHeaderCellDef>
+            <div>{{ 'GUEST_TABLE_COL_TITLE_COORDINATOR' | translate }}</div>
+            <div *ngIf="!hasCoordinator" style="color: red;">({{ 'GUEST_TABLE_COL_TITLE_COORDINATOR_REQUIRED' | translate }})</div>
+        </th>
         <td mat-cell *matCellDef="let element" class="is_coordinator">
-            <mat-slide-toggle [ngModel]="element.is_coordinator"
+            <mat-slide-toggle
+                    [checked]="!!element.is_coordinator"
                     [disabled]="disabled"
                     (change)="updateToggleFieldValue(element.id, 'is_coordinator', $event)">
             </mat-slide-toggle>
