@@ -759,13 +759,6 @@ class BookingLineGroup extends Model {
         }
     }
 
-    /**
-     * In case prices of a group are impacted, we need to reset parent booking and children lines as well.
-     */
-    public static function _resetPrices($self, $values) {
-        $self->do('reset-prices', $values);
-    }
-
     public static function onupdateRateClassId($self, $om, $oids, $values, $lang) {
         trigger_error("ORM::calling sale\booking\BookingLineGroup:onchangeRateClassId", QN_REPORT_DEBUG);
         $groups = $om->read(self::getType(), $oids, ['booking_id', 'rate_class_id.name'], $lang);

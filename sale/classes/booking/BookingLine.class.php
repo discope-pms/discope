@@ -1305,14 +1305,6 @@ class BookingLine extends Model {
     }
 
     /**
-     * Reset computed fields related to price.
-     */
-    protected static function _resetPrices($self) {
-        // #memo - calls the action, can be removed when not necessary any more
-        $self->do('reset-prices');
-    }
-
-    /**
      * Update the quantity according to parent group (pack_id, nb_pers, nb_nights) and variation array.
      * This method is triggered on fields update from BookingLineGroup or onupdateQtyVars from BookingLine.
      *

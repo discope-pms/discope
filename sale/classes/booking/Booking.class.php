@@ -1329,11 +1329,6 @@ class Booking extends Model {
         }
     }
 
-    // #todo - this should be part of the onupdate() hook
-    public static function _resetPrices($self) {
-        $self->do('reset-prices');
-    }
-
     public static function onupdateBookingLinesGroupsIds($self) {
         $self->do('reset-prices');
     }
