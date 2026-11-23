@@ -727,8 +727,6 @@ class BookingLineGroup extends Model {
 
     /**
      * In case prices of a group are impacted, we need to reset parent booking and children lines as well.
-     *
-     * #todo - refactoring to avoid calling Line _resetPrice here, because Line _restPrice calls Group _resetPrice
      */
     public static function _resetPrices($om, $oids, $values, $lang) {
         // reset computed fields related to price
@@ -738,11 +736,15 @@ class BookingLineGroup extends Model {
             $bookings_ids = array_map(function ($a) { return $a['booking_id']; }, $groups);
             // reset fields in parent bookings
             $om->callonce('sale\booking\Booking', '_resetPrices', $bookings_ids, [], $lang);
-            // reset fields in children lines
-            foreach($groups as $gid => $group) {
-                // do not reset lines for extra-consumptions groups
-                if(!$group['is_extra']) {
-                    $om->callonce('sale\booking\BookingLine', '_resetPrices', $group['booking_lines_ids'], [], $lang);
+            // handle group price reset from a line
+            $skip_lines = $values['skip_lines'] ?? false;
+            if(!$skip_lines) {
+                // reset fields in children lines
+                foreach($groups as $gid => $group) {
+                    // do not reset lines for extra-consumptions groups
+                    if(!$group['is_extra']) {
+                        BookingLine::ids($group['booking_lines_ids'])->do('reset-prices');
+                    }
                 }
             }
         }
