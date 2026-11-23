@@ -117,7 +117,7 @@ Booking::id($params['id'])->update(['has_contract' => false, 'fundings_ids' => $
 */
 
 // #memo - this does not reset `has_manual_*` fields
-$orm->callonce(BookingLine::getType(), '_resetPrices', $booking['booking_lines_ids']);
+BookingLine::ids($booking['booking_lines_ids'])->do('reset-prices');
 BookingLineGroup::ids($booking['booking_lines_groups_ids'])->update(['unit_price' => null, 'price' => null, 'vat_rate' => null, 'total' => null]);
 Booking::id($params['id'])->update(['is_price_tbc' => false, 'price' => null, 'total' => null]);
 

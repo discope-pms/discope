@@ -119,9 +119,9 @@ class BookingPriceAdapter extends Model {
             $bookings_ids = array_map( function($a) { return $a['booking_id']; }, $discounts);
             $booking_lines_ids = array_map( function($a) { return $a['booking_line_id']; }, $discounts);
             $booking_line_groups_ids = array_map( function($a) { return $a['booking_line_group_id']; }, $discounts);
-            $om->update(Booking::getType(), $bookings_ids, ['price' => null, 'total' => null]);
-            $om->callonce(BookingLine::getType(), '_resetPrices', $booking_lines_ids, [], $lang);
-            $om->callonce(BookingLineGroup::getType(), '_resetPrices', $booking_line_groups_ids, [], $lang);
+            Booking::ids($bookings_ids)->lang($lang)->do('reset-prices');
+            BookingLine::ids($booking_lines_ids)->lang($lang)->do('reset-prices');
+            BookingLineGroup::ids($booking_line_groups_ids)->lang($lang)->do('reset-prices');
         }
     }
 
