@@ -1,10 +1,11 @@
 <?php
 /*
     This file is part of the Discope property management software <https://github.com/discope-pms/discope>
-    Some Rights Reserved, Discope PMS, 2020-2024
+    Some Rights Reserved, Discope PMS, 2020-2026
     Original author(s): Yesbabylon SRL
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
+
 use sale\booking\BankCheck;
 use sale\booking\Funding;
 use sale\booking\Payment;
@@ -13,20 +14,19 @@ use sale\booking\Payment;
     'description'   => "Register a manual payment using a bank check to settle the outstanding balance of a funding.",
     'help'          => "This action processes a manual payment via bank check, linking it to the corresponding funding and marking it as paid.",
     'params'        => [
-        'id' =>  [
-            'description'       => 'Identifier of the targeted bankCheck.',
-            'type'              => 'integer',
-            'required'          => true
+        'id' => [
+            'type'          => 'integer',
+            'description'   => 'Identifier of the targeted bankCheck.',
+            'required'      => true
         ],
-        'confirm' =>  [
-            'description'   => 'Manual confirmation.',
+        'confirm' => [
             'type'          => 'boolean',
+            'description'   => 'Manual confirmation.',
             'required'      => true
         ]
-
     ],
-    'access' => [
-        'groups'            => ['booking.default.user', 'finance.default.administrator', 'finance.default.user']
+    'access'        => [
+        'groups'        => ['booking.default.user', 'finance.default.administrator', 'finance.default.user']
     ],
     'response'      => [
         'content-type'  => 'application/json',
@@ -37,7 +37,7 @@ use sale\booking\Payment;
 ]);
 
 /**
- * @var \equal\php\Context          $context
+ * @var \equal\php\Context $context
  */
 ['context' => $context] = $providers;
 
@@ -92,6 +92,7 @@ $payment = Payment::create([
 
 BankCheck::id($bankCheck['id'])->update(['payment_id' => $payment['id'], 'status' => 'paid']);
 
-$context->httpResponse()
-        ->status(205)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(205)
+    ->send();

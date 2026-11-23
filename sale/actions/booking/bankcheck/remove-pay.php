@@ -1,32 +1,33 @@
 <?php
 /*
     This file is part of the Discope property management software <https://github.com/discope-pms/discope>
-    Some Rights Reserved, Discope PMS, 2020-2024
+    Some Rights Reserved, Discope PMS, 2020-2026
     Original author(s): Yesbabylon SRL
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
+
 use sale\booking\BankCheck;
-use sale\booking\Funding;
 use sale\booking\Booking;
+use sale\booking\Funding;
 use sale\booking\Payment;
 
-list($params, $providers) = eQual::announce([
+[$params, $providers] = eQual::announce([
     'description'   => "Detach the payment associated with the specified bank check, if present, and reset the corresponding funding status to 'pending'.",
     'help'          => "",
     'params'        => [
-        'id' =>  [
-            'description'   => 'Unique identifier of the target bank check.',
+        'id' => [
             'type'          => 'integer',
+            'description'   => 'Unique identifier of the target bank check.',
             'required'      => true
         ],
-        'confirm' =>  [
-            'description'   => 'Explicit confirmation required to proceed.',
+        'confirm' => [
             'type'          => 'boolean',
+            'description'   => 'Explicit confirmation required to proceed.',
             'required'      => true
         ]
     ],
-    'access' => [
-        'groups'            => ['finance.default.administrator', 'finance.default.user']
+    'access'        => [
+        'groups'        => ['finance.default.administrator', 'finance.default.user']
     ],
     'response'      => [
         'content-type'  => 'application/json',
@@ -40,7 +41,7 @@ list($params, $providers) = eQual::announce([
  * @var \equal\php\Context          $context
  * @var \equal\orm\ObjectManager    $om
  */
-list($context, $om) = [ $providers['context'], $providers['orm'] ];
+['context' => $context, 'orm' => $om] = $providers;
 
 if(!$params['confirm']) {
     throw new Exception('missing_confirmation', EQ_ERROR_MISSING_PARAM);
@@ -57,23 +58,23 @@ $bankCheck = BankCheck::id($params['id'])
 
 
 if(!$bankCheck) {
-    throw new Exception("unknown_bankcheck", QN_ERROR_UNKNOWN_OBJECT);
+    throw new Exception("unknown_bankcheck", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
 if($bankCheck['booking_id']['status'] == 'balanced') {
-    throw new Exception("booking_balanced", QN_ERROR_INVALID_PARAM);
+    throw new Exception("booking_balanced", EQ_ERROR_INVALID_PARAM);
 }
 
 if(!$bankCheck['funding_id']['id']) {
-    throw new Exception("unknown_funding", QN_ERROR_UNKNOWN_OBJECT);
+    throw new Exception("unknown_funding", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
 if(!$bankCheck['payment_id']['id']) {
-    throw new Exception("unknown_payment", QN_ERROR_UNKNOWN_OBJECT);
+    throw new Exception("unknown_payment", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
 if(!$bankCheck['payment_id']['is_manual']) {
-    throw new Exception("payment_not_manual",QN_ERROR_INVALID_PARAM);
+    throw new Exception("payment_not_manual",EQ_ERROR_INVALID_PARAM);
 }
 
 Payment::id($bankCheck['payment_id']['id'])->delete(true);
@@ -87,6 +88,7 @@ Funding::id($bankCheck['funding_id']['id'])
 
 Booking::updateStatusFromFundings($om, (array) $bankCheck['booking_id']['id'], [], 'en');
 
-$context->httpResponse()
-        ->status(205)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(205)
+    ->send();
