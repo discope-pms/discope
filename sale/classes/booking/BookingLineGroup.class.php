@@ -407,6 +407,40 @@ class BookingLineGroup extends Model {
         ];
     }
 
+    public static function getActions(): array {
+        return [
+
+            'reset-prices' => [
+                'description'   => "Resets computed price related fields.",
+                'policies'      => [],
+                'function'      => 'doResetPrices'
+            ]
+
+        ];
+    }
+
+    protected static function doResetPrices($om, $oids, $values, $lang) {
+        // reset computed fields related to price
+        $om->update(__CLASS__, $oids, ['total' => null, 'price' => null, 'fare_benefit' => null]);
+        $groups = $om->read(__CLASS__, $oids, ['booking_id', 'booking_lines_ids', 'is_extra'], $lang);
+        if($groups > 0) {
+            $bookings_ids = array_map(function ($a) { return $a['booking_id']; }, $groups);
+            // reset fields in parent bookings
+            Booking::ids($bookings_ids)->do('reset-prices');
+            // handle group price reset from a line (avoid loop)
+            $skip_lines = $values['skip_lines'] ?? false;
+            if(!$skip_lines) {
+                // reset fields in children lines
+                foreach($groups as $gid => $group) {
+                    // do not reset lines for extra-consumptions groups
+                    if(!$group['is_extra']) {
+                        BookingLine::ids($group['booking_lines_ids'])->do('reset-prices');
+                    }
+                }
+            }
+        }
+    }
+
     /**
      * @param \equal\orm\ObjectManager  $om
      */
@@ -509,16 +543,16 @@ class BookingLineGroup extends Model {
         }
     }
 
-    public static function onupdateIsLocked($om, $oids, $values, $lang) {
+    public static function onupdateIsLocked($self, $om, $oids, $values, $lang) {
         trigger_error("ORM::calling sale\booking\BookingLineGroup:onchangeIsLocked", QN_REPORT_DEBUG);
         // invalidate prices
-        $om->callonce('sale\booking\BookingLineGroup', '_resetPrices', $oids, [], $lang);
+        $self->do('reset-prices');
         $om->callonce(self::getType(), 'updatePriceId', $oids, [], $lang);
     }
 
-    public static function onupdatePriceId($om, $oids, $values, $lang) {
+    public static function onupdatePriceId($self, $om, $oids, $values, $lang) {
         // invalidate prices
-        $om->callonce('sale\booking\BookingLineGroup', '_resetPrices', $oids, [], $lang);
+        $self->do('reset-prices');
         $om->update(self::getType(), $oids, ['vat_rate' => null, 'unit_price' => null]);
     }
 
@@ -530,7 +564,7 @@ class BookingLineGroup extends Model {
      * Since this method is called, we assume that current group has 'has_pack' set to true,
      * and that pack_id relates to a product that is a pack.
      */
-    public static function onupdatePackId($om, $oids, $values, $lang) {
+    public static function onupdatePackId($self, $om, $oids, $values, $lang) {
         trigger_error("ORM::calling sale\booking\BookingLineGroup:onchangePackId", QN_REPORT_DEBUG);
 
         $groups = $om->read(self::getType(), $oids, [
@@ -610,7 +644,7 @@ class BookingLineGroup extends Model {
 
         // invalidate prices
         // #memo - this must be done after all other processing and should not alter price_id assignments (but only reset computed fields)
-        $om->callonce('sale\booking\BookingLineGroup', '_resetPrices', $oids, [], $lang);
+        $self->do('reset-prices');
 
     }
 
@@ -622,10 +656,10 @@ class BookingLineGroup extends Model {
         }
     }
 
-    public static function onupdateDateFrom($om, $oids, $values, $lang) {
+    public static function onupdateDateFrom($self, $om, $oids, $values, $lang) {
         trigger_error("ORM::calling sale\booking\BookingLineGroup:onchangeDateFrom", QN_REPORT_DEBUG);
         // invalidate prices
-        $om->callonce('sale\booking\BookingLineGroup', '_resetPrices', $oids, [], $lang);
+        $self->do('reset-prices');
 
         $om->update(self::getType(), $oids, ['nb_nights' => null ]);
         $om->callonce(self::getType(), 'updatePriceAdapters', $oids, [], $lang);
@@ -647,10 +681,10 @@ class BookingLineGroup extends Model {
         }
     }
 
-    public static function onupdateDateTo($om, $oids, $values, $lang) {
+    public static function onupdateDateTo($self, $om, $oids, $values, $lang) {
         trigger_error("ORM::calling sale\booking\BookingLineGroup:onchangeDateTo", QN_REPORT_DEBUG);
         // invalidate prices
-        $om->callonce('sale\booking\BookingLineGroup', '_resetPrices', $oids, [], $lang);
+        $self->do('reset-prices');
 
         $om->update(self::getType(), $oids, ['nb_nights' => null ]);
         $om->callonce(self::getType(), 'updatePriceAdapters', $oids, [], $lang);
@@ -700,9 +734,9 @@ class BookingLineGroup extends Model {
         }
     }
 
-    public static function onupdateBookingLinesIds($om, $oids, $values, $lang) {
+    public static function onupdateBookingLinesIds($self, $om, $oids, $values, $lang) {
         // recompute sojourn prices
-        $om->callonce(self::getType(), '_resetPrices', $oids, [], $lang);
+        $self->do('reset-prices');
         // reset rental units assignments
         $om->callonce(self::getType(), 'createRentalUnitsAssignments', $oids, [], $lang);
         // force parent booking to recompute times, prices and has transport
@@ -728,29 +762,11 @@ class BookingLineGroup extends Model {
     /**
      * In case prices of a group are impacted, we need to reset parent booking and children lines as well.
      */
-    public static function _resetPrices($om, $oids, $values, $lang) {
-        // reset computed fields related to price
-        $om->update(__CLASS__, $oids, ['total' => null, 'price' => null, 'fare_benefit' => null]);
-        $groups = $om->read(__CLASS__, $oids, ['booking_id', 'booking_lines_ids', 'is_extra'], $lang);
-        if($groups > 0) {
-            $bookings_ids = array_map(function ($a) { return $a['booking_id']; }, $groups);
-            // reset fields in parent bookings
-            $om->callonce('sale\booking\Booking', '_resetPrices', $bookings_ids, [], $lang);
-            // handle group price reset from a line
-            $skip_lines = $values['skip_lines'] ?? false;
-            if(!$skip_lines) {
-                // reset fields in children lines
-                foreach($groups as $gid => $group) {
-                    // do not reset lines for extra-consumptions groups
-                    if(!$group['is_extra']) {
-                        BookingLine::ids($group['booking_lines_ids'])->do('reset-prices');
-                    }
-                }
-            }
-        }
+    public static function _resetPrices($self, $values) {
+        $self->do('reset-prices', $values);
     }
 
-    public static function onupdateRateClassId($om, $oids, $values, $lang) {
+    public static function onupdateRateClassId($self, $om, $oids, $values, $lang) {
         trigger_error("ORM::calling sale\booking\BookingLineGroup:onchangeRateClassId", QN_REPORT_DEBUG);
         $groups = $om->read(self::getType(), $oids, ['booking_id', 'rate_class_id.name'], $lang);
         // #todo #kaleo - add support for assigning an optional booking_type_id to each rate_class
@@ -760,17 +776,17 @@ class BookingLineGroup extends Model {
                 $om->update(Booking::getType(), $group['booking_id'], ['type_id' => 4]);
             }
         }
-        $om->callonce('sale\booking\BookingLineGroup', '_resetPrices', $oids, [], $lang);
+        $self->do('reset-prices');
         $om->callonce(self::getType(), 'updatePriceAdapters', $oids, [], $lang);
     }
 
-    public static function onupdateSojournTypeId($om, $oids, $values, $lang) {
+    public static function onupdateSojournTypeId($self, $om, $oids, $values, $lang) {
         trigger_error("ORM::calling sale\booking\BookingLineGroup:onchangeSojournTypeId", QN_REPORT_DEBUG);
-        $om->callonce('sale\booking\BookingLineGroup', '_resetPrices', $oids, [], $lang);
+        $self->do('reset-prices');
         $om->callonce(self::getType(), 'updatePriceAdapters', $oids, [], $lang);
     }
 
-    public static function onupdateNbPers($om, $ids, $values, $lang) {
+    public static function onupdateNbPers($self, $om, $ids, $values, $lang) {
         trigger_error("ORM::calling sale\booking\BookingLineGroup:onchangeNbPers", QN_REPORT_DEBUG);
 
         // 0) discard non is_extra groups whose booking is in a non-modifiable status
@@ -788,7 +804,9 @@ class BookingLineGroup extends Model {
         $ids = array_diff($ids, $groups_ids_to_remove);
 
         // 1) invalidate prices
-        $om->callonce(self::getType(), '_resetPrices', $ids, [], $lang);
+        self::ids($ids)
+            ->lang($lang)
+            ->do('reset-prices');
 
         $groups = $om->read(self::getType(), $ids, [
             'booking_id',

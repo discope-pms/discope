@@ -657,6 +657,12 @@ class Booking extends Model {
                 'help'          => '',
                 'policies'      => [],
                 'function'      => 'doRefreshGroupsActivityNumber'
+            ],
+
+            'reset-prices' => [
+                'description'   => "Resets computed price related fields.",
+                'policies'      => [],
+                'function'      => 'doResetPrices'
             ]
         ];
     }
@@ -1324,12 +1330,12 @@ class Booking extends Model {
     }
 
     // #todo - this should be part of the onupdate() hook
-    public static function _resetPrices($om, $oids, $values, $lang) {
-        $om->update(__CLASS__, $oids, ['total' => null, 'price' => null]);
+    public static function _resetPrices($self) {
+        $self->do('reset-prices');
     }
 
-    public static function onupdateBookingLinesGroupsIds($om, $oids, $values, $lang) {
-        $om->callonce(self::getType(), '_resetPrices', $oids, [], $lang);
+    public static function onupdateBookingLinesGroupsIds($self) {
+        $self->do('reset-prices');
     }
 
     /**
@@ -1532,7 +1538,7 @@ class Booking extends Model {
         }
     }
 
-    public static function doImportContacts($self, $om) {
+    protected static function doImportContacts($self, $om) {
         $self->read(['customer_identity_id', 'contacts_ids']);
 
         foreach($self as $id => $booking) {
@@ -1592,7 +1598,7 @@ class Booking extends Model {
         }
     }
 
-    public static function doDeleteUnpaidFundings($self) {
+    protected static function doDeleteUnpaidFundings($self) {
         $self->read(['fundings_ids' => ['is_paid', 'paid_amount', 'payments_ids']]);
         foreach($self as $booking) {
             foreach($booking['fundings_ids'] as $funding_id => $funding) {
@@ -1610,7 +1616,7 @@ class Booking extends Model {
         }
     }
 
-    public static function doUpdateFundingsDueToPaid($self) {
+    protected static function doUpdateFundingsDueToPaid($self) {
         $self->read(['fundings_ids' => ['due_amount', 'paid_amount']]);
         foreach($self as $booking) {
             foreach($booking['fundings_ids'] as $funding_id => $funding) {
@@ -1624,7 +1630,7 @@ class Booking extends Model {
         }
     }
 
-    public static function doCreateNegativeFundingForReimbursement($self) {
+    protected static function doCreateNegativeFundingForReimbursement($self) {
         $self->read(['center_office_id', 'fundings_ids' => ['paid_amount']]);
         foreach($self as $id => $booking) {
             $total_paid_amount = 0;
@@ -1648,7 +1654,7 @@ class Booking extends Model {
         }
     }
 
-    public static function doRefreshGroupsActivityNumber($self) {
+    protected static function doRefreshGroupsActivityNumber($self) {
         $self->read(['center_id' => ['name'], 'booking_lines_groups_ids' => ['order', 'group_type']]);
         foreach($self as $booking) {
             $groups_ids = [];
@@ -1681,6 +1687,10 @@ class Booking extends Model {
                 BookingLineGroup::id($group_id)->update($data);
             }
         }
+    }
+
+    protected static function doResetPrices($om, $oids) {
+        $om->update(self::getType(), $oids, ['total' => null, 'price' => null]);
     }
 
     public static function onupdateIsInvoiced($om, $oids, $values, $lang) {
