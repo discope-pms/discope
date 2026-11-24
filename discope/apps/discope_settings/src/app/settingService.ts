@@ -41,7 +41,7 @@ export class SettingService {
             if(this.queue.length > 0) {
                 const setting = this.queue[0];
                 this.env.getEnv().then((environment: any) => {
-                    this.api.call('?do=core_setting_SettingValue_update-value', {
+                    this.api.call('?do=core_setting_SettingValue_update', {
                         id: setting.id,
                         value: setting.fields.newValue,
                         lang: environment.lang
