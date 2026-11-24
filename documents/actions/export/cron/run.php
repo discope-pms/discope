@@ -12,10 +12,10 @@ use documents\export\ExportingTaskLine;
 [$params, $providers] = eQual::announce([
     'description'   => 'Handle next task in ExportingTask queue.',
     'params'        => [
-        'id' =>  [
-            'description'       => "Optional identifier of a specific exporting task to run.",
+        'id' => [
             'type'              => 'many2one',
-            'foreign_object'    => 'documents\export\ExportingTask'
+            'foreign_object'    => 'documents\export\ExportingTask',
+            'description'       => "Optional identifier of a specific exporting task to run."
         ]
     ],
     // #todo - mark as private (only from scheduler)
@@ -26,15 +26,14 @@ use documents\export\ExportingTaskLine;
         'content-type'  => 'application/json',
         'charset'       => 'utf-8'
     ],
-    'providers'     => ['context', 'orm', 'dispatch']
+    'providers'     => ['context', 'orm']
 ]);
 
 /**
  * @var \equal\php\Context          $context
  * @var \equal\orm\ObjectManager    $orm
- * @var \equal\dispatch\Dispatcher  $dispatch
  */
-['context' => $context, 'orm' => $orm, 'dispatch' => $dispatch] = $providers;
+['context' => $context, 'orm' => $orm] = $providers;
 
 $now = time();
 

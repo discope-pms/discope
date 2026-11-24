@@ -11,9 +11,9 @@ use equal\orm\Domain;
     'description'   => 'Advanced search for Reports: returns a collection of Reports according to extra parameters.',
     'extends'       => 'core_model_collect',
     'params'        => [
-        'entity' =>  [
-            'description'       => 'name',
+        'entity' => [
             'type'              => 'string',
+            'description'       => 'name',
             'default'           => 'documents\Export'
         ],
         'name' => [

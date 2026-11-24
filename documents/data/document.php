@@ -11,7 +11,7 @@ use documents\DocumentTemp;
 [$params, $providers] = eQual::announce([
     'description'   => "Return raw data (with original MIME) of a document identified by given hash.",
     'params'        => [
-        'hash' =>  [
+        'hash' => [
             'type'          => 'string',
             'description'   => "Unique identifier of the resource.",
             'required'      => true
@@ -26,8 +26,8 @@ use documents\DocumentTemp;
             'default'       => 'inline'
         ],
         'is_temp' => [
-            'description'   => "Is the document temporary?",
             'type'          => 'boolean',
+            'description'   => "Is the document temporary?",
             'default'       => false
         ]
     ],
