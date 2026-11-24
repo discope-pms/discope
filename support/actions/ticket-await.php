@@ -17,22 +17,21 @@ use support\Ticket;
             'required'      => true
         ]
     ],
+    'access'        => [
+        'visibility'    => 'protected'
+    ],
     'response'      => [
         'content-type'  => 'application/json',
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'access'        => [
-        'visibility'    => 'protected'
-    ],
-    'providers'     => [ 'context', 'report' ]
+    'providers'     => ['context']
 ]);
 
 /**
- * @var \equal\php\Context      $context
- * @var \equal\error\Reporter   $reporter
+ * @var \equal\php\Context $context
  */
-['context' => $context, 'report' => $reporter] = $providers;
+['context' => $context] = $providers;
 
 
 $ticket = Ticket::id($params['id'])->read(['id', 'status'])->first();

@@ -6,8 +6,8 @@
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 
-use support\TicketEntry;
 use support\Ticket;
+use support\TicketEntry;
 
 [$params, $providers] = eQual::announce([
     'description'   => 'Submit a ticket entry and mark it as \'sent\'.',
@@ -18,23 +18,22 @@ use support\Ticket;
             'required'      => true
         ]
     ],
+    'access'        => [
+        'visibility'    => 'protected'
+    ],
     'response'      => [
         'content-type'  => 'application/json',
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'access' => [
-        'visibility'    => 'protected'
-    ],
-    'providers'     => [ 'context', 'report', 'auth' ]
+    'providers'     => ['context', 'auth']
 ]);
 
 /**
  * @var \equal\php\Context                  $context
- * @var \equal\error\Reporter               $reporter
  * @var \equal\auth\AuthenticationManager   $auth
  */
-['context' => $context, 'report' => $reporter, 'auth' => $auth] = $providers;
+['context' => $context, 'auth' => $auth] = $providers;
 
 // retrieve the user making the submission
 $user_id = $auth->userId();
