@@ -7,8 +7,8 @@
 
 use documents\Export;
 use equal\text\TextTransformer;
-use identity\CenterOffice;
 use finance\accounting\AccountingJournal;
+use identity\CenterOffice;
 use sale\booking\Payment;
 
 [$params, $providers] = eQual::announce([
@@ -22,7 +22,7 @@ use sale\booking\Payment;
         ]
     ],
     'access'        => [
-        'groups'        => ['finance.default.user'],
+        'groups'        => ['finance.default.user']
     ],
     'response'      => [
         'charset'       => 'utf-8',

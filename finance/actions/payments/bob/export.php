@@ -13,8 +13,8 @@ use identity\User;
     'name'          => "Generate Exports",
     'description'   => "Creates BOB export archives with newly available data from invoices and payments.",
     'params'        => [],
-    'access' => [
-        'groups'        => ['finance.default.user'],
+    'access'        => [
+        'groups'        => ['finance.default.user']
     ],
     'response'      => [
         'charset'       => 'utf-8',

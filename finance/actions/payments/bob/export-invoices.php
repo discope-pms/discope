@@ -8,11 +8,10 @@
 use discope\setting\Setting;
 use documents\Export;
 use equal\text\TextTransformer;
-use identity\CenterOffice;
 use finance\accounting\AccountingJournal;
-use sale\booking\Funding;
-use sale\booking\Invoice;
+use identity\CenterOffice;
 use sale\booking\export\InvoiceNotScope;
+use sale\booking\Funding;
 use sale\catalog\Product;
 
 [$params, $providers] = eQual::announce([
@@ -35,22 +34,21 @@ use sale\catalog\Product;
         ]
     ],
     'access'        => [
-        'groups'        => ['finance.default.user'],
+        'groups'        => ['finance.default.user']
     ],
     'response'      => [
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'     => ['context', 'orm', 'auth', 'dispatch']
+    'providers'     => ['context', 'auth', 'dispatch']
 ]);
 
 /**
  * @var \equal\php\Context                  $context
- * @var \equal\orm\ObjectManager            $orm
  * @var \equal\auth\AuthenticationManager   $auth
  * @var \equal\dispatch\Dispatcher          $dispatch
  */
-['context' => $context, 'orm' => $orm, 'auth' => $auth, 'dispatch' => $dispatch] = $providers;
+['context' => $context, 'auth' => $auth, 'dispatch' => $dispatch] = $providers;
 
 /**
  * Methods

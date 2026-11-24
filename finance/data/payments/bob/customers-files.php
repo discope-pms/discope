@@ -35,7 +35,7 @@ use identity\Partner;
         ]
     ],
     'access'        => [
-        'groups'        => ['finance.default.user'],
+        'groups'        => ['finance.default.user']
     ],
     'response'      => [
         'content-type'  => 'application/json',
@@ -46,7 +46,7 @@ use identity\Partner;
 ]);
 
 /**
- * @var \equal\php\Context  $context
+ * @var \equal\php\Context $context
  */
 ['context' => $context] = $providers;
 

@@ -10,16 +10,16 @@ use finance\accounting\Invoice;
 [$params, $providers] = eQual::announce([
     'description'   => "Generate the UBL file of a given invoice.",
     'params'        => [
-        'id' =>  [
+        'id' => [
             'type'          => 'integer',
             'description'   => "Identifier of the invoice for which the UBL file has to be generated.",
             'min'           => 1,
             'required'      => true
         ]
     ],
-    'access' => [
+    'access'        => [
         'visibility'    => 'protected',
-        'groups'        => ['finance.default.user'],
+        'groups'        => ['finance.default.user']
     ],
     'response'      => [
         'content-type'  => 'application/json',
@@ -30,7 +30,7 @@ use finance\accounting\Invoice;
 ]);
 
 /**
- * @var \equal\php\Context  $context
+ * @var \equal\php\Context $context
  */
 ['context' => $context] = $providers;
 

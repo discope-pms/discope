@@ -11,8 +11,7 @@ use identity\CenterOffice;
 [$params, $providers] = eQual::announce([
     'description'   => "This action will close the accounting year. New invoices will now be for the current year, and it will no longer be possible to issue invoices for the previous year.",
     'help'          => "WARNING:  this action cannot be cancelled.",
-    'params'        => [
-    ],
+    'params'        => [],
     'access'        => [
         'visibility'    => 'private'
     ],
@@ -25,7 +24,7 @@ use identity\CenterOffice;
 ]);
 
 /**
- * @var \equal\php\Context  $context
+ * @var \equal\php\Context $context
  */
 ['context' => $context] = $providers;
 

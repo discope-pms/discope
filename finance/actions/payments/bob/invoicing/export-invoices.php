@@ -8,11 +8,11 @@
 use discope\setting\Setting;
 use documents\Export;
 use equal\text\TextTransformer;
-use identity\CenterOffice;
 use finance\accounting\AccountingJournal;
-use sale\booking\Invoice;
-use sale\booking\Funding;
+use identity\CenterOffice;
 use sale\booking\export\InvoiceNotScope;
+use sale\booking\Funding;
+use sale\booking\Invoice;
 use sale\catalog\Product;
 
 [$params, $providers] = eQual::announce([
@@ -35,7 +35,7 @@ use sale\catalog\Product;
         ]
     ],
     'access'        => [
-        'groups'        => ['finance.default.user'],
+        'groups'        => ['finance.default.user']
     ],
     'response'      => [
         'charset'       => 'utf-8',
