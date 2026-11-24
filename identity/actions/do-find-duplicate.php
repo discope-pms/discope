@@ -18,7 +18,7 @@ use identity\Identity;
         ]
     ],
     'access'        => [
-        'visibility' => 'private'
+        'visibility'    => 'private'
     ],
     'response'      => [
         'content-type'  => 'application/json',

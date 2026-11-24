@@ -10,21 +10,21 @@ use identity\Contact;
 use identity\Identity;
 
 [$params, $providers] = eQual::announce([
-    'description'   => 'Advanced search for Identities: returns a collection of Identities according to extra paramaters.',
+    'description'   => 'Advanced search for Identities: returns a collection of Identities according to extra parameters.',
     'extends'       => 'core_model_collect',
     'params'        => [
         'entity' => [
-            'description'       => 'Full name (including namespace) of the class to look into (e.g. \'core\\User\').',
             'type'              => 'string',
+            'description'       => 'Full name (including namespace) of the class to look into (e.g. \'core\\User\').',
             'default'           => 'identity\Identity'
         ],
         'identifier' => [
             'type'              => 'integer',
-            'description'       => "Number for querying on ID number (strict).",
+            'description'       => "Number for querying on ID number (strict)."
         ],
         'query' => [
             'type'              => 'string',
-            'description'       => "Unordered keywords for identity name.",
+            'description'       => "Unordered keywords for identity name."
         ],
         'contact_identity_id' => [
             'type'              => 'many2one',
@@ -32,14 +32,13 @@ use identity\Identity;
             'description'       => 'Related contact identity.'
         ],
         'address_city' => [
-            'type'        => 'string',
-            'description' => 'Filter identities by city name.',
+            'type'              => 'string',
+            'description'       => 'Filter identities by city name.'
         ],
-        'address_zip'  => [
-            'type'        => 'string',
-            'description' => 'Filter identities by postal code (ZIP).',
+        'address_zip' => [
+            'type'              => 'string',
+            'description'       => 'Filter identities by postal code (ZIP).'
         ]
-
     ],
     'response'      => [
         'content-type'  => 'application/json',
