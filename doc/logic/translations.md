@@ -34,7 +34,3 @@ Modèle: contract.contract
 
 Les traductions des termes individuels sont dans la partie « i18n » de
 la configuration.
-
-#### `Configuration > Paramètres > Valeurs des paramètres`
-
-lodging.locale.i18n.\*
