@@ -9,14 +9,14 @@ use equal\data\adapt\DataAdapterProviderSql;
     'description'   => 'Migrate the model discriminator for sale_pay_bankstatementline.',
     'params'        => [
         'confirm' => [
-            'description' => 'Explicit confirmation required to execute the migration.',
-            'type' => 'boolean',
-            'required' => true,
-        ],
+            'type'          => 'boolean',
+            'description'   => 'Explicit confirmation required to execute the migration.',
+            'required'      => true
+        ]
     ],
     'access'        => [
-        'visibility' => 'protected',
-        'groups' => ['admins'],
+        'visibility'    => 'protected',
+        'groups'        => ['admins']
     ],
     'response'      => [
         'content-type'  => 'application/json',
@@ -27,6 +27,10 @@ use equal\data\adapt\DataAdapterProviderSql;
     'providers'     => ['context', 'db']
 ]);
 
+/**
+ * @var \equal\php\Context      $context
+ * @var \equal\db\DBConnector   $dbConnector
+ */
 ['context' => $context, 'db' => $dbConnector] = $providers;
 
 // Require an explicit opt-in before any schema or data change.

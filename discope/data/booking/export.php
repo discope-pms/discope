@@ -14,8 +14,8 @@ use sale\booking\BookingLineGroup;
     'description'   => 'Export a booking and all its booking line groups and booking lines as JSON.',
     'params'        => [
         'id' => [
-            'description'   => 'Identifier of the booking to export.',
             'type'          => 'integer',
+            'description'   => 'Identifier of the booking to export.',
             'min'           => 1,
             'required'      => true
         ]
@@ -33,9 +33,9 @@ use sale\booking\BookingLineGroup;
 ]);
 
 /**
- * @var \equal\php\Context                $context
- * @var \equal\orm\ObjectManager          $orm
- * @var \equal\auth\AuthenticationManager $auth
+ * @var \equal\php\Context                  $context
+ * @var \equal\orm\ObjectManager            $orm
+ * @var \equal\auth\AuthenticationManager   $auth
  */
 ['context' => $context, 'orm' => $orm, 'auth' => $auth] = $providers;
 
