@@ -14,63 +14,62 @@ use Dompdf\Options as DompdfOptions;
 use Endroid\QrCode\Builder\Builder;
 use Endroid\QrCode\ErrorCorrectionLevel\ErrorCorrectionLevelMedium;
 use equal\data\DataFormatter;
-use sale\booking\Consumption;
-use sale\booking\Contract;
-use sale\booking\ContractLine;
-use sale\booking\TimeSlot;
-use SepaQr\Data;
-use Twig\Environment as TwigEnvironment;
-use Twig\Extension\ExtensionInterface;
-use Twig\Extra\Intl\IntlExtension;
-use Twig\Loader\FilesystemLoader as TwigFilesystemLoader;
 use sale\booking\BookingActivity;
-use sale\catalog\Product;
 use sale\booking\BookingLine;
 use sale\booking\BookingLineGroup;
 use sale\booking\BookingLineGroupAgeRangeAssignment;
 use sale\booking\BookingMeal;
+use sale\booking\Consumption;
+use sale\booking\Contract;
+use sale\booking\ContractLine;
 use sale\booking\SojournProductModelRentalUnitAssignement;
+use sale\booking\TimeSlot;
+use sale\catalog\Product;
+use SepaQr\Data;
+use Twig\Environment as TwigEnvironment;
+use Twig\Extra\Intl\IntlExtension;
+use Twig\Loader\FilesystemLoader as TwigFilesystemLoader;
 
 [$params, $providers] = eQual::announce([
     'description'   => "Render a contract given its ID as a PDF document, for Valrance.",
     'params'        => [
         'id' => [
-            'description'   => 'Identifier of the contract to print.',
             'type'          => 'integer',
+            'description'   => 'Identifier of the contract to print.',
             'required'      => true
         ],
         'view_id' => [
-            'description'   => 'The identifier of the view <type.name>.',
             'type'          => 'string',
+            'description'   => 'The identifier of the view <type.name>.',
             'default'       => 'print.default'
         ],
         'mode' => [
-            'description'   => 'Mode in which document has to be rendered: simple or detailed.',
             'type'          => 'string',
+            'description'   => 'Mode in which document has to be rendered: simple or detailed.',
             'selection'     => ['simple', 'grouped', 'detailed'],
             'default'       => 'grouped'
         ],
         'lang' => [
-            'description'   => 'Language in which labels and multilang field have to be returned (2 letters ISO 639-1).',
             'type'          => 'string',
+            'description'   => 'Language in which labels and multilang field have to be returned (2 letters ISO 639-1).',
             'default'       => constant('DEFAULT_LANG')
         ],
         'output' => [
-            'description'   => 'Output format of the document.',
             'type'          => 'string',
+            'description'   => 'Output format of the document.',
             'selection'     => ['pdf', 'html'],
             'default'       => 'pdf'
         ]
     ],
-    'constants'             => ['DEFAULT_LANG', 'L10N_LOCALE'],
-    'access' => [
-        'visibility'        => 'protected',
-        'groups'            => ['booking.default.user'],
+    'access'        => [
+        'visibility'    => 'protected',
+        'groups'        => ['booking.default.user']
     ],
     'response'      => [
-        'content-type'      => 'application/pdf',
-        'accept-origin'     => '*'
+        'content-type'  => 'application/pdf',
+        'accept-origin' => '*'
     ],
+    'constants'     => ['DEFAULT_LANG', 'L10N_LOCALE'],
     'providers'     => ['context']
 ]);
 

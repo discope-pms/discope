@@ -14,47 +14,42 @@ use sale\customer\AgeRange;
 [$params, $providers] = eQual::announce([
     'description'   => 'Lists all bookings with data needed to create summary sheets.',
     'params'        => [
-        /*
-            Filters
-        */
+        /* Filters */
         'date_from' => [
-            'type'              => 'date',
-            'description'       => "Date interval lower limit.",
-            'default'           => strtotime('First day of next month')
+            'type'          => 'date',
+            'description'   => "Date interval lower limit.",
+            'default'       => strtotime('First day of next month')
         ],
         'date_to' => [
-            'type'              => 'date',
-            'description'       => "Date interval upper limit.",
-            'default'           => strtotime('Last day of next month')
+            'type'          => 'date',
+            'description'   => "Date interval upper limit.",
+            'default'       => strtotime('Last day of next month')
         ],
-
-        /*
-            Virtual entity
-        */
+        /* Virtual entity */
         'name' => [
-            'type'              => 'string',
-            'description'       => 'Name of the booking.'
+            'type'          => 'string',
+            'description'   => 'Name of the booking.'
         ],
         'customer_name' => [
-            'type'              => 'string',
-            'description'       => 'Customer name.'
+            'type'          => 'string',
+            'description'   => 'Customer name.'
         ],
         'accounting_account' => [
-            'type'              => 'string',
-            'description'       => 'Accounting account of the customer of the booking.'
+            'type'          => 'string',
+            'description'   => 'Accounting account of the customer of the booking.'
         ],
         'date_from_string' => [
-            'type'              => 'string',
-            'description'       => 'Start date of the booking formatted string d/m/Y.'
+            'type'          => 'string',
+            'description'   => 'Start date of the booking formatted string d/m/Y.'
         ],
         'date_to_string' => [
-            'type'              => 'string',
-            'description'       => 'End date of the booking formatted string d/m/Y.'
+            'type'          => 'string',
+            'description'   => 'End date of the booking formatted string d/m/Y.'
         ],
         'rate_class' => [
-            'type'              => 'string',
-            'description'       => 'Rate class type of the customer.',
-            'selection'         => [
+            'type'          => 'string',
+            'description'   => 'Rate class type of the customer.',
+            'selection'     => [
                 'classe_decouverte',
                 'groupe_adulte',
                 'sejour_adapte',
@@ -63,104 +58,104 @@ use sale\customer\AgeRange;
             ]
         ],
         'status' => [
-            'type'              => 'string',
-            'description'       => 'Status of the booking.'
+            'type'          => 'string',
+            'description'   => 'Status of the booking.'
         ],
         'customer_address_street' => [
-            'type'              => 'string',
-            'description'       => 'Address street of the customer.'
+            'type'          => 'string',
+            'description'   => 'Address street of the customer.'
         ],
         'customer_address_zip' => [
-            'type'              => 'string',
-            'description'       => 'Address zip code of the customer.'
+            'type'          => 'string',
+            'description'   => 'Address zip code of the customer.'
         ],
         'customer_address_city' => [
-            'type'              => 'string',
-            'description'       => 'Address city of the customer.'
+            'type'          => 'string',
+            'description'   => 'Address city of the customer.'
         ],
         'customer_email' => [
-            'type'              => 'string',
-            'description'       => 'Email address of the customer.'
+            'type'          => 'string',
+            'description'   => 'Email address of the customer.'
         ],
         'customer_phone' => [
-            'type'              => 'string',
-            'description'       => 'Phone number of the customer.'
+            'type'          => 'string',
+            'description'   => 'Phone number of the customer.'
         ],
         'contact_title' => [
-            'type'              => 'string',
-            'description'       => 'Title of the contact, if any.'
+            'type'          => 'string',
+            'description'   => 'Title of the contact, if any.'
         ],
         'contact_lastname' => [
-            'type'              => 'string',
-            'description'       => 'Last name of the contact, if any.'
+            'type'          => 'string',
+            'description'   => 'Last name of the contact, if any.'
         ],
         'contact_firstname' => [
-            'type'              => 'string',
-            'description'       => 'First name of the contact, if any.'
+            'type'          => 'string',
+            'description'   => 'First name of the contact, if any.'
         ],
         'contact_email' => [
-            'type'              => 'string',
-            'description'       => 'Email address of the contact, if any.'
+            'type'          => 'string',
+            'description'   => 'Email address of the contact, if any.'
         ],
         'contact_phone' => [
-            'type'              => 'string',
-            'description'       => 'Phone number of the contact, if any.'
+            'type'          => 'string',
+            'description'   => 'Phone number of the contact, if any.'
         ],
         'contact_2_title' => [
-            'type'              => 'string',
-            'description'       => 'Title of the contact, if any.'
+            'type'          => 'string',
+            'description'   => 'Title of the contact, if any.'
         ],
         'contact_2_lastname' => [
-            'type'              => 'string',
-            'description'       => 'Last name of the contact, if any.'
+            'type'          => 'string',
+            'description'   => 'Last name of the contact, if any.'
         ],
         'contact_2_firstname' => [
-            'type'              => 'string',
-            'description'       => 'First name of the contact, if any.'
+            'type'          => 'string',
+            'description'   => 'First name of the contact, if any.'
         ],
         'contact_2_email' => [
-            'type'              => 'string',
-            'description'       => 'Email address of the contact, if any.'
+            'type'          => 'string',
+            'description'   => 'Email address of the contact, if any.'
         ],
         'contact_2_phone' => [
-            'type'              => 'string',
-            'description'       => 'Phone number of the contact, if any.'
+            'type'          => 'string',
+            'description'   => 'Phone number of the contact, if any.'
         ],
         'first_meal' => [
-            'type'              => 'string',
-            'description'       => 'Description of the first meal of the sojourn.'
+            'type'          => 'string',
+            'description'   => 'Description of the first meal of the sojourn.'
         ],
         'last_meal' => [
-            'type'              => 'string',
-            'description'       => 'Description of the last meal of the sojourn.'
+            'type'          => 'string',
+            'description'   => 'Description of the last meal of the sojourn.'
         ],
         'nb_children' => [
-            'type'              => 'string',
-            'description'       => 'Quantity of children participating.'
+            'type'          => 'string',
+            'description'   => 'Quantity of children participating.'
         ],
         'nb_teachers' => [
-            'type'              => 'string',
-            'description'       => 'Quantity of teachers participating.'
+            'type'          => 'string',
+            'description'   => 'Quantity of teachers participating.'
         ],
         'nb_adults' => [
-            'type'              => 'string',
-            'description'       => 'Quantity of adults participating.'
+            'type'          => 'string',
+            'description'   => 'Quantity of adults participating.'
         ],
         'nb_drivers' => [
-            'type'              => 'string',
-            'description'       => 'Quantity of drivers participating.'
+            'type'          => 'string',
+            'description'   => 'Quantity of drivers participating.'
         ],
         'kindergarten' => [
-            'type'              => 'string',
-            'description'       => 'Are the children in kindergarten.'
+            'type'          => 'string',
+            'description'   => 'Are the children in kindergarten.'
         ],
         'travel' => [
-            'type'              => 'string',
-            'description'       => 'Travel description.'
+            'type'          => 'string',
+            'description'   => 'Travel description.'
         ],
         'rental_units' => [
-            'type'              => 'string',
-            'description'       => 'List of rental units.'
+            'type'          => 'string',
+            'description'   => 'List of rental units.'
         ]
     ],
     'response'      => [
@@ -173,14 +168,13 @@ use sale\customer\AgeRange;
         'expires'       => (60*60*1)
         */
     ],
-    'providers'     => ['context', 'adapt']
+    'providers'     => ['context']
 ]);
 
 /**
- * @var \equal\php\Context                      $context
- * @var \equal\data\adapt\DataAdapterProvider   $adapter_provider
+ * @var \equal\php\Context $context
  */
-['context' => $context, 'adapt' => $adapter_provider] = $providers;
+['context' => $context] = $providers;
 
 $bookings = Booking::search([
     ['date_from', '>=', $params['date_from']],
