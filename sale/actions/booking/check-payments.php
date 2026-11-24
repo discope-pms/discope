@@ -5,42 +5,41 @@
     Original author(s): Yesbabylon SRL
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
+
 use sale\booking\Booking;
 use sale\booking\Funding;
 
-list($params, $providers) = announce([
+[$params, $providers] = eQual::announce([
     'description'   => "Checks if all due payments have been received for a given booking.",
     'params'        => [
-        'id' =>  [
-            'description'   => 'Identifier of the booking the check against payments.',
+        'id' => [
             'type'          => 'integer',
+            'description'   => 'Identifier of the booking the check against payments.',
             'required'      => true
-        ],
+        ]
     ],
-    'access' => [
-        'visibility'        => 'protected'
+    'access'        => [
+        'visibility'    => 'protected'
     ],
     'response'      => [
         'content-type'  => 'application/json',
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'     => ['context', 'orm', 'auth', 'dispatch']
+    'providers'     => ['context', 'dispatch']
 ]);
 
 /**
- * @var \equal\php\Context                  $context
- * @var \equal\orm\ObjectManager            $orm
- * @var \equal\auth\AuthenticationManager   $auth
- * @var \equal\dispatch\Dispatcher          $dispatch
+ * @var \equal\php\Context          $context
+ * @var \equal\dispatch\Dispatcher  $dispatch
  */
-list($context, $orm, $auth, $dispatch) = [ $providers['context'], $providers['orm'], $providers['auth'], $providers['dispatch']];
+['context' => $context, 'dispatch' => $dispatch] = $providers;
 
 // ensure booking object exists and is readable
 $booking = Booking::id($params['id'])->read(['id', 'name', 'center_office_id', 'fundings_ids'])->first(true);
 
 if(!$booking) {
-    throw new Exception("unknown_booking", QN_ERROR_UNKNOWN_OBJECT);
+    throw new Exception("unknown_booking", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
 $fundings = Funding::ids($booking['fundings_ids'])->read(['booking_id', 'due_date', 'is_paid'])->get();
@@ -66,7 +65,7 @@ if($fundings) {
 if(!$is_paid) {
     // by convention we dispatch an alert that relates to the controller itself.
     $dispatch->dispatch('lodging.booking.payments', 'sale\booking\Booking', $params['id'], 'warning', 'sale_booking_check-payments', ['id' => $params['id']], [], null, $booking['center_office_id']);
-    $httpResponse->status(qn_error_http(QN_ERROR_NOT_ALLOWED));
+    $httpResponse->status(qn_error_http(EQ_ERROR_NOT_ALLOWED));
 }
 else {
     // symmetrical removal of the alert (if any)

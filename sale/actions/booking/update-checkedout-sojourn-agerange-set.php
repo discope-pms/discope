@@ -13,8 +13,8 @@ use sale\booking\BookingLineGroup;
 use sale\booking\BookingLineGroupAgeRangeAssignment;
 
 [$params, $providers] = eQual::announce([
-    'description'	=>	"Update an age range assignment. This script is meant to be called by the `booking/services` UI.",
-    'params' 		=> [
+    'description'   => "Update an age range assignment. This script is meant to be called by the `booking/services` UI.",
+    'params'        => [
         'id' => [
             'type'              => 'many2one',
             'foreign_object'    => 'sale\booking\BookingLineGroup',

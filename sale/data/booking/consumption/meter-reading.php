@@ -7,41 +7,40 @@
 
 use sale\booking\ConsumptionMeterReading;
 
-list($params, $providers) = eQual::announce([
+[$params, $providers] = eQual::announce([
     'description'   => 'Provides the summary of the consumption reading by the consumption meter, including the consumption index and total price.',
     'params'        => [
         'booking_id' => [
-            'type'                  => 'many2one',
-            'foreign_object'        => 'sale\booking\Booking',
-            'description'           => 'The booking to which the meter reading will be associated.'
+            'type'              => 'many2one',
+            'foreign_object'    => 'sale\booking\Booking',
+            'description'       => 'The booking to which the meter reading will be associated.'
         ],
-
         'consumption_meter_id' => [
             'type'              => 'many2one',
             'foreign_object'    => 'sale\booking\ConsumptionMeter',
             'description'       => 'The meter ID relates to the consumption meter reading in the booking.'
         ],
         'index_initial' => [
-            'type'                  => 'integer',
-            'description'           => 'The index value in the checkin.'
+            'type'              => 'integer',
+            'description'       => 'The index value in the checkin.'
         ],
         'index_final' => [
-            'type'                  => 'integer',
-            'description'           => 'The index value in the checkout.'
+            'type'              => 'integer',
+            'description'       => 'The index value in the checkout.'
         ],
         'index_difference' => [
-            'type'                  => 'integer',
-            'description'           => 'The index value difference between checkout and check-in.'
+            'type'              => 'integer',
+            'description'       => 'The index value difference between checkout and check-in.'
         ],
         'unit_price' => [
-            'type'                  => 'float',
-            'usage'                 => 'amount/money:2',
-            'description'           => 'The unit price of the consumption meter reading in the checkin.'
+            'type'              => 'float',
+            'usage'             => 'amount/money:2',
+            'description'       => 'The unit price of the consumption meter reading in the checkin.'
         ],
         'total' => [
-            'type'                  => 'float',
-            'usage'                 => 'amount/money:2',
-            'description'           => 'The total price of the consumption meter.'
+            'type'              => 'float',
+            'usage'             => 'amount/money:2',
+            'description'       => 'The total price of the consumption meter.'
         ]
     ],
     'response'      => [
@@ -55,7 +54,7 @@ list($params, $providers) = eQual::announce([
 /**
  * @var \equal\php\Context $context
  */
-$context = $providers['context'];
+['context' => $context] = $providers;
 
 $result = [];
 if(isset($params['booking_id'])) {
@@ -103,7 +102,8 @@ if(isset($params['booking_id'])) {
     }
 }
 
-$context->httpResponse()
-        ->header('X-Total-Count', count($result))
-        ->body($result)
-        ->send();
+$context
+    ->httpResponse()
+    ->header('X-Total-Count', count($result))
+    ->body($result)
+    ->send();

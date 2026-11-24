@@ -9,13 +9,13 @@
 use equal\orm\Domain;
 use sale\pos\CashdeskSession;
 
-list($params, $providers) = announce([
+[$params, $providers] = eQual::announce([
     'description'   => 'Advanced search for Order: returns a collection of Order according to extra parameters.',
     'extends'       => 'core_model_collect',
     'params'        => [
-        'entity' =>  [
-            'description'       => 'Full name (including namespace) of the class to look into.',
+        'entity' => [
             'type'              => 'string',
+            'description'       => 'Full name (including namespace) of the class to look into.',
             'default'           => 'sale\pos\Order'
         ],
         'name' => [
@@ -43,22 +43,21 @@ list($params, $providers) = announce([
         'funding_id' => [
             'type'              => 'many2one',
             'foreign_object'    => 'sale\booking\Funding',
-            'description'       => 'The booking funding that relates to the order, if any.',
-        ],
+            'description'       => 'The booking funding that relates to the order, if any.'
+        ]
     ],
     'response'      => [
         'content-type'  => 'application/json',
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'     => [ 'context', 'orm' ]
+    'providers'     => ['context']
 ]);
 
 /**
- * @var \equal\php\Context          $context
- * @var \equal\orm\ObjectManager    $orm
+ * @var \equal\php\Context $context
  */
-list($context, $orm) = [ $providers['context'], $providers['orm'] ];
+['context' => $context] = $providers;
 
 /*
     Add conditions to the domain to consider advanced parameters
@@ -97,6 +96,7 @@ $result = NULL;
 $params['domain'] = $domain;
 $result = eQual::run('get', 'model_collect', $params, true);
 
-$context->httpResponse()
-        ->body($result)
-        ->send();
+$context
+    ->httpResponse()
+    ->body($result)
+    ->send();

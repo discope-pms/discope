@@ -6,72 +6,72 @@
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 
+use core\Mail;
 use equal\email\Email;
 use equal\email\EmailAttachment;
-use core\Mail;
 use sale\booking\Contract;
 
 // announce script and fetch parameters values
-list($params, $providers) = announce([
-    'description'	=>	"Send an instant email with given details with a booking contract as attachment.",
-    'params' 		=>	[
+[$params, $providers] = eQual::announce([
+    'description'   => "Send an instant email with given details with a booking contract as attachment.",
+    'params'        => [
         'contract_id' => [
-            'description'   => 'Contract related to the sending of the email.',
             'type'          => 'integer',
+            'description'   => 'Contract related to the sending of the email.',
             'required'      => true
         ],
-        'title' =>  [
-            'description'   => 'Title of the message.',
+        'title' => [
             'type'          => 'string',
+            'description'   => 'Title of the message.',
             'required'      => true
         ],
         'message' => [
-            'description'   => 'Body of the message.',
             'type'          => 'string',
             'usage'         => 'text/html',
+            'description'   => 'Body of the message.',
             'required'      => true
         ],
         'sender_email' => [
-            'description'   => 'Email address FROM.',
             'type'          => 'string',
             'usage'         => 'email',
+            'description'   => 'Email address FROM.',
             'required'      => true
         ],
         'recipient_email' => [
-            'description'   => 'Email address TO.',
             'type'          => 'string',
             'usage'         => 'email',
+            'description'   => 'Email address TO.',
             'required'      => true
         ],
         'recipients_emails' => [
-            'description'   => 'CC email addresses.',
             'type'          => 'array',
+            'description'   => 'CC email addresses.',
             // #todo - wait for support for "array of" usage
             // 'usage'         => 'email'
         ],
-        'lang' =>  [
-            'description'   => 'Language for multilang contents (2 letters ISO 639-1).',
+        'lang' => [
             'type'          => 'string',
+            'description'   => 'Language for multilang contents (2 letters ISO 639-1).',
             'default'       => constant('DEFAULT_LANG')
         ]
     ],
-    'constants'             => ['DEFAULT_LANG'],
-    'access' => [
-        'groups'            => ['booking.default.user'],
+    'access'        => [
+        'groups'        => ['booking.default.user']
     ],
     'response'      => [
-        'content-type'      => 'application/json',
-        'charset'           => 'utf-8',
-        'accept-origin'     => '*'
+        'content-type'  => 'application/json',
+        'charset'       => 'utf-8',
+        'accept-origin' => '*'
     ],
+    'constants'     => ['DEFAULT_LANG'],
     'providers'     => ['context', 'dispatch']
 ]);
 
 /**
- * @var \equal\php\Context                  $context
- * @var \equal\dispatch\Dispatcher          $dispatch
+ * @var \equal\php\Context          $context
+ * @var \equal\dispatch\Dispatcher  $dispatch
  */
-list($context, $dispatch) = [ $providers['context'], $providers['dispatch']];
+['context' => $context, 'dispatch' => $dispatch] = $providers;
 
 $contract = Contract::id($params['contract_id'])
     ->read([
@@ -80,17 +80,17 @@ $contract = Contract::id($params['contract_id'])
     ->first(true);
 
 if(!$contract) {
-    throw new Exception("unknown_funding", QN_ERROR_UNKNOWN_OBJECT);
+    throw new Exception("unknown_funding", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
 $booking = $contract['booking_id'];
 
 if(!$booking) {
-    throw new Exception("unknown_booking", QN_ERROR_UNKNOWN_OBJECT);
+    throw new Exception("unknown_booking", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
 if(!$booking['has_contract'] || empty($booking['contracts_ids'])) {
-    throw new Exception("incompatible_status", QN_ERROR_INVALID_PARAM);
+    throw new Exception("incompatible_status", EQ_ERROR_INVALID_PARAM);
 }
 
 // by convention the most recent contract is listed first (see schema in sale/classes/booking/Booking.class.php)
@@ -166,6 +166,7 @@ foreach($attachments as $attachment) {
 Mail::queue($message, 'sale\booking\Booking', $booking['id']);
 $dispatch->cancel('lodging.booking.contract.reminder.sent', 'sale\booking\Booking', $booking['id']);
 
-$context->httpResponse()
-        ->status(204)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(204)
+    ->send();

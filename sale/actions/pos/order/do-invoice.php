@@ -6,34 +6,37 @@
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 
-use sale\pos\Order;
-use sale\pos\OrderPaymentPart;
 use finance\accounting\Invoice;
 use finance\accounting\InvoiceLine;
 use sale\pay\Funding;
+use sale\pos\Order;
+use sale\pos\OrderPaymentPart;
 
-list($params, $providers) = announce([
+[$params, $providers] = eQual::announce([
     'description'   => "This will generate an invoice for the given order. Order is expected to be paid already.",
     'params'        => [
-        'id' =>  [
-            'description'   => 'Identifier of the order that must be invoiced.',
+        'id' => [
             'type'          => 'integer',
+            'description'   => 'Identifier of the order that must be invoiced.',
             'min'           => 1,
             'required'      => true
         ]
     ],
-    'access' => [
-        'groups'            => ['booking.default.user', 'pos.default.user'],
+    'access'        => [
+        'groups'        => ['booking.default.user', 'pos.default.user']
     ],
     'response'      => [
         'content-type'  => 'application/json',
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'     => ['context', 'orm', 'auth']
+    'providers'     => ['context']
 ]);
 
-list($context, $orm, $auth) = [$providers['context'], $providers['orm'], $providers['auth']];
+/**
+ * @var \equal\php\Context $context
+ */
+['context' => $context] = $providers;
 
 // read order object
 $order = Order::id($params['id'])
@@ -60,22 +63,22 @@ $order = Order::id($params['id'])
                 ->first(true);
 
 if(!$order) {
-    throw new Exception("unknown_order", QN_ERROR_UNKNOWN_OBJECT);
+    throw new Exception("unknown_order", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
 // only paid orders can generate an invoice
 if($order['status'] != 'paid') {
-    throw new Exception("incompatible_status", QN_ERROR_INVALID_PARAM);
+    throw new Exception("incompatible_status", EQ_ERROR_INVALID_PARAM);
 }
 
 // prevent multiple invoicing
 if($order['invoice_id'] > 0) {
-    throw new Exception("already_invoiced", QN_ERROR_INVALID_PARAM);
+    throw new Exception("already_invoiced", EQ_ERROR_INVALID_PARAM);
 }
 
 // prevent creating an invoice for default customer (POS anonymous customer)
 if($order['customer_id'] == $order['session_id']['center_id']['pos_default_customer_id']) {
-    throw new Exception("restricted_customer", QN_ERROR_INVALID_PARAM);
+    throw new Exception("restricted_customer", EQ_ERROR_INVALID_PARAM);
 }
 
 // create invoice and invoice lines
@@ -137,6 +140,7 @@ foreach($order['order_payments_ids'] as $pid => $payment) {
 // attach the invoice to the Order, and mark it as having an invoice
 Order::id($params['id'])->update(['has_invoice' => true, 'invoice_id' => $invoice['id']]);
 
-$context->httpResponse()
-        ->status(204)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(204)
+    ->send();

@@ -12,32 +12,31 @@ use sale\booking\BookingLine;
 use sale\booking\BookingLineGroup;
 use sale\booking\ConsumptionMeterReading;
 
-list($params, $providers) = announce([
+[$params, $providers] = eQual::announce([
     'description'   => "Creates the additional services for the consumption meter reading.",
     'params'        => [
-        'id' =>  [
-            'description'   => 'Identifier of the booking to mark as confirmed.',
+        'id' => [
             'type'          => 'integer',
+            'description'   => 'Identifier of the booking to mark as confirmed.',
             'required'      => true
         ]
     ],
-    'access' => [
-        'visibility'        => 'protected',
-        'groups'            => ['booking.default.user'],
+    'access'        => [
+        'visibility'    => 'protected',
+        'groups'        => ['booking.default.user']
     ],
     'response'      => [
         'content-type'  => 'application/json',
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'     => [ 'context', 'orm', 'cron', 'dispatch' ]
+    'providers'     => ['context', 'cron', 'dispatch']
 ]);
 
 /**
- * @var \equal\php\Context                  $context
- * @var \equal\orm\ObjectManager            $orm
+ * @var \equal\php\Context $context
  */
-list( $context, $orm ) = [ $providers['context'], $providers['orm'] ];
+['context' => $context] = $providers;
 
 $booking = Booking::id($params['id'])
     ->read([
@@ -80,29 +79,29 @@ $booking = Booking::id($params['id'])
 
 
 if(!$booking) {
-    throw new Exception("unknown_booking", QN_ERROR_UNKNOWN_OBJECT);
+    throw new Exception("unknown_booking", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
 if($booking['status'] != 'checkedout') {
-    throw new Exception("incompatible_status", QN_ERROR_INVALID_PARAM);
+    throw new Exception("incompatible_status", EQ_ERROR_INVALID_PARAM);
 }
 
 $center_office_gg = CenterOffice::search(['name', 'ilike', '%'.'Gites de Groupes'.'%'])->read(['id'])->first(true);
 if($booking['center_office_id'] != $center_office_gg['id'] ) {
-    throw new Exception("incompatible_center_office", QN_ERROR_INVALID_PARAM);
+    throw new Exception("incompatible_center_office", EQ_ERROR_INVALID_PARAM);
 }
 
 if(!$booking['bookings_inspections_ids']) {
-    throw new Exception("missing_bookings_inspections_ids", QN_ERROR_INVALID_PARAM);
+    throw new Exception("missing_bookings_inspections_ids", EQ_ERROR_INVALID_PARAM);
 }
 
 foreach ($booking['bookings_inspections_ids'] as $index =>  $inspection) {
     if ($inspection['status'] === 'billed') {
-        throw new Exception("incompatible_status_inspections ", QN_ERROR_INVALID_PARAM);
+        throw new Exception("incompatible_status_inspections ", EQ_ERROR_INVALID_PARAM);
     }
 
     if (empty($inspection['consumptions_meters_readings_ids'])) {
-        throw new Exception("missing_consumptions_meter_reading_ids", QN_ERROR_INVALID_PARAM);
+        throw new Exception("missing_consumptions_meter_reading_ids", EQ_ERROR_INVALID_PARAM);
     }
 }
 
@@ -207,6 +206,7 @@ foreach($booking['bookings_inspections_ids'] as $index => $booking_inspection) {
 
 }
 
-$context->httpResponse()
-        ->status(204)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(204)
+    ->send();

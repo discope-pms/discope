@@ -12,33 +12,30 @@ use sale\booking\followup\Task;
 [$params, $providers] = eQual::announce([
     'description'   => "Alerts followup tasks that should have be done by today.",
     'params'        => [
-
         'message_model' => [
-            'type'              => 'string',
-            'description'       => "The name of the message model to use for the alert.",
-            'default'           => 'sale.booking.followup.task.reminder'
+            'type'          => 'string',
+            'description'   => "The name of the message model to use for the alert.",
+            'default'       => 'sale.booking.followup.task.reminder'
         ],
-
         'severity' => [
-            'type'              => 'string',
-            'description'       => "Severity of the created alerts.",
-            'selection'         => [
+            'type'          => 'string',
+            'description'   => "Severity of the created alerts.",
+            'selection'     => [
                 'notice',
                 'warning',
                 'important',
                 'urgent'
             ],
-            'default'           => 'important'
+            'default'       => 'important'
         ]
-
     ],
     'access'        => [
-        'visibility'        => 'protected'
+        'visibility'    => 'protected'
     ],
     'response'      => [
-        'content-type'      => 'application/json',
-        'charset'           => 'utf-8',
-        'accept-origin'     => '*'
+        'content-type'  => 'application/json',
+        'charset'       => 'utf-8',
+        'accept-origin' => '*'
     ],
     'providers'     => ['context', 'dispatch']
 ]);
@@ -97,6 +94,7 @@ if(!empty($tasks)) {
     }
 }
 
-$context->httpResponse()
-        ->status(200)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(200)
+    ->send();

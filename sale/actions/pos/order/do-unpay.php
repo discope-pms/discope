@@ -9,18 +9,18 @@
 use sale\pos\Operation;
 use sale\pos\Order;
 
-list($params, $providers) = announce([
+[$params, $providers] = eQual::announce([
     'description'   => 'This will mark the order as in payment.',
     'params'        => [
-        'id' =>  [
-            'description' => 'Identifier of the order that has been unpaid.',
-            'type'        => 'integer',
-            'min'         => 1,
-            'required'    => true
+        'id' => [
+            'type'          => 'integer',
+            'description'   => 'Identifier of the order that has been unpaid.',
+            'min'           => 1,
+            'required'      => true
         ]
     ],
     'access'        => [
-        'groups' => ['booking.default.user', 'pos.default.user'],
+        'groups'        => ['booking.default.user', 'pos.default.user']
     ],
     'response'      => [
         'content-type'  => 'application/json',
@@ -30,8 +30,10 @@ list($params, $providers) = announce([
     'providers'     => ['context']
 ]);
 
-/** @var \equal\php\Context $context */
-$context = $providers['context'];
+/**
+ * @var \equal\php\Context $context
+ */
+['context' => $context] = $providers;
 
 $order = Order::id($params['id'])
     ->read([
@@ -47,19 +49,19 @@ $order = Order::id($params['id'])
     ->first(true);
 
 if(!$order) {
-    throw new Exception('unknown_order', QN_ERROR_UNKNOWN_OBJECT);
+    throw new Exception('unknown_order', EQ_ERROR_UNKNOWN_OBJECT);
 }
 
 if($order['status'] !== 'paid') {
-    throw new Exception('incompatible_status', QN_ERROR_INVALID_PARAM);
+    throw new Exception('incompatible_status', EQ_ERROR_INVALID_PARAM);
 }
 
 if(isset($order['invoice_id']['status']) && $order['invoice_id']['status'] === 'invoice') {
-    throw new Exception('is_invoiced', QN_ERROR_NOT_ALLOWED);
+    throw new Exception('is_invoiced', EQ_ERROR_NOT_ALLOWED);
 }
 
 if($order['has_funding']) {
-    throw new Exception('has_funding', QN_ERROR_NOT_ALLOWED);
+    throw new Exception('has_funding', EQ_ERROR_NOT_ALLOWED);
 }
 
 if(count(array_filter(
@@ -67,7 +69,7 @@ if(count(array_filter(
             function($part) { return $part['payment_method'] === 'booking'; }
         ))
     ) {
-    throw new Exception('payment_by_booking', QN_ERROR_NOT_ALLOWED);
+    throw new Exception('payment_by_booking', EQ_ERROR_NOT_ALLOWED);
 }
 
 foreach($order['order_payments_ids'] as $pid => $payment) {
@@ -116,6 +118,7 @@ foreach($order['order_payments_ids'] as $pid => $payment) {
 
 Order::id($params['id'])->update(['status' => 'payment']);
 
-$context->httpResponse()
-        ->status(204)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(204)
+    ->send();

@@ -8,38 +8,37 @@
 
 use discope\setting\Setting;
 use finance\accounting\Invoice as AccountingInvoice;
-use sale\booking\Invoice;
 use sale\booking\Booking;
 use sale\booking\Funding;
+use sale\booking\Invoice;
 
-list($params, $providers) = eQual::announce([
+[$params, $providers] = eQual::announce([
     'description'   => "Emit a new invoice from an existing proforma and update related booking, if necessary.",
     'params'        => [
-        'id' =>  [
-            'description'   => 'Identifier of the invoice to emit.',
+        'id' => [
             'type'          => 'integer',
+            'description'   => 'Identifier of the invoice to emit.',
             'min'           => 1,
             'required'      => true
-        ],
+        ]
     ],
-    'access' => [
-        'visibility'        => 'protected',
-        'groups'            => ['finance.default.user', 'booking.default.user'],
+    'access'        => [
+        'visibility'    => 'protected',
+        'groups'        => ['finance.default.user', 'booking.default.user']
     ],
     'response'      => [
         'content-type'  => 'application/json',
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'     => ['context', 'orm', 'cron', 'auth']
+    'providers'     => ['context', 'orm']
 ]);
+
 /**
- * @var \equal\php\Context                  $context
- * @var \equal\orm\ObjectManager            $om
- * @var \equal\cron\Scheduler               $cron
- * @var \equal\auth\AuthenticationManager   $auth
+ * @var \equal\php\Context          $context
+ * @var \equal\orm\ObjectManager    $om
  */
-list($context, $om, $cron, $auth) = [$providers['context'], $providers['orm'], $providers['cron'], $providers['auth']];
+['context' => $context, 'orm' => $om] = $providers;
 
 $invoice = Invoice::id($params['id'])
     ->read(['id', 'state', 'deleted', 'date', 'status', 'type', 'is_deposit', 'price', 'booking_id', 'has_orders', 'invoice_lines_ids'])
@@ -51,16 +50,16 @@ if(!$invoice) {
         ->first();
 
     if(!$invoice) {
-        throw new Exception("unknown_invoice", QN_ERROR_UNKNOWN_OBJECT);
+        throw new Exception("unknown_invoice", EQ_ERROR_UNKNOWN_OBJECT);
     }
 }
 
 if($invoice['deleted'] || $invoice['state'] != 'instance' || $invoice['status'] != 'proforma') {
-    throw new Exception("incompatible_status", QN_ERROR_INVALID_PARAM);
+    throw new Exception("incompatible_status", EQ_ERROR_INVALID_PARAM);
 }
 
 if(count($invoice['invoice_lines_ids']) <= 0) {
-    throw new Exception("empty_invoice", QN_ERROR_INVALID_PARAM);
+    throw new Exception("empty_invoice", EQ_ERROR_INVALID_PARAM);
 }
 
 $year = date('Y', $invoice['date']);
@@ -106,12 +105,12 @@ elseif(!is_null($invoice['booking_id'])) {
         ->first(true);
 
     if(!$booking) {
-        throw new Exception("unknown_booking", QN_ERROR_UNKNOWN_OBJECT);
+        throw new Exception("unknown_booking", EQ_ERROR_UNKNOWN_OBJECT);
     }
 
     foreach($booking['invoices_ids'] as $id => $booking_invoice) {
         if($booking_invoice['id'] != $invoice['id'] && $booking_invoice['status'] == 'proforma' && $booking_invoice['type'] == $invoice['type'] && $booking_invoice['date'] <= $invoice['date']) {
-            throw new Exception("existing_previous_invoice", QN_ERROR_INVALID_PARAM);
+            throw new Exception("existing_previous_invoice", EQ_ERROR_INVALID_PARAM);
         }
     }
 
@@ -126,13 +125,13 @@ elseif(!is_null($invoice['booking_id'])) {
             ->first(true);
 
         if($credit_note) {
-            throw new Exception("pending_credit_note", QN_ERROR_INVALID_PARAM);
+            throw new Exception("pending_credit_note", EQ_ERROR_INVALID_PARAM);
         }
     }
 
     // #memo - a booking might have several invoices (several deposit invoices, but only one balance invoice / credit note can be emitted at any time)
     if(!$invoice['is_deposit'] && $invoice['type'] == 'invoice' && $booking['status'] != 'proforma') {
-        throw new Exception("incompatible_booking_status", QN_ERROR_INVALID_PARAM);
+        throw new Exception("incompatible_booking_status", EQ_ERROR_INVALID_PARAM);
     }
 
     // #memo - we must allow the creation of balanced invoice of any amount (null, positive, negative)
@@ -174,7 +173,7 @@ elseif(!is_null($invoice['booking_id'])) {
     }
 
     if(round($sum_invoices, 2) > round($booking['price'], 2)) {
-        throw new Exception("exceeding_booking_price", QN_ERROR_INVALID_PARAM);
+        throw new Exception("exceeding_booking_price", EQ_ERROR_INVALID_PARAM);
     }
 
     // emit the invoice
@@ -207,6 +206,7 @@ else {
     throw new Exception('invalid_invoice', EQ_ERROR_UNKNOWN);
 }
 
-$context->httpResponse()
-        ->status(205)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(205)
+    ->send();

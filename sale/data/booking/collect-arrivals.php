@@ -12,24 +12,24 @@ use identity\User;
 use realestate\RentalUnit;
 use sale\booking\Consumption;
 
-list($params, $providers) = eQual::announce([
+[$params, $providers] = eQual::announce([
     'description'   => 'Advanced search for Bookings: returns a collection of Booking according to extra parameters.',
     'extends'       => 'core_model_collect',
     'params'        => [
-        'entity' =>  [
-            'description'   => 'Full name (including namespace) of the class to look into (e.g. \'core\\User\').',
-            'type'          => 'string',
-            'default'       => 'sale\booking\Booking'
+        'entity' => [
+            'type'              => 'string',
+            'description'       => 'Full name (including namespace) of the class to look into (e.g. \'core\\User\').',
+            'default'           => 'sale\booking\Booking'
         ],
         'date_from' => [
-            'type'          => 'date',
-            'description'   => "First date of the time interval.",
-            'default'       => strtotime('today midnight')
+            'type'              => 'date',
+            'description'       => "First date of the time interval.",
+            'default'           => strtotime('today midnight')
         ],
         'date_to' => [
-            'type'          => 'date',
-            'description'   => "Last date of the time interval.",
-            'default'       => strtotime('today midnight')
+            'type'              => 'date',
+            'description'       => "Last date of the time interval.",
+            'default'           => strtotime('today midnight')
         ],
         'center_id' => [
             'type'              => 'many2one',
@@ -42,12 +42,12 @@ list($params, $providers) = eQual::announce([
         'type_id' => [
             'type'              => 'many2one',
             'foreign_object'    => 'sale\booking\BookingType',
-            'description'       => "The kind of booking it is about.",
+            'description'       => "The kind of booking it is about."
         ],
         'rental_unit_category_id' => [
             'type'              => 'many2one',
-            'description'       => "Category which current unit belongs to, if any.",
-            'foreign_object'    => 'realestate\RentalUnitCategory'
+            'foreign_object'    => 'realestate\RentalUnitCategory',
+            'description'       => "Category which current unit belongs to, if any."
         ]
     ],
     'response'      => [
@@ -55,15 +55,14 @@ list($params, $providers) = eQual::announce([
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'     => [ 'context', 'orm', 'auth' ]
+    'providers'     => ['context', 'auth']
 ]);
 
 /**
- * @var \equal\php\Context $context
- * @var \equal\orm\ObjectManager $orm
- * @var \equal\auth\AuthenticationManager $auth
+ * @var \equal\php\Context                  $context
+ * @var \equal\auth\AuthenticationManager   $auth
  */
-list($context, $orm, $auth) = [ $providers['context'], $providers['orm'], $providers['auth'] ];
+['context' => $context, 'auth' => $auth] = $providers;
 
 
 /*
@@ -128,6 +127,7 @@ $params['domain'] = $domain;
 
 $result = eQual::run('get', 'model_collect', $params, true);
 
-$context->httpResponse()
-        ->body($result)
-        ->send();
+$context
+    ->httpResponse()
+    ->body($result)
+    ->send();

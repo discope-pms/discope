@@ -12,8 +12,8 @@ use sale\booking\BookingActivity;
     'description'   => "List activities of partners, used for reminding activities to external employees and providers.",
     'params'        => [
         /**
-         * Filters
-         */
+        * Filters
+        */
         'partner_id' => [
             'type'              => 'many2one',
             'foreign_object'    => 'identity\Partner',
@@ -35,10 +35,9 @@ use sale\booking\BookingActivity;
             'description'       => "Criteria that results have to match.",
             'default'           => []
         ],
-
         /**
-         * Virtual model columns
-         */
+        * Virtual model columns
+        */
         'id' => [
             'type'              => 'integer',
             'description'       => "The id of the partner concerned by the planning."
@@ -77,7 +76,7 @@ use sale\booking\BookingActivity;
 ]);
 
 /**
- * @var \equal\php\Context  $context
+ * @var \equal\php\Context $context
  */
 ['context' => $context] = $providers;
 
@@ -171,7 +170,8 @@ foreach($activities as $activity) {
     }
 }
 
-$context->httpResponse()
-        ->header('X-Total-Count', count($map_partner_planning))
-        ->body(array_values($map_partner_planning))
-        ->send();
+$context
+    ->httpResponse()
+    ->header('X-Total-Count', count($map_partner_planning))
+    ->body(array_values($map_partner_planning))
+    ->send();

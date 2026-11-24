@@ -8,7 +8,7 @@
 use core\Lang;
 use sale\booking\BookingHistoryEntry;
 
-list($params, $providers) = eQual::announce([
+[$params, $providers] = eQual::announce([
     'description'   => 'Lists all historic contracts (imported from Hestia data) and their related details for a given period.',
     'params'        => [
         /* mixed-usage parameters: required both for fetching data (input) and property of virtual entity (output) */
@@ -33,20 +33,18 @@ list($params, $providers) = eQual::announce([
             'description'       => "The organisation the establishment belongs to.",
             'domain'            => ['id', '<', 6]
         ],
-
         /* parameters used as properties of virtual entity */
-
         'center' => [
             'type'              => 'string',
             'description'       => 'Name of the center.'
         ],
         'center_type' => [
             'type'              => 'string',
+            'description'       => 'Type of the center.',
             'selection'         => [
                 'GA',
                 'GG'
-            ],
-            'description'       => 'Type of the center.'
+            ]
         ],
         'booking' => [
             'type'              => 'string',
@@ -127,10 +125,10 @@ list($params, $providers) = eQual::announce([
 ]);
 
 /**
- * @var \equal\php\Context      $context
- * @var \equal\data\DataAdapter $adapter
+ * @var \equal\php\Context                      $context
+ * @var \equal\data\adapt\DataAdapterProvider   $dap
  */
-list($context, $dap) = [$providers['context'], $providers['adapt']];
+['context' => $context, 'adapt' => $dap] = $providers;
 
 // #memo - this is a workaround to handle the change of logic between 'adapt' as DataAdapter (equal1.0) or DataAdapterProvider (equal2.0)
 if(is_a($dap, 'equal\data\DataAdapter')) {
@@ -257,7 +255,8 @@ foreach($historic_bookings as $booking) {
     ];
 }
 
-$context->httpResponse()
-        ->header('X-Total-Count', count($historic_bookings))
-        ->body($result)
-        ->send();
+$context
+    ->httpResponse()
+    ->header('X-Total-Count', count($historic_bookings))
+    ->body($result)
+    ->send();

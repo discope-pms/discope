@@ -5,39 +5,39 @@
     Original author(s): Yesbabylon SRL
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
-use sale\booking\Consumption;
-use sale\booking\Booking;
 
-list($params, $providers) = announce([
+use sale\booking\Booking;
+use sale\booking\Consumption;
+
+[$params, $providers] = eQual::announce([
     'description'   => "Checks if there are any rental units of the given booking blocked by other bookings.",
     'params'        => [
-        'id' =>  [
-            'description'   => 'Identifier of the booking the check against overbooking.',
+        'id' => [
             'type'          => 'integer',
+            'description'   => 'Identifier of the booking the check against overbooking.',
             'required'      => true
-        ],
+        ]
     ],
     'response'      => [
         'content-type'  => 'application/json',
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'     => ['context', 'orm', 'auth', 'dispatch']
+    'providers'     => ['context', 'orm', 'dispatch']
 ]);
 
 /**
- * @var \equal\php\Context                  $context
- * @var \equal\orm\ObjectManager            $orm
- * @var \equal\auth\AuthenticationManager   $auth
- * @var \equal\dispatch\Dispatcher          $dispatch
+ * @var \equal\php\Context          $context
+ * @var \equal\orm\ObjectManager    $orm
+ * @var \equal\dispatch\Dispatcher  $dispatch
  */
-list($context, $orm, $auth, $dispatch) = [ $providers['context'], $providers['orm'], $providers['auth'], $providers['dispatch']];
+['context' => $context, 'orm' => $orm, 'dispatch' => $dispatch] = $providers;
 
 // ensure booking object exists and is readable
 $booking = Booking::id($params['id'])->read(['id', 'name', 'center_office_id'])->first(true);
 
 if(!$booking) {
-    throw new Exception("unknown_booking", QN_ERROR_UNKNOWN_OBJECT);
+    throw new Exception("unknown_booking", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
 /*
@@ -166,7 +166,7 @@ if($is_colliding_bookings) {
     // by convention, we dispatch an alert that relates to the controller itself.
     $dispatch->dispatch('lodging.booking.overbooking', 'sale\booking\Booking', $params['id'], 'important', 'sale_booking_check-overbooking', ['id' => $params['id']], $links, null, $booking['center_office_id']);
 
-    $httpResponse->status(qn_error_http(QN_ERROR_CONFLICT_OBJECT));
+    $httpResponse->status(qn_error_http(EQ_ERROR_CONFLICT_OBJECT));
 }
 else {
     // symmetrical removal of the alert (if any)

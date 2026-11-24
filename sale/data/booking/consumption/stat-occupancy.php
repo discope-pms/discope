@@ -32,10 +32,9 @@ use sale\booking\Consumption;
         ],
         'rental_unit_category_id' => [
             'type'              => 'many2one',
-            'description'       => "Category which current unit belongs to, if any.",
-            'foreign_object'    => 'realestate\RentalUnitCategory'
+            'foreign_object'    => 'realestate\RentalUnitCategory',
+            'description'       => "Category which current unit belongs to, if any."
         ],
-
         /* parameters used as properties of virtual entity */
         'date' => [
             'type'              => 'date',
@@ -75,15 +74,14 @@ use sale\booking\Consumption;
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'     => ['context', 'orm', 'adapt']
+    'providers'     => ['context', 'adapt']
 ]);
 
 /**
  * @var \equal\php\Context                      $context
- * @var \equal\orm\ObjectManager                $orm
  * @var \equal\data\adapt\DataAdapterProvider   $dap
  */
-['context' => $context, 'orm' => $orm, 'adapt' => $dap] = $providers;
+['context' => $context, 'adapt' => $dap] = $providers;
 
 /**
  * Methods

@@ -10,10 +10,9 @@ use sale\booking\Booking;
 
 [$params, $providers] = eQual::announce([
     'description'   => "Clean cubilis bookings external_data field for ended bookings.",
-    'params'        => [
-    ],
+    'params'        => [],
     'access'        => [
-        'visibility'    => 'protected',
+        'visibility'    => 'protected'
     ],
     'response'      => [
         'content-type'  => 'application/json',
@@ -24,7 +23,7 @@ use sale\booking\Booking;
 ]);
 
 /**
- * @var \equal\php\Context  $context
+ * @var \equal\php\Context $context
  */
 ['context' => $context] = $providers;
 

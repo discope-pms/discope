@@ -10,59 +10,52 @@ use discope\setting\Setting;
 use realestate\RentalUnit;
 use sale\booking\Repairing;
 
-list($params, $providers) = eQual::announce([
+[$params, $providers] = eQual::announce([
     'description'   => "Create a repairing from the planning, by providing date range, customer and rental unit.",
     'params'        => [
-
-        'date_from' =>  [
-            'description'   => 'Identifier of the targeted booking.',
+        'date_from' => [
             'type'          => 'date',
+            'description'   => 'Identifier of the targeted booking.',
             'required'      => true
         ],
-
-        'date_to' =>  [
-            'description'   => 'Identifier of the targeted booking.',
+        'date_to' => [
             'type'          => 'date',
+            'description'   => 'Identifier of the targeted booking.',
             'required'      => true
         ],
-
-        'rental_unit_id' =>  [
-            'description'   => 'Identifier of the targeted booking.',
+        'rental_unit_id' => [
             'type'          => 'integer',
+            'description'   => 'Identifier of the targeted booking.',
             'required'      => true
         ],
-
-        'name' =>  [
-            'description'   => 'Name to set to the repairing, if any.',
+        'name' => [
             'type'          => 'string',
+            'description'   => 'Name to set to the repairing, if any.',
             'default'       => ''
         ],
-
-        'description' =>  [
-            'description'   => 'Short description about the reason of the maintenance.',
+        'description' => [
             'type'          => 'string',
+            'description'   => 'Short description about the reason of the maintenance.',
             'default'       => ''
         ]
-
     ],
-    'access' => [
-        'visibility'        => 'protected',
-        'groups'            => ['booking.default.user']
+    'access'        => [
+        'visibility'    => 'protected',
+        'groups'        => ['booking.default.user']
     ],
     'response'      => [
         'content-type'  => 'application/json',
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'     => ['context', 'cron', 'dispatch']
+    'providers'     => ['context', 'cron']
 ]);
 
 /**
- * @var \equal\php\Context                  $context
- * @var \equal\cron\Scheduler               $cron
- * @var \equal\dispatch\Dispatcher          $dispatch
+ * @var \equal\php\Context      $context
+ * @var \equal\cron\Scheduler   $cron
  */
-list($context, $cron, $dispatch) = [$providers['context'], $providers['cron'], $providers['dispatch']];
+['context' => $context, 'cron' => $cron] = $providers;
 
 
 /*
@@ -78,7 +71,7 @@ $rental_unit = RentalUnit::id($params['rental_unit_id'])
     ->first(true);
 
 if(!$rental_unit) {
-    throw new Exception("unknown_booking", QN_ERROR_UNKNOWN_OBJECT);
+    throw new Exception("unknown_booking", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
 /*
@@ -87,7 +80,7 @@ if(!$rental_unit) {
 
 $data = eQual::run('do', 'realestate_check-unit-available', ['id' => $rental_unit['id'], 'date_from' => $params['date_from'], 'date_to' => $params['date_to'] ]);
 if(is_array($data) && count($data)) {
-    throw new Exception('invalid_rental_unit_booking', QN_ERROR_INVALID_PARAM);
+    throw new Exception('invalid_rental_unit_booking', EQ_ERROR_INVALID_PARAM);
 }
 
 $collection = Repairing::create([
@@ -130,6 +123,7 @@ if($channelmanager_enabled) {
     );
 }
 
-$context->httpResponse()
-        ->status(204)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(204)
+    ->send();

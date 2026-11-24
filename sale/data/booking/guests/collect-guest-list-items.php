@@ -33,7 +33,7 @@ use sale\booking\Booking;
             'description'       => 'The center the guest list items must be part of..'
         ]
     ],
-    'access' => [
+    'access'        => [
         'visibility'    => 'protected',
         'groups'        => ['booking.guestlist.user'],
         'level'         => 2

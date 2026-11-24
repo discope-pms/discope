@@ -12,7 +12,7 @@ use sale\booking\BookingLine;
 use sale\booking\BookingLineGroup;
 use sale\catalog\Product;
 
-list($params, $providers) = announce([
+[$params, $providers] = eQual::announce([
     'description'   => 'Provides data for mandatory INS statistics declaration (Statbel).',
     'params'        => [
         /* mixed-usage parameters: required both for fetching data (input) and property of virtual entity (output) */
@@ -24,8 +24,8 @@ list($params, $providers) = announce([
         ],
         'all_centers' => [
             'type'              => 'boolean',
-            'default'           =>  false,
-            'description'       => "Mark the all Center of the sojourn."
+            'description'       => "Mark the all Center of the sojourn.",
+            'default'           => false
         ],
         'date_from' => [
             'type'              => 'date',
@@ -37,7 +37,6 @@ list($params, $providers) = announce([
             'description'       => 'Output: Day of departure / Input: Date interval upper limit (defaults to last day of previous month).',
             'default'           => mktime(0, 0, 0, date("m"), 0)
         ],
-
         /* parameters used as properties of virtual entity */
         'center' => [
             'type'              => 'string',
@@ -94,15 +93,14 @@ list($params, $providers) = announce([
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'     => [ 'context', 'orm', 'adapt' ]
+    'providers'     => ['context', 'adapt']
 ]);
 
 /**
- * @var \equal\php\Context          $context
- * @var \equal\orm\ObjectManager    $orm
- * @var \equal\data\DataAdapter     $adapter
+ * @var \equal\php\Context                      $context
+ * @var \equal\data\adapt\DataAdapterProvider   $dap
  */
-list($context, $orm, $dap) = [ $providers['context'], $providers['orm'], $providers['adapt'] ];
+['context' => $context, 'adapt' => $dap] = $providers;
 
 // #memo - this is a workaround to handle the change of logic between 'adapt' as DataAdapter (equal1.0) or DataAdapterProvider (equal2.0)
 if(is_a($dap, 'equal\data\DataAdapter')) {
@@ -245,6 +243,7 @@ if(isset($params['center_id']) || $params['all_centers']) {
     }
 }
 
-$context->httpResponse()
-        ->body($result)
-        ->send();
+$context
+    ->httpResponse()
+    ->body($result)
+    ->send();

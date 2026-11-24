@@ -11,7 +11,7 @@ use sale\customer\AgeRange;
 use sale\customer\CustomerNature;
 use sale\customer\RateClass;
 
-list($params, $providers) = announce([
+[$params, $providers] = eQual::announce([
     'description'   => 'Provides participant and person-night counts grouped by center, rate class, customer nature and age range.',
     'params'        => [
         /* mixed-usage parameters: required both for fetching data (input) and property of virtual entity (output) */
@@ -20,13 +20,11 @@ list($params, $providers) = announce([
             'foreign_object'    => 'identity\Center',
             'description'       => "Output: Center of the sojourn / Input: The center for which the stats are required."
         ],
-
         'center_office_id' => [
             'type'              => 'many2one',
             'foreign_object'    => 'identity\CenterOffice',
             'description'       => 'Office the invoice relates to (for center management).'
         ],
-
         'date_from' => [
             'type'              => 'date',
             'description'       => "Output: Day of arrival / Input: Date interval lower limit (defaults to first day of previous month).",
@@ -42,30 +40,24 @@ list($params, $providers) = announce([
             'foreign_object'    => 'sale\customer\AgeRange',
             'description'       => 'Specific age range to limit the result to.'
         ],
-
         'rate_class_id' => [
             'type'              => 'many2one',
             'foreign_object'    => 'sale\customer\RateClass',
             'description'       => 'Rate class that applies to the customer.'
         ],
-
-
         /* parameters used as properties of virtual entity */
         'center' => [
             'type'              => 'string',
             'description'       => 'Name of the center.'
         ],
-
         'rate_class' => [
             'type'              => 'string',
             'description'       => 'Name of the rate class.'
         ],
-
         'customer_nature' => [
             'type'              => 'string',
             'description'       => 'Name of the customer nature.'
         ],
-
         'age_range' => [
             'type'              => 'string',
             'description'       => 'Code of the age range.'
@@ -88,7 +80,7 @@ list($params, $providers) = announce([
 ]);
 
 /**
- * @var \equal\php\Context  $context
+ * @var \equal\php\Context $context
  */
 ['context' => $context] = $providers;
 

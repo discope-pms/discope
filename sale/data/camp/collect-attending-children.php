@@ -13,34 +13,34 @@ use sale\camp\Camp;
     'description'   => "Manage children that are attending the current camps.",
     'params'        => [
         'date_from' => [
-            'type'              => 'date',
-            'description'       => "Date interval lower limit (defaults to first day of the current week).",
-            'default'           => fn() => strtotime('last Sunday')
+            'type'          => 'date',
+            'description'   => "Date interval lower limit (defaults to first day of the current week).",
+            'default'       => fn() => strtotime('last Sunday')
         ],
         'date_to' => [
-            'type'              => 'date',
-            'description'       => "Date interval upper limit (defaults to last day of the current week).",
-            'default'           => fn() => strtotime('Saturday this week')
+            'type'          => 'date',
+            'description'   => "Date interval upper limit (defaults to last day of the current week).",
+            'default'       => fn() => strtotime('Saturday this week')
         ],
         'only_weekend' => [
-            'type'              => 'boolean',
-            'description'       => "Show only the children present during the weekend.",
-            'default'           => false
+            'type'          => 'boolean',
+            'description'   => "Show only the children present during the weekend.",
+            'default'       => false
         ],
         'only_saturday' => [
-            'type'              => 'boolean',
-            'description'       => "Show only the children present during the saturday morning.",
-            'default'           => false
+            'type'          => 'boolean',
+            'description'   => "Show only the children present during the saturday morning.",
+            'default'       => false
         ],
         'only_birthday' => [
-            'type'              => 'boolean',
-            'description'       => "Show only the children with birthday during camp.",
-            'default'           => false
+            'type'          => 'boolean',
+            'description'   => "Show only the children with birthday during camp.",
+            'default'       => false
         ]
     ],
     'access'        => [
         'visibility'    => 'protected',
-        'groups'        => ['camp.default.user'],
+        'groups'        => ['camp.default.user']
     ],
     'response'      => [
         'content-type'  => 'application/json',
@@ -51,8 +51,8 @@ use sale\camp\Camp;
 ]);
 
 /**
- * @var \equal\php\Context                  $context
- * @var \equal\data\adapt\AdapterProvider   $adapter_provider
+ * @var \equal\php\Context                      $context
+ * @var \equal\data\adapt\DataAdapterProvider   $adapter_provider
  */
 ['context' => $context, 'adapt' => $adapter_provider] = $providers;
 
@@ -146,7 +146,8 @@ if($params['only_birthday']) {
     );
 }
 
-$context->httpResponse()
-        ->header('X-Total-Count', count($result))
-        ->body(array_values($result))
-        ->send();
+$context
+    ->httpResponse()
+    ->header('X-Total-Count', count($result))
+    ->body(array_values($result))
+    ->send();

@@ -13,13 +13,12 @@ use sale\booking\Payment;
 [$params, $providers] = eQual::announce([
     'description'   => "Create a financial help payment for a specific funding.",
     'params'        => [
-        'id' =>  [
+        'id' => [
             'type'              => 'integer',
             'description'       => "Identifier of the targeted funding.",
             'min'               => 1,
             'required'          => true
         ],
-
         'financial_help_id' => [
             'type'              => 'many2one',
             'foreign_object'    => 'sale\booking\FinancialHelp',
@@ -31,7 +30,6 @@ use sale\booking\Payment;
             ],
             'required'          => true
         ],
-
         'amount' => [
             'type'              => 'float',
             'usage'             => 'amount/money:2',
@@ -50,7 +48,7 @@ use sale\booking\Payment;
 ]);
 
 /**
- * @var \equal\php\Context  $context
+ * @var \equal\php\Context $context
  */
 ['context' => $context] = $providers;
 
@@ -131,6 +129,7 @@ Payment::create([
 FinancialHelp::id($financial_help['id'])
     ->update(['remaining_amount' => null]);
 
-$context->httpResponse()
-        ->status(205)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(205)
+    ->send();

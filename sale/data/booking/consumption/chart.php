@@ -9,71 +9,71 @@ use equal\orm\Domain;
 use equal\orm\DomainCondition;
 use equal\orm\Operation;
 
-list($params, $providers) = announce([
+[$params, $providers] = eQual::announce([
     'description'   => 'Returns a list of entities according to given domain (filter), start offset, limit and order.',
     'params'        => [
-        'entity' =>  [
-            'description'   => 'Full name (including namespace) of the class to look into (e.g. \'core\\User\').',
-            'type'          => 'string',
-            'default'       => 'sale\booking\Consumption'
+        'entity' => [
+            'type'              => 'string',
+            'description'       => 'Full name (including namespace) of the class to look into (e.g. \'core\\User\').',
+            'default'           => 'sale\booking\Consumption'
         ],
-        'lang' =>  [
-            'description'   => 'Language in which multilang field have to be returned (2 letters ISO 639-1).',
-            'type'          => 'string',
-            'default'       => constant('DEFAULT_LANG')
+        'lang' => [
+            'type'              => 'string',
+            'description'       => 'Language in which multilang field have to be returned (2 letters ISO 639-1).',
+            'default'           => constant('DEFAULT_LANG')
         ],
         'domain' => [
-            'description'   => 'Criterias that results have to match (series of conjunctions)',
-            'type'          => 'array',
-            'default'       => []
+            'type'              => 'array',
+            'description'       => 'Criterias that results have to match (series of conjunctions)',
+            'default'           => []
         ],
         'datasets' => [
-            'description'   => 'Array of datasets descriptors.',
-            'type'          => 'array',
-            'default'       => []
+            'type'              => 'array',
+            'description'       => 'Array of datasets descriptors.',
+            'default'           => []
         ],
         'field' => [
-            'description'   => 'Field to use for grouping the objects (date field in case of a time range).',
-            'type'          => 'string',
-            'default'       => 'date'
+            'type'              => 'string',
+            'description'       => 'Field to use for grouping the objects (date field in case of a time range).',
+            'default'           => 'date'
         ],
         'group_by' => [
-            'description'   => 'Method for grouping the results.',
-            'type'          => 'string',
-            'selection'     => [
+            'type'              => 'string',
+            'description'       => 'Method for grouping the results.',
+            'selection'         => [
                 'field',
                 'range'
             ],
-            'default'       => 'range'
+            'default'           => 'range'
         ],
         'range_from' => [
-            'description'   => 'Start of date range.',
-            'type'          => 'date',
-            'default'       => strtotime(date('Y-01-01'))
+            'type'              => 'date',
+            'description'       => 'Start of date range.',
+            'default'           => strtotime(date('Y-01-01'))
         ],
         'range_to' => [
-            'description'   => 'End of date range.',
-            'type'          => 'date',
-            'default'       => strtotime(date('Y-12-31'))
+            'type'              => 'date',
+            'description'       => 'End of date range.',
+            'default'           => strtotime(date('Y-12-31'))
         ],
         'range_interval' => [
-            'description'   => 'Time interval for grouping abscissa values.',
-            'type'          => 'string',
-            'selection'     => [
+            'type'              => 'string',
+            'description'       => 'Time interval for grouping abscissa values.',
+            'selection'         => [
                 'week',
                 'month',
                 'year'
             ],
-            'default'       => 'year'
+            'default'           => 'year'
         ],
         'mode' => [
-            'description'   => 'Mode defining to way data are to be returned.',
-            'type'          => 'string',
-            'selection'     => [
+            'type'              => 'string',
+            'description'       => 'Mode defining to way data are to be returned.',
+            'selection'         => [
                 'chart',
                 'grid'
             ],
-            'default'       => 'chart'
+            'default'           => 'chart'
         ],
         'center_id' => [
             'type'              => 'many2one',
@@ -81,7 +81,6 @@ list($params, $providers) = announce([
             'description'       => "The center to which the booking relates to."
         ]
     ],
-    'constants'     => ['DEFAULT_LANG'],
     'response'      => [
         'content-type'  => 'application/json',
         'charset'       => 'utf-8',
@@ -90,10 +89,14 @@ list($params, $providers) = announce([
         'cache-vary'    => ['uri'],
         'expires'       => 30 * (60*60*24)
     ],
+    'constants'     => ['DEFAULT_LANG'],
     'providers'     => [ 'context' ]
 ]);
 
-list($context) = [ $providers['context'] ];
+/**
+ * @var \equal\php\Context $context
+ */
+['context' => $context] = $providers;
 
 $getDateIndex = function($date, $interval) {
     switch($interval) {
@@ -122,7 +125,7 @@ $getNextDate = function($date, $interval) {
 };
 
 if(!class_exists($params['entity'])) {
-    throw new Exception("unknown_entity", QN_ERROR_UNKNOWN_OBJECT);
+    throw new Exception("unknown_entity", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
 /*
@@ -309,6 +312,7 @@ if($params['mode'] == 'grid') {
     $result = &$res;
 }
 
-$context->httpResponse()
-        ->body($result)
-        ->send();
+$context
+    ->httpResponse()
+    ->body($result)
+    ->send();

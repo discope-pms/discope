@@ -10,7 +10,7 @@ use identity\Center;
 use identity\User;
 use sale\pos\CashdeskSession;
 
-list($params, $providers) = announce([
+[$params, $providers] = eQual::announce([
     'description'   => 'Provides closed cashdesk sessions statistics.',
     'params'        => [
         /* mixed-usage parameters: required both for fetching data (input) and property of virtual entity (output) */
@@ -29,7 +29,6 @@ list($params, $providers) = announce([
             'description'       => 'First date of the time interval.',
             'default'           => strtotime('today')
         ],
-
         /* parameters used as properties of virtual entity */
         'center' => [
             'type'              => 'string',
@@ -41,11 +40,11 @@ list($params, $providers) = announce([
         ],
         'total_opening' => [
             'type'              => 'float',
-            'description'       => "Amount of money in the cashdesk at the opening.",
+            'description'       => "Amount of money in the cashdesk at the opening."
         ],
         'total_closing' => [
             'type'              => 'float',
-            'description'       => "Amount of money in the cashdesk at the closing.",
+            'description'       => "Amount of money in the cashdesk at the closing."
         ],
         'total_cash' => [
             'type'              => 'float',
@@ -93,10 +92,10 @@ list($params, $providers) = announce([
 ]);
 
 /**
- * @var \equal\php\Context                   $context
- * @var \equal\auth\AuthenticationManager    $auth
+ * @var \equal\php\Context                  $context
+ * @var \equal\auth\AuthenticationManager   $auth
  */
-list($context, $auth) = [ $providers['context'], $providers['auth'] ];
+['context' => $context, 'auth' => $auth] = $providers;
 
 $map_centers = [];
 
@@ -225,7 +224,8 @@ foreach($map_centers as $center_id => $dates) {
     }
 }
 
-$context->httpResponse()
-        ->header('X-Total-Count', count($result))
-        ->body($result)
-        ->send();
+$context
+    ->httpResponse()
+    ->header('X-Total-Count', count($result))
+    ->body($result)
+    ->send();

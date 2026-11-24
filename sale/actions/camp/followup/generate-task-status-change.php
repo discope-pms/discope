@@ -5,29 +5,27 @@
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 
+use sale\camp\Enrollment;
 use sale\camp\followup\Task;
 use sale\camp\followup\TaskModel;
-use sale\camp\Enrollment;
 
 [$params, $providers] = eQual::announce([
-    'description'	=> "Generate task models' tasks when a enrollment status changes.",
-    'params' 		=> [
-
+    'description'   => "Generate task models' tasks when a enrollment status changes.",
+    'params'        => [
         'enrollment_id' => [
             'type'              => 'many2one',
             'foreign_object'    => 'sale\camp\Enrollment',
             'description'       => "Enrollment the status has just changed.",
             'required'          => true
         ]
-
     ],
     'access'        => [
-        'visibility'        => 'protected'
+        'visibility'    => 'protected'
     ],
     'response'      => [
-        'content-type'      => 'application/json',
-        'charset'           => 'utf-8',
-        'accept-origin'     => '*'
+        'content-type'  => 'application/json',
+        'charset'       => 'utf-8',
+        'accept-origin' => '*'
     ],
     'providers'     => ['context']
 ]);
@@ -125,6 +123,7 @@ if(!empty($task_models)) {
     }
 }
 
-$context->httpResponse()
-        ->status(204)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(204)
+    ->send();

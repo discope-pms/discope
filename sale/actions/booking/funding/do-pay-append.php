@@ -5,55 +5,55 @@
     Original author(s): Yesbabylon SRL
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
-use sale\booking\Funding;
+
 use sale\booking\Booking;
+use sale\booking\Funding;
 use sale\booking\Payment;
 
-list($params, $providers) = eQual::announce([
+[$params, $providers] = eQual::announce([
     'description'   => "Create a manual payment to complete the payments of a funding and mark it as paid.",
     'help'          => "This action is intended for payment with bank card only. Manual payments can be undone while the booking is not fully balanced (and invoiced).",
     'params'        => [
-        'id' =>  [
-            'description'   => 'Identifier of the targeted funding.',
+        'id' => [
             'type'          => 'integer',
+            'description'   => 'Identifier of the targeted funding.',
             'min'           => 1,
             'required'      => true
         ]
     ],
-    'access' => [
-        'groups'            => ['booking.default.user', 'finance.default.administrator', 'finance.default.user']
+    'access'        => [
+        'groups'        => ['booking.default.user', 'finance.default.administrator', 'finance.default.user']
     ],
     'response'      => [
         'content-type'  => 'application/json',
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'     => ['context', 'orm']
+    'providers'     => ['context']
 ]);
 
 /**
- * @var \equal\php\Context          $context
- * @var \equal\orm\ObjectManager    $om
+ * @var \equal\php\Context $context
  */
-list($context, $om) = [ $providers['context'], $providers['orm'] ];
+['context' => $context] = $providers;
 
 $funding = Funding::id($params['id'])
             ->read(['booking_id' => ['id', 'customer_id'], 'invoice_id', 'center_office_id', 'is_paid', 'paid_amount', 'due_amount'])
             ->first(true);
 
 if(!$funding) {
-    throw new Exception("unknown_funding", QN_ERROR_UNKNOWN_OBJECT);
+    throw new Exception("unknown_funding", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
 if($funding['is_paid']) {
-    throw new Exception("funding_already_paid", QN_ERROR_INVALID_PARAM);
+    throw new Exception("funding_already_paid", EQ_ERROR_INVALID_PARAM);
 }
 
 $sign = ($funding['due_amount'] >= 0)? 1 : -1;
 $remaining_amount = abs($funding['due_amount']) - abs($funding['paid_amount']);
 
 if($remaining_amount <= 0) {
-    throw new Exception("nothing_to_pay", QN_ERROR_INVALID_PARAM);
+    throw new Exception("nothing_to_pay", EQ_ERROR_INVALID_PARAM);
 }
 
 Payment::create([
@@ -73,6 +73,7 @@ Payment::create([
 // Funding::id($params['id'])->update(['is_paid' => true]);
 // Booking::updateStatusFromFundings($om, (array) $funding['booking_id']['id'], [], 'en');
 
-$context->httpResponse()
-        ->status(205)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(205)
+    ->send();

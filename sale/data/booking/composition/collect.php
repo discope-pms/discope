@@ -11,13 +11,13 @@ use identity\Center;
 use identity\User;
 use sale\booking\Booking;
 
-list($params, $providers) = eQual::announce([
+[$params, $providers] = eQual::announce([
     'description'   => 'Advanced search functionality for compositions, returning a collection of compositions based on additional specific parameters.',
     'params'        => [
         'all_centers' => [
             'type'              => 'boolean',
             'description'       => 'Indicates whether to include all centers within the defined range.',
-            'default'           =>  false
+            'default'           => false
         ],
         'center_id' => [
             'type'              => 'many2one',
@@ -40,19 +40,19 @@ list($params, $providers) = eQual::announce([
         ],
         'center' => [
             'type'              => 'string',
-            'description'       => 'Name of the associated center.',
+            'description'       => 'Name of the associated center.'
         ],
         'booking' => [
             'type'              => 'string',
-            'description'       => 'Name of the associated booking.',
+            'description'       => 'Name of the associated booking.'
         ],
         'date' => [
             'type'              => 'date',
-            'description'       => 'Date associated with the booking.',
+            'description'       => 'Date associated with the booking.'
         ],
         'nb_person' => [
             'type'              => 'integer',
-            'description'       => 'Total number of people included.',
+            'description'       => 'Total number of people included.'
         ]
     ],
     'response'      => [
@@ -64,8 +64,8 @@ list($params, $providers) = eQual::announce([
 ]);
 
 /**
- * @var \equal\php\Context          $context
- * @var \equal\auth\AuthenticationManager $auth
+ * @var \equal\php\Context                  $context
+ * @var \equal\auth\AuthenticationManager   $auth
  */
 ['context' => $context, 'auth' => $auth] = $providers;
 
@@ -78,11 +78,11 @@ if(isset($params['center_id']) || $params['all_centers']) {
     if($params['all_centers']) {
         $user_id = $auth->userId();
         if($user_id <= 0) {
-            throw new Exception('user_unknown', QN_ERROR_NOT_ALLOWED);
+            throw new Exception('user_unknown', EQ_ERROR_NOT_ALLOWED);
         }
         $user = User::id($user_id)->read(['centers_ids'])->first();
         if(!$user) {
-            throw new Exception('unexpected_error', QN_ERROR_INVALID_USER);
+            throw new Exception('unexpected_error', EQ_ERROR_INVALID_USER);
         }
         $domain[] = ['center_id', 'in', $user['centers_ids'] ];
 
@@ -163,6 +163,7 @@ elseif($params['center_id']) {
 }
 
 
-$context->httpResponse()
-        ->body($result)
-        ->send();
+$context
+    ->httpResponse()
+    ->body($result)
+    ->send();

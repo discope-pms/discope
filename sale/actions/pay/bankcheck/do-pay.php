@@ -14,19 +14,16 @@ use sale\pay\Payment;
     'description'   => "Register a manual payment using a bank check to settle the outstanding balance of a funding.",
     'help'          => "This action processes a manual payment via bank check, linking it to the corresponding funding and marking it as paid.",
     'params'        => [
-
-        'id' =>  [
-            'type'              => 'integer',
-            'description'       => "Identifier of the targeted bank check.",
-            'required'          => true
+        'id' => [
+            'type'          => 'integer',
+            'description'   => "Identifier of the targeted bank check.",
+            'required'      => true
         ],
-
-        'confirm' =>  [
-            'type'              => 'boolean',
-            'description'       => "Manual confirmation.",
-            'required'          => true
+        'confirm' => [
+            'type'          => 'boolean',
+            'description'   => "Manual confirmation.",
+            'required'      => true
         ]
-
     ],
     'access'        => [
         'groups'        => ['booking.default.user', 'finance.default.administrator', 'finance.default.user']
@@ -40,7 +37,7 @@ use sale\pay\Payment;
 ]);
 
 /**
- * @var \equal\php\Context  $context
+ * @var \equal\php\Context $context
  */
 ['context' => $context] = $providers;
 
@@ -98,6 +95,7 @@ BankCheck::id($bank_check['id'])
         'status'        => 'paid'
     ]);
 
-$context->httpResponse()
-        ->status(205)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(205)
+    ->send();

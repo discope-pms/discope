@@ -8,25 +8,24 @@
 use core\alert\Message;
 use sale\booking\Booking;
 
-list($params, $providers) = eQual::announce([
-    'description'	=>	"Batch for updating alerts related to bookings.",
-    'access' => [
-        'visibility'        => 'protected',
-        'groups'            => ['booking.default.user'],
+[$params, $providers] = eQual::announce([
+    'description'   => "Batch for updating alerts related to bookings.",
+    'access'        => [
+        'visibility'    => 'protected',
+        'groups'        => ['booking.default.user']
     ],
-    'response' => [
-        'content-type'      => 'application/json',
-        'charset'           => 'utf-8',
-        'accept-origin'     => '*'
+    'response'      => [
+        'content-type'  => 'application/json',
+        'charset'       => 'utf-8',
+        'accept-origin' => '*'
     ],
-    'providers' => ['context', 'dispatch']
+    'providers'     => ['context']
 ]);
 
 /**
- * @var equal\php\Context           $context
- * @var equal\dispatch\Dispatcher   $dispatcher
+ * @var \equal\php\Context $context
  */
-list($context, $dispatcher) = [$providers['context'], $providers['dispatch']];
+['context' => $context] = $providers;
 
 $result = [
     'logs' => []
@@ -65,6 +64,7 @@ if(count($map_bookings_ids)) {
     }
 }
 
-$context->httpResponse()
-        ->body(['result' => $result])
-        ->send();
+$context
+    ->httpResponse()
+    ->body(['result' => $result])
+    ->send();

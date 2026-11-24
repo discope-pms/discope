@@ -5,31 +5,35 @@
     Original author(s): Yesbabylon SRL
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
-use sale\pos\Order;
-use sale\booking\Payment;
 
-list($params, $providers) = eQual::announce([
+use sale\booking\Payment;
+use sale\pos\Order;
+
+[$params, $providers] = eQual::announce([
     'description'   => "Generates a list of payments relating to the given orders.",
     'help'          => "This script is meant to be called after invoice creation, so that orders can no longer be updated (in case of error while encoding in the cashdesk).",
     'params'        => [
-        'ids' =>  [
-            'description'   => 'List of Order identifiers.',
+        'ids' => [
             'type'          => 'array',
+            'description'   => 'List of Order identifiers.',
             'required'      => true
         ]
     ],
-    'access' => [
-        'groups'            => ['pos.default.user', 'pos.default.administrator', 'admins'],
+    'access'        => [
+        'groups'        => ['pos.default.user', 'pos.default.administrator', 'admins']
     ],
     'response'      => [
         'content-type'  => 'application/json',
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'     => ['context', 'orm', 'auth']
+    'providers'     => ['context']
 ]);
 
-list($context, $orm, $auth) = [$providers['context'], $providers['orm'], $providers['auth']];
+/**
+ * @var \equal\php\Context $context
+ */
+['context' => $context] = $providers;
 
 $result = [
     'created'   => 0,
@@ -124,6 +128,7 @@ foreach($orders as $order) {
     }
 }
 
-$context->httpResponse()
-        ->body($result)
-        ->send();
+$context
+    ->httpResponse()
+    ->body($result)
+    ->send();

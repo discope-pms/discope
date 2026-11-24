@@ -5,45 +5,44 @@
     Original author(s): Yesbabylon SRL
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
+
+use sale\booking\Booking;
 use sale\booking\Funding;
 use sale\booking\Invoice;
-use sale\booking\Booking;
 
-list($params, $providers) = announce([
+[$params, $providers] = eQual::announce([
     'description'   => "Delete a proforma invoice.",
     'params'        => [
-        'id' =>  [
-            'description'   => 'Identifier of the invoice to emit.',
+        'id' => [
             'type'          => 'integer',
+            'description'   => 'Identifier of the invoice to emit.',
             'min'           => 1,
             'required'      => true
-        ],
+        ]
     ],
-    'access' => [
-        'visibility'        => 'protected',
-        'groups'            => ['finance.default.user', 'booking.default.user'],
+    'access'        => [
+        'visibility'    => 'protected',
+        'groups'        => ['finance.default.user', 'booking.default.user']
     ],
     'response'      => [
         'content-type'  => 'application/json',
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'     => ['context', 'orm', 'cron', 'auth']
+    'providers'     => ['context']
 ]);
+
 /**
- * @var \equal\php\Context                  $context
- * @var \equal\orm\ObjectManager            $orm
- * @var \equal\cron\Scheduler               $cron
- * @var \equal\auth\AuthenticationManager   $auth
+ * @var \equal\php\Context $context
  */
-list($context, $orm, $cron, $auth) = [$providers['context'], $providers['orm'], $providers['cron'], $providers['auth']];
+['context' => $context] = $providers;
 
 $invoice = Invoice::id($params['id'])
     ->read(['id', 'status', 'type', 'is_deposit', 'funding_id', 'fundings_ids', 'booking_id'])
     ->first(true);
 
 if($invoice['status'] != 'proforma') {
-    throw new Exception("incompatible_status", QN_ERROR_INVALID_PARAM);
+    throw new Exception("incompatible_status", EQ_ERROR_INVALID_PARAM);
 }
 
 // detach fundings from deleted invoice
@@ -69,6 +68,7 @@ elseif($invoice['type'] === 'invoice') {
 
 $invoice = Invoice::id($params['id'])->delete(true);
 
-$context->httpResponse()
-        ->status(204)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(204)
+    ->send();

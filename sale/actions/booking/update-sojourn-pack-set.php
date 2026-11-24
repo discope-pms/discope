@@ -5,18 +5,19 @@
     Original author(s): Yesbabylon SRL
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
+
 use sale\booking\Booking;
 use sale\booking\BookingLineGroup;
 use sale\catalog\Product;
 
 // announce script and fetch parameters values
-list($params, $providers) = eQual::announce([
-    'description'	=>	"Updates a sojourn based on partial patch of the main product. This script is meant to be called by the `booking/services` UI.",
-    'params' 		=>	[
-        'id' =>  [
-            'description'       => 'Identifier of the targeted sojourn.',
+[$params, $providers] = eQual::announce([
+    'description'   => "Updates a sojourn based on partial patch of the main product. This script is meant to be called by the `booking/services` UI.",
+    'params'        => [
+        'id' => [
             'type'              => 'many2one',
             'foreign_object'    => 'sale\booking\BookingLineGroup',
+            'description'       => 'Identifier of the targeted sojourn.',
             'required'          => true
         ],
         'pack_id' => [
@@ -26,16 +27,16 @@ list($params, $providers) = eQual::announce([
             'required'          => true
         ]
     ],
-    'access' => [
-        'visibility'        => 'protected',
-        'groups'            => ['booking.default.user']
+    'access'        => [
+        'visibility'    => 'protected',
+        'groups'        => ['booking.default.user']
     ],
-    'response' => [
-        'content-type'      => 'application/json',
-        'charset'           => 'utf-8',
-        'accept-origin'     => '*'
+    'response'      => [
+        'content-type'  => 'application/json',
+        'charset'       => 'utf-8',
+        'accept-origin' => '*'
     ],
-    'providers' => ['context', 'orm']
+    'providers'     => ['context', 'orm']
 ]);
 
 /**
@@ -168,6 +169,7 @@ Booking::refreshIsTbc($orm, $group['booking_id']['id']);
 // restore events in case this controller is chained with others
 $orm->enableEvents();
 
-$context->httpResponse()
-        ->status(204)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(204)
+    ->send();

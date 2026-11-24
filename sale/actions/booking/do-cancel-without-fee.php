@@ -9,18 +9,16 @@
 [$params, $providers] = eQual::announce([
     'description'   => "This will cancel the booking without cancellation fee.",
     'params'        => [
-
-        'id' =>  [
-            'type'              => 'integer',
-            'description'       => "Identifier of the targeted booking.",
-            'min'               => 1,
-            'required'          => true
+        'id' => [
+            'type'          => 'integer',
+            'description'   => "Identifier of the targeted booking.",
+            'min'           => 1,
+            'required'      => true
         ],
-
-        'reason' =>  [
-            'type'              => 'string',
-            'description'       => "Reason of the booking cancellation.",
-            'selection'         => [
+        'reason' => [
+            'type'          => 'string',
+            'description'   => "Reason of the booking cancellation.",
+            'selection'     => [
                 'other',                    // customer cancelled for a non-listed reason or without mentioning the reason (cancellation fees might apply)
                 'overbooking',              // the booking was cancelled due to failure in delivery of the service
                 'duplicate',                // several contacts of the same group made distinct bookings for the same sojourn
@@ -29,11 +27,11 @@
                 'health_impediment',        // cancellation for medical or mourning reason
                 'ota'                       // cancellation was made through the channel manager
             ],
-            'required'          => true
+            'required'      => true
         ]
     ],
     'access'        => [
-        'groups'        => ['booking.default.user'],
+        'groups'        => ['booking.default.user']
     ],
     'response'      => [
         'content-type'  => 'application/json',
@@ -44,7 +42,7 @@
 ]);
 
 /**
- * @var \equal\php\Context  $context
+ * @var \equal\php\Context $context
  */
 ['context' => $context] = $providers;
 
@@ -53,6 +51,7 @@ eQual::run('do', 'sale_booking_do-cancel', [
     'reason'    => $params['reason']
 ]);
 
-$context->httpResponse()
-        ->status(200)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(200)
+    ->send();

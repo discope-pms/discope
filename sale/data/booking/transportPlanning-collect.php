@@ -17,65 +17,64 @@ use sale\catalog\Product;
     'description'   => 'Advanced search for : returns a collection of Reports according to extra parameters.',
     'params'        => [
         /**
-         * Filters
-         */
+        * Filters
+        */
         'date_from' => [
-            'type'              => 'date',
-            'description'       => "Start of the time interval of the desired plannings.",
-            'default'           => fn() => time()
+            'type'          => 'date',
+            'description'   => "Start of the time interval of the desired plannings.",
+            'default'       => fn() => time()
         ],
         'date_to' => [
-            'type'              => 'date',
-            'description'       => "End of the time interval of the desired plannings.",
-            'default'           => fn() => strtotime('+1 month')
+            'type'          => 'date',
+            'description'   => "End of the time interval of the desired plannings.",
+            'default'       => fn() => strtotime('+1 month')
         ],
-
         /**
-         * Virtual model columns
-         */
+        * Virtual model columns
+        */
         'id' => [
-            'type'              => 'integer',
-            'description'       => "Identifier of the booking line."
+            'type'          => 'integer',
+            'description'   => "Identifier of the booking line."
         ],
         'product' => [
-            'type'              => 'string',
-            'description'       => "The transport product concerned."
+            'type'          => 'string',
+            'description'   => "The transport product concerned."
         ],
         'date' => [
-            'type'              => 'date',
-            'description'       => "The date of the transport has to be taken care of.",
+            'type'          => 'date',
+            'description'   => "The date of the transport has to be taken care of."
         ],
         'time_slot' => [
-            'type'              => 'string',
-            'description'       => "The date of the transport has to be taken care of.",
+            'type'          => 'string',
+            'description'   => "The date of the transport has to be taken care of."
         ],
         'booking' => [
-            'type'              => 'string',
-            'description'       => "The booking the transport product is needed for."
+            'type'          => 'string',
+            'description'   => "The booking the transport product is needed for."
         ],
         'group' => [
-            'type'              => 'string',
-            'description'       => "The booking group the transport product is needed for."
+            'type'          => 'string',
+            'description'   => "The booking group the transport product is needed for."
         ],
         'nb_pers' => [
-            'type'              => 'integer',
-            'description'       => "The quantity of people in the group."
+            'type'          => 'integer',
+            'description'   => "The quantity of people in the group."
         ],
         'nb_children' => [
-            'type'              => 'integer',
-            'description'       => "The quantity of children in the group."
+            'type'          => 'integer',
+            'description'   => "The quantity of children in the group."
         ],
         'customer' => [
-            'type'              => 'string',
-            'description'       => "The booking customer the transport product is needed for."
+            'type'          => 'string',
+            'description'   => "The booking customer the transport product is needed for."
         ],
         'booking_activity' => [
-            'type'              => 'string',
-            'description'       => "The activity the transport product is needed for."
+            'type'          => 'string',
+            'description'   => "The activity the transport product is needed for."
         ],
         'description' => [
-            'type'              => 'string',
-            'description'       => "The description of the booking line."
+            'type'          => 'string',
+            'description'   => "The description of the booking line."
         ]
     ],
     'response'      => [
@@ -87,8 +86,8 @@ use sale\catalog\Product;
 ]);
 
 /**
- * @var \equal\php\Context $context
- * @var \equal\data\adapt\DataAdapterProvider $dap
+ * @var \equal\php\Context                      $context
+ * @var \equal\data\adapt\DataAdapterProvider   $dap
  */
 ['context' => $context, 'adapt' => $dap] = $providers;
 
@@ -207,7 +206,8 @@ usort($result, function ($a, $b) {
     return strcmp($a['booking_activity'], $b['booking_activity']);
 });
 
-$context->httpResponse()
-        ->header('X-Total-Count', count($result))
-        ->body($result)
-        ->send();
+$context
+    ->httpResponse()
+    ->header('X-Total-Count', count($result))
+    ->body($result)
+    ->send();

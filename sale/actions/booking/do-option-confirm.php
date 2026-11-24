@@ -6,40 +6,37 @@
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 
-list($params, $providers) = announce([
+[$params, $providers] = eQual::announce([
     'description'   => "Direct update of the booking status from quote to confirmed.",
     'params'        => [
-        'id' =>  [
-            'description'   => 'Identifier of the targeted booking.',
+        'id' => [
             'type'          => 'integer',
+            'description'   => 'Identifier of the targeted booking.',
             'min'           => 1,
             'required'      => true
         ],
-        'instant_payment' =>  [
-            'description'   => 'If set, the \'instant payment\' plan will be generated.',
+        'instant_payment' => [
             'type'          => 'boolean',
+            'description'   => 'If set, the \'instant payment\' plan will be generated.',
             'default'       => false
         ]
     ],
-    'access' => [
-        'visibility'        => 'protected',
-        'groups'            => ['booking.default.user']
+    'access'        => [
+        'visibility'    => 'protected',
+        'groups'        => ['booking.default.user']
     ],
     'response'      => [
         'content-type'  => 'application/json',
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'     => ['context', 'orm', 'cron', 'dispatch']
+    'providers'     => ['context']
 ]);
 
 /**
- * @var \equal\php\Context                  $context
- * @var \equal\orm\ObjectManager            $orm
- * @var \equal\cron\Scheduler               $cron
- * @var \equal\dispatch\Dispatcher          $dispatch
+ * @var \equal\php\Context $context
  */
-list($context, $orm, $cron, $dispatch) = [$providers['context'], $providers['orm'], $providers['cron'], $providers['dispatch']];
+['context' => $context] = $providers;
 
 
 
@@ -48,6 +45,7 @@ eQual::run('do', 'sale_booking_do-option', ['id' => $params['id']]);
 eQual::run('do', 'sale_booking_do-confirm', ['id' => $params['id'], 'instant_payment' => $params['instant_payment']]);
 
 
-$context->httpResponse()
-        ->status(204)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(204)
+    ->send();

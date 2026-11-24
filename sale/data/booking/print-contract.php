@@ -14,6 +14,7 @@ use Dompdf\Options as DompdfOptions;
 use Endroid\QrCode\Builder\Builder;
 use Endroid\QrCode\ErrorCorrectionLevel\ErrorCorrectionLevelMedium;
 use equal\data\DataFormatter;
+use sale\booking\BookingActivity;
 use sale\booking\Consumption;
 use sale\booking\Contract;
 use sale\booking\TimeSlot;
@@ -22,7 +23,6 @@ use Twig\Environment as TwigEnvironment;
 use Twig\Extension\ExtensionInterface;
 use Twig\Extra\Intl\IntlExtension;
 use Twig\Loader\FilesystemLoader as TwigFilesystemLoader;
-use sale\booking\BookingActivity;
 
 [$params, $providers] = eQual::announce([
     'description'   => "Render a contract given its ID as a PDF document.",
@@ -39,12 +39,12 @@ use sale\booking\BookingActivity;
         ],
         'mode' => [
             'type'          => 'string',
+            'description'   => 'Mode in which document has to be rendered: simple or detailed.',
             'selection'     => [
                 'simple',
                 'grouped',
                 'detailed'
             ],
-            'description'   => 'Mode in which document has to be rendered: simple or detailed.',
             'default'       => 'grouped'
         ],
         'lang' => [
@@ -60,19 +60,19 @@ use sale\booking\BookingActivity;
         ]
     ],
     'access'        => [
-        'visibility'        => 'protected',
-        'groups'            => ['booking.default.user'],
+        'visibility'    => 'protected',
+        'groups'        => ['booking.default.user']
     ],
     'response'      => [
-        'content-type'      => 'application/pdf',
-        'accept-origin'     => '*'
+        'content-type'  => 'application/pdf',
+        'accept-origin' => '*'
     ],
     'constants'     => ['DEFAULT_LANG'],
     'providers'     => ['context']
 ]);
 
 /**
- * @var \equal\php\Context  $context
+ * @var \equal\php\Context $context
  */
 ['context' => $context] = $providers;
 
@@ -157,7 +157,7 @@ $getTemplateFilePath = function($entity, $view_id) {
         $template_file = EQ_BASEDIR."/packages/{$package}/views/{$class_path}.{$view_id}.html";
 
         if(!file_exists($template_file)) {
-            throw new Exception("unknown_view_id", QN_ERROR_UNKNOWN_OBJECT);
+            throw new Exception("unknown_view_id", EQ_ERROR_UNKNOWN_OBJECT);
         }
     }
 
@@ -298,7 +298,7 @@ if(is_null($output)) {
     $contract = Contract::id($params['id'])->read($fields, $params['lang'])->first(true);
 
     if(!$contract) {
-        throw new Exception("unknown_contract", QN_ERROR_UNKNOWN_OBJECT);
+        throw new Exception("unknown_contract", EQ_ERROR_UNKNOWN_OBJECT);
     }
 
 
@@ -310,7 +310,7 @@ if(is_null($output)) {
 
 
     if(!$booking) {
-        throw new Exception("unknown_booking", QN_ERROR_UNKNOWN_OBJECT);
+        throw new Exception("unknown_booking", EQ_ERROR_UNKNOWN_OBJECT);
     }
 
     $logo_document_data = $booking['center_id']['organisation_id']['logo_document_id']['data'] ?? null;
@@ -1024,8 +1024,8 @@ if(is_null($output)) {
         $html = $template->render($values);
     }
     catch(Exception $e) {
-        trigger_error("ORM::error while parsing template - ".$e->getMessage(), QN_REPORT_DEBUG);
-        throw new Exception("template_parsing_issue", QN_ERROR_INVALID_CONFIG);
+        trigger_error("ORM::error while parsing template - ".$e->getMessage(), EQ_REPORT_DEBUG);
+        throw new Exception("template_parsing_issue", EQ_ERROR_INVALID_CONFIG);
     }
 
     if($params['output'] === 'html') {

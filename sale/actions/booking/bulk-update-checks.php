@@ -6,36 +6,36 @@
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 
-list($params, $providers) = eQual::announce([
-    'description'	=>	"Runs a checks update on a selection of Booking.",
-    'params' 		=>	[
+[$params, $providers] = eQual::announce([
+    'description'   => "Runs a checks update on a selection of Booking.",
+    'params'        => [
         'ids' => [
-            'description'       => 'List of Booking identifiers the check against emptiness.',
-            'type'              => 'array'
+            'type'          => 'array',
+            'description'   => 'List of Booking identifiers the check against emptiness.'
         ]
     ],
-    'access' => [
-        'visibility'        => 'protected',
-        'groups'            => ['booking.default.user'],
+    'access'        => [
+        'visibility'    => 'protected',
+        'groups'        => ['booking.default.user']
     ],
-    'response' => [
-        'content-type'      => 'application/json',
-        'charset'           => 'utf-8',
-        'accept-origin'     => '*'
+    'response'      => [
+        'content-type'  => 'application/json',
+        'charset'       => 'utf-8',
+        'accept-origin' => '*'
     ],
-    'providers' => ['context', 'dispatch']
+    'providers'     => ['context']
 ]);
 
 /**
- * @var \equal\php\Context                  $context
- * @var \equal\dispatch\Dispatcher          $dispatch
+ * @var \equal\php\Context $context
  */
-list($context, $dispatch) = [ $providers['context'], $providers['dispatch']];
+['context' => $context] = $providers;
 
 foreach($params['ids'] as $id) {
     eQual::run('do', 'sale_booking_do-update-check', ['id' => $id]);
 }
 
-$context->httpResponse()
-        ->status(204)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(204)
+    ->send();

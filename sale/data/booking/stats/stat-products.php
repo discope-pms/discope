@@ -8,7 +8,7 @@
 
 use sale\booking\Invoice;
 
-list($params, $providers) = eQual::announce([
+[$params, $providers] = eQual::announce([
     'description'   => 'Provides the quantity and prices for a given product and period.',
     'params'        => [
         'organisation_id' => [
@@ -37,7 +37,6 @@ list($params, $providers) = eQual::announce([
             'foreign_object'    => 'sale\catalog\Product',
             'description'       => 'Product filter'
         ],
-
         /* parameters used as properties of virtual entity */
         'name' => [
             'type'              => 'string',
@@ -71,7 +70,7 @@ list($params, $providers) = eQual::announce([
 /**
  * @var \equal\php\Context $context
  */
-$context = $providers['context'];
+['context' => $context] = $providers;
 
 $result = [];
 if( (isset($params['center_office_id']) || isset($params['organisation_id'])) && isset($params['product_id']) ) {
@@ -149,7 +148,8 @@ if( (isset($params['center_office_id']) || isset($params['organisation_id'])) &&
     }
 }
 
-$context->httpResponse()
-        ->header('X-Total-Count', count($result))
-        ->body($result)
-        ->send();
+$context
+    ->httpResponse()
+    ->header('X-Total-Count', count($result))
+    ->body($result)
+    ->send();

@@ -5,35 +5,35 @@
     Original author(s): Yesbabylon SRL
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
+
 use sale\booking\Booking;
 
-list($params, $providers) = eQual::announce([
+[$params, $providers] = eQual::announce([
     'description'   => "Create a manual payment to complete the payments of all fundings not related to a deposit invoice.",
     'help'          => "This action is intended for payment with bank card only. Manual payments can be undone while the booking is not fully balanced (and invoiced).",
     'params'        => [
-        'id' =>  [
-            'description'   => 'Identifier of the targeted booking.',
+        'id' => [
             'type'          => 'integer',
+            'description'   => 'Identifier of the targeted booking.',
             'min'           => 1,
             'required'      => true
         ]
     ],
-    'access' => [
-        'groups'            => ['booking.default.user', 'sale.default.administrator']
+    'access'        => [
+        'groups'        => ['booking.default.user', 'sale.default.administrator']
     ],
     'response'      => [
         'content-type'  => 'application/json',
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'     => ['context', 'orm']
+    'providers'     => ['context']
 ]);
 
 /**
- * @var \equal\php\Context          $context
- * @var \equal\orm\ObjectManager    $om
+ * @var \equal\php\Context $context
  */
-list($context, $om) = [ $providers['context'], $providers['orm'] ];
+['context' => $context] = $providers;
 
 // read booking object
 $booking = Booking::id($params['id'])
@@ -41,11 +41,11 @@ $booking = Booking::id($params['id'])
     ->first(true);
 
 if(!$booking) {
-    throw new Exception("unknown_booking", QN_ERROR_UNKNOWN_OBJECT);
+    throw new Exception("unknown_booking", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
 if(in_array($booking['status'], ['balanced', 'cancelled'])) {
-    throw new Exception("incompatible_status", QN_ERROR_INVALID_PARAM);
+    throw new Exception("incompatible_status", EQ_ERROR_INVALID_PARAM);
 }
 
 foreach($booking['fundings_ids'] as $funding) {
@@ -59,6 +59,7 @@ foreach($booking['fundings_ids'] as $funding) {
     }
 }
 
-$context->httpResponse()
-        ->status(204)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(204)
+    ->send();

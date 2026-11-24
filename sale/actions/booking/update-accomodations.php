@@ -5,23 +5,23 @@
     Original author(s): Yesbabylon SRL
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
-use sale\booking\Consumption;
+
 use realestate\RentalUnit;
+use sale\booking\Consumption;
 
 // announce script and fetch parameters values
 [$params, $providers] = eQual::announce([
-    'description'	=>	"Update the status of accommodation rental-units based on their current occupation. This script is meant to be run by CRON on a daily basis.",
-    'params' 		=>	[
+    'description'   => "Update the status of accommodation rental-units based on their current occupation. This script is meant to be run by CRON on a daily basis.",
+    'params'        => [],
+    'access'        => [
+        'visibility'    => 'private'
     ],
-    'access' => [
-        'visibility'        => 'private'
+    'response'      => [
+        'content-type'  => 'application/json',
+        'charset'       => 'utf-8',
+        'accept-origin' => '*'
     ],
-    'response' => [
-        'content-type'      => 'application/json',
-        'charset'           => 'utf-8',
-        'accept-origin'     => '*'
-    ],
-    'providers' => ['context', 'orm']
+    'providers'     => ['context', 'orm']
 ]);
 
 /**
@@ -70,6 +70,7 @@ foreach($consumptions as $cid => $consumption) {
     }
 }
 
-$context->httpResponse()
-        ->status(204)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(204)
+    ->send();

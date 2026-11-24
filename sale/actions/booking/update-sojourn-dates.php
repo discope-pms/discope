@@ -5,47 +5,48 @@
     Original author(s): Yesbabylon SRL
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
+
 use sale\booking\Booking;
 use sale\booking\BookingLineGroup;
 
 // announce script and fetch parameters values
-list($params, $providers) = eQual::announce([
-    'description'	=>	"Updates a sojourn based on partial patch of the main product. This script is meant to be called by the `booking/services` UI.",
-    'params' 		=>	[
-        'id' =>  [
-            'description'       => 'Identifier of the targeted sojourn.',
+[$params, $providers] = eQual::announce([
+    'description'   => "Updates a sojourn based on partial patch of the main product. This script is meant to be called by the `booking/services` UI.",
+    'params'        => [
+        'id' => [
             'type'              => 'many2one',
             'foreign_object'    => BookingLineGroup::getType(),
+            'description'       => 'Identifier of the targeted sojourn.',
             'required'          => true
         ],
-        'date_from' =>  [
+        'date_from' => [
             'type'              => 'date',
             'description'       => 'New first date of the sojourn.',
             'required'          => true
         ],
-        'date_to' =>  [
+        'date_to' => [
             'type'              => 'date',
             'description'       => 'New last date of the sojourn.',
             'required'          => true
         ]
     ],
-    'access' => [
-        'visibility'        => 'protected',
-        'groups'            => ['booking.default.user']
+    'access'        => [
+        'visibility'    => 'protected',
+        'groups'        => ['booking.default.user']
     ],
-    'response' => [
-        'content-type'      => 'application/json',
-        'charset'           => 'utf-8',
-        'accept-origin'     => '*'
+    'response'      => [
+        'content-type'  => 'application/json',
+        'charset'       => 'utf-8',
+        'accept-origin' => '*'
     ],
-    'providers' => ['context', 'orm']
+    'providers'     => ['context', 'orm']
 ]);
 
 /**
  * @var \equal\php\Context          $context
  * @var \equal\orm\ObjectManager    $orm
  */
-list($context, $orm) = [ $providers['context'], $providers['orm']];
+['context' => $context, 'orm' => $orm] = $providers;
 
 // read BookingLineGroup object
 $group = BookingLineGroup::id($params['id'])
@@ -143,6 +144,7 @@ Booking::refreshDate($orm, $group['booking_id']['id']);
 // restore events in case this controller is chained with others
 $orm->enableEvents();
 
-$context->httpResponse()
-        ->status(204)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(204)
+    ->send();

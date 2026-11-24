@@ -7,7 +7,7 @@
 
 use identity\Center;
 
-list($params, $providers) = announce([
+[$params, $providers] = eQual::announce([
     'description'   => "Linearize historic bookings data from Hestia to a csv file.",
     'help'          => "Csv files should be put in \"packages/lodging/init/history/\" folder.\n".
                        'Needed files for a center are "M_Resa.csv", "R_Client.csv", "M_Reglement.csv", "M_Resa_Compo.csv", "M_Resa_Regl.csv"',
@@ -19,8 +19,8 @@ list($params, $providers) = announce([
         ]
     ],
     'access'        => [
-        'visibility' => 'protected',
-        'groups'     => ['admins']
+        'visibility'    => 'protected',
+        'groups'        => ['admins']
     ],
     'response'      => [
         'content-type'  => 'application/json',
@@ -30,8 +30,10 @@ list($params, $providers) = announce([
     'providers'     => ['context']
 ]);
 
-/** @var \equal\php\Context $context */
-$context = $providers['context'];
+/**
+ * @var \equal\php\Context $context
+ */
+['context' => $context] = $providers;
 
 $getCsvFileContent = function($file_path, $id_column, $columns, $multiple_items_with_same_id) {
     $data = [];
@@ -68,7 +70,7 @@ $getCsvFileContent = function($file_path, $id_column, $columns, $multiple_items_
 $getHistoricCsvFilesData = function($csv_files, $center, $multiple_items_with_same_id = false) use ($getCsvFileContent) {
     $historic_data = [];
     foreach($csv_files as $file => $file_config) {
-        $file_path = QN_BASEDIR . '/packages/lodging/init/history/';
+        $file_path = EQ_BASEDIR . '/packages/lodging/init/history/';
         if($file_config['center_specific']) {
             $file_path .= $center . '_';
         }
@@ -194,7 +196,7 @@ $getNbRentalUnit = function($compositions) {
 };
 
 $getLinearizedFile = function($center) {
-    $linearized_file_path = QN_BASEDIR . '/packages/lodging/init/history/'.$center.'_linearized.csv';
+    $linearized_file_path = EQ_BASEDIR . '/packages/lodging/init/history/'.$center.'_linearized.csv';
     unlink($linearized_file_path);
     return fopen($linearized_file_path, 'w');
 };
@@ -283,9 +285,10 @@ foreach($historic_data['M_Resa'] as $resa) {
 
 fclose($linearized_file);
 
-$context->httpResponse()
-        ->body([
+$context
+    ->httpResponse()
+    ->body([
             'success'          => true,
             'handled_bookings' => count($historic_data['M_Resa'])
         ])
-        ->send();
+    ->send();

@@ -6,84 +6,87 @@
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 
+use communication\TemplateAttachment;
+use core\Lang;
+use core\Mail;
+use documents\Document;
 use equal\email\Email;
 use equal\email\EmailAttachment;
-use communication\TemplateAttachment;
-use documents\Document;
 use sale\booking\Invoice;
-use core\Mail;
-use core\Lang;
 
 // announce script and fetch parameters values
-list($params, $providers) = announce([
-    'description'	=>	"Send an instant email with given details with an invoice as attachment.",
-    'params' 		=>	[
+[$params, $providers] = eQual::announce([
+    'description'   => "Send an instant email with given details with an invoice as attachment.",
+    'params'        => [
         'invoice_id' => [
-            'description'   => 'Identifier of the booking related to the sending of the email.',
             'type'          => 'integer',
+            'description'   => 'Identifier of the booking related to the sending of the email.',
             'required'      => true
         ],
-        'title' =>  [
-            'description'   => 'Title of the message.',
+        'title' => [
             'type'          => 'string',
+            'description'   => 'Title of the message.',
             'required'      => true
         ],
         'message' => [
-            'description'   => 'Body of the message.',
             'type'          => 'string',
             'usage'         => 'text/html',
+            'description'   => 'Body of the message.',
             'required'      => true
         ],
         'sender_email' => [
-            'description'   => 'Email address FROM.',
             'type'          => 'string',
             'usage'         => 'email',
+            'description'   => 'Email address FROM.',
             'required'      => true
         ],
         'recipient_email' => [
-            'description'   => 'Email address TO.',
             'type'          => 'string',
             'usage'         => 'email',
+            'description'   => 'Email address TO.',
             'required'      => true
         ],
         'recipients_emails' => [
-            'description'   => 'CC email addresses.',
             'type'          => 'array',
+            'description'   => 'CC email addresses.',
             /*'usage'         => 'email'*/
         ],
         'attachments_ids' => [
-            'description'   => 'List of identitiers of attachments to join.',
             'type'          => 'array',
+            'description'   => 'List of identitiers of attachments to join.',
             'default'       => []
         ],
-        'mode' =>  [
-            'description'   => 'Mode in which document has to be rendered: simple or detailed.',
+        'mode' => [
             'type'          => 'string',
+            'description'   => 'Mode in which document has to be rendered: simple or detailed.',
             'selection'     => ['simple', 'grouped', 'detailed'],
             'default'       => 'grouped'
         ],
-        'lang' =>  [
-            'description'   => 'Language to use for multilang contents.',
+        'lang' => [
             'type'          => 'string',
             'usage'         => 'language/iso-639',
+            'description'   => 'Language to use for multilang contents.',
             'default'       => constant('DEFAULT_LANG')
         ]
     ],
-    'constants'             => ['DEFAULT_LANG'],
-    'access' => [
-        'groups'            => ['booking.default.user'],
+    'access'        => [
+        'groups'        => ['booking.default.user']
     ],
-    'response' => [
-        'content-type'      => 'application/json',
-        'charset'           => 'utf-8',
-        'accept-origin'     => '*'
+    'response'      => [
+        'content-type'  => 'application/json',
+        'charset'       => 'utf-8',
+        'accept-origin' => '*'
     ],
-    'providers' => ['context', 'cron']
+    'constants'     => ['DEFAULT_LANG'],
+    'providers'     => ['context']
 ]);
 
 
 // init local vars with inputs
-list($context, $cron) = [ $providers['context'], $providers['cron'] ];
+/**
+ * @var \equal\php\Context $context
+ */
+['context' => $context] = $providers;
 
 $invoice = Invoice::id($params['invoice_id'])
     ->read([
@@ -92,13 +95,13 @@ $invoice = Invoice::id($params['invoice_id'])
     ->first(true);
 
 if(!$invoice) {
-    throw new Exception("unknown_invoice", QN_ERROR_UNKNOWN_OBJECT);
+    throw new Exception("unknown_invoice", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
 $booking = $invoice['booking_id'];
 
 if(!$booking) {
-    throw new Exception("unknown_booking", QN_ERROR_UNKNOWN_OBJECT);
+    throw new Exception("unknown_booking", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
 if(empty($params['title'])) {
@@ -182,6 +185,7 @@ foreach($attachments as $attachment) {
 // queue message
 Mail::queue($message, 'sale\booking\Booking', $booking['id']);
 
-$context->httpResponse()
-        ->status(204)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(204)
+    ->send();

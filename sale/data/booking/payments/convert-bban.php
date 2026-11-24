@@ -8,34 +8,38 @@
 
 use sale\booking\BankStatement;
 
-list($params, $providers) = announce([
+[$params, $providers] = eQual::announce([
     'description'   => "Returns the IBAN format of a bank account as provided by belgian Bank statements (CODA).",
     'params'        => [
-        'bban' =>  [
-            'description'   => 'BBAN account number.',
+        'bban' => [
             'type'          => 'string',
+            'description'   => 'BBAN account number.',
             'required'      => true
         ]
     ],
-    'access' => [
-        'visibility'        => 'private'
+    'access'        => [
+        'visibility'    => 'private'
     ],
     'response'      => [
         'content-type'  => 'application/json',
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'     => ['context', 'orm']
+    'providers'     => ['context']
 ]);
 
 
-list($context, $orm) = [$providers['context'], $providers['orm']];
+/**
+ * @var \equal\php\Context $context
+ */
+['context' => $context] = $providers;
 
 
 $iban = BankStatement::convertBbanToIban($params['bban']);
 
 
-$context->httpResponse()
-        ->status(200)
-        ->body(['result' => $iban])
-        ->send();
+$context
+    ->httpResponse()
+    ->status(200)
+    ->body(['result' => $iban])
+    ->send();

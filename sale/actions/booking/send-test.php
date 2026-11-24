@@ -9,25 +9,27 @@
 use equal\email\Email;
 
 // announce script and fetch parameters values
-list($params, $providers) = announce([
-    'description'	=>	"Send an instant email with given details with a booking quote as attachment.",
-    'params' 		=>	[
+[$params, $providers] = eQual::announce([
+    'description'   => "Send an instant email with given details with a booking quote as attachment.",
+    'params'        => [],
+    'access'        => [
+        'groups'        => ['booking.default.user']
     ],
-    'access' => [
-        'groups'            => ['booking.default.user'],
+    'response'      => [
+        'content-type'  => 'application/json',
+        'charset'       => 'utf-8',
+        'accept-origin' => '*'
     ],
-    'constants' => ['TEST'],
-    'response' => [
-        'content-type'      => 'application/json',
-        'charset'           => 'utf-8',
-        'accept-origin'     => '*'
-    ],
-    'providers' => ['context', 'cron']
+    'constants'     => ['TEST'],
+    'providers'     => ['context']
 ]);
 
 
 // init local vars with inputs
-list($context, $cron) = [ $providers['context'], $providers['cron'] ];
+/**
+ * @var \equal\php\Context $context
+ */
+['context' => $context] = $providers;
 
 echo constant('TEST');
 
@@ -46,6 +48,7 @@ $message->setTo('cedricfrancoys@gmail.com')
 
 
 
-$context->httpResponse()
-        ->status(204)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(204)
+    ->send();

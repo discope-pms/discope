@@ -10,7 +10,7 @@ use sale\booking\BookingLine;
 use sale\booking\BookingLineGroup;
 use sale\catalog\Product;
 
-list($params, $providers) = eQual::announce([
+[$params, $providers] = eQual::announce([
     'description'   => 'Lists all contracts and their related details for a given period.',
     'params'        => [
         /* mixed-usage parameters: required both for fetching data (input) and property of virtual entity (output) */
@@ -35,20 +35,18 @@ list($params, $providers) = eQual::announce([
             'description'       => "The organisation the establishment belongs to.",
             'domain'            => ['id', '<', 6]
         ],
-
         /* parameters used as properties of virtual entity */
-
         'center' => [
             'type'              => 'string',
             'description'       => 'Name of the center.'
         ],
         'center_type' => [
             'type'              => 'string',
+            'description'       => 'Type of the center.',
             'selection'         => [
                 'GA',
                 'GG'
-            ],
-            'description'       => 'Type of the center.'
+            ]
         ],
         'booking' => [
             'type'              => 'string',
@@ -118,22 +116,21 @@ list($params, $providers) = eQual::announce([
         'price_vati' => [
             'type'              => 'float',
             'description'       => 'Price of the sojourn VAT included.'
-        ],
+        ]
     ],
     'response'      => [
         'content-type'  => 'application/json',
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'     => [ 'context', 'orm', 'adapt' ]
+    'providers'     => ['context', 'adapt']
 ]);
 
 /**
- * @var \equal\php\Context          $context
- * @var \equal\orm\ObjectManager    $orm
- * @var \equal\data\DataAdapter     $adapter
+ * @var \equal\php\Context                      $context
+ * @var \equal\data\adapt\DataAdapterProvider   $dap
  */
-list($context, $orm, $dap) = [ $providers['context'], $providers['orm'], $providers['adapt'] ];
+['context' => $context, 'adapt' => $dap] = $providers;
 
 // #memo - this is a workaround to handle the change of logic between 'adapt' as DataAdapter (equal1.0) or DataAdapterProvider (equal2.0)
 if(is_a($dap, 'equal\data\DataAdapter')) {
@@ -305,7 +302,8 @@ foreach($bookings as $booking) {
     ];
 }
 
-$context->httpResponse()
-        ->header('X-Total-Count', count($result))
-        ->body($result)
-        ->send();
+$context
+    ->httpResponse()
+    ->header('X-Total-Count', count($result))
+    ->body($result)
+    ->send();

@@ -11,12 +11,12 @@ use sale\booking\Booking;
 
 use discope\setting\Setting;
 
-list($params, $providers) = announce([
+[$params, $providers] = eQual::announce([
     'description'   => "This archives the reservation, if the reservation is in quote  or checkout, with a date in the past and no money received",
     'params'        => [
-        'id' =>  [
-            'description'   => 'Identifier of the booking the check against emptiness.',
+        'id' => [
             'type'          => 'integer',
+            'description'   => 'Identifier of the booking the check against emptiness.',
             'required'      => true
         ]
     ],
@@ -25,16 +25,13 @@ list($params, $providers) = announce([
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'     => ['context', 'orm', 'auth', 'dispatch']
+    'providers'     => ['context']
 ]);
 
 /**
- * @var \equal\php\Context                  $context
- * @var \equal\orm\ObjectManager            $orm
- * @var \equal\auth\AuthenticationManager   $auth
- * @var \equal\dispatch\Dispatcher          $dispatch
+ * @var \equal\php\Context $context
  */
-list($context, $orm, $auth, $dispatch) = [ $providers['context'], $providers['orm'], $providers['auth'], $providers['dispatch']];
+['context' => $context] = $providers;
 
 // ensure booking object exists and is readable
 $booking = Booking::id($params['id'])
@@ -42,7 +39,7 @@ $booking = Booking::id($params['id'])
                     ->first(true);
 
 if(!$booking) {
-    throw new Exception("unknown_booking", QN_ERROR_UNKNOWN_OBJECT);
+    throw new Exception("unknown_booking", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
 $quote_delay = Setting::get_value('sale', 'features', 'quote.validity_delay');
@@ -50,21 +47,21 @@ $quote_delay = Setting::get_value('sale', 'features', 'quote.validity_delay');
 $booking_delay = Setting::get_value('sale', 'features', 'booking.archive_delay');
 
 if($booking['state'] == 'archive') {
-    throw new Exception("invalid_states_booking", QN_ERROR_INVALID_PARAM);
+    throw new Exception("invalid_states_booking", EQ_ERROR_INVALID_PARAM);
 }
 
 if($booking['status'] == 'quote') {
     if($booking['created'] >= strtotime("-$quote_delay days") || round($booking['paid_amount'], 2) != 0.00) {
-        throw new Exception("invalid_quote_booking", QN_ERROR_INVALID_PARAM);
+        throw new Exception("invalid_quote_booking", EQ_ERROR_INVALID_PARAM);
     }
     Booking::id($booking['id'])->update(['state' => 'archive']);
 }
 elseif($booking['status'] == 'checkedout') {
     if(!$booking['is_cancelled']) {
-        throw new Exception("non_cancelled_booking", QN_ERROR_INVALID_PARAM);
+        throw new Exception("non_cancelled_booking", EQ_ERROR_INVALID_PARAM);
     }
     if($booking['date_to'] >=  strtotime("-$booking_delay days") || round($booking['price'],2) != 0.00){
-        throw new Exception("invalid_checkout_booking", QN_ERROR_INVALID_PARAM);
+        throw new Exception("invalid_checkout_booking", EQ_ERROR_INVALID_PARAM);
     }
     Booking::id($booking['id'])->update(['state' => 'archive']);
 }
@@ -72,7 +69,7 @@ elseif($booking['status'] === 'cancelled') {
     Booking::id($booking['id'])->update(['state' => 'archive']);
 }
 else {
-    throw new Exception("invalid_status_booking", QN_ERROR_INVALID_PARAM);
+    throw new Exception("invalid_status_booking", EQ_ERROR_INVALID_PARAM);
 }
 
 // remove any pending alert
@@ -82,6 +79,7 @@ Message::search([
 ])
     ->delete(true);
 
-$context->httpResponse()
-        ->status(204)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(204)
+    ->send();

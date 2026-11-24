@@ -10,31 +10,31 @@ use sale\booking\BookingLine;
 use sale\booking\BookingLineGroup;
 
 [$params, $providers] = eQual::announce([
-    'description'	=> "Updates a Booking Line by changed its product. This script is meant to be called by the `booking/services` UI.",
-    'params' 		=> [
+    'description'   => "Updates a Booking Line by changed its product. This script is meant to be called by the `booking/services` UI.",
+    'params'        => [
         'id' => [
-            'description'       => 'Identifier of the targeted Booking Line.',
             'type'              => 'many2one',
             'foreign_object'    => 'sale\booking\BookingLine',
+            'description'       => 'Identifier of the targeted Booking Line.',
             'required'          => true
         ],
         'product_id' => [
             'type'              => 'many2one',
-            'description'       => 'Identifier of the product to assign the line to.',
             'foreign_object'    => 'sale\catalog\Product',
+            'description'       => 'Identifier of the product to assign the line to.',
             'default'           => false
         ]
     ],
     'access'        => [
-        'visibility'        => 'protected',
-        'groups'            => ['booking.default.user']
+        'visibility'    => 'protected',
+        'groups'        => ['booking.default.user']
     ],
     'response'      => [
-        'content-type'      => 'application/json',
-        'charset'           => 'utf-8',
-        'accept-origin'     => '*'
+        'content-type'  => 'application/json',
+        'charset'       => 'utf-8',
+        'accept-origin' => '*'
     ],
-    'providers' => ['context', 'orm']
+    'providers'     => ['context', 'orm']
 ]);
 
 /**
@@ -82,6 +82,7 @@ BookingLineGroup::refreshMeals($orm, $line['booking_line_group_id']);
 // restore events in case this controller is chained with others
 $orm->enableEvents();
 
-$context->httpResponse()
-        ->status(204)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(204)
+    ->send();

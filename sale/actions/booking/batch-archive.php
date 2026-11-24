@@ -7,20 +7,23 @@
 
 use sale\booking\Booking;
 
-list($params, $providers) = eQual::announce([
-    'description'	=>	" Archives outdated booking records in batch. Targets bookings with status 'quote', created over 12 months ago, with no amount paid.",
-    'access' => [
-        'visibility'        => 'protected',
-        'groups'            => ['booking.default.user'],
+[$params, $providers] = eQual::announce([
+    'description'   => " Archives outdated booking records in batch. Targets bookings with status 'quote', created over 12 months ago, with no amount paid.",
+    'access'        => [
+        'visibility'    => 'protected',
+        'groups'        => ['booking.default.user']
     ],
-    'response' => [
-        'content-type'      => 'application/json',
-        'charset'           => 'utf-8',
-        'accept-origin'     => '*'
+    'response'      => [
+        'content-type'  => 'application/json',
+        'charset'       => 'utf-8',
+        'accept-origin' => '*'
     ],
-    'providers' => ['context']
+    'providers'     => ['context']
 ]);
 
+/**
+ * @var \equal\php\Context $context
+ */
 ['context' => $context] = $providers;
 
 $bookings = Booking::search([
@@ -34,6 +37,7 @@ if($bookings){
     eQual::run('do', 'sale_booking_bulk-archive', ['ids' => $bookings]);
 }
 
-$context->httpResponse()
-        ->status(204)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(204)
+    ->send();

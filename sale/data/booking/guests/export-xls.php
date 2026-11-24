@@ -7,8 +7,11 @@
 
 use sale\booking\Booking;
 
-list($params, $providers) = eQual::announce([
+[$params, $providers] = eQual::announce([
     'description'   => 'Returns descriptor of current User, based on received guest_access_token (no user_id).',
+    'access'        => [
+        'visibility'    => 'public'
+    ],
     'response'      => [
         'content-type'          => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
         'content-disposition'   => 'inline; filename="export.xlsx"',
@@ -16,18 +19,14 @@ list($params, $providers) = eQual::announce([
         'errors'                => ['invalid_token', 'malformed_token', 'expired_token']
     ],
     'constants'     => ['AUTH_SECRET_KEY'],
-    'access'        => [
-        'visibility'        => 'public'
-    ],
-    'providers'     => ['context', 'orm', 'auth']
+    'providers'     => ['context', 'auth']
 ]);
 
 /**
  * @var \equal\php\Context                  $context
- * @var \equal\orm\ObjectManager            $orm
  * @var \equal\auth\AuthenticationManager   $auth
  */
-['context' => $context, 'orm' => $orm, 'auth' => $auth] = $providers;
+['context' => $context, 'auth' => $auth] = $providers;
 
 $user_id = $auth->userId();
 if($user_id === EQ_ROOT_USER_ID) {
@@ -62,6 +61,7 @@ $result = eQual::run('get','model_export-xls', [
     'params'    => ['limit' => 500]
     ]);
 
-$context->httpResponse()
-        ->body($result)
-        ->send();
+$context
+    ->httpResponse()
+    ->body($result)
+    ->send();

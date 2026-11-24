@@ -10,41 +10,45 @@
     'description'   => "Render a booking quote as a PDF document, given its id.",
     'params'        => [
         'id' => [
-            'description'   => 'Identifier of the booking to print.',
-            'type'          => 'integer',
-            'required'      => true
+            'type'              => 'integer',
+            'description'       => 'Identifier of the booking to print.',
+            'required'          => true
         ],
         'type' => [
-            'description'   => 'The type of activities planning.',
-            'type'          => 'string',
-            'default'       => 'global'
+            'type'              => 'string',
+            'description'       => 'The type of activities planning.',
+            'default'           => 'global'
         ],
         'booking_line_group_id' => [
-            'type'          => 'many2one',
-            'foreign_object'=> 'sale\booking\BookingLineGroup',
-            'description'   => 'Identifier of the booking line group (sojourn) to print.',
-            'required'      => true,
-            'domain'        => ['booking_id', '=', 'object.id']
+            'type'              => 'many2one',
+            'foreign_object'    => 'sale\booking\BookingLineGroup',
+            'description'       => 'Identifier of the booking line group (sojourn) to print.',
+            'domain'            => ['booking_id', '=', 'object.id'],
+            'required'          => true
         ]
     ],
-    'constants'             => ['DEFAULT_LANG', 'L10N_LOCALE'],
-    'access' => [
-        'visibility'        => 'protected',
-        'groups'            => ['booking.default.user'],
+    'access'        => [
+        'visibility'    => 'protected',
+        'groups'        => ['booking.default.user']
     ],
     'response'      => [
-        'content-type'      => 'application/pdf',
-        'accept-origin'     => '*'
+        'content-type'  => 'application/pdf',
+        'accept-origin' => '*'
     ],
-    'providers'     => ['context', 'orm']
+    'constants'     => ['DEFAULT_LANG', 'L10N_LOCALE'],
+    'providers'     => ['context']
 ]);
 
 
-['context' => $context, 'orm' => $orm] = $providers;
+/**
+ * @var \equal\php\Context $context
+ */
+['context' => $context] = $providers;
 
 $output = eQual::run('get', 'sale_booking_print-booking-activity', $params);
 
-$context->httpResponse()
-        ->header('Content-Disposition', 'inline; filename="document.pdf"')
-        ->body($output)
-        ->send();
+$context
+    ->httpResponse()
+    ->header('Content-Disposition', 'inline; filename="document.pdf"')
+    ->body($output)
+    ->send();

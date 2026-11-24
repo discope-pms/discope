@@ -12,9 +12,9 @@ use Dompdf\Options as DompdfOptions;
 use equal\data\DataFormatter;
 use identity\Identity;
 use Twig\Environment as TwigEnvironment;
-use Twig\Loader\FilesystemLoader as TwigFilesystemLoader;
-use Twig\Extra\Intl\IntlExtension;
 use Twig\Extension\ExtensionInterface;
+use Twig\Extra\Intl\IntlExtension;
+use Twig\Loader\FilesystemLoader as TwigFilesystemLoader;
 use Twig\TwigFilter;
 
 use sale\booking\FinancialHelp;
@@ -22,13 +22,12 @@ use sale\booking\FinancialHelp;
 [$params, $providers] = eQual::announce([
     'description'   => "Generates an invoice intended for a specific financial help.",
     'params'        => [
-        'id' =>  [
+        'id' => [
             'type'              => 'integer',
             'description'       => "Identifier of the targeted financial help.",
             'min'               => 1,
             'required'          => true
         ],
-
         'organisation_id' => [
             'type'              => 'many2one',
             'foreign_object'    => 'identity\Identity',
@@ -40,7 +39,6 @@ use sale\booking\FinancialHelp;
                     ->first(true);
             }
         ],
-
         'date_from' => [
             'type'              => 'date',
             'description'       => "Start interval of the payments filter.",
@@ -48,7 +46,6 @@ use sale\booking\FinancialHelp;
                 return strtotime('first day of january this year');
             }
         ],
-
         'date_to' => [
             'type'              => 'date',
             'description'       => "End interval of the payments filter.",
@@ -57,24 +54,20 @@ use sale\booking\FinancialHelp;
                 return strtotime('last day of december this year');
             }
         ],
-
         'helper_name' => [
             'type'              => 'string',
             'description'       => "Financial helper name.",
             'required'          => true
         ],
-
         'helper_address1' => [
             'type'              => 'string',
             'description'       => "Financial helper address line 1.",
             'required'          => true
         ],
-
         'helper_address_dispatch' => [
             'type'              => 'string',
             'description'       => "Financial helper address dispatch."
         ],
-
         'helper_address2' => [
             'type'              => 'string',
             'description'       => "Financial helper address line 2."
@@ -84,14 +77,14 @@ use sale\booking\FinancialHelp;
         'groups'        => ['booking.default.user', 'finance.default.administrator', 'finance.default.user']
     ],
     'response'      => [
-        'content-type'      => 'application/pdf',
-        'accept-origin'     => '*'
+        'content-type'  => 'application/pdf',
+        'accept-origin' => '*'
     ],
     'providers'     => ['context']
 ]);
 
 /**
- * @var \equal\php\Context  $context
+ * @var \equal\php\Context $context
  */
 ['context' => $context] = $providers;
 
@@ -250,7 +243,7 @@ $options = new DompdfOptions();
 $options->set('isRemoteEnabled', true);
 $dompdf = new Dompdf($options);
 // if external fonts are involved, tell dompdf to store them in /bin
-$options->setFontDir(QN_BASEDIR.'/bin');
+$options->setFontDir(EQ_BASEDIR.'/bin');
 $dompdf->setPaper('A4', 'portrait');
 
 // remove utf8mb4 chars (emojis)
@@ -266,7 +259,8 @@ $canvas->page_text(530, $canvas->get_height() - 35, 'p. {PAGE_NUM} / {PAGE_COUNT
 // get generated PDF raw binary
 $output = $dompdf->output();
 
-$context->httpResponse()
-        ->header('Content-Disposition', 'inline; filename="document.pdf"')
-        ->body($output)
-        ->send();
+$context
+    ->httpResponse()
+    ->header('Content-Disposition', 'inline; filename="document.pdf"')
+    ->body($output)
+    ->send();

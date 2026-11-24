@@ -5,40 +5,45 @@
     Original author(s): Yesbabylon SRL
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
+
 use Codelicious\Coda\Parser;
 use equal\text\TextTransformer;
 use sale\booking\BankStatement;
 
-list($params, $providers) = eQual::announce([
+[$params, $providers] = eQual::announce([
     'description'   => "Parse a raw CODA file and returns it as a list of statement lines.",
     'params'        => [
-        'data' =>  [
+        'data' => [
             'type'          => 'string',
-            'description'   => "Raw CODA data to parse as statements.",
             'usage'         => 'text/plain',
+            'description'   => "Raw CODA data to parse as statements.",
             'required'      => true
         ]
     ],
-    'access' => [
+    'access'        => [
         'visibility'    => 'protected',
-        'groups'        => ['sale.default.user'],
+        'groups'        => ['sale.default.user']
     ],
     'response'      => [
         'content-type'  => 'application/json',
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'     => ['context', 'orm', 'auth']
+    'providers'     => ['context', 'auth']
 ]);
 
 
-list($context, $orm, $auth) = [$providers['context'], $providers['orm'], $providers['auth']];
+/**
+ * @var \equal\php\Context                  $context
+ * @var \equal\auth\AuthenticationManager   $auth
+ */
+['context' => $context, 'auth' => $auth] = $providers;
 
 $user_id = $auth->userId();
 
 if($user_id <= 0) {
     // restricted to identified users
-    throw new Exception('unknown_user', QN_ERROR_NOT_ALLOWED);
+    throw new Exception('unknown_user', EQ_ERROR_NOT_ALLOWED);
 }
 
 $content = $params['data'];
@@ -106,9 +111,10 @@ foreach ($statements as $statement) {
     $result[] = $line;
 }
 
-$context->httpResponse()
-        ->status(200)
-        ->body($result)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(200)
+    ->body($result)
+    ->send();
 
 

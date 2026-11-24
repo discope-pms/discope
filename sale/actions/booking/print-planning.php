@@ -9,25 +9,26 @@
 [$params, $providers] = eQual::announce([
     'description'   => "Render pending bookings planning.",
     'params'        => [],
-    'access' => [
-        'visibility'        => 'protected',
-        'groups'            => ['booking.default.user'],
+    'access'        => [
+        'visibility'    => 'protected',
+        'groups'        => ['booking.default.user']
     ],
     'response'      => [
-        'content-type'      => 'application/pdf',
-        'accept-origin'     => '*'
+        'content-type'  => 'application/pdf',
+        'accept-origin' => '*'
     ],
     'providers'     => ['context']
 ]);
 
 /**
- * @var \equal\php\Context  $context
+ * @var \equal\php\Context $context
  */
 ['context' => $context] = $providers;
 
 $output = eQual::run('get', 'sale_booking_print-planning');
 
-$context->httpResponse()
-        ->header('Content-Disposition', 'inline; filename="booking_planning.pdf"')
-        ->body($output)
-        ->send();
+$context
+    ->httpResponse()
+    ->header('Content-Disposition', 'inline; filename="booking_planning.pdf"')
+    ->body($output)
+    ->send();

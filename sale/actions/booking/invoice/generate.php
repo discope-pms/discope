@@ -15,35 +15,38 @@ use sale\booking\InvoiceLine;
 use sale\booking\InvoiceLineGroup;
 use sale\catalog\Product;
 
-list($params, $providers) = eQual::announce([
+[$params, $providers] = eQual::announce([
     'description'   => "Generate a proforma balance invoice for a given booking.",
     'params'        => [
-        'id' =>  [
-            'description'   => 'Identifier of the booking for which the invoice has to be generated.',
+        'id' => [
             'type'          => 'integer',
+            'description'   => 'Identifier of the booking for which the invoice has to be generated.',
             'min'           => 1,
             'required'      => true
         ],
-        'partner_id' =>  [
-            'description'   => 'Identifier of the partner to which the invoice must be addressed, if not set defaults to customer_id.',
-            'type'          => 'integer'
+        'partner_id' => [
+            'type'          => 'integer',
+            'description'   => 'Identifier of the partner to which the invoice must be addressed, if not set defaults to customer_id.'
         ]
     ],
-    'constants'             => ['DEFAULT_LANG'],
-    'access' => [
-        'visibility'        => 'protected',
-        'groups'            => ['booking.default.user']
+    'access'        => [
+        'visibility'    => 'protected',
+        'groups'        => ['booking.default.user']
     ],
     'response'      => [
         'content-type'  => 'application/json',
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'     => ['context', 'orm', 'auth']
+    'constants'     => ['DEFAULT_LANG'],
+    'providers'     => ['context']
 ]);
 
 
-list($context, $orm, $auth) = [$providers['context'], $providers['orm'], $providers['auth']];
+/**
+ * @var \equal\php\Context $context
+ */
+['context' => $context] = $providers;
 
 
 // #memo - final invoice is released after checkout (unless payment plan holds a balance invoice)
@@ -53,7 +56,7 @@ list($context, $orm, $auth) = [$providers['context'], $providers['orm'], $provid
 $invoice = Invoice::search([['booking_id', '=', $params['id']], ['type', '=', 'invoice'], ['status', '=', 'invoice'], ['is_deposit', '=', false]])->read(['id'])->first(true);
 
 if($invoice) {
-    throw new Exception("invoice_already_exists", QN_ERROR_NOT_ALLOWED);
+    throw new Exception("invoice_already_exists", EQ_ERROR_NOT_ALLOWED);
 }
 
 // read booking object
@@ -101,15 +104,15 @@ $booking = Booking::id($params['id'])
     ->first(true);
 
 if(!$booking) {
-    throw new Exception("unknown_booking", QN_ERROR_UNKNOWN_OBJECT);
+    throw new Exception("unknown_booking", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
 if(!in_array($booking['status'], ['confirmed', 'checkedout'])) {
-    throw new Exception("incompatible_status", QN_ERROR_INVALID_PARAM);
+    throw new Exception("incompatible_status", EQ_ERROR_INVALID_PARAM);
 }
 
 if(count($booking['booking_lines_ids']) <= 0) {
-    throw new Exception("empty_booking", QN_ERROR_INVALID_PARAM);
+    throw new Exception("empty_booking", EQ_ERROR_INVALID_PARAM);
 }
 
 /*
@@ -127,7 +130,7 @@ if(is_array($data) && count($data)) {
 
 // raise an exception with first error (alerts should have been issued in the check controllers)
 foreach($errors as $error) {
-    throw new Exception($error, QN_ERROR_INVALID_PARAM);
+    throw new Exception($error, EQ_ERROR_INVALID_PARAM);
 }
 
 
@@ -419,6 +422,7 @@ if($fundings) {
 Invoice::id($invoice['id'])->update(['total' => null])->read(['total']);
 Invoice::id($invoice['id'])->update(['price' => null])->read(['price']);
 
-$context->httpResponse()
-        ->status(204)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(204)
+    ->send();

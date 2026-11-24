@@ -16,25 +16,21 @@ use sale\catalog\Product;
     'description'   => "Collects the booking lines that uses financial helps products.",
     'extends'       => 'core_model_collect',
     'params'        => [
-
         'entity' => [
-            'type'              => 'string',
-            'description'       => "Full name (including namespace) of the class to look into (e.g. 'core\\User').",
-            'default'           => 'sale\booking\BookingLine'
+            'type'          => 'string',
+            'description'   => "Full name (including namespace) of the class to look into (e.g. 'core\\User').",
+            'default'       => 'sale\booking\BookingLine'
         ],
-
         'date_from' => [
-            'type'              => 'date',
-            'description'       => "Date interval lower limit.",
-            'default'           => fn() => strtotime('first day of january this year')
+            'type'          => 'date',
+            'description'   => "Date interval lower limit.",
+            'default'       => fn() => strtotime('first day of january this year')
         ],
-
         'date_to' => [
-            'type'              => 'date',
-            'description'       => "Date interval upper limit.",
-            'default'           => fn() => strtotime('last day of december this year')
+            'type'          => 'date',
+            'description'   => "Date interval upper limit.",
+            'default'       => fn() => strtotime('last day of december this year')
         ]
-
     ],
     'response'      => [
         'content-type'  => 'application/json',
@@ -45,7 +41,7 @@ use sale\catalog\Product;
 ]);
 
 /**
- * @var \equal\php\Context  $context
+ * @var \equal\php\Context $context
  */
 ['context' => $context] = $providers;
 
@@ -83,6 +79,7 @@ $params['domain'] = $domain->toArray();
 
 $result = eQual::run('get', 'model_collect', $params, true);
 
-$context->httpResponse()
-        ->body($result)
-        ->send();
+$context
+    ->httpResponse()
+    ->body($result)
+    ->send();

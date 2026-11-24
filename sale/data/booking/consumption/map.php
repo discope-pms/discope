@@ -5,44 +5,50 @@
     Original author(s): Yesbabylon SRL
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
+
 use realestate\RentalUnit;
 use sale\booking\Booking;
 use sale\booking\Consumption;
 use sale\booking\Repairing;
 use sale\customer\Customer;
 
-list($params, $providers) = eQual::announce([
+[$params, $providers] = eQual::announce([
     'description'   => "Retrieve the consumptions attached to rental units of specified centers and return an associative array mapping rental units and ate indexes with related consumptions (this controller is used for the planning).",
     'params'        => [
-        'centers_ids' =>  [
-            'description'   => 'Identifiers of the centers for which the consumptions are requested.',
+        'centers_ids' => [
             'type'          => 'array',
+            'description'   => 'Identifiers of the centers for which the consumptions are requested.',
             'required'      => true
         ],
         'date_from' => [
-            'description'   => 'Start of time-range for the lookup.',
             'type'          => 'date',
+            'description'   => 'Start of time-range for the lookup.',
             'required'      => true
         ],
         'date_to' => [
-            'description'   => 'End of time-range for the lookup.',
             'type'          => 'date',
+            'description'   => 'End of time-range for the lookup.',
             'required'      => true
         ]
     ],
-    'access' => [
-        'groups'            => ['booking.default.user', 'booking.infra.user']
+    'access'        => [
+        'groups'        => ['booking.default.user', 'booking.infra.user']
     ],
     'response'      => [
         'content-type'  => 'application/json',
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'     => ['context', 'orm', 'auth', 'adapt']
+    'providers'     => ['context', 'orm', 'auth']
 ]);
 
 
-list($context, $orm, $auth, $dap) = [$providers['context'], $providers['orm'], $providers['auth'], $providers['adapt']];
+/**
+ * @var \equal\php\Context                  $context
+ * @var \equal\orm\ObjectManager            $orm
+ * @var \equal\auth\AuthenticationManager   $auth
+ */
+['context' => $context, 'orm' => $orm, 'auth' => $auth] = $providers;
 
 // #memo - processing of this controller might be heavy, so we make sure AC does not check permissions for each single consumption
 $auth->su();
@@ -140,6 +146,7 @@ foreach($result as $rental_unit_id => $dates) {
     }
 }
 
-$context->httpResponse()
-        ->body($result)
-        ->send();
+$context
+    ->httpResponse()
+    ->body($result)
+    ->send();

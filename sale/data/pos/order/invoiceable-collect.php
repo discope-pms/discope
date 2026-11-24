@@ -8,13 +8,13 @@
 
 use equal\orm\Domain;
 
-list($params, $providers) = eQual::announce([
+[$params, $providers] = eQual::announce([
     'description'   => 'Advanced search for Order: returns a collection of Order according to extra parameters.',
     'extends'       => 'core_model_collect',
     'params'        => [
-        'entity'    =>  [
-            'description'       => 'Full name (including namespace) of the class to look into.',
+        'entity' => [
             'type'              => 'string',
+            'description'       => 'Full name (including namespace) of the class to look into.',
             'default'           => 'sale\pos\Order'
         ],
         'center_id' => [
@@ -25,9 +25,9 @@ list($params, $providers) = eQual::announce([
         'all_months' => [
             'type'              => 'boolean',
             'description'       => "The Orders every month.",
-            'default'           => true,
+            'default'           => true
         ],
-        'date'      => [
+        'date' => [
             'type'              => 'date',
             'description'       => "Date of the creation.",
             'default'           => function() { return strtotime('Today'); }
@@ -38,14 +38,13 @@ list($params, $providers) = eQual::announce([
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'     => [ 'context', 'orm' ]
+    'providers'     => ['context']
 ]);
 
 /**
- * @var \equal\php\Context          $context
- * @var \equal\orm\ObjectManager    $orm
+ * @var \equal\php\Context $context
  */
-list($context, $orm) = [ $providers['context'], $providers['orm'] ];
+['context' => $context] = $providers;
 
 $domain = $params['domain'];
 
@@ -64,6 +63,7 @@ $params['domain'] = $domain;
 
 $result = eQual::run('get', 'model_collect', $params, true);
 
-$context->httpResponse()
-        ->body($result)
-        ->send();
+$context
+    ->httpResponse()
+    ->body($result)
+    ->send();

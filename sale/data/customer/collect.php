@@ -13,22 +13,22 @@ use identity\Identity;
     'description'   => 'Advanced search for Customers: returns a collection of Customer according to extra parameters.',
     'extends'       => 'core_model_collect',
     'params'        => [
-        'entity' =>  [
-            'description'   => 'Full name (including namespace) of the class to look into (e.g. \'core\\User\').',
+        'entity' => [
             'type'          => 'string',
+            'description'   => 'Full name (including namespace) of the class to look into (e.g. \'core\\User\').',
             'default'       => 'sale\customer\Customer'
         ],
         'name' => [
-            'type'              => 'string',
-            'description'       => 'Name of the customer.'
+            'type'          => 'string',
+            'description'   => 'Name of the customer.'
         ],
         'accounting_account' => [
-            'type'              => 'string',
-            'description'       => 'Accounting code of the customer identity.'
+            'type'          => 'string',
+            'description'   => 'Accounting code of the customer identity.'
         ],
         'email' => [
-            'type'              => 'string',
-            'description'       => 'Email of the customer identity.'
+            'type'          => 'string',
+            'description'   => 'Email of the customer identity.'
         ]
     ],
     'response'      => [
@@ -40,7 +40,7 @@ use identity\Identity;
 ]);
 
 /**
- * @var \equal\php\Context  $context
+ * @var \equal\php\Context $context
  */
 ['context' => $context] = $providers;
 

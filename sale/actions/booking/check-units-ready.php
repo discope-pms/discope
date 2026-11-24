@@ -9,17 +9,17 @@
 use sale\booking\Booking;
 use sale\booking\SojournProductModelRentalUnitAssignement;
 
-list($params, $providers) = announce([
+[$params, $providers] = eQual::announce([
     'description'   => "Checks the action required of rental units for the checkin.",
     'params'        => [
-        'id' =>  [
-            'description'   => 'Identifier of the booking the check against unit contract validity.',
+        'id' => [
             'type'          => 'integer',
+            'description'   => 'Identifier of the booking the check against unit contract validity.',
             'required'      => true
         ]
     ],
-    'access' => [
-        'visibility'        => 'protected'
+    'access'        => [
+        'visibility'    => 'protected'
     ],
     'response'      => [
         'content-type'  => 'application/json',
@@ -30,10 +30,10 @@ list($params, $providers) = announce([
 ]);
 
 /**
- * @var \equal\php\Context                  $context
- * @var \equal\dispatch\Dispatcher          $dispatch
+ * @var \equal\php\Context          $context
+ * @var \equal\dispatch\Dispatcher  $dispatch
  */
-list($context, $dispatch) = [ $providers['context'], $providers['dispatch']];
+['context' => $context, 'dispatch' => $dispatch] = $providers;
 
 $booking = Booking::id($params['id'])
     ->read([
@@ -51,7 +51,7 @@ $booking = Booking::id($params['id'])
     ->first(true);
 
 if(!$booking) {
-    throw new Exception("unknown_booking", QN_ERROR_UNKNOWN_OBJECT);
+    throw new Exception("unknown_booking", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
 $booking_line_groups = $booking['booking_lines_groups_ids'];
@@ -96,7 +96,7 @@ $httpResponse = $context->httpResponse()->status(200);
 if($mismatch) {
     $result[] = $params['id'];
     $dispatch->dispatch('lodging.booking.rental_units_ready', 'sale\booking\Booking', $params['id'], 'important', 'sale_booking_check-units-ready', ['id' => $params['id']], [], null, $booking['center_office_id']);
-    $httpResponse->status(qn_error_http(QN_ERROR_NOT_ALLOWED));
+    $httpResponse->status(qn_error_http(EQ_ERROR_NOT_ALLOWED));
 }
 else {
     $dispatch->cancel('lodging.booking.rental_units_ready', 'sale\booking\Booking', $params['id']);

@@ -9,7 +9,7 @@
 use sale\booking\channelmanager\Property;
 use sale\booking\Consumption;
 
-list($params, $providers) = eQual::announce([
+[$params, $providers] = eQual::announce([
     'description'   => 'Provides data for viewing resulting availability of Room Types in a given date range for a given Property.',
     'params'        => [
         /* input parameters: required for fetching data */
@@ -28,7 +28,6 @@ list($params, $providers) = eQual::announce([
             'description'       => 'Date interval upper limit (defaults to last day of previous month).',
             'default'           => mktime(0, 0, 0, date("m"), 0)
         ],
-
         /* parameters used as properties of virtual entity */
         'property' => [
             'type'              => 'string',
@@ -36,7 +35,7 @@ list($params, $providers) = eQual::announce([
         ],
         'date' => [
             'type'              => 'date',
-            'description'       => 'Day for tuple room_type-availability.',
+            'description'       => 'Day for tuple room_type-availability.'
         ],
         'room_type' => [
             'type'              => 'string',
@@ -46,22 +45,20 @@ list($params, $providers) = eQual::announce([
             'type'              => 'integer',
             'description'       => 'Availability of the room type at the date.'
         ]
-
     ],
     'response'      => [
         'content-type'  => 'application/json',
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'     => [ 'context', 'orm', 'adapt' ]
+    'providers'     => ['context', 'orm']
 ]);
 
 /**
  * @var \equal\php\Context          $context
  * @var \equal\orm\ObjectManager    $orm
- * @var \equal\data\DataAdapter     $adapter
  */
-list($context, $orm, $adapter) = [ $providers['context'], $providers['orm'], $providers['adapt'] ];
+['context' => $context, 'orm' => $orm] = $providers;
 
 $result = [];
 
@@ -120,6 +117,7 @@ if($property) {
     }
 }
 
-$context->httpResponse()
-        ->body($result)
-        ->send();
+$context
+    ->httpResponse()
+    ->body($result)
+    ->send();

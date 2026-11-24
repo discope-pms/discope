@@ -12,8 +12,8 @@ use sale\booking\BookingLine;
 use sale\booking\BookingLineGroup;
 
 [$params, $providers] = eQual::announce([
-    'description'	=>	"Update booking line qty of checkedout booking. This script is meant to be called by the `booking/services` UI.",
-    'params' 		=> [
+    'description'   => "Update booking line qty of checkedout booking. This script is meant to be called by the `booking/services` UI.",
+    'params'        => [
         'id' => [
             'type'              => 'many2one',
             'foreign_object'    => 'sale\booking\BookingLine',

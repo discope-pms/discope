@@ -12,16 +12,16 @@ use sale\booking\Booking;
 [$params, $providers] = eQual::announce([
     'description'   => "Attempt to reconcile a BankStatementLine using its communication (VCS or free-text message).",
     'params'        => [
-        'id' =>  [
-            'description'   => 'Identifier of the BankStatementLine to reconcile.',
+        'id' => [
             'type'          => 'integer',
+            'description'   => 'Identifier of the BankStatementLine to reconcile.',
             'min'           => 1,
             'required'      => true
-        ],
+        ]
     ],
-    'access' => [
-        'visibility'        => 'protected',
-        'groups'            => ['finance.default.user', 'sale.default.user'],
+    'access'        => [
+        'visibility'    => 'protected',
+        'groups'        => ['finance.default.user', 'sale.default.user']
     ],
     'response'      => [
         'content-type'  => 'application/json',
@@ -106,6 +106,7 @@ else {
     }
 }
 
-$context->httpResponse()
-        ->status(204)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(204)
+    ->send();

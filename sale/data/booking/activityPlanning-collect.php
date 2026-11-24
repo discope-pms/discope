@@ -14,8 +14,8 @@ use sale\booking\TimeSlot;
     'description'   => "Activities planning for bookings and camps.",
     'params'        => [
         /**
-         * Filters
-         */
+        * Filters
+        */
         'date_from' => [
             'type'              => 'date',
             'description'       => "Start of the time interval of the desired plannings.",
@@ -32,10 +32,9 @@ use sale\booking\TimeSlot;
             'description'       => "Time slot of the planning.",
             'domain'            => ['code', 'in', ['AM', 'PM', 'EV']]
         ],
-
         /**
-         * Virtual model columns
-         */
+        * Virtual model columns
+        */
         'id' => [
             'type'              => 'integer',
             'description'       => "Identifier of the booking line."
@@ -46,11 +45,11 @@ use sale\booking\TimeSlot;
         ],
         'date' => [
             'type'              => 'date',
-            'description'       => "The date of the transport has to be taken care of.",
+            'description'       => "The date of the transport has to be taken care of."
         ],
         'time_slot' => [
             'type'              => 'string',
-            'description'       => "The date of the transport has to be taken care of.",
+            'description'       => "The date of the transport has to be taken care of."
         ],
         'customer' => [
             'type'              => 'string',
@@ -66,8 +65,8 @@ use sale\booking\TimeSlot;
 ]);
 
 /**
- * @var \equal\php\Context $context
- * @var \equal\data\adapt\DataAdapterProvider $dap
+ * @var \equal\php\Context                      $context
+ * @var \equal\data\adapt\DataAdapterProvider   $dap
  */
 ['context' => $context, 'adapt' => $dap] = $providers;
 
@@ -160,7 +159,8 @@ usort($result, function ($a, $b) {
     return strcmp($a['product'], $b['product']);
 });
 
-$context->httpResponse()
-        ->header('X-Total-Count', count($result))
-        ->body($result)
-        ->send();
+$context
+    ->httpResponse()
+    ->header('X-Total-Count', count($result))
+    ->body($result)
+    ->send();

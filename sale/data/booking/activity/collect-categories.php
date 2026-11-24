@@ -15,13 +15,11 @@ use sale\catalog\ProductModelCategory;
     'description'   => "Advanced search for Categories that contains at least one activity product: returns a collection of Category according to extra parameters.",
     'extends'       => 'core_model_collect',
     'params'        => [
-
-        'entity' =>  [
-            'description'   => 'Full name (including namespace) of the class to look into (e.g. \'core\\User\').',
+        'entity' => [
             'type'          => 'string',
+            'description'   => 'Full name (including namespace) of the class to look into (e.g. \'core\\User\').',
             'default'       => 'sale\catalog\Category'
         ]
-
     ],
     'response'      => [
         'content-type'  => 'application/json',
@@ -32,7 +30,7 @@ use sale\catalog\ProductModelCategory;
 ]);
 
 /**
- * @var \equal\php\Context  $context
+ * @var \equal\php\Context $context
  */
 ['context' => $context] = $providers;
 
@@ -55,6 +53,7 @@ $params['domain'] = $domain->toArray();
 
 $result = eQual::run('get', 'model_collect', $params, true);
 
-$context->httpResponse()
-        ->body($result)
-        ->send();
+$context
+    ->httpResponse()
+    ->body($result)
+    ->send();

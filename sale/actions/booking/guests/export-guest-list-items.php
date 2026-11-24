@@ -5,11 +5,11 @@
     License: GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 
-use identity\User;
 use discope\setting\Setting;
 use identity\Center;
-use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use identity\User;
 use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use sale\booking\Booking;
 use sale\booking\GuestListItem;
 
@@ -38,11 +38,11 @@ use sale\booking\GuestListItem;
         ],
         'lang' => [
             'type'              => 'string',
-            'description '      => 'Specific language for multilang field.',
+            'description'       => 'Specific language for multilang field.',
             'default'           => constant('DEFAULT_LANG')
         ]
     ],
-    'access' => [
+    'access'        => [
         'visibility'    => 'protected',
         'groups'        => ['booking.guestlist.user'],
         'level'         => 2
@@ -52,15 +52,14 @@ use sale\booking\GuestListItem;
         'accept-origin' => '*'
     ],
     'constants'     => ['DEFAULT_LANG'],
-    'providers'     => ['context', 'orm', 'auth']
+    'providers'     => ['context', 'auth']
 ]);
 
 /**
  * @var \equal\php\Context                  $context
- * @var \equal\orm\ObjectManager            $orm
  * @var \equal\auth\AuthenticationManager   $auth
  */
-['context' => $context, 'orm' => $orm, 'auth' => $auth] = $providers;
+['context' => $context, 'auth' => $auth] = $providers;
 
 $getLabels = function($lang, $default_labels = []) {
     $view_i18n_file_path = sprintf('%s/packages/sale/i18n/%s/_parts/labels.json', EQ_BASEDIR, $lang);

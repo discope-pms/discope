@@ -12,19 +12,16 @@ use sale\booking\PartnerPlanningSummary;
 [$params, $providers] = eQual::announce([
     'description'   => "Creates a planning summary for a specific partner.",
     'params'        => [
-
         'ids' => [
-            'type'              => 'array',
-            'description'       => "List of partners ids concerned by the creation.",
-            'required'          => true
+            'type'          => 'array',
+            'description'   => "List of partners ids concerned by the creation.",
+            'required'      => true
         ],
-
         'params' => [
-            'description'       => 'Additional params to relay to the data controller.',
-            'type'              => 'array',
-            'default'           => []
+            'type'          => 'array',
+            'description'   => 'Additional params to relay to the data controller.',
+            'default'       => []
         ]
-
     ],
     'response'      => [
         'content-type'  => 'application/json',
@@ -35,8 +32,8 @@ use sale\booking\PartnerPlanningSummary;
 ]);
 
 /**
- * @var \equal\php\Context $context
- * @var \equal\data\adapt\DataAdapterProvider $dap
+ * @var \equal\php\Context                      $context
+ * @var \equal\data\adapt\DataAdapterProvider   $dap
  */
 ['context' => $context, 'adapt' => $dap] = $providers;
 
@@ -82,6 +79,7 @@ foreach($partners as $partner) {
     ]);
 }
 
-$context->httpResponse()
-        ->status(201)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(201)
+    ->send();

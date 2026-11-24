@@ -11,12 +11,12 @@ use sale\booking\Booking;
 use sale\booking\BookingInspection;
 
 [$params, $providers] = eQual::announce([
-    'description'	=>	"Submit Booking Inspection, sends consumption meters readings to given emails.",
-    'params' 		=>	[
+    'description'   => "Submit Booking Inspection, sends consumption meters readings to given emails.",
+    'params'        => [
         'id' => [
             'type'              => 'many2one',
-            'description'       => "Identifier of the targeted Booking Inspection.",
             'foreign_object'    => 'sale\booking\BookingLine',
+            'description'       => "Identifier of the targeted Booking Inspection.",
             'required'          => true
         ],
         'emails' => [
@@ -25,7 +25,7 @@ use sale\booking\BookingInspection;
         ]
     ],
     'access'        => [
-        'visibility'    => 'protected',
+        'visibility'    => 'protected'
     ],
     'response'      => [
         'content-type'  => 'application/json',
@@ -36,7 +36,7 @@ use sale\booking\BookingInspection;
 ]);
 
 /**
- * @var \equal\php\Context  $context
+ * @var \equal\php\Context $context
  */
 ['context' => $context] = $providers;
 
@@ -148,6 +148,7 @@ if ($next_booking_status === 'checkedout'){
     }
 }
 
-$context->httpResponse()
-        ->status(204)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(204)
+    ->send();

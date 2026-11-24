@@ -12,7 +12,7 @@ use sale\booking\Repairing;
 [$params, $providers] = eQual::announce([
     'description'   => "This will remove the repairing episode.The rental unit will be released and made available for bookings.",
     'params'        => [
-        'id' =>  [
+        'id' => [
             'type'          => 'integer',
             'description'   => "Identifier of the targeted repairing.",
             'min'           => 1,
@@ -20,22 +20,21 @@ use sale\booking\Repairing;
         ]
     ],
     'access'        => [
-        'groups'        => ['booking.default.user'],
+        'groups'        => ['booking.default.user']
     ],
     'response'      => [
         'content-type'  => 'application/json',
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'     => ['context', 'orm', 'cron']
+    'providers'     => ['context', 'cron']
 ]);
 
 /**
- * @var \equal\php\Context          $context
- * @var \equal\orm\ObjectManager    $orm
- * @var \equal\cron\Scheduler       $cron
+ * @var \equal\php\Context      $context
+ * @var \equal\cron\Scheduler   $cron
  */
-['context' => $context, 'orm' => $orm, 'cron' => $cron] = $providers;
+['context' => $context, 'cron' => $cron] = $providers;
 
 $repairing = Repairing::id($params['id'])
     ->read(['date_from', 'date_to', 'rental_units_ids'])
@@ -72,7 +71,8 @@ if($channelmanager_enabled) {
 // remove targeted repairing
 Repairing::id($params['id'])->delete(true);
 
-$context->httpResponse()
-        // success but notify client to reset content
-        ->status(205)
-        ->send();
+$context
+    ->httpResponse()
+    // success but notify client to reset content
+    ->status(205)
+    ->send();

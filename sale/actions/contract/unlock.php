@@ -5,21 +5,22 @@
     Original author(s): Yesbabylon SRL
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
+
 use sale\booking\Contract;
 
-list($params, $providers) = announce([
+[$params, $providers] = eQual::announce([
     'description'   => "Unlocks a contract (can be cancelled if booking is reverted to quote).",
     'params'        => [
-        'id' =>  [
-            'description'   => 'Identifier of the targeted contract.',
+        'id' => [
             'type'          => 'integer',
+            'description'   => 'Identifier of the targeted contract.',
             'min'           => 1,
             'required'      => true
         ]
     ],
-    'access' => [
-        'visibility'        => 'public',
-        'groups'            => ['booking.default.administrator', 'sale.default.administrator'],
+    'access'        => [
+        'visibility'    => 'public',
+        'groups'        => ['booking.default.administrator', 'sale.default.administrator']
     ],
     'response'      => [
         'content-type'  => 'application/json',
@@ -30,9 +31,9 @@ list($params, $providers) = announce([
 ]);
 
 /**
- * @var \equal\php\Context  $context
+ * @var \equal\php\Context $context
  */
-list($context) = [$providers['context']];
+['context' => $context] = $providers;
 
 // read contract object
 $contract = Contract::id($params['id'])
@@ -40,7 +41,7 @@ $contract = Contract::id($params['id'])
                     ->first(true);
 
 if(!$contract) {
-    throw new Exception("unknown_contract", QN_ERROR_UNKNOWN_OBJECT);
+    throw new Exception("unknown_contract", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
 if($contract['valid_until'] < time()) {
@@ -52,6 +53,7 @@ if($contract['valid_until'] < time()) {
 Contract::id($params['id'])->update(['is_locked' => false]);
 
 
-$context->httpResponse()
-        ->status(204)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(204)
+    ->send();

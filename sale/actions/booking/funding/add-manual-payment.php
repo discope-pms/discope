@@ -7,39 +7,37 @@
 */
 
 use sale\booking\Booking;
-use sale\booking\Payment;
 use sale\booking\Funding;
+use sale\booking\Payment;
 
 [$params, $providers] = eQual::announce([
     'description'   => "Creates an arbitrary payment and associate it with a funding record.",
     'params'        => [
-        'id' =>  [
-            'description'       => 'Identifier of the targeted funding.',
-            'type'              => 'integer',
-            'min'               => 1,
-            'required'          => true
+        'id' => [
+            'type'          => 'integer',
+            'description'   => 'Identifier of the targeted funding.',
+            'min'           => 1,
+            'required'      => true
         ],
-
         'date' => [
-            'type'              => 'date',
-            'description'       => "Date at which the payment was received.",
-            'default'           => time()
+            'type'          => 'date',
+            'description'   => "Date at which the payment was received.",
+            'default'       => time()
         ],
-
         'payment_origin' => [
-            'type'              => 'string',
-            'selection'         => [
+            'type'          => 'string',
+            'description'   => "Origin of the received money.",
+            'selection'     => [
                 'cashdesk',             // money was received at the cashdesk
                 'bank',                 // money was received on a bank account
                 'online'                // money was received online, through a PSP
             ],
-            'description'       => "Origin of the received money.",
-            'default'           => 'bank'
+            'default'       => 'bank'
         ],
-
         'payment_method' => [
-            'type'              => 'string',
-            'selection'         => [
+            'type'          => 'string',
+            'description'   => "The method used for payment at the cashdesk.",
+            'selection'     => [
                 'cash',                 // cash money
                 'bank_card',            // electronic payment with bank (or credit) card
                 'booking',              // payment through addition to the final (balance) invoice of a specific booking
@@ -48,15 +46,13 @@ use sale\booking\Funding;
                 'wire_transfer',        // transfer between bank accounts
                 'financial_help'        // a financial help will take care of the payment
             ],
-            'description'       => "The method used for payment at the cashdesk.",
-            'default'           => 'wire_transfer'
+            'default'       => 'wire_transfer'
         ],
-
         'amount' => [
-            'type'              => 'float',
-            'usage'             => 'amount/money:2',
-            'description'       => 'The monetary value of the bank check.',
-            'default'           => function($id = null) {
+            'type'          => 'float',
+            'usage'         => 'amount/money:2',
+            'description'   => 'The monetary value of the bank check.',
+            'default'       => function($id = null) {
                 $funding = Funding::id($id)->read(['due_amount', 'paid_amount'])->first(true);
                 if(!$funding) {
                     return null;
@@ -64,11 +60,10 @@ use sale\booking\Funding;
                 $remaining_amount = abs($funding['due_amount']) - abs($funding['paid_amount']);
                 return  $remaining_amount ;
             }
-        ],
-
+        ]
     ],
-    'access' => [
-        'groups'            => ['booking.default.user', 'finance.default.administrator', 'finance.default.user']
+    'access'        => [
+        'groups'        => ['booking.default.user', 'finance.default.administrator', 'finance.default.user']
     ],
     'response'      => [
         'content-type'  => 'application/json',
@@ -137,6 +132,7 @@ $payment = Payment::create([
 
 Booking::updateStatusFromFundings($orm, [$funding['booking_id']['id']]);
 
-$context->httpResponse()
-        ->status(205)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(205)
+    ->send();

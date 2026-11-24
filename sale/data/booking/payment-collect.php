@@ -10,13 +10,13 @@ use equal\orm\Domain;
 use sale\booking\BankStatementLine;
 use sale\booking\Booking;
 
-list($params, $providers) = eQual::announce([
+[$params, $providers] = eQual::announce([
     'description'   => 'Advanced search for Payments: returns a collection of Payments according to extra parameters.',
     'extends'       => 'core_model_collect',
     'params'        => [
-        'entity' =>  [
-            'description'       => 'name',
+        'entity' => [
             'type'              => 'string',
+            'description'       => 'name',
             'default'           => 'sale\booking\Payment'
         ],
         'booking_id' => [
@@ -27,11 +27,11 @@ list($params, $providers) = eQual::announce([
         'center_office_id' => [
             'type'              => 'many2one',
             'foreign_object'    => 'identity\CenterOffice',
-            'description'       => "The center office to which the payments relates to.",
+            'description'       => "The center office to which the payments relates to."
         ],
-        'partner_id'  => [
+        'partner_id' => [
             'type'              => 'many2one',
-            'foreign_object'    => 'identity\Partner',
+            'foreign_object'    => 'identity\Partner'
         ],
         'amount_min' => [
             'type'              => 'float',
@@ -43,23 +43,23 @@ list($params, $providers) = eQual::announce([
         ],
         'payment_origin' => [
             'type'              => 'string',
+            'description'       => "Origin of the received money.",
             'selection'         => [
                 'all',
                 'cashdesk',
                 'bank',
                 'online'
-            ],
-            'description'       => "Origin of the received money."
+            ]
         ],
         'payment_method' => [
             'type'              => 'string',
+            'description'       => "The method used for payment at the cashdesk.",
             'selection'         => [
                 'all',
                 'voucher',
                 'cash',
                 'bank_card'
-            ],
-            'description'       => "The method used for payment at the cashdesk."
+            ]
         ],
         'receipt_date_min' => [
             'type'              => 'date',
@@ -82,23 +82,23 @@ list($params, $providers) = eQual::announce([
             'default'           => strtotime("+2 Years")
         ],
         'bank_account_iban' => [
-            'type'          => 'string',
-            'usage'         => 'uri/urn:iban',
-            'description'   => "Number of the bank account of the Identity, if any."
-        ],
+            'type'              => 'string',
+            'usage'             => 'uri/urn:iban',
+            'description'       => "Number of the bank account of the Identity, if any."
+        ]
     ],
     'response'      => [
         'content-type'  => 'application/json',
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'     => [ 'context', 'orm' ]
+    'providers'     => ['context']
 ]);
+
 /**
  * @var \equal\php\Context $context
- * @var \equal\orm\ObjectManager $orm
  */
-list($context, $orm) = [ $providers['context'], $providers['orm'] ];
+['context' => $context] = $providers;
 
 $domain = $params['domain'];
 
@@ -170,6 +170,7 @@ if(isset($params['bank_account_iban']) && strlen($params['bank_account_iban'])) 
 $params['domain'] = $domain;
 $result = eQual::run('get', 'model_collect', $params, true);
 
-$context->httpResponse()
-        ->body($result)
-        ->send();
+$context
+    ->httpResponse()
+    ->body($result)
+    ->send();

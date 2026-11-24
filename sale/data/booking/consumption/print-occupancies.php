@@ -7,11 +7,11 @@
 */
 
 use discope\setting\Setting;
-use identity\User;
 use Dompdf\Dompdf;
 use Dompdf\Options as DompdfOptions;
 use equal\orm\Domain;
 use identity\Center;
+use identity\User;
 use realestate\RentalUnit;
 use sale\booking\Booking;
 use sale\booking\Consumption;
@@ -24,26 +24,26 @@ use Twig\TwigFilter;
 [$params, $providers] = eQual::announce([
     'description'   => "Render room occupancies.",
     'params'        => [
-        'view_id' =>  [
+        'view_id' => [
             'type'              => 'string',
             'description'       => "The identifier of the view <type.name>.",
             'default'           => 'print.occupancies'
         ],
-        'lang' =>  [
+        'lang' => [
             'type'              => 'string',
             'description'       => "Language in which labels and multilang field have to be returned (2 letters ISO 639-1).",
             'default'           => constant('DEFAULT_LANG')
         ],
-        'output' =>  [
+        'output' => [
             'type'              => 'string',
             'description'       => "Output format of the document.",
             'selection'         => ['pdf', 'html'],
             'default'           => 'pdf'
         ],
         'domain' => [
-            'description'   => 'Criterias that results have to match (serie of conjunctions)',
-            'type'          => 'array',
-            'default'       => []
+            'type'              => 'array',
+            'description'       => 'Criterias that results have to match (serie of conjunctions)',
+            'default'           => []
         ],
         'date_from' => [
             'type'              => 'date',
@@ -66,18 +66,18 @@ use Twig\TwigFilter;
         'is_not_option' => [
             'type'              => 'boolean',
             'description'       => 'Discard quote and option bookings.',
-            'default'           =>  true
+            'default'           => true
         ]
     ],
-    'constants'             => ['DEFAULT_LANG', 'L10N_LOCALE'],
     'access'        => [
-        'visibility'        => 'protected',
-        'groups'            => ['booking.default.user', 'camp.default.user'],
+        'visibility'    => 'protected',
+        'groups'        => ['booking.default.user', 'camp.default.user']
     ],
     'response'      => [
-        'content-type'      => 'application/pdf',
-        'accept-origin'     => '*'
+        'content-type'  => 'application/pdf',
+        'accept-origin' => '*'
     ],
+    'constants'     => ['DEFAULT_LANG', 'L10N_LOCALE'],
     'providers'     => ['context', 'auth']
 ]);
 

@@ -12,44 +12,44 @@ use equal\php\Context;
 use sale\booking\Booking;
 use sale\booking\Funding;
 
-list($params, $providers) = eQual::announce([
-    'description' => 'Advanced search for Bookings. Returns a collection of Booking with unpaid fundings, most recent first by default.',
-    'extends'     => 'core_model_collect',
-    'params'      => [
-        'entity' =>  [
-            'type'        => 'string',
-            'description' => 'Full name (including namespace) of the class to look into (e.g. \'core\\User\').',
-            'default'     => Booking::getType()
+[$params, $providers] = eQual::announce([
+    'description'   => 'Advanced search for Bookings. Returns a collection of Booking with unpaid fundings, most recent first by default.',
+    'extends'       => 'core_model_collect',
+    'params'        => [
+        'entity' => [
+            'type'          => 'string',
+            'description'   => 'Full name (including namespace) of the class to look into (e.g. \'core\\User\').',
+            'default'       => Booking::getType()
         ],
         'order' => [
-            'description' => 'Column(s) to use for sorting results.',
-            'type'        => 'string',
-            'default'     => 'created'
+            'type'          => 'string',
+            'description'   => 'Column(s) to use for sorting results.',
+            'default'       => 'created'
         ],
         'sort' => [
-            'description' => 'The direction  (i.e. \'asc\' or \'desc\').',
-            'type'        => 'string',
-            'default'     => 'desc'
+            'type'          => 'string',
+            'description'   => 'The direction  (i.e. \'asc\' or \'desc\').',
+            'default'       => 'desc'
         ]
     ],
-    'access' => [
-        'groups' => ['booking.default.user']
+    'access'        => [
+        'groups'        => ['booking.default.user']
     ],
-    'response'    => [
+    'response'      => [
         'content-type'  => 'application/json',
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'   => ['context']
+    'providers'     => ['context']
 ]);
 
 /**
- * @var Context $context
+ * @var \equal\php\Context $context
  */
-$context = $providers['context'];
+['context' => $context] = $providers;
 
 if($params['entity'] !== Booking::getType()) {
-    throw new Exception('invalid_entity', QN_ERROR_INVALID_PARAM);
+    throw new Exception('invalid_entity', EQ_ERROR_INVALID_PARAM);
 }
 
 $map_unpaid_booking_ids = [];
@@ -75,6 +75,7 @@ if(count($map_unpaid_booking_ids)) {
     $result = eQual::run('get', 'model_collect', $params, true);
 }
 
-$context->httpResponse()
-        ->body($result)
-        ->send();
+$context
+    ->httpResponse()
+    ->body($result)
+    ->send();

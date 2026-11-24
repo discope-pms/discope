@@ -11,18 +11,16 @@ use sale\booking\PartnerEvent;
 [$params, $providers] = eQual::announce([
     'description'   => "Removes a partner event.",
     'params'        => [
-
-        'id' =>  [
+        'id' => [
             'type'          => 'many2one',
             'description'   => "Identifier of the targeted partner event.",
             'min'           => 1,
             'required'      => true
         ]
-
     ],
     'access'        => [
         'visibility'    => 'protected',
-        'groups'        => ['booking.default.user', 'camp.default.user'],
+        'groups'        => ['booking.default.user', 'camp.default.user']
     ],
     'response'      => [
         'content-type'  => 'application/json',
@@ -33,7 +31,7 @@ use sale\booking\PartnerEvent;
 ]);
 
 /**
- * @var \equal\php\Context  $context
+ * @var \equal\php\Context $context
  */
 ['context' => $context] = $providers;
 
@@ -51,6 +49,7 @@ if(!is_null($partner_event['camp_id'])) {
 
 PartnerEvent::id($partner_event['id'])->delete();
 
-$context->httpResponse()
-        ->status(205)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(205)
+    ->send();

@@ -10,23 +10,20 @@ use sale\customer\RateClass;
 use sale\price\Price;
 use sale\price\PriceList;
 
-[$params, $provider] = eQual::announce([
+[$params, $providers] = eQual::announce([
     'description'   => "Import products prices prices from a CSV formatted file.",
     'params'        => [
-
         'price_list_id' => [
             'type'              => 'many2one',
             'foreign_object'    => 'sale\price\PriceList',
             'description'       => "Identifier of the targeted price list.",
             'required'          => true
         ],
-
         'data' => [
             'type'              => 'binary',
             'description'       => 'Payload of the file (raw file data).',
             'required'          => true
         ]
-
     ],
     'access'        => [
         'visibility'    => 'protected'
@@ -41,9 +38,9 @@ use sale\price\PriceList;
 ]);
 
 /**
- * @var \equal\php\Context  $context
+ * @var \equal\php\Context $context
  */
-['context' => $context] = $provider;
+['context' => $context] = $providers;
 
 $price_list = PriceList::id($params['price_list_id'])
     ->read(['id'])
@@ -109,6 +106,7 @@ for($i = 1; $i < count($lines); $i++) {
     ]);
 }
 
-$context->httpResponse()
-        ->status(204)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(204)
+    ->send();

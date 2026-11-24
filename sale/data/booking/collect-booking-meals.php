@@ -10,9 +10,9 @@ use equal\orm\Domain;
 use equal\orm\DomainCondition;
 
 [$params, $providers] = eQual::announce([
-    'extends'       => 'core_model_collect',
-    'params'        => [
-        'entity' =>  [
+    'extends'   => 'core_model_collect',
+    'params'    => [
+        'entity' => [
             'type'              => 'string',
             'description'       => "Full name (including namespace) of the class to look into (e.g. 'core\\User').",
             'default'           => 'sale\booking\BookingMeal'
@@ -48,12 +48,12 @@ use equal\orm\DomainCondition;
             'description'       => "Place where the meal is served."
         ]
     ],
-    'response'      => [
+    'response'  => [
         'content-type'  => 'application/json',
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'     => ['context']
+    'providers' => ['context']
 ]);
 
 /**
@@ -105,6 +105,7 @@ $params['domain'] = $domain->toArray();
 
 $result = eQual::run('get', 'model_collect', $params, true);
 
-$context->httpResponse()
-        ->body($result)
-        ->send();
+$context
+    ->httpResponse()
+    ->body($result)
+    ->send();

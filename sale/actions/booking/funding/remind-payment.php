@@ -4,19 +4,20 @@
     Author: Yesbabylon SRL, 2020-2024
     License: GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
+
+use communication\Template;
 use core\Mail;
 use equal\email\Email;
-use communication\Template;
-use sale\booking\Funding;
 use sale\booking\Contract;
+use sale\booking\Funding;
 
-list($params, $providers) = eQual::announce([
+[$params, $providers] = eQual::announce([
     'description'   => "Send a funding payment reminder email to booking \"contract\" contact.",
     'help'          => "A communication template must exist for {category}.{code}.{type} :"
                         ." category is the center (establishment) field template_category_id, code is \"reminder\" and type is \"funding\"."
                         ." If a booking contact of type contract is not found then the email is sent to the first contact found with an email address set.",
     'params'        => [
-        'id' =>  [
+        'id' => [
             'type'          => 'integer',
             'description'   => "Identifier of the funding to remind payment.",
             'required'      => true
@@ -37,7 +38,7 @@ list($params, $providers) = eQual::announce([
  * @var \equal\php\Context          $context
  * @var \equal\dispatch\Dispatcher  $dispatch
  */
-list($context, $dispatch) = [ $providers['context'], $providers['dispatch'] ];
+['context' => $context, 'dispatch' => $dispatch] = $providers;
 
 $funding = Funding::id($params['id'])
     ->read([
@@ -59,7 +60,7 @@ $funding = Funding::id($params['id'])
 
 if($funding['is_paid']) {
     $dispatch->cancel('lodging.booking.funding.payment_reminder_failed', 'sale\booking\Booking', $funding['booking_id']['id']);
-    throw new Exception('funding_already_paid', QN_ERROR_INVALID_PARAM);
+    throw new Exception('funding_already_paid', EQ_ERROR_INVALID_PARAM);
 }
 
 $contact = null;
@@ -77,7 +78,7 @@ foreach($funding['booking_id']['contacts_ids'] as $c) {
 
 if(is_null($contact)) {
     $dispatch->dispatch('lodging.booking.funding.payment_reminder_failed', 'sale\booking\Booking', $funding['booking_id']['id'], 'important', 'sale_booking_funding_remind-payment', ['id' => $params['id']], [],null, $funding['booking_id']['center_office_id']['id']);
-    throw new Exception('missing_contact_email', QN_ERROR_UNKNOWN_OBJECT);
+    throw new Exception('missing_contact_email', EQ_ERROR_UNKNOWN_OBJECT);
 }
 
 $last_contract_id = array_shift($funding['booking_id']['contracts_ids']);
@@ -100,7 +101,7 @@ $template = Template::search([
 
 if(is_null($template)) {
     $dispatch->dispatch('lodging.booking.funding.payment_reminder_failed', 'sale\booking\Booking', $funding['booking_id']['id'], 'important', 'sale_booking_funding_remind-payment', ['id' => $params['id']], [], null, $funding['booking_id']['center_office_id']['id']);
-    throw new Exception('missing_template', QN_ERROR_UNKNOWN_OBJECT);
+    throw new Exception('missing_template', EQ_ERROR_UNKNOWN_OBJECT);
 }
 
 $body = $title = '';
@@ -171,6 +172,7 @@ Mail::queue($message, 'sale\booking\Booking', $funding['booking_id']['id']);
 $dispatch->dispatch('lodging.booking.funding.payment_reminder_sent', 'sale\booking\Booking', $funding['booking_id']['id'], 'notice', null, [], [], null, $funding['booking_id']['center_office_id']['id']);
 $dispatch->cancel('lodging.booking.funding.payment_reminder_failed', 'sale\booking\Booking', $funding['booking_id']['id']);
 
-$context->httpResponse()
-        ->status(200)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(200)
+    ->send();

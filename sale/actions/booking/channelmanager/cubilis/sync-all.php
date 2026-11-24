@@ -12,60 +12,60 @@ use sale\booking\channelmanager\Property;
 [$params, $providers] = eQual::announce([
     'description'   => "This script schedules a series of tasks in order to update the amount of available rooms in Cubilis for all rental units for a given Property, between two dates.",
     'params'        => [
-        'property_id'   => [
+        'property_id' => [
             'type'              => 'many2one',
             'foreign_object'    => 'sale\booking\channelmanager\Property',
             'required'          => true
         ],
         'date_from' => [
-            'type'          => 'date',
-            'description'   => 'The start date.',
-            'required'      => true
+            'type'              => 'date',
+            'description'       => 'The start date.',
+            'required'          => true
         ],
         'date_to' => [
-            'type'          => 'date',
-            'description'   => 'The end date (last day for which the update must be performed).',
-            'required'      => true
+            'type'              => 'date',
+            'description'       => 'The end date (last day for which the update must be performed).',
+            'required'          => true
         ],
         'roomtype' => [
-            'type'          => 'integer',
-            'description'   => 'External identifier of the room type (from channel manager).'
+            'type'              => 'integer',
+            'description'       => 'External identifier of the room type (from channel manager).'
         ],
         'delay' => [
-            'type'          => 'integer',
-            'description'   => 'Delay in second before the scheduling of the resulting update tasks',
-            'default'       => 86400
+            'type'              => 'integer',
+            'description'       => 'Delay in second before the scheduling of the resulting update tasks',
+            'default'           => 86400
         ]
     ],
-    'constants' => ['ROOT_APP_URL'],
-    'access' => [
-        'groups'            => ['admins'],
+    'access'        => [
+        'groups'        => ['admins']
     ],
     'response'      => [
         'content-type'  => 'application/json',
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
+    'constants'     => ['ROOT_APP_URL'],
     'providers'     => ['context', 'orm', 'cron', 'auth']
 ]);
 
 /**
- * @var \equal\php\Context                  $context
- * @var \equal\cron\Scheduler               $cron
+ * @var \equal\php\Context      $context
+ * @var \equal\cron\Scheduler   $cron
  */
 ['context' => $context, 'cron' => $cron] = $providers;
 
 $channelmanager_enabled = Setting::get_value('sale', 'features', 'booking.channel_manager', false);
 
 if(!$channelmanager_enabled) {
-    throw new Exception('disabled_feature', QN_ERROR_INVALID_CONFIG);
+    throw new Exception('disabled_feature', EQ_ERROR_INVALID_CONFIG);
 }
 
 $client_domain = Setting::get_value('sale', 'organization', 'booking.channel_manager.client_domain', 'https://kaleo.discope.run');
 
 // #memo - prevent calls from non-production server
 if(constant('ROOT_APP_URL') != $client_domain) {
-    throw new Exception('wrong_host', QN_ERROR_INVALID_CONFIG);
+    throw new Exception('wrong_host', EQ_ERROR_INVALID_CONFIG);
 }
 
 $property = Property::id($params['property_id'])
@@ -73,7 +73,7 @@ $property = Property::id($params['property_id'])
     ->first(true);
 
 if(!$property) {
-    throw new Exception('unknown_property', QN_ERROR_UNKNOWN_OBJECT);
+    throw new Exception('unknown_property', EQ_ERROR_UNKNOWN_OBJECT);
 }
 
 $i = 1;
@@ -111,6 +111,7 @@ for ($current_date = $start_date; $current_date <= $end_date; $current_date = st
     ++$i;
 }
 
-$context->httpResponse()
-        ->status(200)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(200)
+    ->send();

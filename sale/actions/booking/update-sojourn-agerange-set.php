@@ -5,6 +5,7 @@
     Original author(s): Yesbabylon SRL
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
+
 use sale\booking\Booking;
 use sale\booking\BookingLine;
 use sale\booking\BookingLineGroup;
@@ -12,13 +13,13 @@ use sale\booking\BookingLineGroupAgeRangeAssignment;
 use sale\customer\AgeRange;
 
 // announce script and fetch parameters values
-list($params, $providers) = eQual::announce([
-    'description'	=>	"Update an age range assignment. This script is meant to be called by the `booking/services` UI.",
-    'params' 		=>	[
-        'id' =>  [
-            'description'       => 'Identifier of the targeted sojourn.',
+[$params, $providers] = eQual::announce([
+    'description'   => "Update an age range assignment. This script is meant to be called by the `booking/services` UI.",
+    'params'        => [
+        'id' => [
             'type'              => 'many2one',
             'foreign_object'    => 'sale\booking\BookingLineGroup',
+            'description'       => 'Identifier of the targeted sojourn.',
             'required'          => true
         ],
         'age_range_assignment_id' => [
@@ -33,27 +34,27 @@ list($params, $providers) = eQual::announce([
             'description'       => 'New age range assigned.',
             'required'          => true
         ],
-        'qty' =>  [
+        'qty' => [
             'type'              => 'integer',
             'description'       => 'New amount of participants assigned to given ages.',
             'required'          => true
         ],
-        'free_qty' =>  [
+        'free_qty' => [
             'type'              => 'integer',
             'description'       => 'New amount of free participants assigned to given ages.',
             'default'           => 0
         ]
     ],
-    'access' => [
-        'visibility'        => 'protected',
-        'groups'            => ['booking.default.user']
+    'access'        => [
+        'visibility'    => 'protected',
+        'groups'        => ['booking.default.user']
     ],
-    'response' => [
-        'content-type'      => 'application/json',
-        'charset'           => 'utf-8',
-        'accept-origin'     => '*'
+    'response'      => [
+        'content-type'  => 'application/json',
+        'charset'       => 'utf-8',
+        'accept-origin' => '*'
     ],
-    'providers' => ['context', 'orm']
+    'providers'     => ['context', 'orm']
 ]);
 
 /**
@@ -221,6 +222,7 @@ foreach($bookingLineGroup['booking_lines_ids'] as $booking_line_id => $bookingLi
 /**/
 
 
-$context->httpResponse()
-        ->status(204)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(204)
+    ->send();

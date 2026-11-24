@@ -12,14 +12,12 @@ use sale\booking\Contract;
 [$params, $providers] = eQual::announce([
     'description'   => "Update the status of given booking from 'quote' to its previous 'checkedin' status.",
     'params'        => [
-
-        'id' =>  [
-            'description'       => 'Identifier of the targeted booking.',
-            'type'              => 'integer',
-            'min'               => 1,
-            'required'          => true
+        'id' => [
+            'type'          => 'integer',
+            'description'   => 'Identifier of the targeted booking.',
+            'min'           => 1,
+            'required'      => true
         ]
-
     ],
     'access'        => [
         'visibility'    => 'protected',
@@ -34,7 +32,7 @@ use sale\booking\Contract;
 ]);
 
 /**
- * @var \equal\php\Context  $context
+ * @var \equal\php\Context $context
  */
 ['context' => $context] = $providers;
 
@@ -69,6 +67,7 @@ eQual::run('do', 'sale_booking_do-checkin', [
 
 Booking::id($booking['id'])->update(['status_before_revert_to_quote' => null]);
 
-$context->httpResponse()
-        ->status(204)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(204)
+    ->send();

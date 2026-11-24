@@ -13,8 +13,8 @@ use identity\Identity;
 use sale\booking\Booking;
 use sale\booking\BookingActivity;
 use sale\booking\BookingLineGroupAgeRangeAssignment;
-use sale\booking\PartnerEvent;
 use sale\booking\channelmanager\BookingLineGroup;
+use sale\booking\PartnerEvent;
 use sale\camp\Camp;
 use sale\camp\CampGroup;
 use sale\catalog\ProductModel;
@@ -24,24 +24,24 @@ use sale\provider\Provider;
 [$params, $providers] = eQual::announce([
     'description'   => "Return an associative array mapping partners, date indexes and time slots with related activities (this controller is used for the employee planning).",
     'params'        => [
-        'partners_ids' =>  [
-            'description'   => 'Identifiers of the partners for which the activities are requested.',
+        'partners_ids' => [
             'type'          => 'array',
+            'description'   => 'Identifiers of the partners for which the activities are requested.',
             'default'       => []
         ],
-        'product_model_ids' =>  [
-            'description'   => 'Identifiers of the product models for which the activities are requested.',
+        'product_model_ids' => [
             'type'          => 'array',
+            'description'   => 'Identifiers of the product models for which the activities are requested.',
             'default'       => []
         ],
         'date_from' => [
-            'description'   => 'Start of time-range for the lookup (included).',
             'type'          => 'date',
+            'description'   => 'Start of time-range for the lookup (included).',
             'required'      => true
         ],
         'date_to' => [
-            'description'   => 'End of time-range for the lookup (excluded).',
             'type'          => 'date',
+            'description'   => 'End of time-range for the lookup (excluded).',
             'required'      => true
         ]
     ],
@@ -57,10 +57,10 @@ use sale\provider\Provider;
 ]);
 
 /**
- * @var \equal\php\Context                  $context
- * @var \equal\orm\ObjectManager            $orm
- * @var \equal\auth\AuthenticationManager   $auth
- * @var \equal\data\adapt\AdapterProvider   $dap
+ * @var \equal\php\Context                      $context
+ * @var \equal\orm\ObjectManager                $orm
+ * @var \equal\auth\AuthenticationManager       $auth
+ * @var \equal\data\adapt\DataAdapterProvider   $dap
  */
 ['context' => $context, 'orm' => $orm, 'auth' => $auth, 'adapt' => $dap] = $providers;
 
@@ -392,6 +392,7 @@ if(!empty($activity_partner_activities_ids)) {
     }
 }
 
-$context->httpResponse()
-        ->body($result)
-        ->send();
+$context
+    ->httpResponse()
+    ->body($result)
+    ->send();

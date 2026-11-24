@@ -11,50 +11,50 @@ use equal\text\TextTransformer;
 use sale\booking\channelmanager\Identity;
 use sale\customer\Customer;
 
-list($params, $providers) = eQual::announce([
+[$params, $providers] = eQual::announce([
     'description'   => "Resolve a customer based on its contact details. \
                         If the customer exists (exact match, case non-sensitive), its ID is returned, otherwise a new customer is created and related ID is returned.",
     'help'          => "No validation is made on received parameters, but in case of the creation of a new entry, all values are sanitized beforehand.",
     'params'        => [
         'firstname' => [
-            'type'              => 'string',
-            'description'       => 'Customer given name.'
+            'type'          => 'string',
+            'description'   => 'Customer given name.'
         ],
         'lastname' => [
-            'type'              => 'string',
-            'description'       => 'Customer surname.'
+            'type'          => 'string',
+            'description'   => 'Customer surname.'
         ],
         'address_street' => [
-            'type'              => 'string',
-            'description'       => 'Street and number.'
+            'type'          => 'string',
+            'description'   => 'Street and number.'
         ],
         'address_zip' => [
-            'type'              => 'string',
-            'description'       => 'Postal code.'
+            'type'          => 'string',
+            'description'   => 'Postal code.'
         ],
         'address_city' => [
-            'type'              => 'string',
-            'description'       => 'City.'
+            'type'          => 'string',
+            'description'   => 'City.'
         ],
         'address_country' => [
-            'type'              => 'string',
-            'description'       => 'Country.'
+            'type'          => 'string',
+            'description'   => 'Country.'
         ],
         'phone' => [
-            'type'              => 'string',
-            'description'       => 'Phone number.'
+            'type'          => 'string',
+            'description'   => 'Phone number.'
         ],
         'email' => [
-            'type'              => 'string',
-            'description'       => 'Email address.'
+            'type'          => 'string',
+            'description'   => 'Email address.'
         ],
         'lang' => [
-            'type'              => 'string',
-            'description'       => "Preferred language."
-        ],
+            'type'          => 'string',
+            'description'   => "Preferred language."
+        ]
     ],
-    'access' => [
-        'visibility'    => 'protected',
+    'access'        => [
+        'visibility'    => 'protected'
     ],
     'response'      => [
         'content-type'  => 'application/json',
@@ -175,6 +175,7 @@ $result = [
     'customer_identity_id'  => $identity['id']
 ];
 
-$context->httpResponse()
-        ->body($result)
-        ->send();
+$context
+    ->httpResponse()
+    ->body($result)
+    ->send();

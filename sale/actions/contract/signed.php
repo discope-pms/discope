@@ -5,13 +5,13 @@
     License: GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 
-use sale\booking\Contract;
 use sale\booking\Booking;
+use sale\booking\Contract;
 
 [$params, $providers] = eQual::announce([
     'description'   => "Mark a contract as signed (signed version has been received).",
     'params'        => [
-        'id' =>  [
+        'id' => [
             'type'          => 'integer',
             'description'   => "Identifier of the targeted contract.",
             'min'           => 1,
@@ -20,7 +20,7 @@ use sale\booking\Booking;
     ],
     'access'        => [
         'visibility'    => 'protected',
-        'groups'        => ['booking.default.user'],
+        'groups'        => ['booking.default.user']
     ],
     'response'      => [
         'content-type'  => 'application/json',
@@ -44,7 +44,7 @@ $contract = Contract::id($params['id'])
     ->first(true);
 
 if(!$contract) {
-    throw new Exception("unknown_contract", QN_ERROR_UNKNOWN_OBJECT);
+    throw new Exception("unknown_contract", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
 if($contract['valid_until'] < time()) {
@@ -71,6 +71,7 @@ $dispatch->cancel('lodging.booking.contract.unsigned', 'sale\booking\Booking', $
 // Check if required payment have been paid in the meantime and update booking accordingly
 Booking::updateStatusFromFundings($orm, [$contract['booking_id']]);
 
-$context->httpResponse()
-        ->status(200)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(200)
+    ->send();

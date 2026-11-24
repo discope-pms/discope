@@ -5,41 +5,41 @@
     License: GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 
-use core\Mail;
 use communication\Template;
+use core\Mail;
 use equal\email\EmailMessage;
 use sale\booking\Booking;
 
 [$params, $providers] = eQual::announce([
-    'description'	=>	"Send an email with a one-time access link to the provided email address, if allowed for given booking.",
-    'params' 		=>	[
-        'booking_id' =>  [
-            'description'   => "Identifier of the Booking for which an access is requested.",
+    'description'   => "Send an email with a one-time access link to the provided email address, if allowed for given booking.",
+    'params'        => [
+        'booking_id' => [
             'type'          => 'integer',
+            'description'   => "Identifier of the Booking for which an access is requested.",
             'required'      => true
         ],
-        'email' =>  [
-            'description'   => "Email address to send the link to (must be in booking Contacts).",
+        'email' => [
             'type'          => 'string',
             'usage'         => 'email',
+            'description'   => "Email address to send the link to (must be in booking Contacts).",
             'required'      => true
         ],
-        'lang' =>  [
-            'description'   => 'Language of the reminder which is defined by the responsible.',
+        'lang' => [
             'type'          => 'string',
+            'description'   => 'Language of the reminder which is defined by the responsible.',
             'default'       => constant('DEFAULT_LANG')
-        ],
+        ]
     ],
-    'access' => [
-        'visibility'        => 'public'
+    'access'        => [
+        'visibility'    => 'public'
     ],
     'response'      => [
-        'content-type'      => 'application/json',
-        'charset'           => 'utf-8',
-        'accept-origin'     => '*'
+        'content-type'  => 'application/json',
+        'charset'       => 'utf-8',
+        'accept-origin' => '*'
     ],
-    'providers'     => ['context', 'auth'],
-    'constants'     => ['BACKEND_URL']
+    'constants'     => ['BACKEND_URL'],
+    'providers'     => ['context', 'auth']
 ]);
 
 /**

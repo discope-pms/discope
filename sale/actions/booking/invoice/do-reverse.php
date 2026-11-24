@@ -12,34 +12,32 @@ use sale\booking\Invoice;
 use sale\booking\InvoiceLine;
 use sale\booking\InvoiceLineGroup;
 
-list($params, $providers) = announce([
+[$params, $providers] = eQual::announce([
     'description'   => "Reverse an invoice by creating a credit note (only invoices -not credit notes- can be reversed).",
     'params'        => [
-        'id' =>  [
-            'description'   => 'Identifier of the invoice to reverse.',
+        'id' => [
             'type'          => 'integer',
+            'description'   => 'Identifier of the invoice to reverse.',
             'min'           => 1,
             'required'      => true
-        ],
+        ]
     ],
-    'access' => [
-        'visibility'        => 'protected',
-        'groups'            => ['finance.default.user', 'booking.default.user'],
+    'access'        => [
+        'visibility'    => 'protected',
+        'groups'        => ['finance.default.user', 'booking.default.user']
     ],
     'response'      => [
         'content-type'  => 'application/json',
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'     => ['context', 'orm', 'auth']
+    'providers'     => ['context']
 ]);
 
 /**
- * @var \equal\php\Context                  $context
- * @var \equal\orm\ObjectManager            $orm
- * @var \equal\auth\AuthenticationManager   $auth
+ * @var \equal\php\Context $context
  */
-list($context, $orm, $auth) = [$providers['context'], $providers['orm'], $providers['auth']];
+['context' => $context] = $providers;
 
 // emit the invoice : changing status will trigger an invoice number assignation
 $invoice = Invoice::id($params['id'])
@@ -72,17 +70,17 @@ $invoice = Invoice::id($params['id'])
     ->first(true);
 
 if(!$invoice) {
-    throw new Exception("unknown_invoice", QN_ERROR_UNKNOWN_OBJECT);
+    throw new Exception("unknown_invoice", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
 // credit notes cannot be reversed
 if($invoice['type'] != 'invoice') {
-    throw new Exception("incompatible_type", QN_ERROR_UNKNOWN_OBJECT);
+    throw new Exception("incompatible_type", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
 // only non-draft and non-cancelled invoices can be cancelled/reversed
 if($invoice['status'] != 'invoice') {
-    throw new Exception("incompatible_status", QN_ERROR_UNKNOWN_OBJECT);
+    throw new Exception("incompatible_status", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
 /*
@@ -176,6 +174,7 @@ if(!$invoice['is_deposit'] && isset($invoice['booking_id']) && $invoice['booking
 
 // #memo - we avoid emitting invoices because automatically because it prevents choosing the date for newer invoices
 
-$context->httpResponse()
-        ->status(204)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(204)
+    ->send();

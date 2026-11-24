@@ -13,19 +13,16 @@ use sale\pay\Payment;
 [$params, $providers] = eQual::announce([
     'description'   => "Detach the payment associated with the specified bank check, if present, and reset the corresponding funding status to 'pending'.",
     'params'        => [
-
-        'id' =>  [
-            'description'   => 'Unique identifier of the target bank check.',
+        'id' => [
             'type'          => 'integer',
+            'description'   => 'Unique identifier of the target bank check.',
             'required'      => true
         ],
-
-        'confirm' =>  [
-            'description'   => 'Explicit confirmation required to proceed.',
+        'confirm' => [
             'type'          => 'boolean',
+            'description'   => 'Explicit confirmation required to proceed.',
             'required'      => true
         ]
-
     ],
     'access'        => [
         'groups'        => ['finance.default.administrator', 'finance.default.user']
@@ -39,7 +36,7 @@ use sale\pay\Payment;
 ]);
 
 /**
- * @var \equal\php\Context  $context
+ * @var \equal\php\Context $context
  */
 ['context' => $context] = $providers;
 
@@ -81,6 +78,7 @@ Funding::id($bank_check['funding_id']['id'])
     ->update(['paid_amount' => null])
     ->update(['is_paid' => null]);
 
-$context->httpResponse()
-        ->status(205)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(205)
+    ->send();

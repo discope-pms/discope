@@ -5,45 +5,52 @@
     Original author(s): Yesbabylon SRL
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
-use PhpOffice\PhpSpreadsheet\Spreadsheet;
+
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Reader;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
 
 
-list($params, $providers) = announce([
+[$params, $providers] = eQual::announce([
     'description'   => "Imports the composition (hosts listing) for a given booking. If a composition already exists, it is reset.",
     'params'        => [
-        'data' =>  [
-            'description'   => 'XLSX file holding the data to import as composition.',
+        'data' => [
             'type'          => 'file',
+            'description'   => 'XLSX file holding the data to import as composition.',
             'required'      => true
         ],
-        'booking_id' =>  [
-            'description'   => 'Identifier of the booking to which the composition relates.',
+        'booking_id' => [
             'type'          => 'integer',
+            'description'   => 'Identifier of the booking to which the composition relates.',
             'required'      => true
         ]
     ],
-    'access' => [
-        'visibility'        => 'public',		// 'public' (default) or 'private' (can be invoked by CLI only)
-        'groups'            => ['booking.default.user'],// list of groups ids or names granted
+    'access'        => [
+        'visibility'    => 'public',
+        // 'public' (default) or 'private' (can be invoked by CLI only)
+        'groups'            => ['booking.default.user'],
+        // list of groups ids or names granted
     ],
     'response'      => [
         'content-type'  => 'application/json',
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'     => ['context', 'orm', 'auth']
+    'providers'     => ['context', 'auth']
 ]);
 
 
-list($context, $orm, $auth) = [$providers['context'], $providers['orm'], $providers['auth']];
+/**
+ * @var \equal\php\Context                  $context
+ * @var \equal\auth\AuthenticationManager   $auth
+ */
+['context' => $context, 'auth' => $auth] = $providers;
 
 $user_id = $auth->userId();
 
 if($user_id <= 0) {
     // non permitted for unidentified users
-    throw new Exception('unknown_user', QN_ERROR_NOT_ALLOWED);
+    throw new Exception('unknown_user', EQ_ERROR_NOT_ALLOWED);
 }
 
 $content = $params['data'];
@@ -54,12 +61,12 @@ $finfo = new finfo(FILEINFO_MIME);
 $content_type = explode(';', $finfo->buffer($content))[0];
 
 if($content_type != "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet") {
-    throw new Exception('unknown_content_type', QN_ERROR_INVALID_PARAM);
+    throw new Exception('unknown_content_type', EQ_ERROR_INVALID_PARAM);
 }
 
 $filename = 'bin/'.uniqid(rand(), true).'.xlsx';
 if (file_put_contents($filename, $content) === false) {
-    throw new Exception('file_write_error', QN_ERROR_INVALID_PARAM);
+    throw new Exception('file_write_error', EQ_ERROR_INVALID_PARAM);
 }
 
 /** @var string */
@@ -142,8 +149,9 @@ if(isset($data['errors'])) {
     foreach($data['errors'] as $name => $message) throw new Exception($message, qn_error_code($name));
 }
 
-$context->httpResponse()
-        // ->status(204)
-        ->status(200)
-        ->body($objects)
-        ->send();
+$context
+    ->httpResponse()
+    // ->status(204)
+    ->status(200)
+    ->body($objects)
+    ->send();

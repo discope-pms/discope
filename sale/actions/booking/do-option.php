@@ -6,33 +6,33 @@
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 
-use sale\booking\Booking;
 use discope\setting\Setting;
+use sale\booking\Booking;
 use sale\booking\channelmanager\RoomType;
 
-list($params, $providers) = eQual::announce([
+[$params, $providers] = eQual::announce([
     'description'   => "Update the status of given booking to 'option'. Related consumptions are added to the planning. Auto-deprecation of the option is scheduled according to setting `sale.booking.option.validity`.",
     'params'        => [
-        'id' =>  [
-            'description'   => 'Identifier of the targeted booking.',
+        'id' => [
             'type'          => 'integer',
+            'description'   => 'Identifier of the targeted booking.',
             'min'           => 1,
             'required'      => true
         ],
-        'no_expiry' =>  [
+        'no_expiry' => [
+            'type'          => 'boolean',
             'description'   => 'The option will remain active without time limit.',
-            'type'          => 'boolean',
             'default'       => false
         ],
-        'free_rental_units' =>  [
+        'free_rental_units' => [
+            'type'          => 'boolean',
             'description'   => 'At expiration of the option, automatically release reserved rental units, if any.',
-            'type'          => 'boolean',
             'default'       => false
         ],
-        'days_expiry' =>  [
-            'description'   => 'The number of days for the option to expire.',
+        'days_expiry' => [
             'type'          => 'integer',
-            'default'       =>  Setting::get_value('sale', 'features', 'option.validity_delay', 10)
+            'description'   => 'The number of days for the option to expire.',
+            'default'       => Setting::get_value('sale', 'features', 'option.validity_delay', 10)
         ]
     ],
     'access'        => [
@@ -48,12 +48,12 @@ list($params, $providers) = eQual::announce([
 ]);
 
 /**
- * @var \equal\php\Context                  $context
- * @var \equal\orm\ObjectManager            $orm
- * @var \equal\cron\Scheduler               $cron
- * @var \equal\dispatch\Dispatcher          $dispatch
+ * @var \equal\php\Context          $context
+ * @var \equal\orm\ObjectManager    $orm
+ * @var \equal\cron\Scheduler       $cron
+ * @var \equal\dispatch\Dispatcher  $dispatch
  */
-list($context, $orm, $cron, $dispatch) = [$providers['context'], $providers['orm'], $providers['cron'], $providers['dispatch']];
+['context' => $context, 'orm' => $orm, 'cron' => $cron, 'dispatch' => $dispatch] = $providers;
 
 
 /*
@@ -78,11 +78,11 @@ $booking = Booking::id($params['id'])
     ->first(true);
 
 if(!$booking) {
-    throw new Exception("unknown_booking", QN_ERROR_UNKNOWN_OBJECT);
+    throw new Exception("unknown_booking", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
 if($booking['status'] != 'quote') {
-    throw new Exception("incompatible_status", QN_ERROR_INVALID_PARAM);
+    throw new Exception("incompatible_status", EQ_ERROR_INVALID_PARAM);
 }
 
 $remaining_days = (int) floor(($booking['date_from'] - time()) / (60 * 60 * 24));
@@ -140,7 +140,7 @@ if(is_array($data) && count($data)) {
 
 // raise an exception with first error (alerts should have been issued in the check controllers)
 foreach($errors as $error) {
-    throw new Exception($error, QN_ERROR_INVALID_PARAM);
+    throw new Exception($error, EQ_ERROR_INVALID_PARAM);
 }
 
 
@@ -278,6 +278,7 @@ if($channelmanager_enabled) {
     }
 }
 
-$context->httpResponse()
-        ->status(204)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(204)
+    ->send();

@@ -7,35 +7,35 @@
 */
 
 use equal\orm\Domain;
+use realestate\RentalUnit;
 use sale\booking\Booking;
 use sale\booking\BookingLineGroup;
 use sale\booking\Consumption;
-use realestate\RentalUnit;
 use sale\booking\SojournProductModel;
 use sale\booking\SojournProductModelRentalUnitAssignement;
 use sale\catalog\ProductModel;
 
-list($params, $providers) = eQual::announce([
+[$params, $providers] = eQual::announce([
     'description'   => "Retrieve the list of available rental units for a given sojourn, during a specific time range.",
     'params'        => [
-        'booking_line_group_id' =>  [
+        'booking_line_group_id' => [
+            'type'          => 'integer',
             'description'   => 'Specific sojourn for which is made the request.',
-            'type'          => 'integer',
             'required'      => true
         ],
-        'product_model_id' =>  [
+        'product_model_id' => [
+            'type'          => 'integer',
             'description'   => 'Specific product model for which a matching rental unit list is requested.',
-            'type'          => 'integer',
             'required'      => true
         ],
-        'domain' =>  [
-            'description'   => 'Domain for additional filtering.',
+        'domain' => [
             'type'          => 'array',
+            'description'   => 'Domain for additional filtering.',
             'default'       => []
-        ],
+        ]
     ],
-    'access' => [
-        'groups'            => ['booking.default.user']
+    'access'        => [
+        'groups'        => ['booking.default.user']
     ],
     'response'      => [
         'content-type'  => 'application/json',
@@ -46,7 +46,11 @@ list($params, $providers) = eQual::announce([
 ]);
 
 
-list($context, $orm) = [$providers['context'], $providers['orm']];
+/**
+ * @var \equal\php\Context          $context
+ * @var \equal\orm\ObjectManager    $orm
+ */
+['context' => $context, 'orm' => $orm] = $providers;
 
 $result = [];
 
@@ -259,6 +263,7 @@ if($sojourn) {
     usort($result, function($a, $b) {return $a['order'] > $b['order'];});
 }
 
-$context->httpResponse()
-        ->body($result)
-        ->send();
+$context
+    ->httpResponse()
+    ->body($result)
+    ->send();

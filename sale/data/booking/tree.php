@@ -12,31 +12,35 @@ use sale\booking\SojournProductModelRentalUnitAssignement;
 
 // announce script and fetch parameters values
 [$params, $providers] = eQual::announce([
-    'description'	=>	'Provide a fully loaded tree for a given booking.',
-    'params' 		=>	[
+    'description'   => 'Provide a fully loaded tree for a given booking.',
+    'params'        => [
         'id' => [
-            'description'   => 'Identifier of the booking for which the tree is requested.',
             'type'          => 'integer',
+            'description'   => 'Identifier of the booking for which the tree is requested.',
             'required'      => true
         ],
         'booking_line_group_id' => [
+            'type'          => 'integer',
             'description'   => 'Identifier of the booking group for which the tree is requested.',
-            'help'          => 'If none given, then all are loaded.',
-            'type'          => 'integer'
+            'help'          => 'If none given, then all are loaded.'
         ]
     ],
-    'access' => [
-        'visibility'        => 'protected',
-        'groups'            => ['booking.default.user']
+    'access'        => [
+        'visibility'    => 'protected',
+        'groups'        => ['booking.default.user']
     ],
-    'response' => [
-        'content-type'      => 'application/json',
-        'charset'           => 'utf-8',
-        'accept-origin'     => '*'
+    'response'      => [
+        'content-type'  => 'application/json',
+        'charset'       => 'utf-8',
+        'accept-origin' => '*'
     ],
-    'providers' => ['context', 'auth']
+    'providers'     => ['context', 'auth']
 ]);
 
+/**
+ * @var \equal\php\Context                  $context
+ * @var \equal\auth\AuthenticationManager   $auth
+ */
 ['context' => $context, 'auth' => $auth] = $providers;
 
 // #memo - processing of this controller might be heavy, so we make sure AC does not check permissions for each single consumption
@@ -59,7 +63,7 @@ $booking = Booking::id($params['id'])
     ->first(true);
 
 if(!$booking) {
-    throw new Exception('unknown_booking', QN_ERROR_UNKNOWN_OBJECT);
+    throw new Exception('unknown_booking', EQ_ERROR_UNKNOWN_OBJECT);
 }
 
 $booking_lines_groups_ids = $booking['booking_lines_groups_ids'];
@@ -297,6 +301,7 @@ foreach($booking['booking_lines_groups_ids'] as $group_index => $group) {
     }
 }
 
-$context->httpResponse()
-        ->body($booking)
-        ->send();
+$context
+    ->httpResponse()
+    ->body($booking)
+    ->send();

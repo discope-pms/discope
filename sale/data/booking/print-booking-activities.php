@@ -20,48 +20,48 @@ use Twig\TwigFilter;
     'description'   => "Render booking activities planning for a specific date and time slot.",
     'params'        => [
         'date_from' => [
-            'type'          => 'date',
-            'description'   => "Start date of the interval (included).",
-            'default'       => strtotime('Monday this week')
+            'type'              => 'date',
+            'description'       => "Start date of the interval (included).",
+            'default'           => strtotime('Monday this week')
         ],
         'time_slot_id' => [
             'type'              => 'many2one',
             'foreign_object'    => 'sale\booking\TimeSlot',
             'description'       => "Time slot of the planning.",
-            'required'          => true,
-            'domain'            => ['code', 'in', ['AM', 'PM', 'EV']]
+            'domain'            => ['code', 'in', ['AM', 'PM', 'EV']],
+            'required'          => true
         ],
-        'view_id' =>  [
-            'type'          => 'string',
-            'description'   => "The identifier of the view <type.name>.",
-            'default'       => 'print.all'
+        'view_id' => [
+            'type'              => 'string',
+            'description'       => "The identifier of the view <type.name>.",
+            'default'           => 'print.all'
         ],
-        'lang' =>  [
-            'type'          => 'string',
-            'description'   => "Language in which labels and multilang field have to be returned (2 letters ISO 639-1).",
-            'default'       => constant('DEFAULT_LANG')
+        'lang' => [
+            'type'              => 'string',
+            'description'       => "Language in which labels and multilang field have to be returned (2 letters ISO 639-1).",
+            'default'           => constant('DEFAULT_LANG')
         ],
-        'output' =>  [
-            'type'          => 'string',
-            'description'   => "Output format of the document.",
-            'selection'     => ['pdf', 'html'],
-            'default'       => 'pdf'
+        'output' => [
+            'type'              => 'string',
+            'description'       => "Output format of the document.",
+            'selection'         => ['pdf', 'html'],
+            'default'           => 'pdf'
         ]
     ],
-    'constants'             => ['DEFAULT_LANG', 'L10N_LOCALE'],
-    'access' => [
-        'visibility'        => 'protected',
-        'groups'            => ['booking.default.user', 'camp.default.user'],
+    'access'        => [
+        'visibility'    => 'protected',
+        'groups'        => ['booking.default.user', 'camp.default.user']
     ],
     'response'      => [
-        'content-type'      => 'application/pdf',
-        'accept-origin'     => '*'
+        'content-type'  => 'application/pdf',
+        'accept-origin' => '*'
     ],
+    'constants'     => ['DEFAULT_LANG', 'L10N_LOCALE'],
     'providers'     => ['context']
 ]);
 
 /**
- * @var \equal\php\Context  $context
+ * @var \equal\php\Context $context
  */
 ['context' => $context] = $providers;
 

@@ -6,26 +6,29 @@
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 
-list($params, $providers) = eQual::announce([
-    'description'	=>	"Mark a selection of Booking as archive.",
-    'params' 		=>	[
+[$params, $providers] = eQual::announce([
+    'description'   => "Mark a selection of Booking as archive.",
+    'params'        => [
         'ids' => [
-            'description'       => 'List of Booking identifiers the check against emptiness.',
-            'type'              => 'array'
+            'type'          => 'array',
+            'description'   => 'List of Booking identifiers the check against emptiness.'
         ]
     ],
-    'access' => [
-        'visibility'        => 'protected',
-        'groups'            => ['booking.default.user'],
+    'access'        => [
+        'visibility'    => 'protected',
+        'groups'        => ['booking.default.user']
     ],
-    'response' => [
-        'content-type'      => 'application/json',
-        'charset'           => 'utf-8',
-        'accept-origin'     => '*'
+    'response'      => [
+        'content-type'  => 'application/json',
+        'charset'       => 'utf-8',
+        'accept-origin' => '*'
     ],
-    'providers' => ['context']
+    'providers'     => ['context']
 ]);
 
+/**
+ * @var \equal\php\Context $context
+ */
 ['context' => $context] = $providers;
 
 $errors = [];
@@ -39,6 +42,7 @@ foreach($params['ids'] as $id) {
     }
 }
 
-$context->httpResponse()
-        ->status(204)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(204)
+    ->send();

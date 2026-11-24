@@ -12,43 +12,42 @@ use realestate\RentalUnit;
 use sale\booking\channelmanager\RoomType;
 use sale\booking\Consumption;
 
-list($params, $providers) = eQual::announce([
+[$params, $providers] = eQual::announce([
     'description'   => "Checks if changes made to one or more rental units impacts the availability of a Room Type. If a change is detected, update availability set at the channelmanager side.",
     'params'        => [
         'date_from' => [
-            'type'              => 'date',
-            'description'       => "Day of arrival.",
-            'required'          => true
+            'type'          => 'date',
+            'description'   => "Day of arrival.",
+            'required'      => true
         ],
         'date_to' => [
-            'type'              => 'date',
-            'description'       => "Day of departure (date not included in the update).",
-            'required'          => true
+            'type'          => 'date',
+            'description'   => "Day of departure (date not included in the update).",
+            'required'      => true
         ],
         'rental_units_ids' => [
-            'type'              => 'array',
-            'description'       => 'List of rental units identifiers that must be checked.'
+            'type'          => 'array',
+            'description'   => 'List of rental units identifiers that must be checked.'
         ]
     ],
-    'access' => [
-        'visibility'        => 'protected'
+    'access'        => [
+        'visibility'    => 'protected'
     ],
-    'constants'     => ['ROOT_APP_URL', 'EMAIL_REPORT_RECIPIENT', 'EMAIL_ERRORS_RECIPIENT'],
     'response'      => [
         'content-type'  => 'application/json',
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'     => ['context', 'orm', 'dispatch', 'cron']
+    'constants'     => ['ROOT_APP_URL', 'EMAIL_REPORT_RECIPIENT', 'EMAIL_ERRORS_RECIPIENT'],
+    'providers'     => ['context', 'orm', 'cron']
 ]);
 
 /**
- * @var \equal\php\Context                  $context
- * @var \equal\orm\ObjectManager            $orm
- * @var \equal\dispatch\Dispatcher          $dispatch
- * @var \equal\cron\Scheduler               $cron
+ * @var \equal\php\Context          $context
+ * @var \equal\orm\ObjectManager    $orm
+ * @var \equal\cron\Scheduler       $cron
  */
-list($context, $orm, $dispatch, $cron) = [ $providers['context'], $providers['orm'], $providers['dispatch'], $providers['cron']];
+['context' => $context, 'orm' => $orm, 'cron' => $cron] = $providers;
 
 $result = [
     'errors'                => 0,
@@ -231,7 +230,8 @@ if($params['date_from'] <= $last_updatable_day) {
 }
 
 
-$context->httpResponse()
+$context
+    ->httpResponse()
     ->status(200)
     ->body($result)
     ->send();

@@ -5,19 +5,18 @@
     Original author(s): Yesbabylon SRL
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
-use sale\booking\Funding;
+
 use discope\setting\Setting;
+use sale\booking\Funding;
 
 [$params, $providers] = eQual::announce([
     'description'   => "Checks that a given funding has been paid (should be scheduled on due_date).",
     'params'        => [
-
-        'id' =>  [
+        'id' => [
             'type'          => 'integer',
             'description'   => "Identifier of the funding to check.",
             'required'      => true
         ]
-
     ],
     'access'        => [
         'visibility'    => 'private'
@@ -78,6 +77,7 @@ if(!$funding['is_paid'] && $funding['due_amount'] > 0) {
 
 $auth->su($user_id);
 
-$context->httpResponse()
-        ->status(204)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(204)
+    ->send();

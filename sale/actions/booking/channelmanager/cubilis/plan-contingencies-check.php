@@ -5,36 +5,36 @@
     Original author(s): Yesbabylon SRL
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
+
 use sale\booking\Booking;
 
-list($params, $providers) = eQual::announce([
+[$params, $providers] = eQual::announce([
     'description'   => "Schedule a check of the contingencies (if a change made has implications in the channelmanager).",
     'params'        => [
-        'id' =>  [
-            'description'   => 'Identifier of the targeted booking for which the check must be planned.',
+        'id' => [
             'type'          => 'integer',
+            'description'   => 'Identifier of the targeted booking for which the check must be planned.',
             'min'           => 1,
             'required'      => true
         ]
     ],
-    'access' => [
-        'visibility'        => 'protected',
-        'groups'            => ['booking.default.user']
+    'access'        => [
+        'visibility'    => 'protected',
+        'groups'        => ['booking.default.user']
     ],
     'response'      => [
         'content-type'  => 'application/json',
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'     => ['context', 'orm', 'cron']
+    'providers'     => ['context', 'cron']
 ]);
 
 /**
- * @var \equal\php\Context                  $context
- * @var \equal\orm\ObjectManager            $orm
- * @var \equal\cron\Scheduler               $cron
+ * @var \equal\php\Context      $context
+ * @var \equal\cron\Scheduler   $cron
  */
-list($context, $orm, $cron) = [$providers['context'], $providers['orm'], $providers['cron']];
+['context' => $context, 'cron' => $cron] = $providers;
 
 /*
     Check if consistency must be maintained with channel manager (if booking impacts a rental unit that is linked to a channelmanager room type)
@@ -47,7 +47,7 @@ $booking = Booking::id($params['id'])
     ->first(true);
 
 if(!$booking) {
-    throw new Exception("unknown_booking", QN_ERROR_UNKNOWN_OBJECT);
+    throw new Exception("unknown_booking", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
 $map_rental_units_ids = [];
@@ -71,6 +71,7 @@ if(count($map_rental_units_ids)) {
         );
 }
 
-$context->httpResponse()
-        ->status(204)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(204)
+    ->send();

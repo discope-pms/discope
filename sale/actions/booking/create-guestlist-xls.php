@@ -13,31 +13,26 @@ use sale\booking\Booking;
 [$params, $providers] = eQual::announce([
     'description'   => "Create the booking's guest list xls document.",
     'params'        => [
-
-        'id' =>  [
+        'id' => [
             'type'          => 'many2one',
             'description'   => "Identifier of the booking the guest list xls document should be created.",
             'required'      => true
         ],
-
         'document_name' => [
             'type'          => 'string',
             'description'   => "Name of the generated xls document."
         ],
-
         'is_temp' => [
             'type'          => 'boolean',
             'description'   => "Should the generated document be temporary?",
             'default'       => true
         ],
-
-        'lang' =>  [
+        'lang' => [
             'type'          => 'string',
-            'description'   => "Language to use for columns names.",
             'usage'         => 'language/iso-639',
+            'description'   => "Language to use for columns names.",
             'default'       => constant('DEFAULT_LANG')
         ]
-
     ],
     'access'        => [
         'visibility'    => 'protected',
@@ -53,7 +48,7 @@ use sale\booking\Booking;
 ]);
 
 /**
- * @var \equal\php\Context  $context
+ * @var \equal\php\Context $context
  */
 ['context' => $context] = $providers;
 
@@ -100,7 +95,8 @@ $document = $document_class::create([
     ->read(['id'])
     ->first();
 
-$context->httpResponse()
-        ->body(['document_id' => $document['id']])
-        ->status(201)
-        ->send();
+$context
+    ->httpResponse()
+    ->body(['document_id' => $document['id']])
+    ->status(201)
+    ->send();

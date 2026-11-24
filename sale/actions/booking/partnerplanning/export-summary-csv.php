@@ -8,19 +8,17 @@
 
 use sale\booking\PartnerPlanningSummary;
 
-[$params, $provider] = eQual::announce([
+[$params, $providers] = eQual::announce([
     'description'   => "Returns the planning summary activities table data in CSV format.",
     'params'        => [
-
         'id' => [
             'type'          => 'integer',
             'description'   => "Identifier of targeted planning summary.",
             'required'      => true
         ]
-
     ],
     'access'        => [
-        'visibility'            => 'protected'
+        'visibility'    => 'protected'
     ],
     'response'      => [
         'content-type'          => 'text/csv',
@@ -32,9 +30,9 @@ use sale\booking\PartnerPlanningSummary;
 ]);
 
 /**
- * @var \equal\php\Context  $context
+ * @var \equal\php\Context $context
  */
-['context' => $context] = $provider;
+['context' => $context] = $providers;
 
 $planning_summary = PartnerPlanningSummary::id($params['id'])
     ->read(['activities_table_data'])
@@ -83,6 +81,7 @@ fclose($fp);
 
 $output = file_get_contents($tmp_file);
 
-$context->httpResponse()
-        ->body($output)
-        ->send();
+$context
+    ->httpResponse()
+    ->body($output)
+    ->send();

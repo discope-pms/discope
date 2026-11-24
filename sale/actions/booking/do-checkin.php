@@ -10,54 +10,53 @@ use sale\booking\Booking;
 use sale\booking\Consumption;
 use sale\booking\Contract;
 
-list($params, $providers) = announce([
+[$params, $providers] = eQual::announce([
     'description'   => "Sets booking as checked in.",
     'params'        => [
-        'id' =>  [
-            'description'   => 'Identifier of the booking on which to perform the checkin.',
+        'id' => [
             'type'          => 'integer',
+            'description'   => 'Identifier of the booking on which to perform the checkin.',
             'min'           => 1,
             'required'      => true
         ],
-        'no_payment' =>  [
+        'no_payment' => [
+            'type'          => 'boolean',
             'description'   => 'Do not check for payments and allow to checkin even if some payments are due.',
-            'type'          => 'boolean',
             'default'       => false
         ],
-        'no_composition' =>  [
+        'no_composition' => [
+            'type'          => 'boolean',
             'description'   => 'Do not check for composition completeness and allow to checkin without hosts personal details.',
-            'type'          => 'boolean',
             'default'       => false
         ],
-        'no_rental_unit_cleaned' =>  [
-            'description'   => 'Do not check for rental units cleaned and allow to check in even if some rental unit have be cleaned.',
+        'no_rental_unit_cleaned' => [
             'type'          => 'boolean',
+            'description'   => 'Do not check for rental units cleaned and allow to check in even if some rental unit have be cleaned.',
             'default'       => false
         ],
         'sign_contract' => [
-            'description'   => 'Mark the pending contract as signed.',
             'type'          => 'boolean',
+            'description'   => 'Mark the pending contract as signed.',
             'default'       => false
         ]
     ],
-    'access' => [
-        'visibility'        => 'protected',
-        'groups'            => ['booking.default.user'],
+    'access'        => [
+        'visibility'    => 'protected',
+        'groups'        => ['booking.default.user']
     ],
     'response'      => [
         'content-type'  => 'application/json',
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'     => ['context', 'orm', 'auth']
+    'providers'     => ['context', 'orm']
 ]);
 
 /**
- * @var \equal\php\Context                  $context
- * @var \equal\orm\ObjectManager            $orm
- * @var \equal\auth\AuthenticationManager   $auth
+ * @var \equal\php\Context          $context
+ * @var \equal\orm\ObjectManager    $orm
  */
-list($context, $orm, $auth) = [$providers['context'], $providers['orm'], $providers['auth']];
+['context' => $context, 'orm' => $orm] = $providers;
 
 
 // read booking object
@@ -66,7 +65,7 @@ $booking = Booking::id($params['id'])
                   ->first(true);
 
 if(!$booking) {
-    throw new Exception("unknown_booking", QN_ERROR_UNKNOWN_OBJECT);
+    throw new Exception("unknown_booking", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
 /*
@@ -136,7 +135,7 @@ if(!$params['no_rental_unit_cleaned']) {
 }
 // raise an exception with first error (alerts should have been issued in the check controllers)
 foreach($errors as $error) {
-    throw new Exception($error, QN_ERROR_INVALID_PARAM);
+    throw new Exception($error, EQ_ERROR_INVALID_PARAM);
 }
 
 
@@ -176,6 +175,7 @@ if($consumptions) {
 Booking::id($params['id'])->update(['status' => 'checkedin']);
 
 
-$context->httpResponse()
-        ->status(204)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(204)
+    ->send();

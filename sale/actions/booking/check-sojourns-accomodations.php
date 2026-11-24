@@ -5,20 +5,21 @@
     Original author(s): Yesbabylon SRL
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
+
 use sale\booking\Booking;
 
-list($params, $providers) = eQual::announce([
-    'description'   => "Checks that each sojourn (services group) of a booking has a consistent SPMAccommodations configuration.
-                        It also checks if there are no accommodation in a non-sojourn / non-event group, and if all sojourns have at least one accommodation. Several 'accommodation' product models for a same are not allowed. Only sojourn and events can have accommodations. A sojourn must have at least one accommodation (SPM).",
+[$params, $providers] = eQual::announce([
+    'description'   => "Checks that each sojourn (services group) of a booking has a consistent SPMAccommodations configuration.\n"
+                    ."It also checks if there are no accommodation in a non-sojourn / non-event group, and if all sojourns have at least one accommodation. Several 'accommodation' product models for a same are not allowed. Only sojourn and events can have accommodations. A sojourn must have at least one accommodation (SPM).",
     'params'        => [
-        'id' =>  [
-            'description'   => 'Identifier of the booking for which the assignments are checked.',
+        'id' => [
             'type'          => 'integer',
+            'description'   => 'Identifier of the booking for which the assignments are checked.',
             'required'      => true
-        ],
+        ]
     ],
-    'access' => [
-        'visibility'        => 'protected'
+    'access'        => [
+        'visibility'    => 'protected'
     ],
     'response'      => [
         'content-type'  => 'application/json',
@@ -29,10 +30,10 @@ list($params, $providers) = eQual::announce([
 ]);
 
 /**
- * @var \equal\php\Context                  $context
- * @var \equal\dispatch\Dispatcher          $dispatch
+ * @var \equal\php\Context          $context
+ * @var \equal\dispatch\Dispatcher  $dispatch
  */
-list($context, $dispatch) = [ $providers['context'], $providers['dispatch']];
+['context' => $context, 'dispatch' => $dispatch] = $providers;
 
 // ensure booking object exists and is readable
 $booking = Booking::id($params['id'])
@@ -59,7 +60,7 @@ $booking = Booking::id($params['id'])
     ->first(true);
 
 if(!$booking) {
-    throw new Exception("unknown_booking", QN_ERROR_UNKNOWN_OBJECT);
+    throw new Exception("unknown_booking", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
 $booking_line_groups = $booking['booking_lines_groups_ids'];
@@ -106,7 +107,7 @@ $httpResponse = $context->httpResponse()->status(200);
 
 if(count($errors)) {
     $result[] = $params['id'];
-    $httpResponse->status(qn_error_http(QN_ERROR_NOT_ALLOWED));
+    $httpResponse->status(qn_error_http(EQ_ERROR_NOT_ALLOWED));
     // by convention we dispatch an alert that relates to the controller itself.
     $dispatch->dispatch('lodging.booking.sojourns_accomodations', 'sale\booking\Booking', $params['id'], 'important', 'sale_booking_check-sojourns-accomodations', ['id' => $params['id']], [], null, $booking['center_office_id']);
 }

@@ -8,22 +8,22 @@
 use sale\pos\CashdeskSession;
 
 [$params, $providers] = eQual::announce([
-    'description'   =>	"Provide a fully loaded tree for a given CashdeskSession.",
-    'params'        =>	[
+    'description'   => "Provide a fully loaded tree for a given CashdeskSession.",
+    'params'        => [
         'id' => [
-            'description'   => "Identifier of the session for which the tree is requested.",
             'type'          => 'integer',
+            'description'   => "Identifier of the session for which the tree is requested.",
             'required'      => true
         ]
     ],
     'access'        => [
-        'visibility'        => 'protected',
-        'groups'            => ['pos.default.user'],
+        'visibility'    => 'protected',
+        'groups'        => ['pos.default.user']
     ],
     'response'      => [
-        'content-type'      => 'application/json',
-        'charset'           => 'utf-8',
-        'accept-origin'     => '*'
+        'content-type'  => 'application/json',
+        'charset'       => 'utf-8',
+        'accept-origin' => '*'
     ],
     'providers'     => ['context']
 ]);
@@ -62,6 +62,7 @@ if(is_null($session)) {
     throw new Exception("unknown_session", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
-$context->httpResponse()
-        ->body($session)
-        ->send();
+$context
+    ->httpResponse()
+    ->body($session)
+    ->send();
