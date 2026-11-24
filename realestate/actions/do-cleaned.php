@@ -12,30 +12,27 @@ use realestate\RentalUnit;
     'description'   => "Rental unit will marked as none the action required.",
     'params'        => [
         'id' => [
-            'description'   => 'Identifier of the rental unit the check against emptiness.',
             'type'          => 'integer',
+            'description'   => 'Identifier of the rental unit the check against emptiness.',
             'required'      => true
-        ],
-
+        ]
     ],
-    'access' => [
-        'groups'            => ['booking.default.user'],
+    'access'        => [
+        'groups'        => ['booking.default.user']
     ],
     'response'      => [
         'content-type'  => 'application/json',
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'     => ['context', 'orm', 'auth', 'dispatch']
+    'providers'     => ['context', 'orm']
 ]);
 
 /**
- * @var \equal\php\Context                  $context
- * @var \equal\orm\ObjectManager            $orm
- * @var \equal\auth\AuthenticationManager   $auth
- * @var \equal\dispatch\Dispatcher          $dispatch
+ * @var \equal\php\Context          $context
+ * @var \equal\orm\ObjectManager    $orm
  */
-['context' => $context, 'orm' => $orm, 'auth' => $auth, 'dispatch' => $dispatch] = $providers;
+['context' => $context, 'orm' => $orm] = $providers;
 
 
 $rental_unit = RentalUnit::id($params['id'])

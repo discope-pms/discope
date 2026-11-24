@@ -13,24 +13,23 @@ use sale\booking\Consumption;
     'description'   => "Verify that the rental unit is not assigned to a booking. This check is meant to be called by plan-repair (called from Planning).",
     'params'        => [
         'id' => [
-            'description'       => 'Identifier of the rental unit the check against emptyness.',
-            'type'              => 'integer',
-            'required'          => true
+            'type'          => 'integer',
+            'description'   => 'Identifier of the rental unit the check against emptiness.',
+            'required'      => true
         ],
         'date_from' => [
-            'description'       => 'First date of the time interval.',
-            'type'              => 'date',
-            'required'          => true
+            'type'          => 'date',
+            'description'   => 'First date of the time interval.',
+            'required'      => true
         ],
-
         'date_to' => [
-            'description'       => 'End date of the time interval.',
-            'type'              => 'date',
-            'required'          => true
-        ],
+            'type'          => 'date',
+            'description'   => 'End date of the time interval.',
+            'required'      => true
+        ]
     ],
     'access'        => [
-        'groups'            => ['booking.default.user'],
+        'groups'        => ['booking.default.user']
     ],
     'response'      => [
         'content-type'  => 'application/json',

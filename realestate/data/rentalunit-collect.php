@@ -14,12 +14,11 @@ use identity\User;
     'description'   => 'Advanced search for rental units: retrieves a collection of reports based on specified parameters.',
     'extends'       => 'core_model_collect',
     'params'        => [
-        'entity'    => [
-            'description'       => 'Entity type being queried.',
+        'entity' => [
             'type'              => 'string',
+            'description'       => 'Entity type being queried.',
             'default'           => 'realestate\RentalUnit'
         ],
-
         'center_id' => [
             'type'              => 'many2one',
             'foreign_object'    => 'identity\Center',
@@ -28,15 +27,14 @@ use identity\User;
                 return ($centers = Center::search())->count() === 1 ? current($centers->ids()) : null;
             }
         ],
-
         'parent_id' => [
             'type'              => 'many2one',
             'foreign_object'    => 'realestate\RentalUnit',
             'description'       => "Rental Unit which current unit belongs to, if any."
         ],
-
-        'type'      => [
+        'type' => [
             'type'              => 'string',
+            'description'       => 'Type of the rental unit, which determines its capacity and usage.',
             'selection'         => [
                 'all',
                 'building',
@@ -47,35 +45,30 @@ use identity\User;
                 'room',
                 'FFE'
             ],
-            'default'           => 'all',
-            'description'       => 'Type of the rental unit, which determines its capacity and usage.'
+            'default'           => 'all'
         ],
-
         'is_accomodation' => [
             'type'              => 'boolean',
             'description'       => 'Indicates whether the rental unit serves as an accommodation.',
             'default'           => null
         ],
-
         'has_prm_access' => [
             'type'              => 'boolean',
             'description'       => 'Indicates if the unit is accessible for persons with reduced mobility (PMR)',
-            'default'           => null,
-            'visible'           => ['is_accomodation', '=', true]
+            'visible'           => ['is_accomodation', '=', true],
+            'default'           => null
         ],
-
         'has_pvi_features' => [
             'type'              => 'boolean',
             'description'       => 'Indicates if the unit is adapted for persons with visual impairments (PDV).',
-            'default'           => null,
-            'visible'           => ['is_accomodation', '=', true]
+            'visible'           => ['is_accomodation', '=', true],
+            'default'           => null
         ],
-
         'has_phi_support' => [
             'type'              => 'boolean',
             'description'       => 'Indicates if the unit includes features for persons with hearing impairments (PDA).',
-            'default'           => null,
-            'visible'           => ['is_accomodation', '=', true]
+            'visible'           => ['is_accomodation', '=', true],
+            'default'           => null
         ]
     ],
     'response'      => [
@@ -87,7 +80,7 @@ use identity\User;
 ]);
 
 /**
- * @var \equal\php\Context $context
+ * @var \equal\php\Context                  $context
  * @var \equal\auth\AuthenticationManager   $auth
  */
 ['context' => $context, 'auth' => $auth] = $providers;
