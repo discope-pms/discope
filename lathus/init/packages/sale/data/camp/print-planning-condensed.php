@@ -12,17 +12,16 @@ use Dompdf\Options as DompdfOptions;
 use sale\camp\Camp;
 use sale\camp\CampGroup;
 use Twig\Environment as TwigEnvironment;
-use Twig\Extension\ExtensionInterface;
 use Twig\Extra\Intl\IntlExtension;
 use Twig\Loader\FilesystemLoader as TwigFilesystemLoader;
 
 [$params, $providers] = eQual::announce([
     'description'   => "Print the condensed planning of activities and meals given week (time interval is always reduced to 5 days based on date_from).",
     'params'        => [
-        'view_id' =>  [
-            'description'   => 'The identifier of the view <type.name>.',
-            'type'          => 'string',
-            'default'       => 'print.planning-condensed'
+        'view_id' => [
+            'type'              => 'string',
+            'description'       => 'The identifier of the view <type.name>.',
+            'default'           => 'print.planning-condensed'
         ],
         'date_from' => [
             'type'              => 'date',
@@ -39,16 +38,16 @@ use Twig\Loader\FilesystemLoader as TwigFilesystemLoader;
             'description'       => "Filter by camp group."
         ]
     ],
-    'constants'     => ['L10N_LOCALE', 'L10N_TIMEZONE'],
     'response'      => [
-        'content-type'      => 'application/pdf',
-        'accept-origin'     => '*'
+        'content-type'  => 'application/pdf',
+        'accept-origin' => '*'
     ],
+    'constants'     => ['L10N_LOCALE', 'L10N_TIMEZONE'],
     'providers'     => ['context']
 ]);
 
 /**
- * @var \equal\php\Context  $context
+ * @var \equal\php\Context $context
  */
 ['context' => $context] = $providers;
 
@@ -274,8 +273,8 @@ try {
     $html = $template->render(compact('camps_planning', 'days_names', 'days_indexes', 'map_day_timeslot_mealtype_qty'));
 }
 catch(Exception $e) {
-    trigger_error("ORM::error while parsing template - ".$e->getMessage(), QN_REPORT_DEBUG);
-    throw new Exception("template_parsing_issue", QN_ERROR_INVALID_CONFIG);
+    trigger_error("ORM::error while parsing template - ".$e->getMessage(), EQ_REPORT_DEBUG);
+    throw new Exception("template_parsing_issue", EQ_ERROR_INVALID_CONFIG);
 }
 
 /*
@@ -309,8 +308,9 @@ $canvas->page_text($canvas->get_width() - 70, $canvas->get_height() - 35, date($
     Response
 */
 
-$context->httpResponse()
-        // ->header('Content-Disposition', 'attachment; filename="document.pdf"')
-        ->header('Content-Disposition', 'inline; filename="planning.pdf"')
-        ->body($dompdf->output())
-        ->send();
+$context
+    ->httpResponse()
+    // ->header('Content-Disposition', 'attachment; filename="document.pdf"')
+    ->header('Content-Disposition', 'inline; filename="planning.pdf"')
+    ->body($dompdf->output())
+    ->send();

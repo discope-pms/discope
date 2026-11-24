@@ -9,30 +9,30 @@
 use hr\employee\Employee;
 use sale\booking\BookingActivity;
 
-[$params, $provider] = eQual::announce([
+[$params, $providers] = eQual::announce([
     'description'   => "Unassign future activities that are assigned to deleted employees.",
     'params'        => [
         'handle_out_of_contract' => [
-            'type'              => 'boolean',
-            'description'       => "Unassign future activities that are assigned out of the contract of employees.",
-            'default'           => true
-        ],
+            'type'          => 'boolean',
+            'description'   => "Unassign future activities that are assigned out of the contract of employees.",
+            'default'       => true
+        ]
     ],
     'access'        => [
-        'visibility'        => 'protected'
+        'visibility'    => 'protected'
     ],
     'response'      => [
-        'content-type'      => 'application/json',
-        'charset'           => 'utf-8',
-        'accept-origin'     => '*'
+        'content-type'  => 'application/json',
+        'charset'       => 'utf-8',
+        'accept-origin' => '*'
     ],
     'providers'     => ['context']
 ]);
 
 /**
- * @var \equal\php\Context  $context
+ * @var \equal\php\Context $context
  */
-['context' => $context] = $provider;
+['context' => $context] = $providers;
 
 $employees_ids = Employee::search(['relationship', '=', 'employee'])->ids();
 

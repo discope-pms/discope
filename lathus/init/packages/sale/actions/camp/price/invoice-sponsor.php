@@ -12,27 +12,25 @@ use sale\camp\Sponsor;
 [$params, $providers] = eQual::announce([
     'description'   => "Invoice the given price adapters to sponsors.",
     'params'        => [
-
         'ids' => [
-            'type'              => 'array',
-            'description'       => "Ids of the price adapters to invoice.",
-            'required'          => true
+            'type'          => 'array',
+            'description'   => "Ids of the price adapters to invoice.",
+            'required'      => true
         ]
-
     ],
     'access'        => [
-        'visibility'        => 'protected',
-        'groups'            => ['camp.default.administrator'],
+        'visibility'    => 'protected',
+        'groups'        => ['camp.default.administrator']
     ],
     'response'      => [
-        'content-type'      => 'application/zip',
-        'accept-origin'     => '*'
+        'content-type'  => 'application/zip',
+        'accept-origin' => '*'
     ],
     'providers'     => ['context']
 ]);
 
 /**
- * @var \equal\php\Context  $context
+ * @var \equal\php\Context $context
  */
 ['context' => $context] = $providers;
 
@@ -105,7 +103,8 @@ foreach($map_sponsor_price_adapters_ids as $sponsor_id => $price_adapters_ids) {
 
 $zip = $generateZip($pdfs);
 
-$context->httpResponse()
-        ->header('Content-Disposition', 'inline; filename="document.zip"')
-        ->body($zip)
-        ->send();
+$context
+    ->httpResponse()
+    ->header('Content-Disposition', 'inline; filename="document.zip"')
+    ->body($zip)
+    ->send();

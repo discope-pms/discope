@@ -13,14 +13,12 @@ use sale\pay\Payment;
     'description'   => "Remove the manual payment attached to the funding, if any, and unmark funding as paid.",
     'help'          => "Manual payments can be undone while the enrollment is not validated (and invoiced).",
     'params'        => [
-
-        'id' =>  [
+        'id' => [
             'type'          => 'integer',
-            'min'           => 1,
             'description'   => "Identifier of the targeted funding.",
+            'min'           => 1,
             'required'      => true
         ]
-
     ],
     'access'        => [
         'groups'        => ['finance.default.administrator', 'finance.default.user']
@@ -34,7 +32,7 @@ use sale\pay\Payment;
 ]);
 
 /**
- * @var \equal\php\Context  $context
+ * @var \equal\php\Context $context
  */
 ['context' => $context] = $providers;
 
@@ -74,6 +72,7 @@ Funding::id($params['id'])
     ->update(['paid_amount' => null])
     ->update(['is_paid' => null]);
 
-$context->httpResponse()
-        ->status(205)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(205)
+    ->send();

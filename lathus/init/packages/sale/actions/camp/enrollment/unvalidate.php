@@ -11,28 +11,26 @@ use sale\camp\Enrollment;
 [$params, $providers] = eQual::announce([
     'description'   => "Unvalidates the validated enrollment to alter it.",
     'params'        => [
-
         'id' => [
             'type'          => 'integer',
             'description'   => "Identifier of the enrollment we want to unvalidate.",
             'required'      => true
         ]
-
     ],
     'access'        => [
-        'visibility'        => 'protected',
-        'groups'            => ['camp.default.administrator', 'camp.default.user'],
+        'visibility'    => 'protected',
+        'groups'        => ['camp.default.administrator', 'camp.default.user']
     ],
     'response'      => [
-        'content-type'      => 'application/json',
-        'charset'           => 'utf-8',
-        'accept-origin'     => '*'
+        'content-type'  => 'application/json',
+        'charset'       => 'utf-8',
+        'accept-origin' => '*'
     ],
     'providers'     => ['context']
 ]);
 
 /**
- * @var \equal\php\Context  $context
+ * @var \equal\php\Context $context
  */
 ['context' => $context] = $providers;
 
@@ -50,6 +48,7 @@ if($enrollment['status'] !== 'validated') {
 
 Enrollment::id($enrollment['id'])->transition('unvalidate');
 
-$context->httpResponse()
-        ->status(200)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(200)
+    ->send();

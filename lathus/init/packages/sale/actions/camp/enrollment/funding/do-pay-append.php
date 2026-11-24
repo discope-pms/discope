@@ -5,22 +5,20 @@
     Original author(s): Yesbabylon SRL
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
+
 use sale\booking\Funding;
-use sale\booking\Booking;
 use sale\booking\Payment;
 
-list($params, $providers) = eQual::announce([
+[$params, $providers] = eQual::announce([
     'description'   => "Create a manual payment to complete the payments of a funding and mark it as paid.",
     'help'          => "This action is intended for payment with bank card only. Manual payments can be undone while the booking is not fully balanced (and invoiced).",
     'params'        => [
-
-        'id' =>  [
+        'id' => [
             'type'          => 'integer',
-            'min'           => 1,
             'description'   => "Identifier of the targeted funding.",
+            'min'           => 1,
             'required'      => true
         ]
-
     ],
     'access'        => [
         'groups'        => ['camp.default.user', 'camp.default.administrator', 'finance.default.administrator', 'finance.default.user']
@@ -34,7 +32,7 @@ list($params, $providers) = eQual::announce([
 ]);
 
 /**
- * @var \equal\php\Context  $context
+ * @var \equal\php\Context $context
  */
 ['context' => $context] = $providers;
 
@@ -79,6 +77,7 @@ Payment::create([
         'funding_id'        => $funding['id']
     ]);
 
-$context->httpResponse()
-        ->status(205)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(205)
+    ->send();

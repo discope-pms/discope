@@ -11,30 +11,27 @@ use sale\camp\Enrollment;
 [$params, $providers] = eQual::announce([
     'description'   => "Validates the confirmed enrollment when all documents have been received.",
     'params'        => [
-
         'id' => [
             'type'          => 'integer',
             'description'   => "Identifier of the enrollment we want to validate.",
             'required'      => true
         ],
-
         'do_not_check_payment' => [
             'type'          => 'boolean',
             'description'   => "Check enrollment's payment status before validation?",
             'required'      => true
         ]
-
     ],
     'access'        => [
-        'visibility'        => 'protected',
-        'groups'            => ['camp.default.administrator', 'camp.default.user'],
+        'visibility'    => 'protected',
+        'groups'        => ['camp.default.administrator', 'camp.default.user']
     ],
-    'response' => [
-        'content-type'      => 'application/json',
-        'charset'           => 'utf-8',
-        'accept-origin'     => '*'
+    'response'      => [
+        'content-type'  => 'application/json',
+        'charset'       => 'utf-8',
+        'accept-origin' => '*'
     ],
-    'providers' => ['context', 'dispatch']
+    'providers'     => ['context', 'dispatch']
 ]);
 
 /**
@@ -67,6 +64,7 @@ if(!$params['do_not_check_payment'] && $enrollment['payment_status'] !== 'paid')
 
 Enrollment::id($enrollment['id'])->transition('validate');
 
-$context->httpResponse()
-        ->status(200)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(200)
+    ->send();

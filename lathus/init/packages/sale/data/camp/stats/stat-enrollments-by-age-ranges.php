@@ -48,7 +48,6 @@ use sale\camp\Sponsor;
             ],
             'default'           => 'confirmed_validated'
         ],
-
         /* parameters used as properties of virtual entity */
         'center' => [
             'type'              => 'string',
@@ -72,9 +71,9 @@ use sale\camp\Sponsor;
 ]);
 
 /**
- * @var \equal\php\Context                  $context
- * @var \equal\data\adapt\AdapterProvider   $adapter_provider
- * @var \equal\auth\AuthenticationManager   $auth
+ * @var \equal\php\Context                      $context
+ * @var \equal\data\adapt\DataAdapterProvider   $adapter_provider
+ * @var \equal\auth\AuthenticationManager       $auth
  */
 ['context' => $context, 'adapt' => $adapter_provider, 'auth' => $auth] = $providers;
 
@@ -161,7 +160,8 @@ foreach($map_center_age_ranges_enrollments_qty as $center_id => $map_age_ranges_
     }
 }
 
-$context->httpResponse()
-        ->header('X-Total-Count', count($result))
-        ->body($result)
-        ->send();
+$context
+    ->httpResponse()
+    ->header('X-Total-Count', count($result))
+    ->body($result)
+    ->send();

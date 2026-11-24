@@ -10,9 +10,9 @@ use equal\orm\Domain;
 use equal\orm\DomainCondition;
 
 [$params, $providers] = eQual::announce([
-    'extends'       => 'core_model_collect',
-    'params'        => [
-        'entity' =>  [
+    'extends'   => 'core_model_collect',
+    'params'    => [
+        'entity' => [
             'type'              => 'string',
             'description'       => "Full name (including namespace) of the class to look into (e.g. 'core\\User').",
             'default'           => 'sale\camp\Camp'
@@ -35,17 +35,18 @@ use equal\orm\DomainCondition;
         ],
         'status' => [
             'type'              => 'string',
+            'description'       => "Status of the camp.",
             'selection'         => [
                 'all',
                 'draft',
                 'published',
                 'cancelled'
             ],
-            'description'       => "Status of the camp.",
             'default'           => 'all'
         ],
         'camp_type' => [
             'type'              => 'string',
+            'description'       => "Type of camp.",
             'selection'         => [
                 'all',
                 'sport',
@@ -55,7 +56,6 @@ use equal\orm\DomainCondition;
                 'horse-riding',
                 'recreation'
             ],
-            'description'       => "Type of camp.",
             'default'           => 'all'
         ],
         'sojourn_type' => [
@@ -116,14 +116,14 @@ use equal\orm\DomainCondition;
             'type'              => 'integer',
             'description'       => "Max age of the children",
             'default'           => 18
-        ],
+        ]
     ],
-    'response'      => [
+    'response'  => [
         'content-type'  => 'application/json',
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'     => ['context']
+    'providers' => ['context']
 ]);
 
 /**
@@ -223,6 +223,7 @@ $params['domain'] = $domain->toArray();
 
 $result = eQual::run('get', 'model_collect', $params, true);
 
-$context->httpResponse()
-        ->body($result)
-        ->send();
+$context
+    ->httpResponse()
+    ->body($result)
+    ->send();

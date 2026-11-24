@@ -48,7 +48,6 @@ use sale\camp\WorksCouncil;
             ],
             'default'           => 'confirmed_validated'
         ],
-
         /* parameters used as properties of virtual entity */
         'center' => [
             'type'              => 'string',
@@ -73,9 +72,9 @@ use sale\camp\WorksCouncil;
 ]);
 
 /**
- * @var \equal\php\Context                  $context
- * @var \equal\data\adapt\AdapterProvider   $adapter_provider
- * @var \equal\auth\AuthenticationManager   $auth
+ * @var \equal\php\Context                      $context
+ * @var \equal\data\adapt\DataAdapterProvider   $adapter_provider
+ * @var \equal\auth\AuthenticationManager       $auth
  */
 ['context' => $context, 'adapt' => $adapter_provider, 'auth' => $auth] = $providers;
 
@@ -179,7 +178,8 @@ foreach($map_center_works_councils_enrollments_qty as $center_id => $map_works_c
     }
 }
 
-$context->httpResponse()
-        ->header('X-Total-Count', count($result))
-        ->body($result)
-        ->send();
+$context
+    ->httpResponse()
+    ->header('X-Total-Count', count($result))
+    ->body($result)
+    ->send();

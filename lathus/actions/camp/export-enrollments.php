@@ -14,25 +14,25 @@ use sale\camp\Enrollment;
 
 [$params, $providers] = eQual::announce([
     'description'   => "Create a financial Export of ended camps enrollments.",
-    'help'          => "The generated export includes enrollments of ended camps that have not yet been exported.
-        The generated Export Document follows the AIGA software specifications.",
+    'help'          => "The generated export includes enrollments of ended camps that have not yet been exported.\n"
+                    ."The generated Export Document follows the AIGA software specifications.",
     'params'        => [
         'year' => [
             'type'          => 'integer',
             'description'   => 'The year the export needs to be created for.',
-            'default'       => fn() => (int) date('Y'),
-            'required'      => true
+            'required'      => true,
+            'default'       => fn() => (int) date('Y')
         ]
     ],
     'access'        => [
         'visibility'    => 'protected'
     ],
-    'constants'     => ['EMAIL_ERRORS_RECIPIENT'],
     'response'      => [
         'content-type'  => 'application/json',
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
+    'constants'     => ['EMAIL_ERRORS_RECIPIENT'],
     'providers'     => ['context', 'auth']
 ]);
 

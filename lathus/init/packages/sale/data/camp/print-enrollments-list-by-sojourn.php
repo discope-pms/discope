@@ -13,65 +13,56 @@ use equal\orm\Domain;
 use equal\orm\DomainCondition;
 use sale\camp\Camp;
 use Twig\Environment as TwigEnvironment;
-use Twig\Extension\ExtensionInterface;
 use Twig\Extra\Intl\IntlExtension;
 use Twig\Loader\FilesystemLoader as TwigFilesystemLoader;
 
 [$params, $providers] = eQual::announce([
     'description'   => "Print list of enrollments.",
     'params'        => [
-
-        'view_id' =>  [
-            'description'   => 'The identifier of the view <type.name>.',
+        'view_id' => [
             'type'          => 'string',
+            'description'   => 'The identifier of the view <type.name>.',
             'default'       => 'print.enrollments-list-by-sojourn'
         ],
-
         'date_from' => [
-            'type'              => 'date',
-            'description'       => "Date interval lower limit (defaults to first day of the current week).",
-            'default'           => fn() => strtotime('last Sunday')
+            'type'          => 'date',
+            'description'   => "Date interval lower limit (defaults to first day of the current week).",
+            'default'       => fn() => strtotime('last Sunday')
         ],
-
         'sojourn_number' => [
-            'type'              => 'string',
-            'description'       => "Sojourn number."
+            'type'          => 'string',
+            'description'   => "Sojourn number."
         ],
-
         'only_weekend' => [
-            'type'              => 'boolean',
-            'description'       => "Show only the children present during the weekend.",
-            'default'           => false
+            'type'          => 'boolean',
+            'description'   => "Show only the children present during the weekend.",
+            'default'       => false
         ],
-
         'only_saturday' => [
-            'type'              => 'boolean',
-            'description'       => "Show only the children present during the Saturday morning.",
-            'default'           => false
+            'type'          => 'boolean',
+            'description'   => "Show only the children present during the Saturday morning.",
+            'default'       => false
         ],
-
         'confirmed' => [
-            'type'              => 'boolean',
-            'description'       => "Display enrollments with confirmed status.",
-            'default'           => true
+            'type'          => 'boolean',
+            'description'   => "Display enrollments with confirmed status.",
+            'default'       => true
         ],
-
         'validated' => [
-            'type'              => 'boolean',
-            'description'       => "Display enrollments with validated status.",
-            'default'           => true
+            'type'          => 'boolean',
+            'description'   => "Display enrollments with validated status.",
+            'default'       => true
         ]
-
     ],
     'response'      => [
-        'content-type'      => 'application/pdf',
-        'accept-origin'     => '*'
+        'content-type'  => 'application/pdf',
+        'accept-origin' => '*'
     ],
     'providers'     => ['context']
 ]);
 
 /**
- * @var \equal\php\Context  $context
+ * @var \equal\php\Context $context
  */
 ['context' => $context] = $providers;
 
@@ -250,8 +241,8 @@ try {
     $html = $template->render(compact('map_sojourns_enrollments', 'today', 'date_from', 'date_to', 'title', 'subtitle'));
 }
 catch(Exception $e) {
-    trigger_error("ORM::error while parsing template - ".$e->getMessage(), QN_REPORT_DEBUG);
-    throw new Exception("template_parsing_issue", QN_ERROR_INVALID_CONFIG);
+    trigger_error("ORM::error while parsing template - ".$e->getMessage(), EQ_REPORT_DEBUG);
+    throw new Exception("template_parsing_issue", EQ_ERROR_INVALID_CONFIG);
 }
 
 /*

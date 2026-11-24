@@ -24,31 +24,30 @@ use sale\camp\Camp;
             }
         ],
         'all_centers' => [
-            'type'              => 'boolean',
-            'default'           =>  false,
-            'description'       => "Mark the all Center of the sojourn."
+            'type'          => 'boolean',
+            'description'   => "Mark the all Center of the sojourn.",
+            'default'       => false
         ],
         'date_from' => [
-            'type'              => 'date',
-            'description'       => "Output: Day of arrival / Input: Date interval lower limit (defaults to first day of year).",
-            'default'           => strtotime('first day of january this year')
+            'type'          => 'date',
+            'description'   => "Output: Day of arrival / Input: Date interval lower limit (defaults to first day of year).",
+            'default'       => strtotime('first day of january this year')
         ],
         'date_to' => [
-            'type'              => 'date',
-            'description'       => 'Output: Day of departure / Input: Date interval upper limit (defaults to last day of year).',
-            'default'           => strtotime('last day of december this year')
+            'type'          => 'date',
+            'description'   => 'Output: Day of departure / Input: Date interval upper limit (defaults to last day of year).',
+            'default'       => strtotime('last day of december this year')
         ],
         'confirmed' => [
-            'type'              => 'boolean',
-            'description'       => "Display enrollments with confirmed status.",
-            'default'           => true
+            'type'          => 'boolean',
+            'description'   => "Display enrollments with confirmed status.",
+            'default'       => true
         ],
         'validated' => [
-            'type'              => 'boolean',
-            'description'       => "Display enrollments with validated status.",
-            'default'           => true
+            'type'          => 'boolean',
+            'description'   => "Display enrollments with validated status.",
+            'default'       => true
         ],
-
         /* parameters used as properties of virtual entity */
 
         'center' => [
@@ -56,36 +55,36 @@ use sale\camp\Camp;
             'description'       => 'Name of the center.'
         ],
         'aamm' => [
-            'type'              => 'string',
-            'description'       => 'Year and month.'
+            'type'          => 'string',
+            'description'   => 'Year and month.'
         ],
         'nb_children' => [
-            'type'              => 'integer',
-            'description'       => 'Number of children participating to camps.'
+            'type'          => 'integer',
+            'description'   => 'Number of children participating to camps.'
         ],
         'camps' => [
-            'type'              => 'float',
-            'description'       => 'Total revenue for camps without weekend and saturday morning.'
+            'type'          => 'float',
+            'description'   => 'Total revenue for camps without weekend and saturday morning.'
         ],
         'saturday_mornings' => [
-            'type'              => 'float',
-            'description'       => 'Total revenue for stay until saturday mornings.'
+            'type'          => 'float',
+            'description'   => 'Total revenue for stay until saturday mornings.'
         ],
         'weekends' => [
-            'type'              => 'float',
-            'description'       => 'Total revenue for stay between two consecutive camps.'
+            'type'          => 'float',
+            'description'   => 'Total revenue for stay between two consecutive camps.'
         ],
         'discounts' => [
-            'type'              => 'float',
-            'description'       => 'Total discounts that have been applied.'
+            'type'          => 'float',
+            'description'   => 'Total discounts that have been applied.'
         ],
         'financial_helps' => [
-            'type'              => 'float',
-            'description'       => 'Total revenue that have to be collected.'
+            'type'          => 'float',
+            'description'   => 'Total revenue that have to be collected.'
         ],
         'enrollments' => [
-            'type'              => 'float',
-            'description'       => 'Total revenue from nights.'
+            'type'          => 'float',
+            'description'   => 'Total revenue from nights.'
         ]
     ],
     'response'      => [
@@ -115,14 +114,14 @@ if($params['center_id']) {
 if($params['all_centers']) {
     $user_id = $auth->userId();
     if($user_id <= 0) {
-        throw new Exception("user_unknown", QN_ERROR_NOT_ALLOWED);
+        throw new Exception("user_unknown", EQ_ERROR_NOT_ALLOWED);
     }
     $user = User::id($user_id)
         ->read(['centers_ids'])
         ->first(true);
 
     if(!$user) {
-        throw new Exception("unexpected_error", QN_ERROR_INVALID_USER);
+        throw new Exception("unexpected_error", EQ_ERROR_INVALID_USER);
     }
 
     $domain[] = ['center_id', 'in', $user['centers_ids']];
@@ -249,7 +248,8 @@ foreach($map_center_values as $center => $dates) {
     }
 }
 
-$context->httpResponse()
-        ->header('X-Total-Count', count($result))
-        ->body($result)
-        ->send();
+$context
+    ->httpResponse()
+    ->header('X-Total-Count', count($result))
+    ->body($result)
+    ->send();

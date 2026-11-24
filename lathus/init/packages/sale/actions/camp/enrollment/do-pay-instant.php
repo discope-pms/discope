@@ -12,14 +12,12 @@ use sale\camp\Enrollment;
     'description'   => "Create a manual payment to complete the payments of all fundings not related to a deposit invoice.",
     'help'          => "This action is intended for payment with bank card only. Manual payments can be undone while the enrollment is not fully balanced (and invoiced).",
     'params'        => [
-
-        'id' =>  [
+        'id' => [
             'type'          => 'integer',
-            'min'           => 1,
             'description'   => "Identifier of the targeted enrollment.",
+            'min'           => 1,
             'required'      => true
         ]
-
     ],
     'access'        => [
         'groups'        => ['booking.default.user', 'sale.default.administrator']
@@ -33,7 +31,7 @@ use sale\camp\Enrollment;
 ]);
 
 /**
- * @var \equal\php\Context  $context
+ * @var \equal\php\Context $context
  */
 ['context' => $context] = $providers;
 
@@ -66,6 +64,7 @@ foreach($enrollment['fundings_ids'] as $funding) {
     }
 }
 
-$context->httpResponse()
-        ->status(204)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(204)
+    ->send();

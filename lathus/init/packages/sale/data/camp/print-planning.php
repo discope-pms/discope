@@ -12,17 +12,16 @@ use Dompdf\Options as DompdfOptions;
 use sale\booking\TimeSlot;
 use sale\camp\Camp;
 use Twig\Environment as TwigEnvironment;
-use Twig\Extension\ExtensionInterface;
 use Twig\Extra\Intl\IntlExtension;
 use Twig\Loader\FilesystemLoader as TwigFilesystemLoader;
 
 [$params, $providers] = eQual::announce([
     'description'   => "Print the planning of activities and meals for given week (time interval is always reduced to 7 days based on date_from).",
     'params'        => [
-        'view_id' =>  [
-            'description'   => 'The identifier of the view <type.name>.',
-            'type'          => 'string',
-            'default'       => 'print.planning'
+        'view_id' => [
+            'type'              => 'string',
+            'description'       => 'The identifier of the view <type.name>.',
+            'default'           => 'print.planning'
         ],
         'date_from' => [
             'type'              => 'date',
@@ -34,16 +33,16 @@ use Twig\Loader\FilesystemLoader as TwigFilesystemLoader;
             'description'       => "Filter by camp."
         ]
     ],
-    'constants'     => ['L10N_LOCALE', 'L10N_TIMEZONE'],
     'response'      => [
-        'content-type'      => 'application/pdf',
-        'accept-origin'     => '*'
+        'content-type'  => 'application/pdf',
+        'accept-origin' => '*'
     ],
+    'constants'     => ['L10N_LOCALE', 'L10N_TIMEZONE'],
     'providers'     => ['context']
 ]);
 
 /**
- * @var \equal\php\Context  $context
+ * @var \equal\php\Context $context
  */
 ['context' => $context] = $providers;
 
@@ -284,8 +283,8 @@ try {
     $html = $template->render(compact('camps_planning', 'days_names'));
 }
 catch(Exception $e) {
-    trigger_error("ORM::error while parsing template - ".$e->getMessage(), QN_REPORT_DEBUG);
-    throw new Exception("template_parsing_issue", QN_ERROR_INVALID_CONFIG);
+    trigger_error("ORM::error while parsing template - ".$e->getMessage(), EQ_REPORT_DEBUG);
+    throw new Exception("template_parsing_issue", EQ_ERROR_INVALID_CONFIG);
 }
 
 /*
@@ -307,7 +306,8 @@ $font = $dompdf->getFontMetrics()->getFont("helvetica", "regular");
     Response
 */
 
-$context->httpResponse()
+$context
+    ->httpResponse()
     ->header('Content-Disposition', 'inline; filename="planning-with-meals.pdf"')
     ->body($dompdf->output())
     ->send();

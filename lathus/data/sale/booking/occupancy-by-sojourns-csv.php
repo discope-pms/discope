@@ -34,15 +34,13 @@ use identity\Center;
         'charset'               => 'utf-8',
         'accept-origin'         => '*'
     ],
-    'providers'     => ['context', 'orm', 'adapt']
+    'providers'     => ['context']
 ]);
 
 /**
- * @var \equal\php\Context                      $context
- * @var \equal\orm\ObjectManager                $orm
- * @var \equal\data\adapt\DataAdapterProvider   $dap
+ * @var \equal\php\Context $context
  */
-['context' => $context, 'orm' => $orm, 'adapt' => $dap] = $providers;
+['context' => $context] = $providers;
 
 /**
  * Methods

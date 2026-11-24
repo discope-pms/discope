@@ -13,7 +13,6 @@ use equal\data\DataFormatter;
 use identity\Center;
 use sale\camp\Sponsor;
 use Twig\Environment as TwigEnvironment;
-use Twig\Extension\ExtensionInterface;
 use Twig\Extra\Intl\IntlExtension;
 use Twig\Loader\FilesystemLoader as TwigFilesystemLoader;
 use Twig\TwigFilter;
@@ -21,49 +20,43 @@ use Twig\TwigFilter;
 [$params, $providers] = eQual::announce([
     'description'   => "Print the invoice of a specific sponsor.",
     'params'        => [
-
         'id' => [
             'type'              => 'integer',
             'description'       => "Id of the sponsor to invoice.",
             'required'          => true
         ],
-
-        'view_id' =>  [
-            'description'       => 'The identifier of the view <type.name>.',
+        'view_id' => [
             'type'              => 'string',
+            'description'       => 'The identifier of the view <type.name>.',
             'default'           => 'print.invoice'
         ],
-
         'date_from' => [
             'type'              => 'date',
             'description'       => "Date interval lower limit.",
             'default'           => fn() => strtotime('first day of january this year')
         ],
-
         'date_to' => [
             'type'              => 'date',
             'description'       => "Date interval upper limit.",
             'default'           => fn() => strtotime('last day of december this year')
         ],
-
         'center_id' => [
             'type'              => 'many2one',
             'foreign_object'    => 'identity\Center',
             'description'       => "The center for which we want to invoice the sponsors helps.",
             'default'           => 1
         ]
-
+    ],
+    'response'      => [
+        'content-type'  => 'application/pdf',
+        'accept-origin' => '*'
     ],
     'constants'     => ['L10N_LOCALE', 'L10N_TIMEZONE'],
-    'response'      => [
-        'content-type'      => 'application/pdf',
-        'accept-origin'     => '*'
-    ],
     'providers'     => ['context']
 ]);
 
 /**
- * @var \equal\php\Context  $context
+ * @var \equal\php\Context $context
  */
 ['context' => $context] = $providers;
 
@@ -231,8 +224,9 @@ $font = $dompdf->getFontMetrics()->getFont("helvetica", "regular");
     Response
 */
 
-$context->httpResponse()
-        // ->header('Content-Disposition', 'attachment; filename="document.pdf"')
-        ->header('Content-Disposition', 'inline; filename="facture.pdf"')
-        ->body($dompdf->output())
-        ->send();
+$context
+    ->httpResponse()
+    // ->header('Content-Disposition', 'attachment; filename="document.pdf"')
+    ->header('Content-Disposition', 'inline; filename="facture.pdf"')
+    ->body($dompdf->output())
+    ->send();

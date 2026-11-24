@@ -10,11 +10,11 @@ use sale\camp\catalog\Product;
 use sale\camp\price\Price;
 use sale\camp\price\PriceList;
 
-[$params, $provider] = eQual::announce([
+[$params, $providers] = eQual::announce([
     'description'   => "Returns tariffs list in CSV format, for the export to Lathus website.",
     'params'        => [],
     'access'        => [
-        'visibility'            => 'protected'
+        'visibility'    => 'protected'
     ],
     'response'      => [
         'content-type'          => 'text/csv',
@@ -26,9 +26,9 @@ use sale\camp\price\PriceList;
 ]);
 
 /**
- * @var \equal\php\Context  $context
+ * @var \equal\php\Context $context
  */
-['context' => $context] = $provider;
+['context' => $context] = $providers;
 
 $year = intval(date('Y'));
 if(intval(date('m')) >= 9) {
@@ -145,6 +145,7 @@ T2;294;Partenaires
 T3;337;Autres
 W;92;Week end";
 
-$context->httpResponse()
+$context
+    ->httpResponse()
     ->body($output)
     ->send();

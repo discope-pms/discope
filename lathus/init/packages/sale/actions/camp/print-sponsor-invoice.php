@@ -9,41 +9,37 @@
 [$params, $providers] = eQual::announce([
     'description'   => "Invoice the given price adapters between two dates to a sponsor.",
     'params'        => [
-
         'id' => [
-            'type'              => 'integer',
-            'description'       => "Id of the sponsor to invoice.",
-            'required'          => true
+            'type'          => 'integer',
+            'description'   => "Id of the sponsor to invoice.",
+            'required'      => true
         ],
-
         'date_from' => [
-            'type'              => 'date',
-            'description'       => "Use price adapters of enrollments to camps after this date.",
-            'required'          => true,
-            'default'           => fn() => strtotime('first day of january this year')
+            'type'          => 'date',
+            'description'   => "Use price adapters of enrollments to camps after this date.",
+            'required'      => true,
+            'default'       => fn() => strtotime('first day of january this year')
         ],
-
         'date_to' => [
-            'type'              => 'date',
-            'description'       => "Use price adapters of enrollments to camps before this date.",
-            'required'          => true,
-            'default'           => fn() => strtotime('last day of december this year')
+            'type'          => 'date',
+            'description'   => "Use price adapters of enrollments to camps before this date.",
+            'required'      => true,
+            'default'       => fn() => strtotime('last day of december this year')
         ]
-
     ],
     'access'        => [
-        'visibility'        => 'protected',
-        'groups'            => ['camp.default.administrator'],
+        'visibility'    => 'protected',
+        'groups'        => ['camp.default.administrator']
     ],
     'response'      => [
-        'content-type'      => 'application/pdf',
-        'accept-origin'     => '*'
+        'content-type'  => 'application/pdf',
+        'accept-origin' => '*'
     ],
     'providers'     => ['context']
 ]);
 
 /**
- * @var \equal\php\Context  $context
+ * @var \equal\php\Context $context
  */
 ['context' => $context] = $providers;
 
@@ -53,7 +49,8 @@ $output = eQual::run('get', 'sale_camp_print-sponsor-invoice', [
     'date_to'   => $params['date_to']
 ]);
 
-$context->httpResponse()
-        ->header('Content-Disposition', 'inline; filename="document.pdf"')
-        ->body($output)
-        ->send();
+$context
+    ->httpResponse()
+    ->header('Content-Disposition', 'inline; filename="document.pdf"')
+    ->body($output)
+    ->send();

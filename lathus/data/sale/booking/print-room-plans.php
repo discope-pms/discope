@@ -5,7 +5,6 @@
     Original author(s): Yesbabylon SRL
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
-;
 
 use discope\setting\Setting;
 use Dompdf\Dompdf;
@@ -22,39 +21,42 @@ use Twig\TwigFilter;
     'description'   => "Render a booking quote as a PDF document, given its id.",
     'params'        => [
         'id' => [
-            'description'   => 'Identifier of the booking to print.',
             'type'          => 'integer',
+            'description'   => 'Identifier of the booking to print.',
             'required'      => true
         ],
-        'view_id' =>  [
-            'description'   => 'The identifier of the view <type.name>.',
+        'view_id' => [
             'type'          => 'string',
+            'description'   => 'The identifier of the view <type.name>.',
             'default'       => 'print.room-plans'
         ],
-        'lang' =>  [
-            'description'   => 'Language in which labels and multilang field have to be returned (2 letters ISO 639-1).',
+        'lang' => [
             'type'          => 'string',
+            'description'   => 'Language in which labels and multilang field have to be returned (2 letters ISO 639-1).',
             'default'       => constant('DEFAULT_LANG')
         ],
-        'output' =>  [
-            'description'   => 'Output format of the document.',
+        'output' => [
             'type'          => 'string',
+            'description'   => 'Output format of the document.',
             'selection'     => ['pdf', 'html'],
             'default'       => 'pdf'
         ]
     ],
-    'constants'             => ['DEFAULT_LANG', 'L10N_LOCALE'],
-    'access' => [
-        'visibility'        => 'protected',
-        'groups'            => ['booking.default.user'],
+    'access'        => [
+        'visibility'    => 'protected',
+        'groups'        => ['booking.default.user']
     ],
     'response'      => [
-        'content-type'      => 'application/pdf',
-        'accept-origin'     => '*'
+        'content-type'  => 'application/pdf',
+        'accept-origin' => '*'
     ],
+    'constants'     => ['DEFAULT_LANG', 'L10N_LOCALE'],
     'providers'     => ['context']
 ]);
 
+/**
+ * @var \equal\php\Context $context
+ */
 ['context' => $context] = $providers;
 
 /**
@@ -111,7 +113,7 @@ $parent = get_parent_class($entity);
 $file = EQ_BASEDIR."/packages/$package/views/$class_path.{$params['view_id']}.html";
 
 if(!file_exists($file)) {
-    throw new Exception("unknown_view_id", QN_ERROR_UNKNOWN_OBJECT);
+    throw new Exception("unknown_view_id", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
 /*
@@ -269,10 +271,11 @@ catch(Exception $e) {
 */
 
 if($params['output'] == 'html') {
-    $context->httpResponse()
-            ->header('Content-Type', 'text/html')
-            ->body($html)
-            ->send();
+    $context
+        ->httpResponse()
+        ->header('Content-Type', 'text/html')
+        ->body($html)
+        ->send();
 
     exit(0);
 }
@@ -291,7 +294,8 @@ $canvas->page_text(530, $canvas->get_height() - 35, 'p. {PAGE_NUM} / {PAGE_COUNT
 
 $output = $dompdf->output();
 
-$context->httpResponse()
-        ->header('Content-Disposition', 'inline; filename="document.pdf"')
-        ->body($output)
-        ->send();
+$context
+    ->httpResponse()
+    ->header('Content-Disposition', 'inline; filename="document.pdf"')
+    ->body($output)
+    ->send();

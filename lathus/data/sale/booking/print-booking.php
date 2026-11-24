@@ -17,7 +17,6 @@ use sale\booking\Booking;
 use sale\booking\BookingLine;
 use sale\booking\BookingLineGroup;
 use Twig\Environment as TwigEnvironment;
-use Twig\Extension\ExtensionInterface;
 use Twig\Extra\Intl\IntlExtension;
 use Twig\Loader\FilesystemLoader as TwigFilesystemLoader;
 use Twig\TwigFilter;
@@ -30,37 +29,37 @@ use Twig\TwigFilter;
             'description'   => 'Identifier of the contract to print.',
             'required'      => true
         ],
-        'view_id' =>  [
-            'description'   => 'The identifier of the view <type.name>.',
+        'view_id' => [
             'type'          => 'string',
+            'description'   => 'The identifier of the view <type.name>.',
             'default'       => 'print.default'
         ],
-        'mode' =>  [
-            'description'   => 'Mode in which document has to be rendered: simple or detailed.',
+        'mode' => [
             'type'          => 'string',
+            'description'   => 'Mode in which document has to be rendered: simple or detailed.',
             'selection'     => ['grouped', 'detailed'],
             'default'       => 'grouped'
         ],
-        'output' =>  [
-            'description'   => 'Output format of the document.',
+        'output' => [
             'type'          => 'string',
+            'description'   => 'Output format of the document.',
             'selection'     => ['pdf', 'html'],
             'default'       => 'pdf'
         ]
     ],
     'access'        => [
-        'visibility'        => 'protected',
-        'groups'            => ['booking.default.user'],
+        'visibility'    => 'protected',
+        'groups'        => ['booking.default.user']
     ],
     'response'      => [
-        'content-type'      => 'application/pdf',
-        'accept-origin'     => '*'
+        'content-type'  => 'application/pdf',
+        'accept-origin' => '*'
     ],
     'providers'     => ['context']
 ]);
 
 /**
- * @var \equal\php\Context  $context
+ * @var \equal\php\Context $context
  */
 ['context' => $context] = $providers;
 
@@ -108,10 +107,10 @@ $package = array_shift($parts);
 $class_path = implode('/', $parts);
 $parent = get_parent_class($entity);
 
-$file = QN_BASEDIR."/packages/{$package}/views/{$class_path}.{$params['view_id']}.html";
+$file = EQ_BASEDIR."/packages/{$package}/views/{$class_path}.{$params['view_id']}.html";
 
 if(!file_exists($file)) {
-    throw new Exception("unknown_view_id", QN_ERROR_UNKNOWN_OBJECT);
+    throw new Exception("unknown_view_id", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
 /*
@@ -123,7 +122,7 @@ $booking = Booking::id($params['id'])
     ->first();
 
 if(is_null($booking)) {
-    throw new Exception("unknown_booking", QN_ERROR_UNKNOWN_OBJECT);
+    throw new Exception("unknown_booking", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
 /*
@@ -492,12 +491,13 @@ try {
     $html = $template->render($values);
 }
 catch(Exception $e) {
-    trigger_error("ORM::error while parsing template - ".$e->getMessage(), QN_REPORT_DEBUG);
-    throw new Exception("template_parsing_issue", QN_ERROR_INVALID_CONFIG);
+    trigger_error("ORM::error while parsing template - ".$e->getMessage(), EQ_REPORT_DEBUG);
+    throw new Exception("template_parsing_issue", EQ_ERROR_INVALID_CONFIG);
 }
 
 if($params['output'] == 'html') {
-    $context->httpResponse()
+    $context
+        ->httpResponse()
         ->header('Content-Type', 'text/html')
         ->body($html)
         ->send();
@@ -529,9 +529,10 @@ $canvas->page_text(530, $canvas->get_height() - 35, "p. {PAGE_NUM} / {PAGE_COUNT
 
 $output = $dompdf->output();
 
-$context->httpResponse()
-        // ->header('Content-Disposition', 'attachment; filename="document.pdf"')
-        ->header('Content-Disposition', 'inline; filename="document.pdf"')
-        ->body($output)
-        ->send();
+$context
+    ->httpResponse()
+    // ->header('Content-Disposition', 'attachment; filename="document.pdf"')
+    ->header('Content-Disposition', 'inline; filename="document.pdf"')
+    ->body($output)
+    ->send();
 

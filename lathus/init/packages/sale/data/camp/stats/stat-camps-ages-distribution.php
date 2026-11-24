@@ -43,7 +43,6 @@ use sale\camp\Camp;
             'description'       => "Display enrollments with validated status.",
             'default'           => true
         ],
-
         /* parameters used as properties of virtual entity */
         'center' => [
             'type'              => 'string',
@@ -107,15 +106,14 @@ use sale\camp\Camp;
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'     => ['context', 'adapt' , 'auth']
+    'providers'     => ['context', 'auth']
 ]);
 
 /**
  * @var \equal\php\Context                  $context
- * @var \equal\data\adapt\AdapterProvider   $adapter_provider
  * @var \equal\auth\AuthenticationManager   $auth
  */
-['context' => $context, 'adapt' => $adapter_provider, 'auth' => $auth] = $providers;
+['context' => $context, 'auth' => $auth] = $providers;
 
 $domain = [
     ['date_from', '>=', $params['date_from']],
@@ -244,6 +242,7 @@ usort($result, function($a, $b) {
     return $result;
 });
 
-$context->httpResponse()
-        ->body($result)
-        ->send();
+$context
+    ->httpResponse()
+    ->body($result)
+    ->send();

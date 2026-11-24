@@ -8,11 +8,11 @@
 
 use sale\camp\Camp;
 
-[$params, $provider] = eQual::announce([
+[$params, $providers] = eQual::announce([
     'description'   => "Returns camps list in CSV format, for the export to Lathus website.",
     'params'        => [],
     'access'        => [
-        'visibility'            => 'protected'
+        'visibility'    => 'protected'
     ],
     'response'      => [
         'content-type'          => 'text/csv',
@@ -24,9 +24,9 @@ use sale\camp\Camp;
 ]);
 
 /**
- * @var \equal\php\Context  $context
+ * @var \equal\php\Context $context
  */
-['context' => $context] = $provider;
+['context' => $context] = $providers;
 
 $year = intval(date('Y'));
 if(intval(date('m')) >= 9) {
@@ -117,6 +117,7 @@ $output = file_get_contents($tmp_file);
 
 $output = str_replace('"', '', $output);
 
-$context->httpResponse()
-        ->body($output)
-        ->send();
+$context
+    ->httpResponse()
+    ->body($output)
+    ->send();

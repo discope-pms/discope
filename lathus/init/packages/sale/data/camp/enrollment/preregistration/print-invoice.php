@@ -15,7 +15,6 @@ use sale\camp\Child;
 use sale\camp\Guardian;
 use sale\camp\Institution;
 use Twig\Environment as TwigEnvironment;
-use Twig\Extension\ExtensionInterface;
 use Twig\Extra\Intl\IntlExtension;
 use Twig\Loader\FilesystemLoader as TwigFilesystemLoader;
 use Twig\TwigFilter;
@@ -23,49 +22,43 @@ use Twig\TwigFilter;
 [$params, $providers] = eQual::announce([
     'description'   => "Render children's pre-registration given their IDs as a PDF document.",
     'params'        => [
-
         'id' => [
             'type'          => 'integer',
             'description'   => "Identifier of the child for which we need to print the pre-registration invoice."
         ],
-
         'ids' => [
             'type'          => 'array',
             'description'   => "Identifiers of the children for which we need to print the pre-registration invoice.",
             'help'          => "All children must have the same main guardian.",
             'default'       => []
         ],
-
         'center_id' => [
             'type'          => 'integer',
             'description'   => "The center for which we want to confirm the children pre-registration.",
             'required'      => true
         ],
-
-        'lang' =>  [
+        'lang' => [
             'type'          => 'string',
             'description'   => "Language in which labels and multilang field have to be returned (2 letters ISO 639-1).",
             'default'       => constant('DEFAULT_LANG')
         ],
-
-        'output' =>  [
+        'output' => [
             'type'          => 'string',
             'description'   => 'Output format of the document.',
             'selection'     => ['pdf', 'html'],
             'default'       => 'pdf'
         ]
-
     ],
-    'constants'             => ['DEFAULT_LANG', 'L10N_LOCALE'],
     'response'      => [
-        'content-type'      => 'application/pdf',
-        'accept-origin'     => '*'
+        'content-type'  => 'application/pdf',
+        'accept-origin' => '*'
     ],
+    'constants'     => ['DEFAULT_LANG', 'L10N_LOCALE'],
     'providers'     => ['context']
 ]);
 
 /**
- * @var \equal\php\Context  $context
+ * @var \equal\php\Context $context
  */
 ['context' => $context] = $providers;
 
@@ -303,15 +296,16 @@ try {
     $html = $template->render($values);
 }
 catch(Exception $e) {
-    trigger_error("ORM::error while parsing template - ".$e->getMessage(), QN_REPORT_DEBUG);
-    throw new Exception("template_parsing_issue", QN_ERROR_INVALID_CONFIG);
+    trigger_error("ORM::error while parsing template - ".$e->getMessage(), EQ_REPORT_DEBUG);
+    throw new Exception("template_parsing_issue", EQ_ERROR_INVALID_CONFIG);
 }
 
 if($params['output'] == 'html') {
-    $context->httpResponse()
-            ->header('Content-Type', 'text/html')
-            ->body($html)
-            ->send();
+    $context
+        ->httpResponse()
+        ->header('Content-Type', 'text/html')
+        ->body($html)
+        ->send();
 
     exit(0);
 }
@@ -337,8 +331,9 @@ $font = $dompdf->getFontMetrics()->getFont("helvetica", "regular");
 // get generated PDF raw binary
 $output = $dompdf->output();
 
-$context->httpResponse()
-        // ->header('Content-Disposition', 'attachment; filename="document.pdf"')
-        ->header('Content-Disposition', 'inline; filename="document.pdf"')
-        ->body($output)
-        ->send();
+$context
+    ->httpResponse()
+    // ->header('Content-Disposition', 'attachment; filename="document.pdf"')
+    ->header('Content-Disposition', 'inline; filename="document.pdf"')
+    ->body($output)
+    ->send();

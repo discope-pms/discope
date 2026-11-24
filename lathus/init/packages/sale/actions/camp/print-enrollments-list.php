@@ -25,13 +25,13 @@
             'default'       => false
         ]
     ],
-    'access' => [
-        'visibility'        => 'protected',
-        'groups'            => ['camp.default.user'],
+    'access'        => [
+        'visibility'    => 'protected',
+        'groups'        => ['camp.default.user']
     ],
     'response'      => [
-        'content-type'      => 'application/pdf',
-        'accept-origin'     => '*'
+        'content-type'  => 'application/pdf',
+        'accept-origin' => '*'
     ],
     'providers'     => ['context', 'adapt']
 ]);
@@ -83,7 +83,8 @@ else {
     $output = eQual::run('get', 'sale_camp_print-enrollments-list', $values);
 }
 
-$context->httpResponse()
-        ->header('Content-Disposition', 'inline; filename="enrollments-list.pdf"')
-        ->body($output)
-        ->send();
+$context
+    ->httpResponse()
+    ->header('Content-Disposition', 'inline; filename="enrollments-list.pdf"')
+    ->body($output)
+    ->send();

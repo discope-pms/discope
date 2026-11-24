@@ -11,74 +11,74 @@ use equal\orm\DomainCondition;
 use sale\camp\Camp;
 
 [$params, $providers] = eQual::announce([
-    'extends'       => 'core_model_collect',
-    'params'        => [
-        'entity' =>  [
-            'type'              => 'string',
-            'description'       => "Full name (including namespace) of the class to look into (e.g. 'core\\User').",
-            'default'           => 'sale\camp\price\PriceAdapter'
+    'extends'   => 'core_model_collect',
+    'params'    => [
+        'entity' => [
+            'type'          => 'string',
+            'description'   => "Full name (including namespace) of the class to look into (e.g. 'core\\User').",
+            'default'       => 'sale\camp\price\PriceAdapter'
         ],
         'origin_type' => [
-            'type'              => 'string',
-            'description'       => "Type of price adapter.",
-            'selection'         => [
+            'type'          => 'string',
+            'description'   => "Type of price adapter.",
+            'selection'     => [
                 'all',
                 'other',
                 'loyalty-discount'
             ],
-            'default' => 'all'
+            'default'       => 'all'
         ],
         'date_from' => [
-            'type'              => 'date',
-            'description'       => "Date interval lower limit.",
-            'default'           => fn() => strtotime('first day of January this year')
+            'type'          => 'date',
+            'description'   => "Date interval lower limit.",
+            'default'       => fn() => strtotime('first day of January this year')
         ],
         'date_to' => [
-            'type'              => 'date',
-            'description'       => 'Date interval upper limit.',
-            'default'           => fn() => strtotime('last day of December this year')
+            'type'          => 'date',
+            'description'   => 'Date interval upper limit.',
+            'default'       => fn() => strtotime('last day of December this year')
         ],
         'price_adapter_type' => [
-            'type'              => 'string',
-            'selection'         => [
+            'type'          => 'string',
+            'description'   => "Type of manual discount (fixed amount or percentage of the price).",
+            'selection'     => [
                 'all',
                 'percent',
                 'amount'
             ],
-            'description'       => "Type of manual discount (fixed amount or percentage of the price).",
-            'default'           => 'all'
+            'default'       => 'all'
         ],
         'min_amount' => [
-            'type'              => 'float',
-            'description'       => 'Min amount/percentage removed to the enrollment price.',
-            'default'           => 0
+            'type'          => 'float',
+            'description'   => 'Min amount/percentage removed to the enrollment price.',
+            'default'       => 0
         ],
         'max_amount' => [
-            'type'              => 'float',
-            'description'       => 'Max amount/percentage removed to the enrollment price.',
-            'default'           => 1000
+            'type'          => 'float',
+            'description'   => 'Max amount/percentage removed to the enrollment price.',
+            'default'       => 1000
         ],
         'name' => [
-            'type'              => 'string',
-            'description'       => 'The name of the price adapter'
+            'type'          => 'string',
+            'description'   => 'The name of the price adapter'
         ],
         'advanced_filter' => [
-            'type'              => 'string',
-            'description'       => 'Other filters are ignored except dates.',
-            'selection'         => [
+            'type'          => 'string',
+            'description'   => 'Other filters are ignored except dates.',
+            'selection'     => [
                 'all',
                 'second-sojourn',
                 'third-sojourn'
             ],
-            'default'           => 'all'
+            'default'       => 'all'
         ]
     ],
-    'response'      => [
+    'response'  => [
         'content-type'  => 'application/json',
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'     => ['context']
+    'providers' => ['context']
 ]);
 
 /**

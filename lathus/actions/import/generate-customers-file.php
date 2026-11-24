@@ -5,25 +5,24 @@
     Original author(s): Yesbabylon SRL
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
+
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
 [$params, $providers] = eQual::announce([
     'description'   => 'Advanced search for Bookings: returns a collection of Booking according to extra parameters.',
-    'params'        => [
-    ],
+    'params'        => [],
     'response'      => [
         'content-type'  => 'application/json',
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'     => [ 'context', 'orm' ]
+    'providers'     => ['context']
 ]);
 
 /**
  * @var \equal\php\Context $context
- * @var \equal\orm\ObjectManager $orm
  */
-['context' => $context, 'orm' => $orm] = $providers;
+['context' => $context] = $providers;
 
 
 $input_files = ['client.xlsx', 'indiv_client.xlsx', 'prospect.xlsx'];
@@ -171,6 +170,7 @@ $outputFile = $import_folder_path . "/import_{$timestamp}.json";
 file_put_contents($outputFile, json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
 
 
-$context->httpResponse()
-        ->status(204)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(204)
+    ->send();

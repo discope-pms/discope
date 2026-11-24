@@ -15,7 +15,6 @@ use sale\booking\BookingActivity;
 use sale\booking\BookingMeal;
 use sale\booking\TimeSlot;
 use Twig\Environment as TwigEnvironment;
-use Twig\Extension\ExtensionInterface;
 use Twig\Extra\Intl\IntlExtension;
 use Twig\Loader\FilesystemLoader as TwigFilesystemLoader;
 
@@ -23,52 +22,55 @@ use Twig\Loader\FilesystemLoader as TwigFilesystemLoader;
     'description'   => "Render a booking quote as a PDF document, given its id.",
     'params'        => [
         'id' => [
-            'description'   => 'Identifier of the booking to print.',
-            'type'          => 'integer',
-            'required'      => true
+            'type'              => 'integer',
+            'description'       => 'Identifier of the booking to print.',
+            'required'          => true
         ],
-        'view_id' =>  [
-            'description'   => 'The identifier of the view <type.name>.',
-            'type'          => 'string',
-            'default'       => 'print.activity'
+        'view_id' => [
+            'type'              => 'string',
+            'description'       => 'The identifier of the view <type.name>.',
+            'default'           => 'print.activity'
         ],
-        'mode' =>  [
-            'description'   => 'Mode in which document has to be rendered: simple or detailed.',
-            'type'          => 'string',
-            'selection'     => ['simple', 'grouped', 'detailed'],
-            'default'       => 'grouped'
+        'mode' => [
+            'type'              => 'string',
+            'description'       => 'Mode in which document has to be rendered: simple or detailed.',
+            'selection'         => ['simple', 'grouped', 'detailed'],
+            'default'           => 'grouped'
         ],
-        'lang' =>  [
-            'description'   => 'Language in which labels and multilang field have to be returned (2 letters ISO 639-1).',
-            'type'          => 'string',
-            'default'       => constant('DEFAULT_LANG')
+        'lang' => [
+            'type'              => 'string',
+            'description'       => 'Language in which labels and multilang field have to be returned (2 letters ISO 639-1).',
+            'default'           => constant('DEFAULT_LANG')
         ],
-        'output' =>  [
-            'description'   => 'Output format of the document.',
-            'type'          => 'string',
-            'selection'     => ['pdf', 'html'],
-            'default'       => 'pdf'
+        'output' => [
+            'type'              => 'string',
+            'description'       => 'Output format of the document.',
+            'selection'         => ['pdf', 'html'],
+            'default'           => 'pdf'
         ],
         'booking_line_group_id' => [
-            'type'          => 'many2one',
-            'foreign_object'=> 'sale\booking\BookingLineGroup',
-            'description'   => 'Identifier of the booking line group (sojourn) to print.'
+            'type'              => 'many2one',
+            'foreign_object'    => 'sale\booking\BookingLineGroup',
+            'description'       => 'Identifier of the booking line group (sojourn) to print.'
         ]
     ],
-    'constants'             => ['DEFAULT_LANG', 'L10N_LOCALE'],
-    'access' => [
-        'visibility'        => 'protected',
-        'groups'            => ['booking.default.user'],
+    'access'        => [
+        'visibility'    => 'protected',
+        'groups'        => ['booking.default.user']
     ],
     'response'      => [
-        'content-type'      => 'application/pdf',
-        'accept-origin'     => '*'
+        'content-type'  => 'application/pdf',
+        'accept-origin' => '*'
     ],
-    'providers'     => ['context', 'orm']
+    'constants'     => ['DEFAULT_LANG', 'L10N_LOCALE'],
+    'providers'     => ['context']
 ]);
 
 
-['context' => $context, 'orm' => $orm] = $providers;
+/**
+ * @var \equal\php\Context $context
+ */
+['context' => $context] = $providers;
 
 $getLabels = function($lang, $default_labels = []) {
     $view_i18n_file_path = sprintf('%s/packages/sale/i18n/%s/_parts/labels.json', EQ_BASEDIR, $lang);
@@ -97,10 +99,10 @@ $package = array_shift($parts);
 $class_path = implode('/', $parts);
 $parent = get_parent_class($entity);
 
-$file = QN_BASEDIR."/packages/{$package}/views/{$class_path}.{$params['view_id']}.html";
+$file = EQ_BASEDIR."/packages/{$package}/views/{$class_path}.{$params['view_id']}.html";
 
 if(!file_exists($file)) {
-    throw new Exception("unknown_view_id", QN_ERROR_UNKNOWN_OBJECT);
+    throw new Exception("unknown_view_id", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
 
@@ -177,7 +179,7 @@ $fields = [
 $booking = Booking::id($params['id'])->read($fields, $params['lang'])->first(true);
 
 if(!$booking) {
-    throw new Exception("unknown_contract", QN_ERROR_UNKNOWN_OBJECT);
+    throw new Exception("unknown_contract", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
 $logo_document_data = $booking['center_id']['organisation_id']['logo_document_id']['data'] ?? null;
@@ -388,7 +390,8 @@ catch(Exception $e) {
 }
 
 if($params['output'] == 'html') {
-    $context->httpResponse()
+    $context
+        ->httpResponse()
         ->header('Content-Type', 'text/html')
         ->body($html)
         ->send();
@@ -410,9 +413,10 @@ $canvas->page_text(530, $canvas->get_height() - 35, "p. {PAGE_NUM} / {PAGE_COUNT
 
 $output = $dompdf->output();
 
-$context->httpResponse()
-        ->header('Content-Disposition', 'inline; filename="document.pdf"')
-        ->body($output)
-        ->send();
+$context
+    ->httpResponse()
+    ->header('Content-Disposition', 'inline; filename="document.pdf"')
+    ->body($output)
+    ->send();
 
 
