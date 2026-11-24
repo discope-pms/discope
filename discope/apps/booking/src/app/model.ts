@@ -94,10 +94,10 @@ export class CustomerNatureClass {
   code: string = '';
   name: string = '';
   rate_class_id: RateClassClass = new RateClassClass();
-  customer_type_id: CustomerTypeClass = new CustomerTypeClass();
+  customer_type_id: IdentityTypeClass = new IdentityTypeClass();
 }
 
-export class CustomerTypeClass {
+export class IdentityTypeClass {
   id: number = 1;
   code: string = '';
   name: string = '';
