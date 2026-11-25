@@ -29,11 +29,19 @@ jobs:
       - run:
           name: List files in config directory
           command: ls -la ~/repo/config/
-      # create a config file with Discope specifics
+      # generate configuration using defaults from config/schema.json
+      - run: php run.php --do=core_config_generate
+      # add Discope specifics to the generated config
       - run:
-          name: Create a config file with Discope specifics
+          name: Add Discope specifics to the config file
           command: |
-            echo '{"DEFAULT_LANG": "fr", "ORM_EVENTS_FORCE_ONUPDATE_AT_CREATION": true}' > ~/repo/config/config.json
+            php -r '
+            $file = getenv("HOME") . "/repo/config/config.json";
+            $config = json_decode(file_get_contents($file), true, 512, JSON_THROW_ON_ERROR);
+            $config["DEFAULT_LANG"] = "fr";
+            $config["ORM_EVENTS_FORCE_ONUPDATE_AT_CREATION"] = true;
+            file_put_contents($file, json_encode($config, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR) . PHP_EOL);
+            '
       # Verify the content of the file
       - run:
           name: Verify the content of the config file
@@ -80,8 +88,6 @@ jobs:
       - run:
           name: List files in repo directory
           command: ls -la ~/repo/
-      # generate configuration using defaults from config/schema.json
-      - run: php run.php --do=core_config_generate
       # assign folders permissions
       - run: php run.php --do=init_fs
       # check that mandatory directories are present and have correct access rights set
@@ -153,11 +159,19 @@ jobs:
       - run:
           name: List files in config directory
           command: ls -la ~/repo/config/
-      # create a config file with Discope specifics
+      # generate configuration using defaults from config/schema.json
+      - run: php run.php --do=core_config_generate
+      # add Discope specifics to the generated config
       - run:
-          name: Create a config file with Discope specifics
+          name: Add Discope specifics to the config file
           command: |
-            echo '{"DEFAULT_LANG": "fr", "ORM_EVENTS_FORCE_ONUPDATE_AT_CREATION": true}' > ~/repo/config/config.json
+            php -r '
+            $file = getenv("HOME") . "/repo/config/config.json";
+            $config = json_decode(file_get_contents($file), true, 512, JSON_THROW_ON_ERROR);
+            $config["DEFAULT_LANG"] = "fr";
+            $config["ORM_EVENTS_FORCE_ONUPDATE_AT_CREATION"] = true;
+            file_put_contents($file, json_encode($config, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR) . PHP_EOL);
+            '
       # Verify the content of the file
       - run:
           name: Verify the content of the config file
@@ -204,8 +218,6 @@ jobs:
       - run:
           name: List files in repo directory
           command: ls -la ~/repo/
-      # generate configuration using defaults from config/schema.json
-      - run: php run.php --do=core_config_generate
       # assign folders permissions
       - run: php run.php --do=init_fs
       # check that mandatory directories are present and have correct access rights set
@@ -257,11 +269,19 @@ jobs:
       - run:
           name: List files in config directory
           command: ls -la ~/repo/config/
-      # create a config file with Discope specifics
+      # generate configuration using defaults from config/schema.json
+      - run: php run.php --do=core_config_generate
+      # add Discope specifics to the generated config
       - run:
-          name: Create a config file with Discope specifics
+          name: Add Discope specifics to the config file
           command: |
-            echo '{"DEFAULT_LANG": "fr", "ORM_EVENTS_FORCE_ONUPDATE_AT_CREATION": true}' > ~/repo/config/config.json
+            php -r '
+            $file = getenv("HOME") . "/repo/config/config.json";
+            $config = json_decode(file_get_contents($file), true, 512, JSON_THROW_ON_ERROR);
+            $config["DEFAULT_LANG"] = "fr";
+            $config["ORM_EVENTS_FORCE_ONUPDATE_AT_CREATION"] = true;
+            file_put_contents($file, json_encode($config, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR) . PHP_EOL);
+            '
       # Verify the content of the file
       - run:
           name: Verify the content of the config file
@@ -308,8 +328,6 @@ jobs:
       - run:
           name: List files in repo directory
           command: ls -la ~/repo/
-      # generate configuration using defaults from config/schema.json
-      - run: php run.php --do=core_config_generate
       # assign folders permissions
       - run: php run.php --do=init_fs
       # check that mandatory directories are present and have correct access rights set
