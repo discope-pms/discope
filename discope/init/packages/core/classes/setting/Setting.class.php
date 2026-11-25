@@ -572,7 +572,7 @@ class Setting extends Model {
      * This method is idempotent.
      * @return  void
      */
-    public static function ensure_value(string $package, string $section, string $code, $default=null, array $selector=[], string $lang=null) {
+    public static function ensure_value(string $package, string $section, string $code, $default=null, array $selector=[], ?string $lang=null) {
 
         if(!static::setting_exists($package, $section, $code)) {
             $type = str_replace('double', 'float', gettype($default));
@@ -597,7 +597,7 @@ class Setting extends Model {
     /**
      * @deprecated Use ensure_value() instead.
      */
-    public static function assert_value(string $package, string $section, string $code, $default=null, array $selector=[], string $lang=null) {
+    public static function assert_value(string $package, string $section, string $code, $default=null, array $selector=[], ?string $lang=null) {
         static::ensure_value($package, $section, $code, $default, $selector, $lang);
     }
 
@@ -607,7 +607,7 @@ class Setting extends Model {
      * This method is idempotent.
      * @return  void
      */
-    public static function ensure_sequence(string $package, string $section, string $code, $default=1, array $selector=[], string $lang=null) {
+    public static function ensure_sequence(string $package, string $section, string $code, $default=1, array $selector=[], ?string $lang=null) {
 
         if(!static::setting_exists($package, $section, $code)) {
             $setting_id = static::create_setting($package, $section, $code);
@@ -627,7 +627,7 @@ class Setting extends Model {
     /**
      * @deprecated Use ensure_sequence() instead.
      */
-    public static function assert_sequence(string $package, string $section, string $code, $default=1, array $selector=[], string $lang=null) {
+    public static function assert_sequence(string $package, string $section, string $code, $default=1, array $selector=[], ?string $lang=null) {
         static::ensure_sequence($package, $section, $code, $default, $selector, $lang);
     }
 
@@ -636,7 +636,7 @@ class Setting extends Model {
      *
      * @return  mixed       Returns the value of the target setting or value provided as default if the setting parameter is not found. The type of the returned var depends on the setting's `type` field.
      */
-    public static function get_value(string $package, string $section, string $code, $default=null, array $selectors=[], string $lang=null) {
+    public static function get_value(string $package, string $section, string $code, $default=null, array $selectors=[], ?string $lang=null) {
 
         $setting_id = static::get_setting_id($package, $section, $code);
         if(!$setting_id) {
@@ -753,7 +753,7 @@ class Setting extends Model {
      *
      * @return  void
      */
-    public static function set_value(string $package, string $section, string $code, $value, array $selector=[], string $lang=null) {
+    public static function set_value(string $package, string $section, string $code, $value, array $selector=[], ?string $lang=null) {
         if(!static::setting_exists($package, $section, $code)) {
             return false;
         }
