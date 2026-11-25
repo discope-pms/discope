@@ -80,6 +80,8 @@ jobs:
       - run:
           name: List files in repo directory
           command: ls -la ~/repo/
+      # generate configuration using defaults from config/schema.json
+      - run: php run.php --do=core_config_generate
       # assign folders permissions
       - run: php run.php --do=init_fs
       # check that mandatory directories are present and have correct access rights set
@@ -202,6 +204,8 @@ jobs:
       - run:
           name: List files in repo directory
           command: ls -la ~/repo/
+      # generate configuration using defaults from config/schema.json
+      - run: php run.php --do=core_config_generate
       # assign folders permissions
       - run: php run.php --do=init_fs
       # check that mandatory directories are present and have correct access rights set
@@ -304,6 +308,8 @@ jobs:
       - run:
           name: List files in repo directory
           command: ls -la ~/repo/
+      # generate configuration using defaults from config/schema.json
+      - run: php run.php --do=core_config_generate
       # assign folders permissions
       - run: php run.php --do=init_fs
       # check that mandatory directories are present and have correct access rights set
