@@ -180,7 +180,7 @@ class Guardian extends Model {
         ];
     }
 
-    public static function calcName($self): array {
+    protected static function calcName($self): array {
         $result = [];
         $self->read(['firstname', 'lastname']);
         foreach($self as $id => $child) {
@@ -203,7 +203,7 @@ class Guardian extends Model {
         return $result;
     }
 
-    public static function calcIsVienne($self): array {
+    protected static function calcIsVienne($self): array {
         $result = [];
         $self->read(['address_zip']);
         foreach($self as $id => $guardian) {
@@ -218,7 +218,7 @@ class Guardian extends Model {
         return $result;
     }
 
-    public static function calcIsCcvg($self): array {
+    protected static function calcIsCcvg($self): array {
         $result = [];
         $CCVG_cities = [
             'Adriers', 'Antigny', 'Asnières-sur-Blour', 'Availles-Limouzine', 'Béthines', 'Bouresse',
@@ -252,7 +252,7 @@ class Guardian extends Model {
         return $result;
     }
 
-    public static function onupdateChildrenIds($self) {
+    protected static function onupdateChildrenIds($self) {
         $self->read(['children_ids' => ['main_guardian_id']]);
         foreach($self as $id => $guardian) {
             foreach($guardian['children_ids'] as $cid => $child) {
@@ -263,7 +263,7 @@ class Guardian extends Model {
         }
     }
 
-    public static function onupdate($self, $values) {
+    protected static function onupdate($self, $values) {
         $self->read(['state', 'children_ids' => ['main_guardian_id']]);
         foreach($self as $id => $guardian) {
             if($guardian['state'] === 'draft' && isset($values['state']) && $values['state'] === 'instance') {

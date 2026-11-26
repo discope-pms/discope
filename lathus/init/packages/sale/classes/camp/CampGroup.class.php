@@ -302,7 +302,7 @@ class CampGroup extends Model {
         }
     }
 
-    public static function calcName($self): array {
+    protected static function calcName($self): array {
         $result = [];
         $self->read(['state', 'activity_group_num', 'camp_id' => ['short_name', 'camp_groups_ids']]);
         foreach($self as $id =>  $camp_group) {
@@ -315,7 +315,7 @@ class CampGroup extends Model {
         return $result;
     }
 
-    public static function calcAgeRange($self): array {
+    protected static function calcAgeRange($self): array {
         $result = [];
         $self->read(['camp_id' => ['is_clsh', 'age_range']]);
         foreach($self as $id => $camp_group) {
@@ -331,7 +331,7 @@ class CampGroup extends Model {
         return $result;
     }
 
-    public static function calcMaxChildren($self): array {
+    protected static function calcMaxChildren($self): array {
         $result = [];
         $self->read(['camp_id' => ['employee_ratio']]);
         foreach($self as $id => $camp) {
@@ -341,7 +341,7 @@ class CampGroup extends Model {
         return $result;
     }
 
-    public static function calcActivityGroupNum($self): array {
+    protected static function calcActivityGroupNum($self): array {
         $result = [];
         $self->read(['state', 'camp_id']);
         foreach($self as $id => $camp_group) {
@@ -453,7 +453,7 @@ class CampGroup extends Model {
         return parent::canupdate($self, $values);
     }
 
-    public static function onupdateCampId($self) {
+    protected static function onupdateCampId($self) {
         $self->read([
             'camp_id' => [
                 'id',
@@ -485,11 +485,11 @@ class CampGroup extends Model {
         $self->do('generate-activities');
     }
 
-    public static function onupdateEmployeeId($self) {
+    protected static function onupdateEmployeeId($self) {
         $self->do('refresh-partner-events');
     }
 
-    public static function onupdateSecondEmployeeId($self) {
+    protected static function onupdateSecondEmployeeId($self) {
         $self->do('refresh-partner-events');
     }
 

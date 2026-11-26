@@ -188,7 +188,7 @@ class Child extends Model {
         return parent::canupdate($self);
     }
 
-    public static function calcName($self): array {
+    protected static function calcName($self): array {
         $result = [];
         $self->read(['firstname', 'lastname']);
         foreach($self as $id => $child) {
@@ -200,7 +200,7 @@ class Child extends Model {
         return $result;
     }
 
-    public static function calcCampClass($self): array {
+    protected static function calcCampClass($self): array {
         $result = [];
         $self->read(['camp_class', 'is_cpa_member', 'main_guardian_id' => ['is_vienne', 'is_ccvg']]);
         foreach($self as $id => $child) {
@@ -223,7 +223,7 @@ class Child extends Model {
     /**
      * Reset child age of not locked enrollments
      */
-    public static function onupdateBirthdate($self) {
+    protected static function onupdateBirthdate($self) {
         $reset_age_enrollments_ids = [];
         $self->read(['enrollments_ids' => ['date_from']]);
         foreach($self as $child) {
@@ -240,7 +240,7 @@ class Child extends Model {
         }
     }
 
-    public static function onupdateIsFoster($self) {
+    protected static function onupdateIsFoster($self) {
         $self->read(['is_foster', 'institution_id']);
         foreach($self as $id => $child) {
             if(!$child['is_foster'] && !is_null($child['institution_id'])) {
@@ -249,7 +249,7 @@ class Child extends Model {
         }
     }
 
-    public static function onupdateIsCpaNumber($self) {
+    protected static function onupdateIsCpaNumber($self) {
         $self->read(['is_cpa_member', 'cpa_club']);
         foreach($self as $id => $child) {
             if(!$child['is_cpa_member'] && !is_null($child['cpa_club'])) {
@@ -261,7 +261,7 @@ class Child extends Model {
         }
     }
 
-    public static function onupdateMainGuardianId($self) {
+    protected static function onupdateMainGuardianId($self) {
         $self->read(['camp_class', 'main_guardian_id', 'guardians_ids']);
         foreach($self as $id => $child) {
             if($child['camp_class'] === 'other') {
@@ -273,7 +273,7 @@ class Child extends Model {
         }
     }
 
-    public static function onupdateGuardiansIds($self) {
+    protected static function onupdateGuardiansIds($self) {
         $self->read(['main_guardian_id', 'guardians_ids']);
         foreach($self as $id => $child) {
             if(is_null($child['main_guardian_id']) && !empty($child['guardians_ids'])) {
