@@ -1794,7 +1794,7 @@ class Enrollment extends Model {
         }
     }
 
-    public static function doResetCampEnrollmentsQty($self) {
+    protected static function doResetCampEnrollmentsQty($self) {
         $self->read(['camp_id']);
 
         $map_camps_ids = [];
@@ -1805,7 +1805,7 @@ class Enrollment extends Model {
         Camp::ids(array_keys($map_camps_ids))->update(['enrollments_qty' => null]);
     }
 
-    public static function doDeleteLines($self) {
+    protected static function doDeleteLines($self) {
         $lines_to_del = [];
         $self->read(['enrollment_lines_ids']);
         foreach($self as $enrollment) {
@@ -1817,7 +1817,7 @@ class Enrollment extends Model {
         }
     }
 
-    public static function doGeneratePresences($self) {
+    protected static function doGeneratePresences($self) {
         $self->read([
             'status',
             'is_clsh', 'camp_id', 'child_id', 'date_from', 'date_to', 'weekend_extra',
@@ -1952,7 +1952,7 @@ class Enrollment extends Model {
         }
     }
 
-    public static function doRemovePresences($self) {
+    protected static function doRemovePresences($self) {
         $self->read(['camp_id', 'child_id']);
         foreach($self as $enrollment) {
             Presence::search([
@@ -1963,13 +1963,13 @@ class Enrollment extends Model {
         }
     }
 
-    public static function doCancelAlerts($self, $dispatch) {
+    protected static function doCancelAlerts($self, $dispatch) {
         foreach($self as $id => $enrollment) {
             $dispatch->cancel('sale.enrollment.followup.task.reminder', 'sale\camp\Enrollment', $id);
         }
     }
 
-    public static function doRefreshCampProductLine($self) {
+    protected static function doRefreshCampProductLine($self) {
         $self->read([
             'is_clsh',
             'clsh_type',
@@ -2146,7 +2146,7 @@ class Enrollment extends Model {
         }
     }
 
-    public static function doRefreshRequiredDocuments($self) {
+    protected static function doRefreshRequiredDocuments($self) {
         $self->read([
             'enrollment_documents_ids'  => ['document_id'],
             'camp_id'                   => ['required_documents_ids']
@@ -2183,7 +2183,7 @@ class Enrollment extends Model {
         ]);
     }
 
-    public static function doGenerateFunding($self) {
+    protected static function doGenerateFunding($self) {
         $self->read([
             'paid_amount',
             'price',

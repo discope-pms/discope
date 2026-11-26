@@ -460,7 +460,7 @@ class Camp extends Model {
         ];
     }
 
-    public static function doGenerateMeals($self) {
+    protected static function doGenerateMeals($self) {
         $self->read(['is_clsh', 'date_from', 'date_to']);
 
         $time_slots = TimeSlot::search([])
@@ -527,21 +527,21 @@ class Camp extends Model {
         }
     }
 
-    public static function doRemoveMeals($self) {
+    protected static function doRemoveMeals($self) {
         $self->read([]);
         foreach($self as $id => $camp) {
             BookingMeal::search(['camp_id', '=', $id])->delete(true);
         }
     }
 
-    public static function doGenerateActivities($self) {
+    protected static function doGenerateActivities($self) {
         $self->read(['camp_groups_ids']);
         foreach($self as $id => $camp) {
             CampGroup::search(['id', 'in', $camp['camp_groups_ids']])->do('generate-activities');
         }
     }
 
-    public static function doCancelActivities($self) {
+    protected static function doCancelActivities($self) {
         $self->read(['camp_groups_ids']);
         foreach($self as $id => $camp) {
             CampGroup::search(['id', 'in', $camp['camp_groups_ids']])->do('cancel-activities');

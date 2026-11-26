@@ -173,7 +173,7 @@ class EnrollmentLine extends Model {
         ];
     }
 
-    public static function doResetEnrollmentsPrices($self) {
+    protected static function doResetEnrollmentsPrices($self) {
         $self->read(['enrollment_id']);
 
         $map_enrollment_ids = [];

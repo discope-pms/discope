@@ -285,7 +285,7 @@ class Child extends Model {
         }
     }
 
-    public static function doRemoveUnnecessaryPresences($self) {
+    protected static function doRemoveUnnecessaryPresences($self) {
         $self->read(['enrollments_ids' => ['camp_id']]);
         foreach($self as $child) {
             if(empty($child['enrollments_ids'])) {
