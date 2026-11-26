@@ -38,7 +38,7 @@ use sale\booking\GuestListItem;
         ],
         'lang' => [
             'type'              => 'string',
-            'description '      => 'Specific language for multilang field.',
+            'description'       => 'Specific language for multilang field.',
             'default'           => constant('DEFAULT_LANG')
         ]
     ],
