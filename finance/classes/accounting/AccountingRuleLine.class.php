@@ -59,7 +59,7 @@ class AccountingRuleLine extends Model {
     }
 
 
-    public static function calcAccount($self) {
+    protected static function calcAccount($self) {
         $result = [];
         $self->read(['account_id' => ['code']]);
         foreach($self as $id => $line) {

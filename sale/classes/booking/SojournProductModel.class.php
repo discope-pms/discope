@@ -80,7 +80,7 @@ class SojournProductModel extends Model {
         ];
     }
 
-    public static function calcQty($om, $ids, $lang) {
+    protected static function calcQty($om, $ids, $lang) {
         $result = [];
         $models = $om->read(self::getType(), $ids, ['rental_unit_assignments_ids.qty'], $lang);
         foreach($models as $id => $model) {
@@ -92,7 +92,7 @@ class SojournProductModel extends Model {
         return $result;
     }
 
-    public static function calcIsAccomodation($om, $ids, $lang) {
+    protected static function calcIsAccomodation($om, $ids, $lang) {
         $result = [];
         $models = $om->read(self::getType(), $ids, ['product_model_id.is_accomodation'], $lang);
         foreach($models as $id => $model) {
@@ -105,7 +105,7 @@ class SojournProductModel extends Model {
      * SPMA have been updated.
      * #memo - This handler is not called upon direct creation of SPMA.
      */
-    public static function onupdateRentalUnitAssignmentsIds($om, $ids, $values, $lang) {
+    protected static function onupdateRentalUnitAssignmentsIds($om, $ids, $values, $lang) {
         $spms = $om->read(self::getType(), $ids, ['booking_line_group_id', 'booking_id.status'], $lang);
 
         // reset qty computed field

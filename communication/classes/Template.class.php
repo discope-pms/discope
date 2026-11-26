@@ -68,7 +68,7 @@ class Template extends Model {
         ];
     }
 
-    public static function calcName($self) {
+    protected static function calcName($self) {
         $result = [];
         $self->read(['code', 'type', 'category_id' => ['name']]);
         foreach($self as $id => $template) {
@@ -82,17 +82,17 @@ class Template extends Model {
         return $result;
     }
 
-    public static function onupdateCode($self) {
+    protected static function onupdateCode($self) {
         $self->update(['name' => null]);
         $self->read(['name']);
     }
 
-    public static function onupdateType($self) {
+    protected static function onupdateType($self) {
         $self->update(['name' => null]);
         $self->read(['name']);
     }
 
-    public static function onupdateCategoryId($self) {
+    protected static function onupdateCategoryId($self) {
         $self->update(['name' => null]);
         $self->read(['name']);
     }

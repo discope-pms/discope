@@ -87,7 +87,7 @@ class RoomType extends \equal\orm\Model {
         ];
     }
 
-    public static function onupdatePropertyId($om, $ids, $lang) {
+    protected static function onupdatePropertyId($om, $ids, $lang) {
         $room_types = $om->read(self::getType(), $ids, ['property_id.center_id']);
 
         if($room_types > 0) {

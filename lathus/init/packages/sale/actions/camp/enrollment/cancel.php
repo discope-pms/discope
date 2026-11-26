@@ -34,7 +34,11 @@ use sale\pay\Funding;
             'type'          => 'float',
             'usage'         => 'amount/money:2',
             'description'   => "Amount of the cancellation fee.",
-            'default'       => function($id): float {
+            'default'       => function($id = null) {
+                if(is_null($id)) {
+                    return 0;
+                }
+
                 $enrollment = Enrollment::id($id)->read(['price', 'camp_id' => ['date_from']])->first();
                 if(is_null($enrollment)) {
                     return 0;

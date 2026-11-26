@@ -54,7 +54,7 @@ class InvoiceLineGroup extends Model {
     }
 
 
-    public static function onupdateInvoiceLinesIds($self) {
+    protected static function onupdateInvoiceLinesIds($self) {
         $self->do('reset-invoice-prices');
     }
 

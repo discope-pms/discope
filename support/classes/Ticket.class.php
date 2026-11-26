@@ -133,7 +133,7 @@ class Ticket extends Model {
     /**
      * Upon description update, we store the User-Agent header from the request into the `environment` field.
      */
-    public static function onupdateDescription($self) {
+    protected static function onupdateDescription($self) {
         /** @var \equal\php\Context $context */
         ['context' => $context] = \eQual::inject(['context']);
 

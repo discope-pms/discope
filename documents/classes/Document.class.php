@@ -107,7 +107,7 @@ class Document extends Model {
         ];
     }
 
-    public static function calcReadableSize($self): array {
+    protected static function calcReadableSize($self): array {
         $result = [];
 
         $precision = 1;
@@ -123,7 +123,7 @@ class Document extends Model {
         return $result;
     }
 
-    public static function calcLink($self): array {
+    protected static function calcLink($self): array {
         $result = [];
         $self->read(['hash']);
         foreach($self as $id => $document) {
@@ -135,7 +135,7 @@ class Document extends Model {
         return $result;
     }
 
-    public static function onupdateData($self) {
+    protected static function onupdateData($self) {
         $self->read(['hash', 'data']);
         foreach($self as $id => $document) {
             $content = $document['data'];
@@ -379,7 +379,7 @@ class Document extends Model {
      * By convention, generated thumbnail is always a JPEG image.
      *
      */
-    public static function calcPreviewImage($self): array {
+    protected static function calcPreviewImage($self): array {
         $result = [];
         $self->read(['name', 'type', 'data']);
         foreach($self as $id => $document) {

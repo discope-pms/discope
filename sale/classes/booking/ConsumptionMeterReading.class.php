@@ -96,7 +96,7 @@ class ConsumptionMeterReading extends \equal\orm\Model {
         ];
     }
 
-    public static function calcDisplayValue($om, $oids, $lang) {
+    protected static function calcDisplayValue($om, $oids, $lang) {
         $result = [];
         $meters = $om->read(self::getType(), $oids, ['index_value'], $lang);
         if($meters > 0){
@@ -254,7 +254,7 @@ class ConsumptionMeterReading extends \equal\orm\Model {
         return true;
     }
 
-    public static function calcBooking($om, $oids, $lang) {
+    protected static function calcBooking($om, $oids, $lang) {
         $result = [];
         $consumptions = $om->read(self::getType(), $oids, ['booking_inspection_id.booking_id'], $lang);
         if($consumptions > 0) {
@@ -265,7 +265,7 @@ class ConsumptionMeterReading extends \equal\orm\Model {
         return $result;
     }
 
-    public static function calcCenter($om, $oids, $lang) {
+    protected static function calcCenter($om, $oids, $lang) {
         $result = [];
         $consumptions = $om->read(self::getType(), $oids, ['booking_id.center_id'], $lang);
         if($consumptions > 0) {
@@ -276,7 +276,7 @@ class ConsumptionMeterReading extends \equal\orm\Model {
         return $result;
     }
 
-    public static function calcUnitPrice($om, $oids, $lang) {
+    protected static function calcUnitPrice($om, $oids, $lang) {
         $result = [];
         $readings = $om->read(self::getType(), $oids, [
             'date_reading',
@@ -298,7 +298,7 @@ class ConsumptionMeterReading extends \equal\orm\Model {
         return $result;
     }
 
-    public static function calcPriceId($om, $oids, $lang) {
+    protected static function calcPriceId($om, $oids, $lang) {
         $result = [];
         $readings = $om->read(self::getType(), $oids, [
             'date_reading',

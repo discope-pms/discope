@@ -98,27 +98,11 @@ class Customer extends \identity\Partner {
         ];
     }
 
-    public static function onupdateCustomerNatureId($om, $oids, $values, $lang) {
-        /*
-        // #memo - this has been removed to allow manual setting of rate class
-        $customers = $om->read(__CLASS__, $oids, ['customer_nature_id.rate_class_id', 'customer_nature_id.customer_type_id']);
-        if($customers > 0 && count($customers)) {
-            foreach($customers as $cid => $customer) {
-                $customer_type_id = $customer['customer_nature_id.customer_type_id'];
-                $rate_class_id = $customer['customer_nature_id.rate_class_id'];
-                if(!empty($customer_type_id) && !empty($rate_class_id)) {
-                    $om->update(__CLASS__, $oids, ['rate_class_id' => $rate_class_id, 'customer_type_id' => $customer_type_id]);
-                }
-            }
-        }
-        */
-    }
-
     /**
      * Computes the number of bookings made by the customer during the last two years.
      *
      */
-    public static function calcAddress($om, $oids, $lang) {
+    protected static function calcAddress($om, $oids, $lang) {
         $result = [];
 
         $customers = $om->read(__CLASS__, $oids, ['partner_identity_id.address_street', 'partner_identity_id.address_city'], $lang);
@@ -132,7 +116,7 @@ class Customer extends \identity\Partner {
      * Computes the number of bookings made by the customer during the last 12 months.
      *
      */
-    public static function calcCountBooking12($om, $oids, $lang) {
+    protected static function calcCountBooking12($om, $oids, $lang) {
         $result = [];
         $time = time();
         $from = mktime(0, 0, 0, date('m', $time)-12, date('d', $time), date('Y', $time));
@@ -152,7 +136,7 @@ class Customer extends \identity\Partner {
      * Computes the number of bookings made by the customer during the last two years.
      *
      */
-    public static function calcCountBooking24($om, $oids, $lang) {
+    protected static function calcCountBooking24($om, $oids, $lang) {
         $result = [];
         $time = time();
         $from = mktime(0, 0, 0, date('m', $time)-24, date('d', $time), date('Y', $time));
@@ -168,7 +152,7 @@ class Customer extends \identity\Partner {
         return $result;
     }
 
-    public static function calcEmailSecondary($om, $ids, $lang) {
+    protected static function calcEmailSecondary($om, $ids, $lang) {
         $result = [];
         $customers = $om->read(self::getType(), $ids, ['partner_identity_id.email_secondary']);
         foreach($customers as $id => $customer) {

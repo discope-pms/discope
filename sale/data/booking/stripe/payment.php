@@ -22,8 +22,8 @@ use sale\booking\channelmanager\Property;
         'psp_reference' => [
             'type'              => 'string',
             'description'       => 'Stripe payment intent identifier.',
-            'required'          => true,
-            'example'           => 'pi_3Ng07TJkzhOGpR2F066oJxMi'
+            'help'              => 'Example: `pi_3Ng07TJkzhOGpR2F066oJxMi`',
+            'required'          => true
         ]
     ],
     'response'      => [

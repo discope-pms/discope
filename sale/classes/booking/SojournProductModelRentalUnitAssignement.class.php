@@ -109,7 +109,7 @@ class SojournProductModelRentalUnitAssignement extends Model {
         ];
     }
 
-    public static function calcIsAccomodation($om, $ids, $lang) {
+    protected static function calcIsAccomodation($om, $ids, $lang) {
         $result = [];
         $assignments = $om->read(self::getType(), $ids, ['rental_unit_id.is_accomodation'], $lang);
         foreach($assignments as $oid => $assignment) {
@@ -118,7 +118,7 @@ class SojournProductModelRentalUnitAssignement extends Model {
         return $result;
     }
 
-    public static function onupdateRentalUnitId($om, $ids, $values, $lang) {
+    protected static function onupdateRentalUnitId($om, $ids, $values, $lang) {
         // reset is_accomodation flag (computed)
         $om->update(self::getType(), $ids, ['is_accomodation' => null], $lang);
 
@@ -148,7 +148,7 @@ class SojournProductModelRentalUnitAssignement extends Model {
     /**
      * This hook is used in order to reset parent SPM qty field, and to recreate consumptions relating to 'extra' groups involved in assignment update.
      */
-    public static function onupdateQty($om, $ids, $values, $lang) {
+    protected static function onupdateQty($om, $ids, $values, $lang) {
         $assignments = $om->read(self::getType(), $ids, ['booking_line_group_id', 'sojourn_product_model_id', 'booking_id.status'], $lang);
         if($assignments > 0 && count($assignments)) {
             // reset qty of parents SPM
@@ -167,7 +167,7 @@ class SojournProductModelRentalUnitAssignement extends Model {
         }
     }
 
-    public static function onupdateUseExtra($self) {
+    protected static function onupdateUseExtra($self) {
         $self->read(['use_extra', 'rental_unit_id' => ['extra']]);
         foreach($self as $id => $assignment) {
             if($assignment['rental_unit_id']['extra'] === 0) {
@@ -184,7 +184,7 @@ class SojournProductModelRentalUnitAssignement extends Model {
         }
     }
 
-    public static function onupdateExtraQty($self) {
+    protected static function onupdateExtraQty($self) {
         $self->read(['use_extra', 'extra_qty', 'rental_unit_id' => ['capacity', 'extra']]);
         foreach($self as $id => $assignment) {
             if(!$assignment['use_extra'] || $assignment['rental_unit_id']['extra'] === 0) {

@@ -114,7 +114,7 @@ class Price extends Model {
         ];
     }
 
-    public static function calcName($om, $oids, $lang) {
+    protected static function calcName($om, $oids, $lang) {
         $result = [];
         $res = $om->read(__CLASS__, $oids, ['product_id.sku', 'price_list_id.name', 'has_rate_class', 'rate_class_id.name']);
         if($res > 0 && count($res)) {
@@ -131,7 +131,7 @@ class Price extends Model {
         return $result;
     }
 
-    public static function calcVatRate($om, $oids, $lang) {
+    protected static function calcVatRate($om, $oids, $lang) {
         $result = [];
         $prices = $om->read(__CLASS__, $oids, ['accounting_rule_id.vat_rule_id.rate']);
 
@@ -145,7 +145,7 @@ class Price extends Model {
         return $result;
     }
 
-    public static function calcPriceVat($om, $oids, $lang) {
+    protected static function calcPriceVat($om, $oids, $lang) {
         $result = [];
         $prices = $om->read(__CLASS__, $oids, ['price', 'vat_rate']);
 
@@ -157,7 +157,7 @@ class Price extends Model {
         return $result;
     }
 
-    public static function calcIsActive($om, $oids, $lang) {
+    protected static function calcIsActive($om, $oids, $lang) {
         $result = [];
         $prices = $om->read(__CLASS__, $oids, ['price_list_id.is_active']);
 
@@ -169,22 +169,22 @@ class Price extends Model {
         return $result;
     }
 
-    public static function onupdateAccountingRuleId($om, $oids, $values, $lang) {
+    protected static function onupdateAccountingRuleId($om, $oids, $values, $lang) {
         $res = $om->update(__CLASS__, $oids, ['vat_rate' => null, 'price_vat' => null]);
     }
 
-    public static function onupdatePriceListId($om, $oids, $values, $lang) {
+    protected static function onupdatePriceListId($om, $oids, $values, $lang) {
         $om->update(__CLASS__, $oids, ['name' => null], $lang);
     }
 
-    public static function onupdateProductId($om, $oids, $values, $lang) {
+    protected static function onupdateProductId($om, $oids, $values, $lang) {
         $om->update(__CLASS__, $oids, ['name' => null], $lang);
     }
 
     /**
      * Update price, based on VAT incl. price and applied VAT rate
      */
-    public static function onupdatePriceVat($om, $oids, $values, $lang) {
+    protected static function onupdatePriceVat($om, $oids, $values, $lang) {
         $prices = $om->read(__CLASS__, $oids, ['price_vat', 'vat_rate']);
 
         if($prices > 0 && count($prices)) {
@@ -194,7 +194,7 @@ class Price extends Model {
         }
     }
 
-    public static function onupdatePrice($om, $oids, $values, $lang) {
+    protected static function onupdatePrice($om, $oids, $values, $lang) {
         $om->update(__CLASS__, $oids, ['price_vat' => null]);
     }
 

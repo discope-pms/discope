@@ -66,7 +66,7 @@ class Presence extends Model {
         ];
     }
 
-    public static function calcName($self): array {
+    protected static function calcName($self): array {
         $result = [];
         $self->read([
             'presence_date',

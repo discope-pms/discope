@@ -3,9 +3,6 @@
 use equal\data\adapt\DataAdapterProviderSql;
 
 [$params, $providers] = eQual::announce([
-    'type'          => 'do',
-    'name'          => 'migrate-sale-pay-bankstatementline',
-    'package_name'  => 'core',
     'description'   => 'Migrate the model discriminator for sale_pay_bankstatementline.',
     'params'        => [
         'confirm' => [

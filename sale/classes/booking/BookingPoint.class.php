@@ -129,7 +129,7 @@ class BookingPoint extends Model {
         }
     }
 
-    public static function calcName($self): array {
+    protected static function calcName($self): array {
         $result = [];
         $self->read(['booking_id' => ['name'], 'customer_id' => ['name'],  'points_value']);
         foreach($self as $id => $point) {

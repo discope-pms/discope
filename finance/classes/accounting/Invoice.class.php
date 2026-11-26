@@ -408,7 +408,7 @@ class Invoice extends Model {
         ]);
     }
 
-    public static function calcIsPaid($self) {
+    protected static function calcIsPaid($self) {
         $result = [];
         // #memo - fundings_ids targets all fundings relating to invoice: this includes the installments
         // we need to limit the check to the direct funding, if any
@@ -434,7 +434,7 @@ class Invoice extends Model {
         return $result;
     }
 
-    public static function calcPaymentReference($self) {
+    protected static function calcPaymentReference($self) {
         $result = [];
         $self->read(['number']);
         foreach($self as $id => $invoice) {
@@ -447,7 +447,7 @@ class Invoice extends Model {
         return $result;
     }
 
-    public static function calcJournalId($self): array {
+    protected static function calcJournalId($self): array {
         $result = [];
         $self->read([
             'status',
@@ -495,7 +495,7 @@ class Invoice extends Model {
     /**
      * #memo - this should not include installment [non-invoiced pre-payments] (we should deal with display_price instead)
      */
-    public static function calcTotalDiscount($self): array {
+    protected static function calcTotalDiscount($self): array {
         $result = [];
         $self->read(['invoice_lines_ids' => ['total', 'total_no_discount']]);
         foreach($self as $id => $invoice) {
@@ -514,7 +514,7 @@ class Invoice extends Model {
     /**
      * #memo - this should not include installment [non-invoiced pre-payments] (we should deal with display_price instead)
      */
-    public static function calcTotal($self): array {
+    protected static function calcTotal($self): array {
         $result = [];
         $self->read(['invoice_lines_ids' => ['total']]);
         foreach($self as $id => $invoice) {
@@ -529,7 +529,7 @@ class Invoice extends Model {
         return $result;
     }
 
-    public static function calcSubTotals($self): array {
+    protected static function calcSubTotals($self): array {
         $result = [];
         $self->read(['invoice_lines_ids' => ['vat_rate', 'total']]);
         foreach($self as $id => $invoice) {
@@ -551,7 +551,7 @@ class Invoice extends Model {
         return $result;
     }
 
-    public static function calcSubTotalsVat($self): array {
+    protected static function calcSubTotalsVat($self): array {
         $result = [];
         $self->read(['subtotals']);
         foreach($self as $id => $invoice) {
@@ -569,7 +569,7 @@ class Invoice extends Model {
         return $result;
     }
 
-    public static function calcTotalVat($self): array {
+    protected static function calcTotalVat($self): array {
         $result = [];
         $self->read(['subtotals_vat']);
         foreach($self as $id => $invoice) {
@@ -589,7 +589,7 @@ class Invoice extends Model {
     /**
      * #memo - this should not include installment [non-invoiced pre-payments] (we should deal with display_price instead)
      */
-    public static function calcPrice($self): array {
+    protected static function calcPrice($self): array {
         $result = [];
         $self->read(['total', 'total_vat']);
         foreach($self as $id => $booking) {
@@ -599,7 +599,7 @@ class Invoice extends Model {
         return $result;
     }
 
-    public static function calcBalance($self) {
+    protected static function calcBalance($self) {
         $result = [];
         $self->read(['booking_id', 'type', 'status', 'is_deposit', 'fundings_ids', 'price']);
         foreach($self as $id => $invoice) {
@@ -642,7 +642,7 @@ class Invoice extends Model {
         return $result;
     }
 
-    public static function calcDueDate($self) {
+    protected static function calcDueDate($self) {
         $result = [];
         $self->read([
             'created',
@@ -673,7 +673,7 @@ class Invoice extends Model {
         return $result;
     }
 
-    public static function calcAccountingTotal($self): array {
+    protected static function calcAccountingTotal($self): array {
         $result = [];
         $self->read([
             'organisation_id',
@@ -725,7 +725,7 @@ class Invoice extends Model {
         return $result;
     }
 
-    public static function calcAccountingPrice($self): array {
+    protected static function calcAccountingPrice($self): array {
         $result = [];
         $self->read(['accounting_total', 'subtotals_vat']);
         foreach($self as $id => $invoice) {
@@ -742,7 +742,7 @@ class Invoice extends Model {
         return $result;
     }
 
-    public static function calcDisplayPrice($self): array {
+    protected static function calcDisplayPrice($self): array {
         $result = [];
         $self->read(['type', 'price']);
         foreach($self as $id => $invoice) {
@@ -757,11 +757,11 @@ class Invoice extends Model {
         return $result;
     }
 
-    public static function onupdateInvoiceLinesIds($self) {
+    protected static function onupdateInvoiceLinesIds($self) {
         $self->update(['price' => null, 'total' => null]);
     }
 
-    public static function onupdateInvoiceLineGroupsIds($self) {
+    protected static function onupdateInvoiceLineGroupsIds($self) {
         $self->update(['price' => null, 'total' => null]);
     }
 
@@ -770,7 +770,7 @@ class Invoice extends Model {
      *
      * # todo - use getWorkflow with policies to replace onupdateStatus and canupdate
      */
-    public static function onupdateStatus($om, $oids, $values, $lang) {
+    protected static function onupdateStatus($om, $oids, $values, $lang) {
         // a number must be assigned to the invoice (if not already set)
         if(isset($values['status']) && $values['status'] == 'invoice') {
 

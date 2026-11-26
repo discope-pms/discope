@@ -113,7 +113,7 @@ class BankStatementLine extends Model {
      * Line is considered 'reconciled' if its amount matches the sum of its payments.
      *
      */
-    public static function onupdatePaymentsIds($om, $oids, $values, $lang) {
+    protected static function onupdatePaymentsIds($om, $oids, $values, $lang) {
         $lines = $om->read(self::getType(), $oids, ['amount', 'payments_ids.amount']);
 
         if($lines > 0) {
@@ -132,7 +132,7 @@ class BankStatementLine extends Model {
         }
     }
 
-    public static function onupdateStatus($om, $oids, $values, $lang) {
+    protected static function onupdateStatus($om, $oids, $values, $lang) {
         trigger_error("ORM::calling sale\pay\BankStatementLine::onupdateStatus", QN_REPORT_DEBUG);
 
         $lines = $om->read(self::getType(), $oids, ['status', 'bank_statement_id', 'payments_ids.partner_id']);
@@ -156,7 +156,7 @@ class BankStatementLine extends Model {
         }
     }
 
-    public static function calcRemainingAmount($om, $oids, $lang) {
+    protected static function calcRemainingAmount($om, $oids, $lang) {
         $result = [];
         $lines = $om->read(self::getType(), $oids, ['payments_ids', 'amount'], $lang);
         if($lines > 0) {

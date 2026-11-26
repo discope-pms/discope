@@ -73,7 +73,7 @@ class User extends \core\User {
         ];
     }
 
-    public static function calcName($self) {
+    protected static function calcName($self) {
         $result = [];
         $self->read(['login', 'identity_id' => ['name']]);
         foreach($self as $id => $user) {
@@ -87,7 +87,7 @@ class User extends \core\User {
         return $result;
     }
 
-    public static function onupdateCenterOfficesIds($self) {
+    protected static function onupdateCenterOfficesIds($self) {
         $self->read(['centers_ids', 'center_offices_ids' => ['centers_ids']]);
         foreach($self as $id => $user) {
             // pass-1 remove previous centers_ids

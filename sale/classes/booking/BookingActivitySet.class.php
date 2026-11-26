@@ -119,7 +119,7 @@ class BookingActivitySet extends Model {
         ];
     }
 
-    public static function doGenerateBookingActivities($self) {
+    protected static function doGenerateBookingActivities($self) {
         $self->read([
             'product_id',
             'date_from',
@@ -164,7 +164,7 @@ class BookingActivitySet extends Model {
         }
     }
 
-    public static function onupdateDateFrom($self) {
+    protected static function onupdateDateFrom($self) {
         $self->read(['state']);
         foreach($self as $id => $activity) {
             if($activity['state'] !== 'draft') {
@@ -173,7 +173,7 @@ class BookingActivitySet extends Model {
         }
     }
 
-    public static function onupdateDateTo($self) {
+    protected static function onupdateDateTo($self) {
         $self->read(['state']);
         foreach($self as $id => $activity) {
             if($activity['state'] !== 'draft') {

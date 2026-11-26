@@ -86,7 +86,7 @@ class ContractLineGroup extends \sale\contract\ContractLineGroup {
     /**
      * Get total tax-excluded price of the group, with discount applied.
      */
-    public static function calcTotal($self): array {
+    protected static function calcTotal($self): array {
         $result = [];
         $self->read([
             'is_pack',
@@ -113,7 +113,7 @@ class ContractLineGroup extends \sale\contract\ContractLineGroup {
     /**
      * Compute the VAT incl. total price of the group (pack), with manual and automated discounts applied.
      */
-    public static function calcPrice($self): array {
+    protected static function calcPrice($self): array {
         $result = [];
         $self->read([
             'total',

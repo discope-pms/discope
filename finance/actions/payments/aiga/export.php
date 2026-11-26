@@ -9,7 +9,6 @@ use identity\CenterOffice;
 use identity\User;
 
 [$params, $providers] = eQual::announce([
-    'name'          => "Generate Exports",
     'description'   => "Creates AIGA export archives with newly available data from invoices and payments.",
     'params'        => [],
     'access'        => [

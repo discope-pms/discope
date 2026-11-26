@@ -635,7 +635,7 @@ class ProductModel extends Model {
      *
      * Update related products is_pack
      */
-    public static function onupdateIsPack($om, $oids, $values, $lang) {
+    protected static function onupdateIsPack($om, $oids, $values, $lang) {
         $models = $om->read(get_called_class(), $oids, ['products_ids', 'is_pack']);
         foreach($models as $mid => $model) {
             $om->update('sale\catalog\Product', $model['products_ids'], ['is_pack' => $model['is_pack']]);
@@ -643,7 +643,7 @@ class ProductModel extends Model {
     }
 
 
-    public static function onupdateHasOwnPrice($om, $oids, $values, $lang) {
+    protected static function onupdateHasOwnPrice($om, $oids, $values, $lang) {
         $models = $om->read(get_called_class(), $oids, ['products_ids', 'has_own_price']);
         foreach($models as $mid => $model) {
             $om->update('sale\catalog\Product', $model['products_ids'], ['has_own_price' => $model['has_own_price']]);
@@ -655,21 +655,21 @@ class ProductModel extends Model {
      *
      * Update related products can_sell
      */
-    public static function onupdateCanSell($om, $oids, $values, $lang) {
+    protected static function onupdateCanSell($om, $oids, $values, $lang) {
         $models = $om->read(get_called_class(), $oids, ['products_ids', 'can_sell']);
         foreach($models as $mid => $model) {
             $om->update('sale\catalog\Product', $model['products_ids'], ['can_sell' => $model['can_sell']]);
         }
     }
 
-    public static function onupdateFamilyId($om, $oids, $values, $lang) {
+    protected static function onupdateFamilyId($om, $oids, $values, $lang) {
         $models = $om->read(get_called_class(), $oids, ['products_ids', 'family_id']);
         foreach($models as $mid => $model) {
             $om->update('sale\catalog\Product', $model['products_ids'], ['family_id' => $model['family_id']]);
         }
     }
 
-    public static function onupdateGroupsIds($om, $oids, $values, $lang) {
+    protected static function onupdateGroupsIds($om, $oids, $values, $lang) {
         $models = $om->read(get_called_class(), $oids, ['products_ids', 'groups_ids']);
         foreach($models as $mid => $model) {
             $products = $om->read('sale\catalog\Product', $model['products_ids'], ['groups_ids']);
@@ -684,7 +684,7 @@ class ProductModel extends Model {
     /**
      * Keep activity_rental_units_ids synced with has_rental_unit
      */
-    public static function onupdateHasRentalUnit($self) {
+    protected static function onupdateHasRentalUnit($self) {
         $self->read(['has_rental_unit', 'activity_rental_units_ids']);
         foreach($self as $id => $product_model) {
             if(!$product_model['has_rental_unit'] && !empty($product_model['activity_rental_units_ids'])) {
@@ -700,7 +700,7 @@ class ProductModel extends Model {
     /**
      * Keep has_rental_unit synced with activity_rental_units_ids
      */
-    public static function onupdateActivityRentalUnitIds($self) {
+    protected static function onupdateActivityRentalUnitIds($self) {
         $self->read(['has_rental_unit', 'activity_rental_units_ids']);
         foreach($self as $id => $product_model) {
             if(!empty($product_model['activity_rental_units_ids']) && !$product_model['has_rental_unit']) {
@@ -715,7 +715,7 @@ class ProductModel extends Model {
     /**
      * Assign the related rental unity capacity as own capacity.
      */
-    public static function onupdateRentalUnitId($om, $ids, $values, $lang) {
+    protected static function onupdateRentalUnitId($om, $ids, $values, $lang) {
         $models = $om->read(self::gettype(), $ids, ['rental_unit_id.capacity', 'rental_unit_id.is_accomodation'], $lang);
         foreach($models as $id => $model) {
             $om->update(self::gettype(), $id, ['capacity' => $model['rental_unit_id.capacity'], 'is_accomodation' => $model['rental_unit_id.is_accomodation']]);
@@ -725,14 +725,14 @@ class ProductModel extends Model {
     /**
      * Sync model with variants (products) upon change for `allow_price_adaptation`
      */
-    public static function onupdateAllowPriceAdaptation($om, $ids, $values, $lang) {
+    protected static function onupdateAllowPriceAdaptation($om, $ids, $values, $lang) {
         $models = $om->read(self::getType(), $ids, ['products_ids', 'allow_price_adaptation'], $lang);
         foreach($models as $id => $model) {
             $om->update('sale\catalog\Product', $model['products_ids'], ['allow_price_adaptation' => $model['allow_price_adaptation']]);
         }
     }
 
-    public static function onupdateIsRentalUnit($om, $ids, $values, $lang) {
+    protected static function onupdateIsRentalUnit($om, $ids, $values, $lang) {
         $models = $om->read(self::getType(), $ids, ['is_rental_unit'], $lang);
         foreach($models as $id => $model) {
             if(!$model['is_rental_unit']) {
@@ -741,7 +741,7 @@ class ProductModel extends Model {
         }
     }
 
-    public static function onupdateGroupingCode($om, $ids, $values, $lang) {
+    protected static function onupdateGroupingCode($om, $ids, $values, $lang) {
         $models = $om->read(self::getType(), $ids, ['products_ids','grouping_code_id'], $lang);
         foreach($models as $id => $model) {
             $om->update('sale\catalog\Product', $model['products_ids'], ['grouping_code_id' => $model['grouping_code_id']]);

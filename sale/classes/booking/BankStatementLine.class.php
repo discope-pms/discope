@@ -54,7 +54,7 @@ class BankStatementLine extends \sale\pay\BankStatementLine {
     /**
      * Handler for center_office_id updates.
      */
-    public static function onupdateCenterOfficeId($om, $ids, $values, $lang) {
+    protected static function onupdateCenterOfficeId($om, $ids, $values, $lang) {
         trigger_error("ORM::calling sale\booking\BankStatementLine::onupdateCenterOfficeId", QN_REPORT_DEBUG);
 
         $om->call(self::getType(), 'reconcile', $ids, $values, $lang);

@@ -56,7 +56,7 @@ class ExtraService extends \equal\orm\Model {
         ];
     }
 
-    public static function calcName($om, $ids, $lang) {
+    protected static function calcName($om, $ids, $lang) {
         $result = [];
         $services = $om->read(self::getType(), $ids, ['product_model_id.name'], $lang);
         if($services > 0) {

@@ -460,7 +460,7 @@ class Camp extends Model {
         ];
     }
 
-    public static function doGenerateMeals($self) {
+    protected static function doGenerateMeals($self) {
         $self->read(['is_clsh', 'date_from', 'date_to']);
 
         $time_slots = TimeSlot::search([])
@@ -527,28 +527,28 @@ class Camp extends Model {
         }
     }
 
-    public static function doRemoveMeals($self) {
+    protected static function doRemoveMeals($self) {
         $self->read([]);
         foreach($self as $id => $camp) {
             BookingMeal::search(['camp_id', '=', $id])->delete(true);
         }
     }
 
-    public static function doGenerateActivities($self) {
+    protected static function doGenerateActivities($self) {
         $self->read(['camp_groups_ids']);
         foreach($self as $id => $camp) {
             CampGroup::search(['id', 'in', $camp['camp_groups_ids']])->do('generate-activities');
         }
     }
 
-    public static function doCancelActivities($self) {
+    protected static function doCancelActivities($self) {
         $self->read(['camp_groups_ids']);
         foreach($self as $id => $camp) {
             CampGroup::search(['id', 'in', $camp['camp_groups_ids']])->do('cancel-activities');
         }
     }
 
-    public static function policyPublish($self): array {
+    protected static function policyPublish($self): array {
         $result = [];
         $self->read(['camp_groups_ids']);
         foreach($self as $camp) {
@@ -625,7 +625,7 @@ class Camp extends Model {
         ];
     }
 
-    public static function calcName($self): array {
+    protected static function calcName($self): array {
         $result = [];
         $self->read(['sojourn_number', 'short_name', 'date_from', 'date_to', 'min_age', 'max_age']);
 
@@ -650,7 +650,7 @@ class Camp extends Model {
         return $result;
     }
 
-    public static function calcSojournNumber($self): array {
+    protected static function calcSojournNumber($self): array {
         $result = [];
         $self->read(['center_id' => ['center_office_id' => ['code']]]);
 
@@ -666,7 +666,7 @@ class Camp extends Model {
         return $result;
     }
 
-    public static function calcCampCode($self): array {
+    protected static function calcCampCode($self): array {
         $result = [];
         $self->read(['sojourn_number']);
         foreach($self as $id => $camp) {
@@ -676,7 +676,7 @@ class Camp extends Model {
         return $result;
     }
 
-    public static function calcMinAge($self): array {
+    protected static function calcMinAge($self): array {
         $result = [];
         $self->read(['age_range']);
         foreach($self as $id => $camp) {
@@ -697,7 +697,7 @@ class Camp extends Model {
         return $result;
     }
 
-    public static function calcMaxAge($self): array {
+    protected static function calcMaxAge($self): array {
         $result = [];
         $self->read(['age_range']);
         foreach($self as $id => $camp) {
@@ -720,7 +720,7 @@ class Camp extends Model {
         return $result;
     }
 
-    public static function calcLocation($self): array {
+    protected static function calcLocation($self): array {
         $result = [];
         $self->read(['age_range']);
         foreach($self as $id => $camp) {
@@ -740,7 +740,7 @@ class Camp extends Model {
         return $result;
     }
 
-    public static function calcDefaultEmployeeRatio($self): array {
+    protected static function calcDefaultEmployeeRatio($self): array {
         $result = [];
         $self->read(['camp_model_id' => ['default_employee_ratio']]);
         foreach($self as $id => $camp) {
@@ -750,7 +750,7 @@ class Camp extends Model {
         return $result;
     }
 
-    public static function calcMaxChildren($self): array {
+    protected static function calcMaxChildren($self): array {
         $result = [];
         $self->read(['employee_ratio', 'camp_group_qty']);
         foreach($self as $id => $camp) {
@@ -760,7 +760,7 @@ class Camp extends Model {
         return $result;
     }
 
-    public static function calcEnrollmentsQty($self): array {
+    protected static function calcEnrollmentsQty($self): array {
         $result = [];
         $self->read(['enrollments_ids' => ['status']]);
         foreach($self as $id => $camp) {
@@ -827,7 +827,7 @@ class Camp extends Model {
         return $result;
     }
 
-    public static function onupdateDateFrom($self) {
+    protected static function onupdateDateFrom($self) {
         $self->read(['camp_groups_ids']);
         foreach($self as $camp) {
             CampGroup::search(['id', 'in', $camp['camp_groups_ids']])
@@ -836,7 +836,7 @@ class Camp extends Model {
         }
     }
 
-    public static function onupdateDateTo($self) {
+    protected static function onupdateDateTo($self) {
         $self->read(['camp_groups_ids']);
         foreach($self as $camp) {
             CampGroup::search(['id', 'in', $camp['camp_groups_ids']])
@@ -848,7 +848,7 @@ class Camp extends Model {
     /**
      * Sync camp model required skills and documents with the camp.
      */
-    public static function onupdateCampModelId($self) {
+    protected static function onupdateCampModelId($self) {
         $self->read(['camp_model_id' => ['required_skills_ids', 'required_documents_ids']]);
         foreach($self as $id => $camp) {
             if(!is_null($camp['camp_model_id'])) {
@@ -860,7 +860,7 @@ class Camp extends Model {
         }
     }
 
-    public static function onupdateEmployeeRatio($self) {
+    protected static function onupdateEmployeeRatio($self) {
         $self->read(['camp_groups_ids']);
         foreach($self as $camp) {
             CampGroup::ids($camp['camp_groups_ids'])

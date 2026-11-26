@@ -133,7 +133,7 @@ class ConsumptionMeter extends \equal\orm\Model {
         return $result;
     }
 
-    public static function calcName($om, $oids, $lang) {
+    protected static function calcName($om, $oids, $lang) {
         $result = [];
         $meters = $om->read(self::getType(), $oids, ['type_meter' , 'description_meter'], $lang);
         if($meters > 0){

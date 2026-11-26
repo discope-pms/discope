@@ -124,7 +124,7 @@ class PriceAdapter extends Model {
         return $result;
     }
 
-    public static function calcAmount($self): array {
+    protected static function calcAmount($self): array {
         $result = [];
         $self->read([
             'price_adapter_type',
@@ -181,7 +181,7 @@ class PriceAdapter extends Model {
         ];
     }
 
-    public static function doResetEnrollmentsPrices($self) {
+    protected static function doResetEnrollmentsPrices($self) {
         $self->read(['enrollment_id']);
 
         $map_enrollment_ids = [];
@@ -196,7 +196,7 @@ class PriceAdapter extends Model {
             ]);
     }
 
-    public static function onupdateValue($self) {
+    protected static function onupdateValue($self) {
         $self->do('reset-enrollments-prices');
     }
 

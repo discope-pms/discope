@@ -20,7 +20,7 @@ use sale\booking\TimeSlot;
             'type'              => 'date',
             'description'       => "Start date of the interval (included).",
             'required'          => true,
-            'default'           => function($params) {
+            'default'           => function($params = []) {
                 if(!isset($params['date_from'])) {
                     return strtotime('Monday this week');
                 }
@@ -34,7 +34,7 @@ use sale\booking\TimeSlot;
             'description'       => "Time slot of the planning.",
             'domain'            => ['code', 'in', ['AM', 'PM', 'EV']],
             'required'          => true,
-            'default'           => function($params) {
+            'default'           => function($params = []) {
                 if(!isset($params['time_slot_id'])) {
                     return null;
                 }

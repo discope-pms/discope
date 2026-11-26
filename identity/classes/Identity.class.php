@@ -748,7 +748,7 @@ class Identity extends Model {
         ];
     }
 
-    public static function calcType($self) {
+    protected static function calcType($self) {
         $result = [];
         $self->read(['type_id' => ['code']]);
         foreach($self as $id => $identity) {
@@ -759,7 +759,7 @@ class Identity extends Model {
         return $result;
     }
 
-    public static function calcAccountingAccount($self) {
+    protected static function calcAccountingAccount($self) {
         $result = [];
         $self->read(['id','name']);
         foreach($self as $id => $identity) {
@@ -806,7 +806,7 @@ class Identity extends Model {
      * For organisations the display name is the legal name
      * For individuals, the display name is the concatenation of first and last names
      */
-    public static function calcDisplayName($self) {
+    protected static function calcDisplayName($self) {
         $result = [];
 
         $person_format = Setting::get_value('identity', 'organization', 'identity.person.name_format', '%s{firstname} %s{lastname}');
@@ -851,28 +851,28 @@ class Identity extends Model {
         return $result;
     }
 
-    public static function onupdatePhone($self) {
+    protected static function onupdatePhone($self) {
         $self->read(['partners_ids']);
         foreach($self as $id => $identity) {
             Partner::ids($identity['partners_ids'])->update(['phone' => null]);
         }
     }
 
-    public static function onupdateMobile($self) {
+    protected static function onupdateMobile($self) {
         $self->read(['partners_ids']);
         foreach($self as $id => $identity) {
             Partner::ids($identity['partners_ids'])->update(['mobile' => null]);
         }
     }
 
-    public static function onupdateEmail($self) {
+    protected static function onupdateEmail($self) {
         $self->read(['partners_ids']);
         foreach($self as $id => $identity) {
             Partner::ids($identity['partners_ids'])->update(['email' => null]);
         }
     }
 
-    public static function onupdateName($self) {
+    protected static function onupdateName($self) {
         $self
             ->do('re-calc-is-duplicate')
             ->update(['display_name' => null]);
@@ -892,7 +892,7 @@ class Identity extends Model {
             ->read(['name']);
     }
 
-    public static function onupdateTypeId($self) {
+    protected static function onupdateTypeId($self) {
         $identity_type_individual = IdentityType::search(['code', '=', 'I'])->first();
 
         $partners_ids = [];
@@ -929,7 +929,7 @@ class Identity extends Model {
     /**
      * When lang_id is updated, perform cascading through the partners to update related lang_id
      */
-    public static function onupdateLangId($self) {
+    protected static function onupdateLangId($self) {
         $self->read(['partners_ids', 'lang_id']);
         foreach($self as $identity) {
             Partner::ids($identity['partners_ids'])->update(['lang_id' => $identity['lang_id']]);
@@ -939,7 +939,7 @@ class Identity extends Model {
     /**
      * When a reference partner is given, add it to the identity's contacts list.
      */
-    public static function onupdateReferencePartnerId($self) {
+    protected static function onupdateReferencePartnerId($self) {
         $self->read([
             'contacts_ids'          => ['partner_identity_id'],
             'reference_partner_id'  => ['partner_identity_id']
@@ -961,7 +961,7 @@ class Identity extends Model {
         }
     }
 
-    public static function onupdateAddress($self) {
+    protected static function onupdateAddress($self) {
         $self->do('re-calc-is-duplicate');
     }
 
@@ -1276,7 +1276,7 @@ class Identity extends Model {
         return $result;
     }
 
-    public static function calcIsDuplicate($self) {
+    protected static function calcIsDuplicate($self) {
         $result = [];
         $ids = $self->ids();
         $duplicate_identity_ids = self::getDuplicateIdentityId($ids);
@@ -1297,7 +1297,7 @@ class Identity extends Model {
         return $result;
     }
 
-    public static function onupdateIsDuplicate($self, $values) {
+    protected static function onupdateIsDuplicate($self, $values) {
         if(isset($values['is_duplicate']) && !$values['is_duplicate']) {
             $self->update(['duplicate_identity_id' => null, 'has_duplicate_clue' => false]);
         }

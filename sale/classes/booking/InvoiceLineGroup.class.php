@@ -32,7 +32,7 @@ class InvoiceLineGroup extends \finance\accounting\InvoiceLineGroup {
         ];
     }
 
-    public static function onupdateInvoiceLinesIds($self) {
+    protected static function onupdateInvoiceLinesIds($self) {
         $self->do('reset-invoice-prices');
     }
 

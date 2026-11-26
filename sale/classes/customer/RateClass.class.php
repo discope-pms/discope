@@ -56,7 +56,7 @@ class RateClass extends Model {
         ];
     }
 
-    public static function calcName($self) {
+    protected static function calcName($self) {
         $result = [];
         $self->read(['code', 'description']);
         foreach($self as $id => $rateClass) {
