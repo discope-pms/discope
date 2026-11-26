@@ -19,7 +19,7 @@ class DocumentTemp extends Document {
         return 'documents_document_temp';
     }
 
-    public static function calcLink($self): array {
+    protected static function calcLink($self): array {
         $result = [];
         $self->read(['hash']);
         foreach($self as $id => $document) {

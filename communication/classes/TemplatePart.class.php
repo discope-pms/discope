@@ -66,7 +66,7 @@ class TemplatePart extends Model {
         ];
     }
 
-    public static function calcExcerpt($self) {
+    protected static function calcExcerpt($self) {
         $result = [];
         $self->read(['value']);
         foreach ($self as $id => $part) {

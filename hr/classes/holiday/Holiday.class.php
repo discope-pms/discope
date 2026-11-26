@@ -42,7 +42,7 @@ class Holiday extends \equal\orm\Model {
         ];
     }
 
-    public static function calcYear($self) {
+    protected static function calcYear($self) {
         $result = [];
         $self->read(['date']);
         foreach($self as $id => $holiday) {

@@ -59,7 +59,7 @@ class DocumentCategory extends Model {
     }
 
 
-    public static function calcPath($self, $lang): array {
+    protected static function calcPath($self, $lang): array {
         $result = [];
         $self->read(['name', 'parent_id']);
         foreach($self as $id => $category) {

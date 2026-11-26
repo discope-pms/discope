@@ -136,7 +136,7 @@ class InvoiceLine extends Model {
         ];
     }
 
-    public static function calcName($self): array {
+    protected static function calcName($self): array {
         $result = [];
         $self->read(['product_id' => ['name']]);
         foreach($self as $id => $line) {
@@ -146,7 +146,7 @@ class InvoiceLine extends Model {
         return $result;
     }
 
-    public static function calcUnitPrice($self): array {
+    protected static function calcUnitPrice($self): array {
         $result = [];
         $self->read(['price_id' => ['price']]);
         foreach($self as $id => $line) {
@@ -156,7 +156,7 @@ class InvoiceLine extends Model {
         return $result;
     }
 
-    public static function calcVatRate($self): array {
+    protected static function calcVatRate($self): array {
         $result = [];
         $self->read(['price_id' => ['accounting_rule_id' => ['vat_rule_id' => ['rate']]]]);
         foreach($self as $id => $line) {
@@ -169,7 +169,7 @@ class InvoiceLine extends Model {
     /**
      * Get total tax-excluded price of the line before the discount is applied.
      */
-    public static function calcTotalNoDiscount($self): array {
+    protected static function calcTotalNoDiscount($self): array {
         $result = [];
         $self->read(['qty', 'unit_price']);
         foreach($self as $id => $line) {
@@ -183,7 +183,7 @@ class InvoiceLine extends Model {
     /**
      * Get total tax-excluded price of the line.
      */
-    public static function calcTotal($self): array {
+    protected static function calcTotal($self): array {
         $result = [];
         $self->read(['total_no_discount', 'discount']);
         foreach($self as $id => $line) {
@@ -197,7 +197,7 @@ class InvoiceLine extends Model {
     /**
      * Get final tax-included price of the line.
      */
-    public static function calcPrice($self): array {
+    protected static function calcPrice($self): array {
         $result = [];
         $self->read(['total', 'vat_rate']);
         foreach($self as $id => $line) {
@@ -207,25 +207,25 @@ class InvoiceLine extends Model {
         return $result;
     }
 
-    public static function onupdatePriceId($self, $values) {
+    protected static function onupdatePriceId($self, $values) {
         $self
             ->update(['vat_rate' => null, 'unit_price' => null, 'total' => null, 'price' => null])
             ->do('reset-invoice-prices');
     }
 
-    public static function onupdateVatRate($self) {
+    protected static function onupdateVatRate($self) {
         $self
             ->update(['price' => null])
             ->do('reset-invoice-prices');
     }
 
-    public static function onupdateQty($self) {
+    protected static function onupdateQty($self) {
         $self
             ->update(['price' => null, 'total' => null])
             ->do('reset-invoice-prices');
     }
 
-    public static function onupdateDiscount($self) {
+    protected static function onupdateDiscount($self) {
         $self
             ->update(['price' => null, 'total' => null])
             ->do('reset-invoice-prices');

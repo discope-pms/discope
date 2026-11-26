@@ -98,22 +98,6 @@ class Customer extends \identity\Partner {
         ];
     }
 
-    public static function onupdateCustomerNatureId($om, $oids, $values, $lang) {
-        /*
-        // #memo - this has been removed to allow manual setting of rate class
-        $customers = $om->read(__CLASS__, $oids, ['customer_nature_id.rate_class_id', 'customer_nature_id.customer_type_id']);
-        if($customers > 0 && count($customers)) {
-            foreach($customers as $cid => $customer) {
-                $customer_type_id = $customer['customer_nature_id.customer_type_id'];
-                $rate_class_id = $customer['customer_nature_id.rate_class_id'];
-                if(!empty($customer_type_id) && !empty($rate_class_id)) {
-                    $om->update(__CLASS__, $oids, ['rate_class_id' => $rate_class_id, 'customer_type_id' => $customer_type_id]);
-                }
-            }
-        }
-        */
-    }
-
     /**
      * Computes the number of bookings made by the customer during the last two years.
      *

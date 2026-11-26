@@ -81,13 +81,13 @@ class AccountingJournal extends Model {
                 'type'              => 'many2one',
                 'foreign_object'    => 'identity\CenterOffice',
                 'description'       => 'Management Group the accounting journal belongs to.',
-                'onupdate'          => 'updateCenterOfficeId'
+                'onupdate'          => 'onupdateCenterOfficeId'
             ]
 
         ];
     }
 
-    public static function calcName($self) {
+    protected static function calcName($self) {
         $result = [];
         $self->read(['code', 'organisation_id' => ['name']]);
         foreach($self as $id => $journal) {
@@ -97,7 +97,7 @@ class AccountingJournal extends Model {
         return $result;
     }
 
-    public static function updateCenterOfficeId($self) {
+    protected static function onupdateCenterOfficeId($self) {
         $self->read(['center_office_id' => ['organisation_id']]);
         foreach($self as $id => $journal) {
             AccountingJournal::id($id)->update([
