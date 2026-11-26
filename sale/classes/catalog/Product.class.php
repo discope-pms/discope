@@ -326,7 +326,7 @@ class Product extends Model {
      * Computes the display name of the product as a concatenation of Label and SKU.
      *
      */
-    public static function calcName($om, $ids, $lang) {
+    protected static function calcName($om, $ids, $lang) {
         $result = [];
         $res = $om->read(get_called_class(), $ids, ['label', 'sku'], $lang);
         foreach($res as $id => $odata) {
@@ -337,11 +337,11 @@ class Product extends Model {
         return $result;
     }
 
-    public static function onupdateLabel($om, $ids, $values, $lang) {
+    protected static function onupdateLabel($om, $ids, $values, $lang) {
         $om->update(self::getType(), $ids, ['name' => null], $lang);
     }
 
-    public static function onupdateSku($om, $ids, $values, $lang) {
+    protected static function onupdateSku($om, $ids, $values, $lang) {
         $products = $om->read(self::getType(), $ids, ['prices_ids']);
         if($products > 0 && count($products)) {
             $prices_ids = [];
@@ -353,7 +353,7 @@ class Product extends Model {
         $om->update(self::getType(), $ids, ['name' => null], $lang);
     }
 
-    public static function onupdateProductModelId($om, $ids, $values, $lang) {
+    protected static function onupdateProductModelId($om, $ids, $values, $lang) {
         $products = $om->read(get_called_class(), $ids, ['product_model_id.can_sell', 'product_model_id.groups_ids', 'product_model_id.family_id']);
         foreach($products as $id => $product) {
             $om->update(self::getType(), $id, [
@@ -364,14 +364,14 @@ class Product extends Model {
         }
     }
 
-    public static function onupdateAgeRangeId($self) {
+    protected static function onupdateAgeRangeId($self) {
         $self->read(['age_range_id']);
         foreach($self as $id => $product) {
             self::id($id)->update(['has_age_range' => boolval($product['age_range_id'])]);
         }
     }
 
-    public static function onupdateRateClassId($self) {
+    protected static function onupdateRateClassId($self) {
         $self->read(['rate_class_id']);
         foreach($self as $id => $product) {
             self::id($id)->update(['has_rate_class' => boolval($product['rate_class_id'])]);

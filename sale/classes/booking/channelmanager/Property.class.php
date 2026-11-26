@@ -102,7 +102,7 @@ class Property extends \equal\orm\Model {
         ];
     }
 
-    public static function calcName($om, $ids, $lang) {
+    protected static function calcName($om, $ids, $lang) {
         $result = [];
         $properties = $om->read(self::getType(), $ids, ['center_id.name']);
         if($properties > 0) {

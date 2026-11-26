@@ -129,7 +129,7 @@ class Funding extends \sale\pay\Funding {
         ];
     }
 
-    public static function calcName($om, $oids, $lang) {
+    protected static function calcName($om, $oids, $lang) {
         $result = [];
         $fundings = $om->read(get_called_class(), $oids, ['booking_id.name', 'due_amount', 'enrollment_id.name', 'enrollment_id.camp_id.sojourn_code'], $lang);
 
@@ -149,7 +149,7 @@ class Funding extends \sale\pay\Funding {
         return $result;
     }
 
-    public static function calcAmountShare($om, $ids, $lang) {
+    protected static function calcAmountShare($om, $ids, $lang) {
         $result = [];
         $fundings = $om->read(self::getType(), $ids, ['booking_id.price', 'due_amount'], $lang);
 
@@ -170,7 +170,7 @@ class Funding extends \sale\pay\Funding {
         return $result;
     }
 
-    public static function calcPaymentReference($om, $ids, $lang) {
+    protected static function calcPaymentReference($om, $ids, $lang) {
         $result = [];
         $fundings = $om->read(self::getType(), $ids, ['booking_id.payment_reference', 'enrollment_id.payment_reference'], $lang);
         foreach($fundings as $id => $funding) {
@@ -184,7 +184,7 @@ class Funding extends \sale\pay\Funding {
         return $result;
     }
 
-    public static function calcIsPaid($orm, $ids, $lang) {
+    protected static function calcIsPaid($orm, $ids, $lang) {
         $result = [];
         $fundings = $orm->read(self::getType(), $ids, ['booking_id', 'due_amount', 'paid_amount', 'invoice_id'], $lang);
         $map_bookings_ids = [];
@@ -221,7 +221,7 @@ class Funding extends \sale\pay\Funding {
      *
      * #note - this should not be necessary since Payment::onupdateFundingId is necessarily triggered at payment creation
      */
-    public static function calcPaidAmount($om, $oids, $lang) {
+    protected static function calcPaidAmount($om, $oids, $lang) {
         $result = [];
         $fundings = $om->read(self::getType(), $oids, ['booking_id', 'invoice_id', 'payments_ids.amount'], $lang);
         if($fundings > 0) {
@@ -244,7 +244,7 @@ class Funding extends \sale\pay\Funding {
     /**
      * When due_amount is updated (funding is assigned to a booking), we reset the amount_share of all the fundings of the booking.
      */
-    public static function onupdateDueAmount($orm, $oids, $values, $lang) {
+    protected static function onupdateDueAmount($orm, $oids, $values, $lang) {
         $fundings = $orm->read(self::getType(), $oids, ['booking_id']);
         $map_bookings_ids = [];
         if($fundings > 0 && count($fundings)) {
@@ -260,7 +260,7 @@ class Funding extends \sale\pay\Funding {
     /**
      * The field is_paid is a computed fields, but it can also be set manually to arbitrary mark an invoice as paid.
      */
-    public static function onupdateIsPaid($orm, $oids, $values, $lang) {
+    protected static function onupdateIsPaid($orm, $oids, $values, $lang) {
         $fundings = $orm->read(self::getType(), $oids, ['invoice_id', 'booking_id']);
         if($fundings > 0 && count($fundings)) {
             $map_bookings_ids = [];
@@ -279,7 +279,7 @@ class Funding extends \sale\pay\Funding {
         }
     }
 
-    public static function onupdateBookingId($orm, $ids, $values, $lang) {
+    protected static function onupdateBookingId($orm, $ids, $values, $lang) {
         $fundings = $orm->read(self::getType(), $ids, ['booking_id', 'booking_id.status', 'booking_id.center_id.center_office_id']);
         if($fundings > 0 && count($fundings)) {
             $map_bookings_ids = [];

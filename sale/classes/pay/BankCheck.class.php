@@ -156,7 +156,7 @@ class BankCheck extends Model {
         ];
     }
 
-    public static function calcName($self): array {
+    protected static function calcName($self): array {
         $result = [];
         $self->read(['bank_check_number', 'amount', 'emission_date']);
         foreach($self as $id => $bankCheck) {
@@ -165,7 +165,7 @@ class BankCheck extends Model {
         return $result;
     }
 
-    public static function calcEnrollmentId($self): array {
+    protected static function calcEnrollmentId($self): array {
         $result = [];
         $self->read(['funding_id' => ['enrollment_id']]);
         foreach($self as $id => $bank_check) {

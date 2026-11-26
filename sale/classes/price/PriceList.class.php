@@ -92,7 +92,7 @@ class PriceList extends Model {
         ];
     }
 
-    public static function calcDuration($om, $oids, $lang) {
+    protected static function calcDuration($om, $oids, $lang) {
         $result = [];
         $lists = $om->read(self::getType(), $oids, ['date_from', 'date_to']);
 
@@ -104,7 +104,7 @@ class PriceList extends Model {
         return $result;
     }
 
-    public static function calcIsActive($om, $ids, $lang) {
+    protected static function calcIsActive($om, $ids, $lang) {
         $result = [];
         $lists = $om->read(self::getType(), $ids, ['date_from', 'date_to', 'status']);
         $now = time();
@@ -117,7 +117,7 @@ class PriceList extends Model {
     }
 
 
-    public static function calcPricesCount($om, $oids, $lang) {
+    protected static function calcPricesCount($om, $oids, $lang) {
         $result = [];
         $lists = $om->read(self::getType(), $oids, ['prices_ids']);
 
@@ -132,7 +132,7 @@ class PriceList extends Model {
     /**
      * Invalidate related prices names.
      */
-    public static function onupdateName($om, $oids, $values, $lang) {
+    protected static function onupdateName($om, $oids, $values, $lang) {
         $lists = $om->read(self::getType(), $oids, ['prices_ids'], $lang);
 
         if($lists > 0) {
@@ -142,7 +142,7 @@ class PriceList extends Model {
         }
     }
 
-    public static function onupdateStatus($om, $ids, $values, $lang) {
+    protected static function onupdateStatus($om, $ids, $values, $lang) {
         $pricelists = $om->read(self::getType(), $ids, ['status', 'prices_ids']);
         $om->update(self::getType(), $ids, ['is_active' => null]);
         // immediate re-compute (required by subsequent re-computations of prices is_active flag)

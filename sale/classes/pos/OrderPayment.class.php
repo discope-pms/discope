@@ -132,7 +132,7 @@ class OrderPayment extends Model {
      * Sync the payment with the assigned order (fields has_funding and funding_id).
      * This handled is mostly called upon creation and assignation to an order.
      */
-    public static function onupdateOrderId($om, $ids, $values, $lang) {
+    protected static function onupdateOrderId($om, $ids, $values, $lang) {
         $payments = $om->read(self::getType(), $ids, ['order_id'], $lang);
         if($payments > 0) {
             foreach($payments as $id => $payment) {
@@ -148,7 +148,7 @@ class OrderPayment extends Model {
     /**
      *
      */
-    public static function onupdateStatus($om, $ids, $values, $lang) {
+    protected static function onupdateStatus($om, $ids, $values, $lang) {
         /*
         $payments = $om->read(self::getType(), $ids, ['status', 'order_payment_parts_ids'], $lang);
         if($payments > 0) {
@@ -158,7 +158,7 @@ class OrderPayment extends Model {
         */
     }
 
-    public static function onupdateFundingId($om, $ids, $values, $lang) {
+    protected static function onupdateFundingId($om, $ids, $values, $lang) {
         $payments = $om->read(self::getType(), $ids, ['order_id', 'funding_id', 'funding_id.booking_id', 'funding_id.invoice_id'], $lang);
         if($payments > 0) {
             $map_bookings_ids = [];
@@ -180,7 +180,7 @@ class OrderPayment extends Model {
         }
     }
 
-    public static function onupdateHasBooking($om, $ids, $values, $lang) {
+    protected static function onupdateHasBooking($om, $ids, $values, $lang) {
         // upon update, update related order lines accordingly
         $payments = $om->read(self::getType(), $ids, ['has_booking', 'booking_id', 'order_id', 'order_lines_ids'], $lang);
         if($payments > 0) {
@@ -191,7 +191,7 @@ class OrderPayment extends Model {
         }
     }
 
-    public static function calcTotalPaid($om, $ids, $lang) {
+    protected static function calcTotalPaid($om, $ids, $lang) {
         $result = [];
         $payments = $om->read(self::getType(), $ids, ['order_payment_parts_ids'], $lang);
         if($payments > 0) {
@@ -209,7 +209,7 @@ class OrderPayment extends Model {
         return $result;
     }
 
-    public static function calcTotalDue($self) {
+    protected static function calcTotalDue($self) {
         $result = [];
         $self->read([
             'order_lines_ids'   => ['price'],
@@ -258,7 +258,7 @@ class OrderPayment extends Model {
         return $result;
     }
 
-    public static function calcTotalChange($om, $ids, $lang) {
+    protected static function calcTotalChange($om, $ids, $lang) {
         $result = [];
         $payments = $om->read(self::getType(), $ids, ['total_due', 'total_paid'], $lang);
         if($payments > 0) {
@@ -272,7 +272,7 @@ class OrderPayment extends Model {
         return $result;
     }
 
-    public static function calcIsExported($om, $ids, $lang) {
+    protected static function calcIsExported($om, $ids, $lang) {
         $result = [];
         $payments = $om->read(self::getType(), $ids, ['payments_ids.is_exported']);
         foreach($payments as $id => $order_payment) {
@@ -286,11 +286,11 @@ class OrderPayment extends Model {
         return $result;
     }
 
-    public static function onupdateOrderPaymentPartsIds($om, $ids, $values, $lang) {
+    protected static function onupdateOrderPaymentPartsIds($om, $ids, $values, $lang) {
         $om->update(self::getType(), $ids, ['total_paid' => null], $lang);
     }
 
-    public static function onupdateOrderLinesIds($om, $ids, $values, $lang) {
+    protected static function onupdateOrderLinesIds($om, $ids, $values, $lang) {
         $om->update(self::getType(), $ids, ['total_due' => null], $lang);
     }
 

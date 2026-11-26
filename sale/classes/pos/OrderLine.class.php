@@ -140,7 +140,7 @@ class OrderLine extends Model {
     /**
      * Update parent Order for lines referring to a funding.
      */
-    public static function onupdateOrderId($om, $ids, $values, $lang) {
+    protected static function onupdateOrderId($om, $ids, $values, $lang) {
         $lines = $om->read(self::getType(), $ids, ['order_id', 'funding_id'], $lang);
         if($lines > 0) {
             foreach($lines as $id => $line) {
@@ -150,7 +150,7 @@ class OrderLine extends Model {
         }
     }
 
-    public static function onupdateProductId($om, $ids, $values, $lang) {
+    protected static function onupdateProductId($om, $ids, $values, $lang) {
         $lines = $om->read(self::getType(), $ids, ['product_id', 'order_id.center_id.price_list_category_id']);
 
         foreach($lines as $lid => $line) {
@@ -197,7 +197,7 @@ class OrderLine extends Model {
         }
     }
 
-    public static function onupdateFundingId($om, $ids, $values, $lang) {
+    protected static function onupdateFundingId($om, $ids, $values, $lang) {
         $lines = $om->read(self::getType(), $ids, ['order_id', 'has_funding', 'funding_id', 'funding_id.booking_id.customer_id'], $lang);
         if($lines > 0) {
             foreach($lines as $id => $line) {
@@ -222,7 +222,7 @@ class OrderLine extends Model {
         return [];
     }
 
-    public static function calcTotalNoDiscount($self): array{
+    protected static function calcTotalNoDiscount($self): array{
         $result = [];
         $self->read(['qty', 'free_qty', 'unit_price']);
         foreach($self as $id => $line) {
@@ -233,7 +233,7 @@ class OrderLine extends Model {
         return $result;
     }
 
-    public static function calcTotal($self): array {
+    protected static function calcTotal($self): array {
         $result = [];
         $self->read(['total_no_discount', 'discount']);
         foreach($self as $id => $line) {
@@ -247,7 +247,7 @@ class OrderLine extends Model {
     /**
      * Get final tax-included price of the line.
      */
-    public static function calcPrice($self): array {
+    protected static function calcPrice($self): array {
         $result = [];
         $self->read(['total', 'vat_rate']);
         foreach($self as $id => $line) {
@@ -261,7 +261,7 @@ class OrderLine extends Model {
      * Recompute the vat_incl and vat_excl prices of the line.
      * This method is used as onupdate handler for all fields impacting the price.
      */
-    public static function _resetPrice($om, $ids, $values, $lang) {
+    protected static function _resetPrice($om, $ids, $values, $lang) {
         $lines = $om->read(self::getType(), $ids, ['order_id'], $lang);
         if($lines > 0) {
             $orders_ids = array_map(function ($a) {return $a['order_id'];}, $lines);

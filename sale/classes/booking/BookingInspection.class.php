@@ -94,7 +94,7 @@ class BookingInspection extends \equal\orm\Model {
         ];
     }
 
-    public static function calcName($om, $oids, $lang) {
+    protected static function calcName($om, $oids, $lang) {
         $result = [];
         $meters = $om->read(self::getType(), $oids, ['booking_id.name' , 'type_inspection'], $lang);
         if($meters > 0){
@@ -105,7 +105,7 @@ class BookingInspection extends \equal\orm\Model {
         return $result;
     }
 
-    public static function onupdateName($om, $ids, $values, $lang) {
+    protected static function onupdateName($om, $ids, $values, $lang) {
         $res = $om->read(self::getType(), $ids, ['name'], $lang);
         if($res > 0 && count($res)) {
             foreach($res as $id => $meter) {

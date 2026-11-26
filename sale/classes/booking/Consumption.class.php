@@ -240,7 +240,7 @@ class Consumption extends Model {
     }
 
 
-    public static function calcName($om, $oids, $lang) {
+    protected static function calcName($om, $oids, $lang) {
         $result = [];
         $consumptions = $om->read(get_called_class(), $oids, ['booking_id.customer_id.name', 'booking_id.description', 'product_id.name', 'date', 'schedule_from']);
         if($consumptions) {
@@ -253,7 +253,7 @@ class Consumption extends Model {
         return $result;
     }
 
-    public static function onupdateRentalUnitId($om, $oids, $values, $lang) {
+    protected static function onupdateRentalUnitId($om, $oids, $values, $lang) {
         $consumptions = $om->read(self::getType(), $oids,
             [
                 'rental_unit_id',
@@ -359,7 +359,7 @@ class Consumption extends Model {
      * @param  string                     $lang       Language in which multilang fields are being updated.
      * @return void
      */
-    public static function onupdateScheduleFrom($om, $oids, $values, $lang) {
+    protected static function onupdateScheduleFrom($om, $oids, $values, $lang) {
         // booking_id is only assigned upon creation, so hook is called because of an update (not a creation)
         if(!isset($values['booking_id'])) {
             $consumptions = $om->read(self::getType(), $oids, ['is_rental_unit', 'date', 'schedule_from', 'booking_line_id'], $lang);
@@ -388,7 +388,7 @@ class Consumption extends Model {
      * @param  string                     $lang       Language in which multilang fields are being updated.
      * @return void
      */
-    public static function onupdateScheduleTo($om, $oids, $values, $lang) {
+    protected static function onupdateScheduleTo($om, $oids, $values, $lang) {
         // booking_id is only assigned upon creation, so hook is called because of an update (not a creation)
         if(!isset($values['booking_id'])) {
             $consumptions = $om->read(self::getType(), $oids, ['is_rental_unit', 'date', 'schedule_to', 'booking_line_id'], $lang);

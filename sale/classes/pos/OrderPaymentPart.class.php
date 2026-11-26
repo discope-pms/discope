@@ -163,7 +163,7 @@ class OrderPaymentPart extends \equal\orm\Model {
         ];
     }
 
-    public static function onupdateAmount($om, $ids, $values, $lang) {
+    protected static function onupdateAmount($om, $ids, $values, $lang) {
         $parts = $om->read(get_called_class(), $ids, ['order_payment_id'], $lang);
         if($parts > 0) {
             $order_payments_ids = array_reduce($parts, function($c, $o) { return array_merge($c, [$o['order_payment_id']]); }, []);
@@ -171,7 +171,7 @@ class OrderPaymentPart extends \equal\orm\Model {
         }
     }
 
-    public static function onupdateFundingId($om, $ids, $values, $lang) {
+    protected static function onupdateFundingId($om, $ids, $values, $lang) {
         $parts = $om->read(self::getType(), $ids, ['funding_id.booking_id'], $lang);
         if($parts > 0) {
             foreach($parts as $id => $part) {
@@ -183,7 +183,7 @@ class OrderPaymentPart extends \equal\orm\Model {
     /**
      * Force related funding to reset computed fields when status is updated.
      */
-    public static function onupdateStatus($om, $ids, $values, $lang) {
+    protected static function onupdateStatus($om, $ids, $values, $lang) {
         $parts = $om->read(self::getType(), $ids, ['order_payment_id', 'funding_id', 'funding_id.booking_id', 'funding_id.invoice_id'], $lang);
         if($parts > 0) {
             $map_bookings_ids = [];
@@ -211,7 +211,7 @@ class OrderPaymentPart extends \equal\orm\Model {
     /**
      * Retrieve partner_id, funding_id and center_office_id from parent order.
      */
-    public static function onupdateOrderPaymentId($om, $ids, $values, $lang) {
+    protected static function onupdateOrderPaymentId($om, $ids, $values, $lang) {
         $parts = $om->read(self::getType(), $ids, ['order_payment_id.order_id'], $lang);
         if($parts > 0) {
             foreach($parts as $id => $part) {
@@ -227,7 +227,7 @@ class OrderPaymentPart extends \equal\orm\Model {
     /**
      * @param \equal\orm\ObjectManager  $om Instance of the ObjectManager service.
      */
-    public static function onupdatePaymentMethod($om, $ids, $values, $lang) {
+    protected static function onupdatePaymentMethod($om, $ids, $values, $lang) {
         // upon update of the payment method, adapt parent payment and related line
         $parts = $om->read(self::getType(), $ids, ['payment_method', 'booking_id', 'order_payment_id'], $lang);
         if($parts > 0) {

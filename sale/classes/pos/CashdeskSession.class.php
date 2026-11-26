@@ -159,7 +159,7 @@ class CashdeskSession extends Model {
      *
      * If cashdesk id modified, then sync session center_id with it
      */
-    public static function onupdateCashdeskId($om, $oids, $values, $lang) {
+    protected static function onupdateCashdeskId($om, $oids, $values, $lang) {
         $sessions = $om->read(self::getType(), $oids, ['cashdesk_id.id', 'cashdesk_id.center_id', 'amount_opening', 'user_id'], $lang);
 
         if($sessions > 0) {
@@ -177,7 +177,7 @@ class CashdeskSession extends Model {
         }
     }
 
-    public static function onupdateStatus($om, $oids, $values, $lang) {
+    protected static function onupdateStatus($om, $oids, $values, $lang) {
         // upon session closing, create additional operation if there is a delta in cash amount
         if(isset($values['status']) && $values['status'] == 'closed') {
             $sessions = $om->read(self::getType(), $oids, ['cashdesk_id', 'user_id', 'amount_opening', 'amount_closing', 'operations_ids.amount'], $lang);
@@ -213,7 +213,7 @@ class CashdeskSession extends Model {
         }
     }
 
-    public static function calcName($om, $ids, $lang) {
+    protected static function calcName($om, $ids, $lang) {
         $result = [];
 
         $sessions = $om->read(self::getType(), $ids, ['cashdesk_id.name', 'user_id.name'], $lang);
@@ -229,7 +229,7 @@ class CashdeskSession extends Model {
         return $result;
     }
 
-    public static function calcLinkSheet($om, $ids, $lang) {
+    protected static function calcLinkSheet($om, $ids, $lang) {
         $result = [];
         foreach($ids as $id) {
             $result[$id] = '/?get=sale_pos_print-cashdeskSession-day&id='.$id;

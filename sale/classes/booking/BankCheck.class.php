@@ -45,7 +45,7 @@ class BankCheck extends \sale\pay\BankCheck  {
         ];
     }
 
-    public static function calcBookingId($self): array {
+    protected static function calcBookingId($self): array {
         $result = [];
         $self->read(['funding_id' =>['id', 'booking_id']]);
         foreach($self as $id => $bankCheck) {

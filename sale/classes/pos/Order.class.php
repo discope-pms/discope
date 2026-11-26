@@ -211,7 +211,7 @@ class Order extends Model {
      *
      * @param \equal\orm\ObjectManager  $om Instance of the ObjectManager service.
      */
-    public static function onupdateStatus($om, $ids, $values, $lang) {
+    protected static function onupdateStatus($om, $ids, $values, $lang) {
         if(!isset($values['status'])) {
             return;
         }
@@ -283,7 +283,7 @@ class Order extends Model {
     /**
      * Assign default customer_id based on the center that the session relates to.
      */
-    public static function onupdateSessionId($om, $ids, $values, $lang) {
+    protected static function onupdateSessionId($om, $ids, $values, $lang) {
         // retrieve default customers assigned to centers
         $orders = $om->read(self::getType(), $ids, ['session_id.center_id', 'session_id.center_id.pos_default_customer_id'], $lang);
 
@@ -299,11 +299,11 @@ class Order extends Model {
 
     }
 
-    public static function onupdateOrderLinesIds($om, $ids, $values, $lang) {
+    protected static function onupdateOrderLinesIds($om, $ids, $values, $lang) {
         $om->update(self::getType(), $ids, ['price' => null, 'total' => null], $lang);
     }
 
-    public static function onupdateFundingId($om, $ids, $values, $lang) {
+    protected static function onupdateFundingId($om, $ids, $values, $lang) {
         $orders = $om->read(self::getType(), $ids, ['funding_id'], $lang);
         if($orders > 0) {
             foreach($orders as $oid => $order) {
@@ -312,7 +312,7 @@ class Order extends Model {
         }
     }
 
-    public static function onupdateInvoiceId($om, $ids, $values, $lang) {
+    protected static function onupdateInvoiceId($om, $ids, $values, $lang) {
         $orders = $om->read(self::getType(), $ids, ['invoice_id'], $lang);
         if($orders > 0) {
             foreach($orders as $id => $order) {
@@ -321,7 +321,7 @@ class Order extends Model {
         }
     }
 
-    public static function calcName($self): array {
+    protected static function calcName($self): array {
         $result = [];
         $self->read(['sequence', 'session_id' => ['cashdesk_id']]);
         foreach($self as $id => $order) {
@@ -335,7 +335,7 @@ class Order extends Model {
         return $result;
     }
 
-    public static function calcSequence($self): array {
+    protected static function calcSequence($self): array {
         trigger_error("ORM::calling sale\pos\Order:calcSequence", QN_REPORT_DEBUG);
         $result = [];
         $self->read(['session_id']);
@@ -353,7 +353,7 @@ class Order extends Model {
         return $result;
     }
 
-    public static function calcTotal($self): array {
+    protected static function calcTotal($self): array {
         $result = [];
         $self->read(['order_lines_ids' => ['total']]);
         foreach($self as $id => $order) {
@@ -368,7 +368,7 @@ class Order extends Model {
         return $result;
     }
 
-    public static function calcSubTotals($self): array {
+    protected static function calcSubTotals($self): array {
         $result = [];
         $self->read(['order_lines_ids' => ['vat_rate', 'total']]);
         foreach($self as $id => $order) {
@@ -390,7 +390,7 @@ class Order extends Model {
         return $result;
     }
 
-    public static function calcSubTotalsVat($self): array {
+    protected static function calcSubTotalsVat($self): array {
         $result = [];
         $self->read(['subtotals']);
         foreach($self as $id => $order) {
@@ -406,7 +406,7 @@ class Order extends Model {
         return $result;
     }
 
-    public static function calcTotalVat($self): array {
+    protected static function calcTotalVat($self): array {
         $result = [];
         $self->read(['subtotals_vat']);
         foreach($self as $id => $order) {
@@ -421,7 +421,7 @@ class Order extends Model {
         return $result;
     }
 
-    public static function calcPrice($self): array {
+    protected static function calcPrice($self): array {
         $result = [];
         $self->read(['total', 'total_vat']);
         foreach($self as $id => $order) {
@@ -431,7 +431,7 @@ class Order extends Model {
         return $result;
     }
 
-    public static function calcTotalPaid($self): array {
+    protected static function calcTotalPaid($self): array {
         $result = [];
         $self->read(['order_payments_ids' => ['total_paid']]);
         foreach($self as $id => $order) {

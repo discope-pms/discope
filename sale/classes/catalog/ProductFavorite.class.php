@@ -56,7 +56,7 @@ class ProductFavorite extends Model {
      * Computes the display name of the product as a concatenation of Label and SKU.
      *
      */
-    public static function calcName($om, $oids, $lang) {
+    protected static function calcName($om, $oids, $lang) {
         $result = [];
         $res = $om->read(self::getType(), $oids, ['product_id.name'], $lang);
         foreach($res as $oid => $odata) {
@@ -65,7 +65,7 @@ class ProductFavorite extends Model {
         return $result;
     }
 
-    public static function onupdateProductId($om, $oids, $values, $lang) {
+    protected static function onupdateProductId($om, $oids, $values, $lang) {
         $om->update(self::getType(), $oids, ['name' => null], $lang);
     }
 

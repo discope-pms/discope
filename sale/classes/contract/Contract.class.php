@@ -123,7 +123,7 @@ class Contract extends Model {
         ];
     }
 
-    public static function calcName($self): array {
+    protected static function calcName($self): array {
         $result = [];
         $self->read(['id', 'customer_id' => ['name']]);
         foreach($self as $id => $contract) {
@@ -133,7 +133,7 @@ class Contract extends Model {
         return $result;
     }
 
-    public static function calcTotal($self): array {
+    protected static function calcTotal($self): array {
         $result = [];
         $self->read(['contract_lines_ids' => ['total']]);
         foreach($self as $id => $contract) {
@@ -148,7 +148,7 @@ class Contract extends Model {
         return $result;
     }
 
-    public static function calcSubTotals($self): array {
+    protected static function calcSubTotals($self): array {
         $result = [];
         $self->read(['contract_lines_ids' => ['vat_rate', 'total']]);
         foreach($self as $id => $contract) {
@@ -170,7 +170,7 @@ class Contract extends Model {
         return $result;
     }
 
-    public static function calcSubTotalsVat($self): array {
+    protected static function calcSubTotalsVat($self): array {
         $result = [];
         $self->read(['subtotals']);
         foreach($self as $id => $contract) {
@@ -186,7 +186,7 @@ class Contract extends Model {
         return $result;
     }
 
-    public static function calcTotalVat($self): array {
+    protected static function calcTotalVat($self): array {
         $result = [];
         $self->read(['subtotals_vat']);
         foreach($self as $id => $contract) {
@@ -201,7 +201,7 @@ class Contract extends Model {
         return $result;
     }
 
-    public static function calcPrice($self): array {
+    protected static function calcPrice($self): array {
         $result = [];
         $self->read(['total', 'total_vat']);
         foreach($self as $id => $contract) {

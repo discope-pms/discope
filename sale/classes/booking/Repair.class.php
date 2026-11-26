@@ -84,7 +84,7 @@ class Repair extends Consumption {
         ];
     }
 
-    public static function onupdateScheduleFrom($om, $oids, $values, $lang) {
+    protected static function onupdateScheduleFrom($om, $oids, $values, $lang) {
         $repairs = $om->read(self::getType(), $oids, ['repairing_id'], $lang);
         if($repairs > 0) {
             $repairings_ids = array_map(function($a) {return (int) $a['repairing_id'];}, $repairs);
@@ -92,7 +92,7 @@ class Repair extends Consumption {
         }
     }
 
-    public static function onupdateScheduleTo($om, $oids, $values, $lang) {
+    protected static function onupdateScheduleTo($om, $oids, $values, $lang) {
         $repairs = $om->read(self::getType(), $oids, ['repairing_id'], $lang);
         if($repairs > 0) {
             $repairings_ids = array_map(function($a) {return (int) $a['repairing_id'];}, $repairs);

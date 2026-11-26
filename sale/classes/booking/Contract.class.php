@@ -52,7 +52,7 @@ class Contract extends \sale\contract\Contract {
         ];
     }
 
-    public static function calcName($self): array {
+    protected static function calcName($self): array {
         $result = [];
         $self->read([
             'customer_id'   => ['name'],

@@ -66,7 +66,7 @@ class BookingTypeCondition extends Model {
         ];
     }
 
-    public static function calcName($self): array {
+    protected static function calcName($self): array {
         $result = [];
         $self->read(['operand', 'operator', 'value']);
         foreach($self as $id => $condition) {

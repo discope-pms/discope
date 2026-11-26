@@ -80,7 +80,7 @@ class Provider extends \identity\Partner {
         ];
     }
 
-    public static function calcAddress($self) {
+    protected static function calcAddress($self) {
         $result = [];
         $self->read(['partner_identity_id' => ['address_street', 'address_city']]);
         foreach($self as $id => $provider) {
@@ -92,7 +92,7 @@ class Provider extends \identity\Partner {
         return $result;
     }
 
-    public static function calcVatNumber($self) {
+    protected static function calcVatNumber($self) {
         $result = [];
         $self->read(['partner_identity_id' => ['vat_number']]);
         foreach($self as $id => $provider) {
@@ -104,7 +104,7 @@ class Provider extends \identity\Partner {
         return $result;
     }
 
-    public static function calcRegistrationNumber($self) {
+    protected static function calcRegistrationNumber($self) {
         $result = [];
         $self->read(['partner_identity_id' => ['registration_number']]);
         foreach($self as $id => $provider) {
