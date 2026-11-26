@@ -14,8 +14,8 @@ use sale\booking\TimeSlot;
     'description'   => "Activities planning for bookings and camps.",
     'params'        => [
         /**
-        * Filters
-        */
+         * Filters
+         */
         'date_from' => [
             'type'              => 'date',
             'description'       => "Start of the time interval of the desired plannings.",
@@ -33,8 +33,8 @@ use sale\booking\TimeSlot;
             'domain'            => ['code', 'in', ['AM', 'PM', 'EV']]
         ],
         /**
-        * Virtual model columns
-        */
+         * Virtual model columns
+         */
         'id' => [
             'type'              => 'integer',
             'description'       => "Identifier of the booking line."

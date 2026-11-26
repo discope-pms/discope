@@ -12,8 +12,8 @@ use sale\booking\BookingActivity;
     'description'   => "List activities of partners, used for reminding activities to external employees and providers.",
     'params'        => [
         /**
-        * Filters
-        */
+         * Filters
+         */
         'partner_id' => [
             'type'              => 'many2one',
             'foreign_object'    => 'identity\Partner',
@@ -36,8 +36,8 @@ use sale\booking\BookingActivity;
             'default'           => []
         ],
         /**
-        * Virtual model columns
-        */
+         * Virtual model columns
+         */
         'id' => [
             'type'              => 'integer',
             'description'       => "The id of the partner concerned by the planning."

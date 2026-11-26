@@ -27,6 +27,7 @@ use sale\pay\Payment;
 [$params, $providers] = eQual::announce([
     'description'   => "Pull enrollments from CPA Lathus API.",
     'params'        => [
+        /* #memo - `page_count` cannot be implemented since there is a req_limit of 60s */
         'page' => [
             'type'          => 'integer',
             'description'   => 'Page to fetch from the remote API..',
@@ -40,7 +41,6 @@ use sale\pay\Payment;
             'max'           => 200,
             'default'       => 30
         ]
-        // #memo `page_count` cannot be implemented since there is a req_limit of 60s
     ],
     'access'        => [
         'visibility'    => 'protected'

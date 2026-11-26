@@ -21,8 +21,8 @@ use sale\booking\Booking;
             'default'           => 'sale\booking\Funding'
         ],
         /**
-        * Funding filters
-        */
+         * Funding filters
+         */
         'due_amount_min' => [
             'type'              => 'integer',
             'description'       => 'Minimal amount expected for the funding.'
@@ -36,8 +36,8 @@ use sale\booking\Booking;
             'description'       => 'Message for identifying the purpose of the transaction.'
         ],
         /**
-        * Booking filters
-        */
+         * Booking filters
+         */
         'booking_id' => [
             'type'              => 'many2one',
             'foreign_object'    => 'sale\booking\Booking',
@@ -56,8 +56,8 @@ use sale\booking\Booking;
             'description'       => 'Name of the booking of the funding.'
         ],
         /**
-        * Customer
-        */
+         * Customer
+         */
         'customer_accounting_account' => [
             'type'              => 'string',
             'description'       => 'Accounting account of the customer\'s identity.'

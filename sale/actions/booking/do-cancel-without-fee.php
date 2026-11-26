@@ -19,13 +19,13 @@
             'type'          => 'string',
             'description'   => "Reason of the booking cancellation.",
             'selection'     => [
-                'other',                    // customer cancelled for a non-listed reason or without mentioning the reason (cancellation fees might apply)
-                'overbooking',              // the booking was cancelled due to failure in delivery of the service
-                'duplicate',                // several contacts of the same group made distinct bookings for the same sojourn
-                'internal_impediment',      // cancellation due to an incident impacting the rental units
-                'external_impediment',      // cancellation due to external delivery failure (organization, means of transport, ...)
-                'health_impediment',        // cancellation for medical or mourning reason
-                'ota'                       // cancellation was made through the channel manager
+                'other',                // customer cancelled for a non-listed reason or without mentioning the reason (cancellation fees might apply)
+                'overbooking',          // the booking was cancelled due to failure in delivery of the service
+                'duplicate',            // several contacts of the same group made distinct bookings for the same sojourn
+                'internal_impediment',  // cancellation due to an incident impacting the rental units
+                'external_impediment',  // cancellation due to external delivery failure (organization, means of transport, ...)
+                'health_impediment',    // cancellation for medical or mourning reason
+                'ota'                   // cancellation was made through the channel manager
             ],
             'required'      => true
         ]

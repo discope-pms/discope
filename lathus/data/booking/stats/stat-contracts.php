@@ -75,7 +75,6 @@ use sale\customer\Customer;
             'description'       => "Identity type of the customer."
         ],
         /* parameters used as properties of virtual entity */
-
         'center' => [
             'type'              => 'string',
             'description'       => 'Name of the center.'

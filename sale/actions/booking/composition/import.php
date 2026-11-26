@@ -8,7 +8,6 @@
 
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Reader;
-use PhpOffice\PhpSpreadsheet\Spreadsheet;
 
 
 [$params, $providers] = eQual::announce([
@@ -28,8 +27,7 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
     'access'        => [
         'visibility'    => 'public',
         // 'public' (default) or 'private' (can be invoked by CLI only)
-        'groups'            => ['booking.default.user'],
-        // list of groups ids or names granted
+        'groups'            => ['booking.default.user']
     ],
     'response'      => [
         'content-type'  => 'application/json',

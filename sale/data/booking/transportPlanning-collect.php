@@ -17,8 +17,8 @@ use sale\catalog\Product;
     'description'   => 'Advanced search for : returns a collection of Reports according to extra parameters.',
     'params'        => [
         /**
-        * Filters
-        */
+         * Filters
+         */
         'date_from' => [
             'type'          => 'date',
             'description'   => "Start of the time interval of the desired plannings.",
@@ -30,8 +30,8 @@ use sale\catalog\Product;
             'default'       => fn() => strtotime('+1 month')
         ],
         /**
-        * Virtual model columns
-        */
+         * Virtual model columns
+         */
         'id' => [
             'type'          => 'integer',
             'description'   => "Identifier of the booking line."

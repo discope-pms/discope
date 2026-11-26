@@ -28,9 +28,9 @@ use sale\booking\Payment;
             'type'          => 'string',
             'description'   => "Origin of the received money.",
             'selection'     => [
-                'cashdesk',             // money was received at the cashdesk
-                'bank',                 // money was received on a bank account
-                'online'                // money was received online, through a PSP
+                'cashdesk', // money was received at the cashdesk
+                'bank',     // money was received on a bank account
+                'online'    // money was received online, through a PSP
             ],
             'default'       => 'bank'
         ],
@@ -38,13 +38,13 @@ use sale\booking\Payment;
             'type'          => 'string',
             'description'   => "The method used for payment at the cashdesk.",
             'selection'     => [
-                'cash',                 // cash money
-                'bank_card',            // electronic payment with bank (or credit) card
-                'booking',              // payment through addition to the final (balance) invoice of a specific booking
-                'voucher',              // gift, coupon, or tour-operator voucher
-                'bank_check',           // physical bank check
-                'wire_transfer',        // transfer between bank accounts
-                'financial_help'        // a financial help will take care of the payment
+                'cash',             // cash money
+                'bank_card',        // electronic payment with bank (or credit) card
+                'booking',          // payment through addition to the final (balance) invoice of a specific booking
+                'voucher',          // gift, coupon, or tour-operator voucher
+                'bank_check',       // physical bank check
+                'wire_transfer',    // transfer between bank accounts
+                'financial_help'    // a financial help will take care of the payment
             ],
             'default'       => 'wire_transfer'
         ],

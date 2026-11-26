@@ -27,9 +27,9 @@ use sale\pay\Payment;
             'type'          => 'string',
             'description'   => "Origin of the received money.",
             'selection'     => [
-                'cashdesk',             // money was received at the cashdesk
-                'bank',                 // money was received on a bank account
-                'online'                // money was received online, through a PSP
+                'cashdesk', // money was received at the cashdesk
+                'bank',     // money was received on a bank account
+                'online'    // money was received online, through a PSP
             ],
             'default'       => 'bank'
         ],
@@ -37,10 +37,10 @@ use sale\pay\Payment;
             'type'          => 'string',
             'description'   => "The method used for payment at the cashdesk.",
             'selection'     => [
-                'cash',                 // cash money
-                'bank_card',            // electronic payment with bank (or credit) card
-                'bank_check',           // physical bank check
-                'wire_transfer'         // transfer between bank accounts
+                'cash',         // cash money
+                'bank_card',    // electronic payment with bank (or credit) card
+                'bank_check',   // physical bank check
+                'wire_transfer' // transfer between bank accounts
             ],
             'default'       => 'wire_transfer'
         ],

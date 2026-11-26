@@ -19,8 +19,8 @@ use sale\pos\Order;
             'type'          => 'string',
             'description'   => "Type of tree being requested.",
             'selection'     => [
-                'lines',        // tree with order lines
-                'payments',     // tree with order payments
+                'lines',    // tree with order lines
+                'payments', // tree with order payments
                 'ticket'
             ],
             'default'       => 'lines'
