@@ -25,8 +25,8 @@ use PhpOffice\PhpSpreadsheet\Reader;
         ]
     ],
     'access'        => [
-        'visibility'    => 'public',    // 'public' (default) or 'private' (can be invoked by CLI only)
-        'groups'        => ['booking.default.user']
+        'visibility'    => 'public',                    // 'public' (default) or 'private' (can be invoked by CLI only)
+        'groups'        => ['booking.default.user'],    // list of groups ids or names granted
     ],
     'response'      => [
         'content-type'  => 'application/json',
