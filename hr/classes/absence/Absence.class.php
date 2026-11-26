@@ -97,7 +97,7 @@ class Absence extends \equal\orm\Model {
     }
 
 
-    public static function calcDuration($orm, $oids, $lang) {
+    protected static function calcDuration($orm, $oids, $lang) {
         $result = [];
         $res = $orm->read(self::getType(), $oids, ['measure_unit', 'qty'], $lang);
         foreach($res as $oid => $odata) {

@@ -852,7 +852,7 @@ class BookingLine extends Model {
      *
      * This method is called at booking line creation if product_id is amongst the fields.
      */
-    public static function onupdateProductId($self, $om, $oids, $values, $lang) {
+    protected static function onupdateProductId($self, $om, $oids, $values, $lang) {
         trigger_error("ORM::calling sale\booking\BookingLine:onupdateProductId", QN_REPORT_DEBUG);
 
         /*
@@ -1134,7 +1134,7 @@ class BookingLine extends Model {
      * This handler is called at booking line creation and all subsequent qty updates.
      * It is in charge of updating the rental units assignments related to the line.
      */
-    public static function onupdateQty($self, $om, $oids, $values, $lang) {
+    protected static function onupdateQty($self, $om, $oids, $values, $lang) {
         trigger_error("ORM::calling sale\booking\BookingLine:onupdateQty", QN_REPORT_DEBUG);
 
         $lines = $om->read(self::getType(), $oids, [
@@ -1167,7 +1167,7 @@ class BookingLine extends Model {
         $self->do('reset-prices');
     }
 
-    public static function onupdateQtyVars($self, $om, $oids, $values, $lang) {
+    protected static function onupdateQtyVars($self, $om, $oids, $values, $lang) {
         trigger_error("ORM::calling sale\booking\BookingLine:onupdateQtyVars", QN_REPORT_DEBUG);
 
         // reset computed fields related to price
@@ -1275,24 +1275,24 @@ class BookingLine extends Model {
      * Handler for unit_price field update.
      * Resets computed fields related to price.
      */
-    public static function onupdateUnitPrice($self, $om, $oids, $values, $lang) {
+    protected static function onupdateUnitPrice($self, $om, $oids, $values, $lang) {
         $om->update(self::getType(), $oids, ['has_manual_unit_price' => true], $lang);
         $self->do('reset-prices', $values);
     }
 
-    public static function onupdateVatRate($self, $om, $oids, $values, $lang) {
+    protected static function onupdateVatRate($self, $om, $oids, $values, $lang) {
         // mark line with manual vat_rate
         $om->update(self::getType(), $oids, ['has_manual_vat_rate' => true], $lang);
         // reset computed fields related to price
         $self->do('reset-prices', $values);
     }
 
-    public static function onupdatePriceId($self, $values) {
+    protected static function onupdatePriceId($self, $values) {
         // reset computed fields related to price
         $self->do('reset-prices', $values);
     }
 
-    public static function onupdatePriceAdaptersIds($self, $values) {
+    protected static function onupdatePriceAdaptersIds($self, $values) {
         // reset computed fields related to price
         $self->do('reset-prices', $values);
     }
@@ -1300,7 +1300,7 @@ class BookingLine extends Model {
     /**
      * New group assignment (should be called upon creation only)
      */
-    public static function onupdateBookingLineGroupId($om, $oids, $values, $lang) {
+    protected static function onupdateBookingLineGroupId($om, $oids, $values, $lang) {
         trigger_error("ORM::calling sale\booking\BookingLine:onupdateBookingLineGroupId", QN_REPORT_DEBUG);
     }
 
@@ -1591,7 +1591,7 @@ class BookingLine extends Model {
      * For BookingLines the display name is the name of the product it relates to.
      *
      */
-    public static function calcName($self) {
+    protected static function calcName($self) {
         $result = [];
         $self->read(['product_id' => 'name']);
         foreach($self as $id => $line) {
@@ -1607,7 +1607,7 @@ class BookingLine extends Model {
      * Compute the VAT excl. unit price of the line, with automated discounts applied.
      *
      */
-    public static function calcUnitPrice($self) {
+    protected static function calcUnitPrice($self) {
         $result = [];
         $self->read([
             'price_id' => [
@@ -1658,7 +1658,7 @@ class BookingLine extends Model {
         return $result;
     }
 
-    public static function calcFreeQty($self) {
+    protected static function calcFreeQty($self) {
         $result = [];
         $self->read([
             'qty',
@@ -1761,7 +1761,7 @@ class BookingLine extends Model {
         return $result;
     }
 
-    public static function calcDiscount($self) {
+    protected static function calcDiscount($self) {
         $result = [];
         $self->read([
             'unit_price',
@@ -1786,7 +1786,7 @@ class BookingLine extends Model {
         return $result;
     }
 
-    public static function calcFareBenefit($self) {
+    protected static function calcFareBenefit($self) {
         $result = [];
         $self->read([
             'free_qty',
@@ -1817,7 +1817,7 @@ class BookingLine extends Model {
     /**
      * Get total tax-excluded price of the line before the discount is applied.
      */
-    public static function calcTotalNoDiscount($self): array {
+    protected static function calcTotalNoDiscount($self): array {
         $result = [];
         $self->read(['qty', 'free_qty', 'unit_price']);
         foreach($self as $id => $line) {
@@ -1831,7 +1831,7 @@ class BookingLine extends Model {
     /**
      * Get total tax-excluded price of the line.
      */
-    public static function calcTotal($self): array {
+    protected static function calcTotal($self): array {
         $result = [];
         $self->read(['qty', 'free_qty', 'unit_price', 'discount']);
         foreach($self as $id => $line) {
@@ -1847,7 +1847,7 @@ class BookingLine extends Model {
     /**
      * Get the vat rate of the line from the price of the product
      */
-    public static function calcVatRate($self): array {
+    protected static function calcVatRate($self): array {
         $result = [];
         $self->read(['price_id' => ['accounting_rule_id' => ['vat_rule_id' => ['rate']]]]);
         foreach($self as $id => $line) {
@@ -1865,7 +1865,7 @@ class BookingLine extends Model {
     /**
      * Get final tax-included price of the line.
      */
-    public static function calcPrice($self): array {
+    protected static function calcPrice($self): array {
         $result = [];
         $self->read(['qty', 'free_qty', 'unit_price', 'discount', 'vat_rate']);
         foreach($self as $id => $line) {
@@ -1879,7 +1879,7 @@ class BookingLine extends Model {
         return $result;
     }
 
-    public static function calcIsAccomodation($self): array {
+    protected static function calcIsAccomodation($self): array {
         trigger_error("ORM::calling sale\booking\BookingLine:calcIsAccomodation", QN_REPORT_DEBUG);
 
         $result = [];
@@ -1891,7 +1891,7 @@ class BookingLine extends Model {
         return $result;
     }
 
-    public static function calcIsRentalUnit($self): array {
+    protected static function calcIsRentalUnit($self): array {
         trigger_error("ORM::calling sale\booking\BookingLine:calcIsRentalUnit", QN_REPORT_DEBUG);
 
         $result = [];
@@ -1903,7 +1903,7 @@ class BookingLine extends Model {
         return $result;
     }
 
-    public static function calcIsMeal($self): array {
+    protected static function calcIsMeal($self): array {
         trigger_error("ORM::calling sale\booking\BookingLine:calcIsMeal", QN_REPORT_DEBUG);
 
         $result = [];
@@ -1917,7 +1917,7 @@ class BookingLine extends Model {
         return $result;
     }
 
-    public static function calcIsSnack($self): array {
+    protected static function calcIsSnack($self): array {
         trigger_error("ORM::calling sale\booking\BookingLine:calcIsSnack", QN_REPORT_DEBUG);
 
         $result = [];
@@ -1929,7 +1929,7 @@ class BookingLine extends Model {
         return $result;
     }
 
-    public static function calcIsActivity($self): array {
+    protected static function calcIsActivity($self): array {
         $result = [];
         $self->read(['product_id' => ['product_model_id' => ['is_activity']]]);
         foreach($self as $id => $booking_line) {
@@ -1941,7 +1941,7 @@ class BookingLine extends Model {
         return $result;
     }
 
-    public static function calcIsTransport($self): array {
+    protected static function calcIsTransport($self): array {
         $result = [];
         $self->read(['product_id' => ['product_model_id' => ['is_transport']]]);
         foreach($self as $id => $booking_line) {
@@ -1953,7 +1953,7 @@ class BookingLine extends Model {
         return $result;
     }
 
-    public static function calcIsSupply($self): array {
+    protected static function calcIsSupply($self): array {
         $result = [];
         $self->read(['product_id' => ['product_model_id' => ['is_supply']]]);
         foreach($self as $id => $booking_line) {
@@ -1965,7 +1965,7 @@ class BookingLine extends Model {
         return $result;
     }
 
-    public static function calcIsFullday($self): array {
+    protected static function calcIsFullday($self): array {
         $result = [];
         $self->read(['product_id' => ['product_model_id' => ['is_fullday']]]);
         foreach($self as $id => $booking_line) {
@@ -1977,7 +1977,7 @@ class BookingLine extends Model {
         return $result;
     }
 
-    public static function calcQtyAccountingMethod($self) {
+    protected static function calcQtyAccountingMethod($self) {
         trigger_error("ORM::calling sale\booking\BookingLine:calcQtyAccountingMethod", QN_REPORT_DEBUG);
 
         $result = [];
@@ -1989,7 +1989,7 @@ class BookingLine extends Model {
         return $result;
     }
 
-    public static function calcServiceDate($self): array {
+    protected static function calcServiceDate($self): array {
         $result = [];
         $self->read([
             'booking_line_group_id' => ['date_from', 'date_to'],
@@ -2032,7 +2032,7 @@ class BookingLine extends Model {
         return $result;
     }
 
-    public static function calcTimeSlotId($self): array {
+    protected static function calcTimeSlotId($self): array {
         $result = [];
         $self->read([
             'is_activity',
@@ -2293,7 +2293,7 @@ class BookingLine extends Model {
 
     }
 
-    public static function onupdateBookingActivityId($self) {
+    protected static function onupdateBookingActivityId($self) {
         $self->read([
             'is_transport',
             'service_date',
@@ -2316,7 +2316,7 @@ class BookingLine extends Model {
         }
     }
 
-    public static function onupdateServiceDate($self) {
+    protected static function onupdateServiceDate($self) {
         $self->read(['is_activity', 'service_date', 'booking_activity_id' => ['supplies_booking_lines_ids', 'transports_booking_lines_ids']]);
         foreach($self as $booking_line) {
             if(!$booking_line['is_activity']) {
@@ -2362,7 +2362,7 @@ class BookingLine extends Model {
         }
     }
 
-    public static function onupdateTimeSlotId($self) {
+    protected static function onupdateTimeSlotId($self) {
         $self->read(['is_activity', 'time_slot_id', 'booking_activity_id' => ['supplies_booking_lines_ids', 'transports_booking_lines_ids']]);
         foreach($self as $booking_line) {
             if(!$booking_line['is_activity']) {

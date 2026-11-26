@@ -38,7 +38,7 @@ use sale\booking\Booking;
             'default'       => false
         ],
         'lang' => [
-            'description '  => 'Specific language for multilang field.',
+            'description'   => 'Specific language for multilang field.',
             'type'          => 'string',
             'default'       => constant('DEFAULT_LANG')
         ]

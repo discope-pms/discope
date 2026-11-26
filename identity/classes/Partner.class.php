@@ -101,7 +101,6 @@ class Partner extends Model {
                 'type'              => 'many2one',
                 'foreign_object'    => 'sale\customer\CustomerNature',
                 'description'       => 'Nature of the customer (map with rate classes).',
-                'onupdate'          => 'sale\customer\Customer::onupdateCustomerNatureId',
                 'visible'           => ['relationship', '=', 'customer']
             ],
 
@@ -185,7 +184,7 @@ class Partner extends Model {
         ];
     }
 
-    public static function onupdatePartnerIdentityId($self) {
+    protected static function onupdatePartnerIdentityId($self) {
         $self->read([ 'partner_identity_id' => 'lang_id' ]);
         foreach($self as $id => $partner) {
             if( ($partner['partner_identity_id']['lang_id'] ?? false) ) {
@@ -194,7 +193,7 @@ class Partner extends Model {
         }
     }
 
-    public static function onupdateRelationship($self) {
+    protected static function onupdateRelationship($self) {
         $self->read(['relationship']);
         foreach($self as $id => $partner) {
             // Set default value depending on partner relationship

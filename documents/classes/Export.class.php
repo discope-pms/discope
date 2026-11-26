@@ -67,7 +67,7 @@ class Export extends Document {
         ];
     }
 
-    public static function calcName($self): array {
+    protected static function calcName($self): array {
         $result = [];
         $self->read(['created', 'export_type', 'center_office_id' => ['name']]);
         foreach($self as $id => $export) {
@@ -82,7 +82,7 @@ class Export extends Document {
         return $result;
     }
 
-    public static function policyReversible($self): array {
+    protected static function policyReversible($self): array {
         $result = [];
         $self->read(['object_class']);
         foreach($self as $export) {

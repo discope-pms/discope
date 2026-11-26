@@ -102,7 +102,7 @@ class BankStatement extends Model {
         ];
     }
 
-    public static function calcName($om, $oids, $lang) {
+    protected static function calcName($om, $oids, $lang) {
         $result = [];
         $statements = $om->read(get_called_class(), $oids, ['bank_account_number', 'date', 'old_balance', 'new_balance']);
         foreach($statements as $oid => $statement) {
@@ -111,7 +111,7 @@ class BankStatement extends Model {
         return $result;
     }
 
-    public static function calcBankAccountIban($om, $oids, $lang) {
+    protected static function calcBankAccountIban($om, $oids, $lang) {
         $result = [];
         $statements = $om->read(get_called_class(), $oids, ['bank_account_number', 'bank_account_bic']);
 
@@ -121,7 +121,7 @@ class BankStatement extends Model {
         return $result;
     }
 
-    public static function calcStatus($om, $oids, $lang) {
+    protected static function calcStatus($om, $oids, $lang) {
         $result = [];
         $statements = $om->read(get_called_class(), $oids, ['statement_lines_ids.status']);
 

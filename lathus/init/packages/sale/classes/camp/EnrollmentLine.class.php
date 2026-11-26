@@ -101,7 +101,7 @@ class EnrollmentLine extends Model {
         ];
     }
 
-    public static function calcUnitPrice($self): array {
+    protected static function calcUnitPrice($self): array {
         $result = [];
         $self->read(['price_id' => ['price']]);
         foreach($self as $id => $enrollment_line) {
@@ -116,7 +116,7 @@ class EnrollmentLine extends Model {
         return $result;
     }
 
-    public static function calcTotal($self): array {
+    protected static function calcTotal($self): array {
         $result = [];
         $self->read(['unit_price', 'qty']);
         foreach($self as $id => $enrollment_line) {
@@ -131,7 +131,7 @@ class EnrollmentLine extends Model {
         return $result;
     }
 
-    public static function calcVatRate($self): array {
+    protected static function calcVatRate($self): array {
         $result = [];
         $self->read(['price_id' => ['accounting_rule_id' => ['vat_rule_id' => ['rate']]]]);
         foreach($self as $id => $enrollment_line) {
@@ -146,7 +146,7 @@ class EnrollmentLine extends Model {
         return $result;
     }
 
-    public static function calcPrice($self): array {
+    protected static function calcPrice($self): array {
         $result = [];
         $self->read(['total', 'vat_rate']);
         foreach($self as $id => $enrollment_line) {
@@ -173,7 +173,7 @@ class EnrollmentLine extends Model {
         ];
     }
 
-    public static function doResetEnrollmentsPrices($self) {
+    protected static function doResetEnrollmentsPrices($self) {
         $self->read(['enrollment_id']);
 
         $map_enrollment_ids = [];
@@ -188,13 +188,13 @@ class EnrollmentLine extends Model {
             ]);
     }
 
-    public static function onupdateQty($self) {
+    protected static function onupdateQty($self) {
         $self->update(['total' => null, 'price' => null]);
 
         $self->do('reset-enrollments-prices');
     }
 
-    public static function onupdateProductId($self) {
+    protected static function onupdateProductId($self) {
         $map_enrollments_ids = [];
 
         $self->read(['enrollment_id', 'product_id' => ['camp_product_type']]);
@@ -209,31 +209,31 @@ class EnrollmentLine extends Model {
         }
     }
 
-    public static function onupdatePriceId($self) {
+    protected static function onupdatePriceId($self) {
         $self->update(['unit_price' => null, 'total' => null, 'price' => null]);
 
         $self->do('reset-enrollments-prices');
     }
 
-    public static function onupdateUnitPrice($self) {
+    protected static function onupdateUnitPrice($self) {
         $self->update(['total' => null, 'price' => null]);
 
         $self->do('reset-enrollments-prices');
     }
 
-    public static function onupdateTotal($self) {
+    protected static function onupdateTotal($self) {
         $self->update(['price' => null]);
 
         $self->do('reset-enrollments-prices');
     }
 
-    public static function onupdateVatRate($self) {
+    protected static function onupdateVatRate($self) {
         $self->update(['price' => null]);
 
         $self->do('reset-enrollments-prices');
     }
 
-    public static function onupdatePrice($self) {
+    protected static function onupdatePrice($self) {
         $self->do('reset-enrollments-prices');
     }
 

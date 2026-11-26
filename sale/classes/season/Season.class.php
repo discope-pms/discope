@@ -66,7 +66,7 @@ class Season extends Model {
         ];
     }
 
-    public static function onupdateSeasonCategoryId($om, $oids, $values, $lang) {
+    protected static function onupdateSeasonCategoryId($om, $oids, $values, $lang) {
         $seasons = $om->read(self::getType(), $oids, ['season_periods_ids']);
         foreach($seasons as $season) {
             $om->update(SeasonPeriod::getType(), $season['season_periods_ids'], ['season_category_id' => null]);

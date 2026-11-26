@@ -675,7 +675,7 @@ class Booking extends Model {
         $self->do('import_contacts');
     }
 
-    public static function calcName($self) {
+    protected static function calcName($self) {
         $result = [];
         $format = Setting::get_value('sale', 'organization', 'booking.sequence_format', '%05d{sequence}');
         $self->read(['center_id' => ['center_office_id' => ['code']]]);
@@ -707,7 +707,7 @@ class Booking extends Model {
         return $result;
     }
 
-    public static function calcDisplayName($self) {
+    protected static function calcDisplayName($self) {
         $result = [];
         $self->read(['state', 'name', 'customer_identity_id' => ['id', 'name', 'accounting_account', 'address_city']]);
         foreach($self as $id => $booking) {
@@ -728,7 +728,7 @@ class Booking extends Model {
         return $result;
     }
 
-    public static function calcDateFrom($self) {
+    protected static function calcDateFrom($self) {
         $result = [];
         $self->read([
             'booking_lines_groups_ids' => [
@@ -751,7 +751,7 @@ class Booking extends Model {
         return $result;
     }
 
-    public static function calcDateTo($self) {
+    protected static function calcDateTo($self) {
         $result = [];
         $self->read([
             'booking_lines_groups_ids' => [
@@ -774,7 +774,7 @@ class Booking extends Model {
         return $result;
     }
 
-    public static function calcTimeFrom($self) {
+    protected static function calcTimeFrom($self) {
         $result = [];
         $self->read([
             'booking_lines_groups_ids' => [
@@ -801,7 +801,7 @@ class Booking extends Model {
         return $result;
     }
 
-    public static function calcTimeTo($self) {
+    protected static function calcTimeTo($self) {
         $result = [];
         $self->read([
             'booking_lines_groups_ids' => [
@@ -828,7 +828,7 @@ class Booking extends Model {
         return $result;
     }
 
-    public static function calcNbPers($self) {
+    protected static function calcNbPers($self) {
         $result = [];
         $self->read(['booking_lines_groups_ids' => ['nb_pers', 'is_autosale', 'is_extra', 'group_type']]);
         foreach($self as $id => $booking) {
@@ -879,7 +879,7 @@ class Booking extends Model {
         return $result;
     }
 
-    public static function calcHasTransport($self): array {
+    protected static function calcHasTransport($self): array {
         $result = [];
         $self->read(['booking_lines_ids' => ['product_model_id' => ['is_transport']]]);
         foreach($self as $id => $booking) {
@@ -901,7 +901,7 @@ class Booking extends Model {
      * Computes the paid_amount property based on the bookings fundings.
      *
      */
-    public static function calcPaidAmount($self) {
+    protected static function calcPaidAmount($self) {
         $result = [];
         $self->read([
             'fundings_ids' => [
@@ -930,7 +930,7 @@ class Booking extends Model {
     /**
      * Payment status tells if a given booking is currently expecting money.
      */
-    public static function calcPaymentStatus($self) {
+    protected static function calcPaymentStatus($self) {
         $result = [];
         $self->read([
             'fundings_ids' => [
@@ -953,7 +953,7 @@ class Booking extends Model {
         return $result;
     }
 
-    public static function calcTotal($self): array {
+    protected static function calcTotal($self): array {
         $result = [];
         $self->read([
             'booking_lines_groups_ids' => [
@@ -984,7 +984,7 @@ class Booking extends Model {
         return $result;
     }
 
-    public static function calcSubTotals($self): array {
+    protected static function calcSubTotals($self): array {
         $result = [];
         $self->read([
             'booking_lines_groups_ids' => [
@@ -1030,7 +1030,7 @@ class Booking extends Model {
         return $result;
     }
 
-    public static function calcSubTotalsVat($self): array {
+    protected static function calcSubTotalsVat($self): array {
         $result = [];
         $self->read(['subtotals']);
         foreach($self as $id => $booking) {
@@ -1046,7 +1046,7 @@ class Booking extends Model {
         return $result;
     }
 
-    public static function calcTotalVat($self): array {
+    protected static function calcTotalVat($self): array {
         $result = [];
         $self->read(['subtotals_vat']);
         foreach($self as $id => $booking) {
@@ -1061,7 +1061,7 @@ class Booking extends Model {
         return $result;
     }
 
-    public static function calcPrice($self): array {
+    protected static function calcPrice($self): array {
         $result = [];
         $self->read(['total', 'total_vat']);
         foreach($self as $id => $booking) {
@@ -1080,7 +1080,7 @@ class Booking extends Model {
      *  as 10000000 % 97 = 76
      *  we do (aaa * 76 + bbbbbbb) % 97
      */
-    public static function calcPaymentReference($self) {
+    protected static function calcPaymentReference($self) {
         $result = [];
         $self->read(['name', 'state', 'customer_identity_id' => ['name', 'id', 'accounting_account']]);
         foreach($self as $id => $booking) {
@@ -1140,7 +1140,7 @@ class Booking extends Model {
         return $result;
     }
 
-    public static function calcDisplayPaymentReference($self) {
+    protected static function calcDisplayPaymentReference($self) {
         $result = [];
         $reference_type = Setting::get_value('sale', 'organization', 'booking.reference.type', 'VCS');
         $self->read(['payment_reference']);
@@ -1155,7 +1155,7 @@ class Booking extends Model {
         return $result;
     }
 
-    public static function calcIsLocked($self) {
+    protected static function calcIsLocked($self) {
         $result = [];
         $self->read([
             'contracts_ids' => [
@@ -1178,7 +1178,7 @@ class Booking extends Model {
         return $result;
     }
 
-    public static function calcAlert($self) {
+    protected static function calcAlert($self) {
         $result = [];
         $self->read(['contracts_ids']);
         foreach($self as $id => $booking) {
@@ -1229,7 +1229,7 @@ class Booking extends Model {
         return $result;
     }
 
-    public static function calcCurrentContractId($self) {
+    protected static function calcCurrentContractId($self) {
         $result = [];
         $self->read(['contracts_ids']);
         foreach($self as $id => $booking) {
@@ -1329,14 +1329,14 @@ class Booking extends Model {
         }
     }
 
-    public static function onupdateBookingLinesGroupsIds($self) {
+    protected static function onupdateBookingLinesGroupsIds($self) {
         $self->do('reset-prices');
     }
 
     /**
      * Maintain sync of has_contract flag and with customer count_booking_12 and count_booking_24
      */
-    public static function onupdateStatus($om, $ids, $values, $lang) {
+    protected static function onupdateStatus($om, $ids, $values, $lang) {
         $bookings = $om->read(self::getType(), $ids, ['status', 'customer_id'], $lang);
         if($bookings > 0) {
             foreach($bookings as $id => $booking) {
@@ -1374,7 +1374,7 @@ class Booking extends Model {
      * @param  array                        $values    Associative array mapping fields names with new values tha thave been assigned.
      * @param  string                       $lang      Language (char 2) in which multilang field are to be processed.
      */
-    public static function onupdateCustomerId($om, $oids, $values, $lang) {
+    protected static function onupdateCustomerId($om, $oids, $values, $lang) {
 
         /*
         // #memo - this has been removed to allow manual assignment of rat_class_id
@@ -1415,7 +1415,7 @@ class Booking extends Model {
     /**
      * Maintain sync with Customer
      */
-    public static function onupdateCustomerNatureId($om, $oids, $values, $lang) {
+    protected static function onupdateCustomerNatureId($om, $oids, $values, $lang) {
         $bookings = $om->read(self::getType(), $oids, ['customer_id', 'customer_rate_class_id', 'customer_nature_id', 'customer_nature_id.rate_class_id'], $lang);
 
         if($bookings > 0) {
@@ -1434,7 +1434,7 @@ class Booking extends Model {
         }
     }
 
-    public static function onupdateCustomerRateClassId($om, $oids, $values, $lang) {
+    protected static function onupdateCustomerRateClassId($om, $oids, $values, $lang) {
         $bookings = $om->read(self::getType(), $oids, ['customer_id', 'customer_rate_class_id'], $lang);
 
         if($bookings > 0) {
@@ -1451,7 +1451,7 @@ class Booking extends Model {
     /**
      * #workaround - Prevent name update by other mean than calculation.
      */
-    public static function onupdateName($om, $ids, $values, $lang) {
+    protected static function onupdateName($om, $ids, $values, $lang) {
         $res = $om->read(self::getType(), $ids, ['name'], $lang);
         if($res > 0 && count($res)) {
             foreach($res as $id => $booking) {
@@ -1473,7 +1473,7 @@ class Booking extends Model {
      * @param  array                        $values    Associative array mapping fields names with new values that have been assigned.
      * @param  string                       $lang      Language (char 2) in which multilang field are to be processed.
      */
-    public static function onupdateCustomerIdentityId($om, $oids, $values, $lang) {
+    protected static function onupdateCustomerIdentityId($om, $oids, $values, $lang) {
 
         $bookings = $om->read(self::getType(), $oids, [
             'description',
@@ -1688,7 +1688,7 @@ class Booking extends Model {
         $om->update(self::getType(), $oids, ['total' => null, 'price' => null]);
     }
 
-    public static function onupdateIsInvoiced($om, $oids, $values, $lang) {
+    protected static function onupdateIsInvoiced($om, $oids, $values, $lang) {
         $bookings = $om->read(self::getType(), $oids, ['is_invoiced', 'booking_lines_ids']);
         foreach($bookings as $id => $booking) {
             // update all booking lines accordingly to their parent booking

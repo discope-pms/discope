@@ -6,8 +6,9 @@
 */
 
 [$params, $providers] = eQual::announce([
-    'deprecated'    => "No followup notification is planned for quotes (customer details might still be incomplete).",
+    'deprecated'    => true,
     'description'   => "Deprecated quote reminder controller kept to neutralize legacy scheduled tasks.",
+    'help'          => "No followup notification is planned for quotes (customer details might still be incomplete).",
     'params'        => [
         'id' => [
             'type'          => 'integer',

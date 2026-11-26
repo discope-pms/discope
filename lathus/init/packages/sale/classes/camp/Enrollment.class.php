@@ -741,7 +741,7 @@ class Enrollment extends Model {
         return $result;
     }
 
-    public static function calcDateCreated($self) {
+    protected static function calcDateCreated($self) {
         $result = [];
         $self->read(['created']);
         foreach($self as $id => $enrollment) {
@@ -751,7 +751,7 @@ class Enrollment extends Model {
         return $result;
     }
 
-    public static function calcCampClass($self): array {
+    protected static function calcCampClass($self): array {
         $result = [];
         $self->read(['is_clsh', 'works_council_id', 'child_id' => ['camp_class', 'main_guardian_id' => ['is_ccvg']]]);
         foreach($self as $id => $enrollment) {
@@ -780,7 +780,7 @@ class Enrollment extends Model {
         return $result;
     }
 
-    public static function calcChildAge($self): array {
+    protected static function calcChildAge($self): array {
         $result = [];
         $self->read(['date_from', 'child_id'  => ['birthdate']]);
         foreach($self as $id => $enrollment) {
@@ -799,7 +799,7 @@ class Enrollment extends Model {
     /**
      * Used to allow manual bypass of camp's age range condition
      */
-    public static function calcAllowOutsideAgeRange($self): array {
+    protected static function calcAllowOutsideAgeRange($self): array {
         $result = [];
         $self->read(['id']);
         foreach($self as $id => $enrollment) {
@@ -809,7 +809,7 @@ class Enrollment extends Model {
         return $result;
     }
 
-    public static function calcCampName($self): array {
+    protected static function calcCampName($self): array {
         $result = [];
         $self->read(['camp_id' => ['sojourn_number', 'short_name']]);
         foreach($self as $id => $enrollment) {
@@ -819,7 +819,7 @@ class Enrollment extends Model {
         return $result;
     }
 
-    public static function calcCampEmployees($self): array {
+    protected static function calcCampEmployees($self): array {
         $result = [];
         $self->read(['camp_id' => ['camp_groups_ids' => ['employee_id' => ['partner_identity_id' => ['lastname', 'firstname']]]]]);
         foreach($self as $id => $enrollment) {
@@ -836,7 +836,7 @@ class Enrollment extends Model {
         return $result;
     }
 
-    public static function calcCampRemainingQty($self): array {
+    protected static function calcCampRemainingQty($self): array {
         $result = [];
         $self->read(['camp_id' => ['enrollments_qty', 'max_children']]);
         foreach($self as $id => $enrollment) {
@@ -846,7 +846,7 @@ class Enrollment extends Model {
         return $result;
     }
 
-    public static function calcHasCampBirthday($self): array {
+    protected static function calcHasCampBirthday($self): array {
         $result = [];
         $self->read(['date_from', 'date_to', 'child_id'  => ['birthdate']]);
         foreach($self as $id => $enrollment) {
@@ -863,7 +863,7 @@ class Enrollment extends Model {
         return $result;
     }
 
-    public static function calcTotal($self): array {
+    protected static function calcTotal($self): array {
         $result = [];
         $self->read([
             'camp_id'               => ['is_clsh'],
@@ -927,7 +927,7 @@ class Enrollment extends Model {
         return $result;
     }
 
-    public static function calcPrice($self): array {
+    protected static function calcPrice($self): array {
         $result = [];
         $self->read([
             'camp_id'               => ['is_clsh'],
@@ -991,7 +991,7 @@ class Enrollment extends Model {
         return $result;
     }
 
-    public static function calcAllDocumentsReceived($self): array {
+    protected static function calcAllDocumentsReceived($self): array {
         $result = [];
         $self->read([
             'enrollment_documents_ids'  => ['document_id', 'received'],
@@ -1014,7 +1014,7 @@ class Enrollment extends Model {
         return $result;
     }
 
-    public static function calcDocAquaticSkillsReceived($self): array {
+    protected static function calcDocAquaticSkillsReceived($self): array {
         $result = [];
         $self->read(['enrollment_documents_ids' => ['document_id' => ['doc_type'], 'received']]);
         foreach($self as $id => $enrollment) {
@@ -1032,7 +1032,7 @@ class Enrollment extends Model {
         return $result;
     }
 
-    public static function calcPaymentStatus($self): array {
+    protected static function calcPaymentStatus($self): array {
         $result = [];
         $self->read(['status', 'fundings_ids' => ['due_date', 'is_paid']]);
         foreach($self as $id => $enrollment) {
@@ -1051,7 +1051,7 @@ class Enrollment extends Model {
         return $result;
     }
 
-    public static function calcPaymentReference($self): array {
+    protected static function calcPaymentReference($self): array {
         $result = [];
         $self->read(['main_guardian_id']);
         foreach($self as $id => $enrollment) {
@@ -1109,7 +1109,7 @@ class Enrollment extends Model {
         return $result;
     }
 
-    public static function calcPaidAmount($self): array {
+    protected static function calcPaidAmount($self): array {
         $result = [];
         $self->read(['fundings_ids' => ['paid_amount']]);
         foreach($self as $id => $enrollment) {
@@ -1122,7 +1122,7 @@ class Enrollment extends Model {
         return $result;
     }
 
-    public static function policyConfirm($self): array {
+    protected static function policyConfirm($self): array {
         $result = [];
         $self->read([
             'is_ase',
@@ -1157,7 +1157,7 @@ class Enrollment extends Model {
         return $result;
     }
 
-    public static function policyValidate($self): array {
+    protected static function policyValidate($self): array {
         $result = [];
         $self->read(['all_documents_received']);
         foreach($self as $enrollment) {
@@ -1610,7 +1610,7 @@ class Enrollment extends Model {
         return parent::cancreate($self, $values);
     }
 
-    public static function onupdateCampId($self) {
+    protected static function onupdateCampId($self) {
         // prevent state to pass to instance when camp selected and state is "draft"
         $self->read(['state']);
         foreach($self as $enrollment) {
@@ -1649,11 +1649,11 @@ class Enrollment extends Model {
         }
     }
 
-    public static function onupdateFamilyQuotient($self) {
+    protected static function onupdateFamilyQuotient($self) {
         $self->do('refresh_camp_product_line');
     }
 
-    public static function onupdateWeekendExtra($self) {
+    protected static function onupdateWeekendExtra($self) {
         $self->read([
             'weekend_extra',
             'status',
@@ -1763,19 +1763,19 @@ class Enrollment extends Model {
         }
     }
 
-    public static function onupdatePresentDay($self) {
+    protected static function onupdatePresentDay($self) {
         $self->do('refresh_camp_product_line');
     }
 
-    public static function onupdateWorksCouncilId($self) {
+    protected static function onupdateWorksCouncilId($self) {
         $self->do('refresh_camp_product_line');
     }
 
-    public static function onupdateCampClass($self) {
+    protected static function onupdateCampClass($self) {
         $self->do('refresh_camp_product_line');
     }
 
-    public static function onupdatePreregistrationSent($self) {
+    protected static function onupdatePreregistrationSent($self) {
         $self->read(['preregistration_sent']);
         foreach($self as $id => $enrollment) {
             if($enrollment['preregistration_sent']) {
@@ -1784,7 +1784,7 @@ class Enrollment extends Model {
         }
     }
 
-    public static function onupdate($self, $values) {
+    protected static function onupdate($self, $values) {
         if(isset($values['status']) || (isset($values['state']) && $values['state'] === 'instance')) {
             $self->do('reset_camp_enrollments_qty');
 
@@ -1794,7 +1794,7 @@ class Enrollment extends Model {
         }
     }
 
-    public static function doResetCampEnrollmentsQty($self) {
+    protected static function doResetCampEnrollmentsQty($self) {
         $self->read(['camp_id']);
 
         $map_camps_ids = [];
@@ -1805,7 +1805,7 @@ class Enrollment extends Model {
         Camp::ids(array_keys($map_camps_ids))->update(['enrollments_qty' => null]);
     }
 
-    public static function doDeleteLines($self) {
+    protected static function doDeleteLines($self) {
         $lines_to_del = [];
         $self->read(['enrollment_lines_ids']);
         foreach($self as $enrollment) {
@@ -1817,7 +1817,7 @@ class Enrollment extends Model {
         }
     }
 
-    public static function doGeneratePresences($self) {
+    protected static function doGeneratePresences($self) {
         $self->read([
             'status',
             'is_clsh', 'camp_id', 'child_id', 'date_from', 'date_to', 'weekend_extra',
@@ -1952,7 +1952,7 @@ class Enrollment extends Model {
         }
     }
 
-    public static function doRemovePresences($self) {
+    protected static function doRemovePresences($self) {
         $self->read(['camp_id', 'child_id']);
         foreach($self as $enrollment) {
             Presence::search([
@@ -1963,13 +1963,13 @@ class Enrollment extends Model {
         }
     }
 
-    public static function doCancelAlerts($self, $dispatch) {
+    protected static function doCancelAlerts($self, $dispatch) {
         foreach($self as $id => $enrollment) {
             $dispatch->cancel('sale.enrollment.followup.task.reminder', 'sale\camp\Enrollment', $id);
         }
     }
 
-    public static function doRefreshCampProductLine($self) {
+    protected static function doRefreshCampProductLine($self) {
         $self->read([
             'is_clsh',
             'clsh_type',
@@ -2146,7 +2146,7 @@ class Enrollment extends Model {
         }
     }
 
-    public static function doRefreshRequiredDocuments($self) {
+    protected static function doRefreshRequiredDocuments($self) {
         $self->read([
             'enrollment_documents_ids'  => ['document_id'],
             'camp_id'                   => ['required_documents_ids']
@@ -2183,7 +2183,7 @@ class Enrollment extends Model {
         ]);
     }
 
-    public static function doGenerateFunding($self) {
+    protected static function doGenerateFunding($self) {
         $self->read([
             'paid_amount',
             'price',

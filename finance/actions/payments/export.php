@@ -8,7 +8,6 @@
 use discope\setting\Setting;
 
 [$params, $providers] = eQual::announce([
-    'name'          => "Generate Exports",
     'description'   => "Creates export archives with newly available data from invoices and payments.",
     'help'          => "Creates either BOB or EBP exports depending on Setting 'finance.invoice.export_type'.",
     'params'        => [

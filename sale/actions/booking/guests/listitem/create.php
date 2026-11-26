@@ -32,7 +32,7 @@ list($params, $providers) = eQual::announce([
             'default'       => []
         ],
         'lang' => [
-            'description '  => 'Specific language for multilang field.',
+            'description'   => 'Specific language for multilang field.',
             'type'          => 'string',
             'default'       => constant('DEFAULT_LANG')
         ]

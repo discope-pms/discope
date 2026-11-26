@@ -87,7 +87,7 @@ class Invoice extends \finance\accounting\Invoice {
         ];
     }
 
-    public static function calcIsPaid($self) {
+    protected static function calcIsPaid($self) {
         $result = [];
         $self->read([
             'status',
@@ -130,7 +130,7 @@ class Invoice extends \finance\accounting\Invoice {
         return $result;
     }
 
-    public static function calcPaymentReference($self) {
+    protected static function calcPaymentReference($self) {
         $result = [];
         $self->read(['booking_id' => ['payment_reference']]);
         foreach($self as $id => $invoice) {
@@ -140,7 +140,7 @@ class Invoice extends \finance\accounting\Invoice {
         return $result;
     }
 
-    public static function onupdatePartnerId($self) {
+    protected static function onupdatePartnerId($self) {
         $self->read(['partner_id' => ['partner_identity_id']]);
         foreach($self as $id => $invoice) {
             $self->update(['customer_identity_id' => $invoice['partner_id']['partner_identity_id'] ?? null]);

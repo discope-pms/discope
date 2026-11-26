@@ -444,7 +444,7 @@ class BookingLineGroup extends Model {
     /**
      * @param \equal\orm\ObjectManager  $om
      */
-    public static function onupdateIsSojourn($om, $oids, $values, $lang) {
+    protected static function onupdateIsSojourn($om, $oids, $values, $lang) {
         $groups = $om->read(self::getType(), $oids, ['booking_id', 'booking_lines_ids', 'nb_pers', 'is_sojourn', 'age_range_assignments_ids'], $lang);
         if($groups > 0) {
             foreach($groups as $gid => $group) {
@@ -475,7 +475,7 @@ class BookingLineGroup extends Model {
         }
     }
 
-    public static function onupdateGroupType($om, $ids, $values, $lang) {
+    protected static function onupdateGroupType($om, $ids, $values, $lang) {
         $groups = $om->read(self::getType(), $ids, ['group_type', 'booking_id', 'booking_activities_ids'], $lang);
         if($groups > 0) {
             foreach($groups as $id => $group) {
@@ -504,7 +504,7 @@ class BookingLineGroup extends Model {
     /**
      * Force resetting other activities 'group_num'
      */
-    public static function onupdateActivityGroupNum($self) {
+    protected static function onupdateActivityGroupNum($self) {
         $self->read(['booking_activities_ids']);
         foreach($self as $group) {
             BookingActivity::ids($group['booking_activities_ids'])->update(['group_num' => null]);
@@ -514,7 +514,7 @@ class BookingLineGroup extends Model {
     /**
      * @param \equal\orm\ObjectManager  $om
      */
-    public static function onupdateIsEvent($om, $oids, $values, $lang) {
+    protected static function onupdateIsEvent($om, $oids, $values, $lang) {
         $groups = $om->read(self::getType(), $oids, ['booking_lines_ids'], $lang);
         if($groups > 0) {
             foreach($groups as $gid => $group) {
@@ -527,7 +527,7 @@ class BookingLineGroup extends Model {
         }
     }
 
-    public static function onupdateHasPack($om, $oids, $values, $lang) {
+    protected static function onupdateHasPack($om, $oids, $values, $lang) {
         trigger_error("ORM::calling sale\booking\BookingLineGroup:onchangeHasPack", QN_REPORT_DEBUG);
 
         $groups = $om->read(self::getType(), $oids, ['has_pack', 'booking_lines_ids']);
@@ -543,14 +543,14 @@ class BookingLineGroup extends Model {
         }
     }
 
-    public static function onupdateIsLocked($self, $om, $oids, $values, $lang) {
+    protected static function onupdateIsLocked($self, $om, $oids, $values, $lang) {
         trigger_error("ORM::calling sale\booking\BookingLineGroup:onchangeIsLocked", QN_REPORT_DEBUG);
         // invalidate prices
         $self->do('reset-prices');
         $om->callonce(self::getType(), 'updatePriceId', $oids, [], $lang);
     }
 
-    public static function onupdatePriceId($self, $om, $oids, $values, $lang) {
+    protected static function onupdatePriceId($self, $om, $oids, $values, $lang) {
         // invalidate prices
         $self->do('reset-prices');
         $om->update(self::getType(), $oids, ['vat_rate' => null, 'unit_price' => null]);
@@ -564,7 +564,7 @@ class BookingLineGroup extends Model {
      * Since this method is called, we assume that current group has 'has_pack' set to true,
      * and that pack_id relates to a product that is a pack.
      */
-    public static function onupdatePackId($self, $om, $oids, $values, $lang) {
+    protected static function onupdatePackId($self, $om, $oids, $values, $lang) {
         trigger_error("ORM::calling sale\booking\BookingLineGroup:onchangePackId", QN_REPORT_DEBUG);
 
         $groups = $om->read(self::getType(), $oids, [
@@ -648,7 +648,7 @@ class BookingLineGroup extends Model {
 
     }
 
-    public static function onupdateOrder($self) {
+    protected static function onupdateOrder($self) {
         $self->read(['booking_id', 'booking_activities_ids']);
         foreach($self as $group) {
             Booking::id($group['booking_id'])->do('refresh_groups_activity_number');
@@ -656,7 +656,7 @@ class BookingLineGroup extends Model {
         }
     }
 
-    public static function onupdateDateFrom($self, $om, $oids, $values, $lang) {
+    protected static function onupdateDateFrom($self, $om, $oids, $values, $lang) {
         trigger_error("ORM::calling sale\booking\BookingLineGroup:onchangeDateFrom", QN_REPORT_DEBUG);
         // invalidate prices
         $self->do('reset-prices');
@@ -681,7 +681,7 @@ class BookingLineGroup extends Model {
         }
     }
 
-    public static function onupdateDateTo($self, $om, $oids, $values, $lang) {
+    protected static function onupdateDateTo($self, $om, $oids, $values, $lang) {
         trigger_error("ORM::calling sale\booking\BookingLineGroup:onchangeDateTo", QN_REPORT_DEBUG);
         // invalidate prices
         $self->do('reset-prices');
@@ -704,7 +704,7 @@ class BookingLineGroup extends Model {
         }
     }
 
-    public static function onupdateTimeFrom($om, $oids, $values, $lang) {
+    protected static function onupdateTimeFrom($om, $oids, $values, $lang) {
         trigger_error("ORM::calling sale\booking\BookingLineGroup:onupdateTimeTo", QN_REPORT_DEBUG);
 
         // update parent booking
@@ -719,7 +719,7 @@ class BookingLineGroup extends Model {
         }
     }
 
-    public static function onupdateTimeTo($om, $oids, $values, $lang) {
+    protected static function onupdateTimeTo($om, $oids, $values, $lang) {
         trigger_error("ORM::calling sale\booking\BookingLineGroup:onupdateTimeTo", QN_REPORT_DEBUG);
 
         // update parent booking
@@ -734,7 +734,7 @@ class BookingLineGroup extends Model {
         }
     }
 
-    public static function onupdateBookingLinesIds($self, $om, $oids, $values, $lang) {
+    protected static function onupdateBookingLinesIds($self, $om, $oids, $values, $lang) {
         // recompute sojourn prices
         $self->do('reset-prices');
         // reset rental units assignments
@@ -759,7 +759,7 @@ class BookingLineGroup extends Model {
         }
     }
 
-    public static function onupdateRateClassId($self, $om, $oids, $values, $lang) {
+    protected static function onupdateRateClassId($self, $om, $oids, $values, $lang) {
         trigger_error("ORM::calling sale\booking\BookingLineGroup:onchangeRateClassId", QN_REPORT_DEBUG);
         $groups = $om->read(self::getType(), $oids, ['booking_id', 'rate_class_id.name'], $lang);
         // #todo #kaleo - add support for assigning an optional booking_type_id to each rate_class
@@ -773,13 +773,13 @@ class BookingLineGroup extends Model {
         $om->callonce(self::getType(), 'updatePriceAdapters', $oids, [], $lang);
     }
 
-    public static function onupdateSojournTypeId($self, $om, $oids, $values, $lang) {
+    protected static function onupdateSojournTypeId($self, $om, $oids, $values, $lang) {
         trigger_error("ORM::calling sale\booking\BookingLineGroup:onchangeSojournTypeId", QN_REPORT_DEBUG);
         $self->do('reset-prices');
         $om->callonce(self::getType(), 'updatePriceAdapters', $oids, [], $lang);
     }
 
-    public static function onupdateNbPers($self, $om, $ids, $values, $lang) {
+    protected static function onupdateNbPers($self, $om, $ids, $values, $lang) {
         trigger_error("ORM::calling sale\booking\BookingLineGroup:onchangeNbPers", QN_REPORT_DEBUG);
 
         // 0) discard non is_extra groups whose booking is in a non-modifiable status
@@ -870,7 +870,7 @@ class BookingLineGroup extends Model {
      *
      * @param \equal\orm\Collection $self
      */
-    public static function calcNbPers($self) {
+    protected static function calcNbPers($self) {
         $result = [];
         $self->read(['age_range_assignments_ids' => ['qty']]);
         foreach($self as $id => $bookingLineGroup) {
@@ -882,7 +882,7 @@ class BookingLineGroup extends Model {
         return $result;
     }
 
-    public static function calcNbChildren($self) {
+    protected static function calcNbChildren($self) {
         $result = [];
         $self->read([
             'age_range_assignments_ids' => [
@@ -906,7 +906,7 @@ class BookingLineGroup extends Model {
         return $result;
     }
 
-    public static function calcVatRate($self) {
+    protected static function calcVatRate($self) {
         $result = [];
         $self->read(['price_id' => ['accounting_rule_id' => ['vat_rule_id' => ['rate']]]]);
         foreach($self as $id => $group) {
@@ -916,7 +916,7 @@ class BookingLineGroup extends Model {
         return $result;
     }
 
-    public static function calcQty($self) {
+    protected static function calcQty($self) {
         $result = [];
         $self->read([
             'has_pack',
@@ -967,7 +967,7 @@ class BookingLineGroup extends Model {
         return $result;
     }
 
-    public static function calcHasSchedulableServices($self) {
+    protected static function calcHasSchedulableServices($self) {
         $result = [];
         $self->read([
             'booking_lines_ids' => [
@@ -998,7 +998,7 @@ class BookingLineGroup extends Model {
         return $result;
     }
 
-    public static function calcNbNights($self) {
+    protected static function calcNbNights($self) {
         $result = [];
         $self->read(['date_from', 'date_to']);
         foreach($self as $id => $group) {
@@ -1012,7 +1012,7 @@ class BookingLineGroup extends Model {
      * Compute the VAT excl. unit price of the group, with automated discounts applied.
      *
      */
-    public static function calcUnitPrice($self) {
+    protected static function calcUnitPrice($self) {
         $result = [];
         $self->read(['price_id' => ['price']]);
         foreach($self as $id => $group) {
@@ -1062,7 +1062,7 @@ class BookingLineGroup extends Model {
     /**
      * Get total tax-excluded price of the group, with discount applied.
      */
-    public static function calcTotal($self): array {
+    protected static function calcTotal($self): array {
         $result = [];
         $self->read(['is_locked', 'has_pack', 'unit_price', 'qty', 'booking_lines_ids' => ['total']]);
         foreach($self as $id => $group) {
@@ -1085,7 +1085,7 @@ class BookingLineGroup extends Model {
     /**
      * Compute the VAT incl. total price of the group (pack), with manual and automated discounts applied.
      */
-    public static function calcPrice($self): array {
+    protected static function calcPrice($self): array {
         $result = [];
         $self->read(['total', 'vat_rate', 'is_locked', 'has_pack', 'booking_lines_ids' => ['price']]);
         foreach($self as $id => $group) {
@@ -1109,7 +1109,7 @@ class BookingLineGroup extends Model {
      * Retrieve sum of fare benefits granted on booking lines.
      *
      */
-    public static function calcFareBenefit($self) {
+    protected static function calcFareBenefit($self) {
         $result = [];
         $self->read(['booking_lines_ids' => ['fare_benefit']]);
         foreach($self as $id => $group) {

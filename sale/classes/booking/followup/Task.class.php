@@ -78,7 +78,7 @@ class Task extends \core\followup\Task {
         ];
     }
 
-    public static function calcDescription($self): array {
+    protected static function calcDescription($self): array {
         $booking_task_description_format = Setting::get_value('sale', 'booking', 'task.description_format', '');
         $date_format = Setting::get_value('core', 'locale', 'date_format', 'm/d/Y');
 
@@ -119,7 +119,7 @@ class Task extends \core\followup\Task {
         return $result;
     }
 
-    public static function calcObjectId($self): array {
+    protected static function calcObjectId($self): array {
         $result = [];
         $self->read(['booking_id']);
         foreach($self as $id => $task) {
@@ -164,7 +164,7 @@ class Task extends \core\followup\Task {
         ];
     }
 
-    public static function onupdateIsDone($self) {
+    protected static function onupdateIsDone($self) {
         parent::onupdateIsDone($self);
 
         $self->do('cancel_alerts');

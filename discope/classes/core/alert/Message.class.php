@@ -28,7 +28,7 @@ class Message extends \core\alert\Message {
         ];
     }
 
-    public static function calcAlert($self) {
+    protected static function calcAlert($self) {
         $result = [];
         $self->read(['severity']);
         foreach($self as $id => $message) {

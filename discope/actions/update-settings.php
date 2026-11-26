@@ -1,5 +1,23 @@
 <?php
+
 use core\setting\Setting;
+
+[$params, $providers] = eQual::announce([
+    'description'   => 'Update settings.',
+    'params'        => [],
+    'access'        => [
+        'visibility'    => 'protected',
+        'groups'        => ['admins'],
+    ],
+    'response'      => [
+        'content-type'  => 'application/json',
+        'charset'       => 'UTF-8',
+        'accept-origin' => '*'
+    ],
+    'providers'     => ['context']
+]);
+
+['context' => $context] = $providers;
 
 $sections = [
         1 => 'locale',
@@ -73,4 +91,7 @@ foreach($adaptations as $entry) {
     }
 }
 
-echo "\nupdate complete.\n";
+$context
+    ->httpResponse()
+    ->body(['updated'])
+    ->send();

@@ -49,7 +49,7 @@ class GuestList extends Model {
         ];
     }
 
-    public static function onupdateBookingId($om, $oids, $values, $lang) {
+    protected static function onupdateBookingId($om, $oids, $values, $lang) {
         $lines = $om->read(self::getType(), $oids, ['booking_id'], $lang);
         foreach($lines as $lid => $line) {
             Booking::id($line['booking_id'])->update(['guest_list_id' => $lid]);

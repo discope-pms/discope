@@ -94,7 +94,7 @@ class PartnerPlanningSummary extends Model {
         ];
     }
 
-    public static function calcSubject($self): array {
+    protected static function calcSubject($self): array {
         $template = Template::search([
             ['code', '=', 'partner_reminder'],
             ['type', '=', 'planning']
@@ -133,7 +133,7 @@ class PartnerPlanningSummary extends Model {
         return $result;
     }
 
-    public static function calcActivitiesTableData($self): array {
+    protected static function calcActivitiesTableData($self): array {
         $result = [];
         foreach($self as $id => $planning) {
             $activities = BookingActivity::ids(self::getActivitiesIds($id))
@@ -225,7 +225,7 @@ class PartnerPlanningSummary extends Model {
         return $result;
     }
 
-    public static function calcMailContent($self): array {
+    protected static function calcMailContent($self): array {
         $template = Template::search([
             ['code', '=', 'partner_reminder'],
             ['type', '=', 'planning']

@@ -318,11 +318,11 @@ class RentalUnit extends Model {
         return [];
     }
 
-    public static function onupdateParentId($self) {
+    protected static function onupdateParentId($self) {
         $self->update(['has_parent' => null, 'display_in_planning' => null]);
     }
 
-    public static function calcHasParent($self) {
+    protected static function calcHasParent($self) {
         $result = [];
         $self->read(['parent_id']);
         foreach($self as $id => $unit) {

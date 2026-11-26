@@ -68,7 +68,7 @@ class Task extends \core\followup\Task {
         ];
     }
 
-    public static function calcObjectId($self): array {
+    protected static function calcObjectId($self): array {
         $result = [];
         $self->read(['enrollment_id']);
         foreach($self as $id => $task) {
@@ -113,7 +113,7 @@ class Task extends \core\followup\Task {
         ];
     }
 
-    public static function onupdateIsDone($self) {
+    protected static function onupdateIsDone($self) {
         parent::onupdateIsDone($self);
 
         $self->do('cancel_alerts');

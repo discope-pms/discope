@@ -121,7 +121,7 @@ class ContractLine extends Model {
         ];
     }
 
-    public static function calcName($self): array {
+    protected static function calcName($self): array {
         $result = [];
         $self->read(['product_id' => ['label']]);
         foreach($self as $id => $line) {
@@ -134,7 +134,7 @@ class ContractLine extends Model {
     /**
      * Get total tax-excluded price of the line before the discount is applied.
      */
-    public static function calcTotalNoDiscount($self): array {
+    protected static function calcTotalNoDiscount($self): array {
         $result = [];
         $self->read(['qty', 'free_qty', 'unit_price']);
         foreach($self as $id => $line) {
@@ -148,7 +148,7 @@ class ContractLine extends Model {
     /**
      * Get total tax-excluded price of the line.
      */
-    public static function calcTotal($self): array {
+    protected static function calcTotal($self): array {
         $result = [];
         $self->read(['total_no_discount', 'discount']);
         foreach($self as $id => $line) {
@@ -162,7 +162,7 @@ class ContractLine extends Model {
     /**
      * Get final tax-included price of the line.
      */
-    public static function calcPrice($self): array {
+    protected static function calcPrice($self): array {
         $result = [];
         $self->read(['total', 'vat_rate']);
         foreach($self as $id => $line) {

@@ -98,7 +98,7 @@ class BookingLineGroupAgeRangeAssignment extends Model {
      * Handler for qty updates.
      * Update parent sojourn nb_pers according to currently set age range assignments.
      */
-    public static function onupdateQty($om, $oids, $values, $lang) {
+    protected static function onupdateQty($om, $oids, $values, $lang) {
         $assignments = $om->read(self::getType(), $oids, ['booking_line_group_id', 'booking_line_group_id.nb_pers', 'booking_line_group_id.age_range_assignments_ids'], $lang);
         if($assignments > 0 && count($assignments)) {
             foreach($assignments as $id => $assignment) {
@@ -112,7 +112,7 @@ class BookingLineGroupAgeRangeAssignment extends Model {
         }
     }
 
-    public static function onupdateAgeRangeId($om, $oids, $values, $lang) {
+    protected static function onupdateAgeRangeId($om, $oids, $values, $lang) {
         $assignments = $om->read(self::getType(), $oids, ['booking_line_group_id'], $lang);
         $booking_line_groups_ids = array_map(function ($a) {return $a['booking_line_group_id'];}, $assignments);
         $om->callonce(\sale\booking\BookingLineGroup::getType(), 'updatePack', $booking_line_groups_ids, [], $lang);

@@ -45,7 +45,7 @@ class TicketAttachment extends \documents\Document {
         ];
     }
 
-    public static function calcName($self) {
+    protected static function calcName($self) {
         $result = [];
         $self->read(['ticket_id']);
         foreach($result as $id => $ticketAttachment) {

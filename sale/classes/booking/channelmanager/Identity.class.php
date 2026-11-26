@@ -49,7 +49,7 @@ class Identity extends \identity\Identity {
         ];
     }
 
-    public static function onupdateAddressCountry($self, $values) {
+    protected static function onupdateAddressCountry($self, $values) {
         if(isset($values['address_country'])) {
             if(in_array($values['address_country'], ['be', 'Belgium', 'belgium', 'belgique', 'Belgique', 'Belgie', 'België', 'belgie', 'belgië'])) {
                 $self->update(['address_country' => 'BE']);

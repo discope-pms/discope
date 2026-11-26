@@ -96,7 +96,7 @@ class FinancialHelp extends Model {
         ];
     }
 
-    public static function calcRemainingAmount($self): array {
+    protected static function calcRemainingAmount($self): array {
         $result = [];
         $self->read(['amount', 'payments_ids' => ['amount']]);
 

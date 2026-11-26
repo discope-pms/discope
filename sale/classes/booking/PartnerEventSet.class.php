@@ -87,7 +87,7 @@ class PartnerEventSet extends Model {
         ];
     }
 
-    public static function doRegeneratePartnerEvent($self) {
+    protected static function doRegeneratePartnerEvent($self) {
         $self->read(['name', 'description', 'date_from', 'date_to', 'partner_id', 'event_type', 'partner_events_ids' => ['event_date', 'time_slot_id']]);
         foreach($self as $id => $partner_event_set) {
             // Remove linked partner events
@@ -136,11 +136,11 @@ class PartnerEventSet extends Model {
         }
     }
 
-    public static function onupdateDateFrom($self) {
+    protected static function onupdateDateFrom($self) {
         $self->do('regenerate-partner-events');
     }
 
-    public static function onupdateDateTo($self) {
+    protected static function onupdateDateTo($self) {
         $self->do('regenerate-partner-events');
     }
 }

@@ -167,7 +167,7 @@ class Funding extends Model {
     }
 
 
-    public static function calcName($om, $oids, $lang) {
+    protected static function calcName($om, $oids, $lang) {
         $result = [];
         $fundings = $om->read(get_called_class(), $oids, ['payment_deadline_id.name', 'due_amount', 'enrollment_id.name', 'enrollment_id.camp_id.sojourn_code'], $lang);
 
@@ -184,7 +184,7 @@ class Funding extends Model {
         return $result;
     }
 
-    public static function calcPaidAmount($om, $oids, $lang) {
+    protected static function calcPaidAmount($om, $oids, $lang) {
         $result = [];
         $fundings = $om->read(self::getType(), $oids, ['enrollment_id', 'payments_ids.amount'], $lang);
         if($fundings > 0) {
@@ -207,7 +207,7 @@ class Funding extends Model {
         return $result;
     }
 
-    public static function calcRemainingAmount($self): array {
+    protected static function calcRemainingAmount($self): array {
         $result = [];
         $self->read(['due_amount', 'paid_amount']);
         foreach($self as $id => $funding) {
@@ -217,7 +217,7 @@ class Funding extends Model {
         return $result;
     }
 
-    public static function calcIsPaid($om, $oids, $lang) {
+    protected static function calcIsPaid($om, $oids, $lang) {
         $result = [];
         $fundings = $om->read(self::getType(), $oids, ['due_amount', 'paid_amount'], $lang);
         if($fundings > 0) {
@@ -236,7 +236,7 @@ class Funding extends Model {
         return $result;
     }
 
-    public static function calcAmountShare($om, $ids, $lang) {
+    protected static function calcAmountShare($om, $ids, $lang) {
         $result = [];
         $fundings = $om->read(self::getType(), $ids, ['enrollment_id.price', 'due_amount'], $lang);
 
@@ -261,7 +261,7 @@ class Funding extends Model {
         return $result;
     }
 
-    public static function calcPaymentReference($om, $ids, $lang) {
+    protected static function calcPaymentReference($om, $ids, $lang) {
         $result = [];
         $fundings = $om->read(self::getType(), $ids, ['enrollment_id.payment_reference'], $lang);
         foreach($fundings as $id => $funding) {
@@ -303,7 +303,7 @@ class Funding extends Model {
         parent::onupdate($om, $ids, $values, $lang);
     }
 
-    public static function onupdateDueAmount($om, $oids, $values, $lang) {
+    protected static function onupdateDueAmount($om, $oids, $values, $lang) {
         $fundings = $om->read(self::getType(), $oids, ['enrollment_id']);
         if($fundings > 0 && count($fundings)) {
             $map_enrollments_ids = [];
@@ -326,7 +326,7 @@ class Funding extends Model {
         }
     }
 
-    public static function onupdateIsPaid($orm, $oids, $values, $lang) {
+    protected static function onupdateIsPaid($orm, $oids, $values, $lang) {
         $fundings = $orm->read(self::getType(), $oids, ['enrollment_id']);
         if($fundings > 0 && count($fundings)) {
             $map_enrollments_ids = [];
@@ -349,7 +349,7 @@ class Funding extends Model {
      * @param  array                        $values     Associative array holding the new values to be assigned.
      * @param  string                       $lang       Language in which multilang fields are being updated.
      */
-    public static function onupdatePaymentDeadlineId($om, $oids, $values, $lang) {
+    protected static function onupdatePaymentDeadlineId($om, $oids, $values, $lang) {
         $fundings = $om->read(self::getType(), $oids, ['payment_deadline_id.name'], $lang);
         if($fundings > 0) {
             foreach($fundings as $oid => $funding) {
@@ -360,7 +360,7 @@ class Funding extends Model {
         }
     }
 
-    public static function onupdateEnrollmentId($self, $values) {
+    protected static function onupdateEnrollmentId($self, $values) {
         $self->read(['enrollment_id' => ['camp_id' => ['center_id' => ['center_office_id']]]]);
         $map_enrollments_ids = [];
         foreach($self as $funding) {

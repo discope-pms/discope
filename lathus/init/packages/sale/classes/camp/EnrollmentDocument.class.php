@@ -47,7 +47,7 @@ class EnrollmentDocument extends Model {
         ];
     }
 
-    public static function onupdateEnrollmentId($self) {
+    protected static function onupdateEnrollmentId($self) {
         $self->read(['enrollment_id']);
         foreach($self as $enrollment_doc) {
             // reset all documents received computed value
@@ -58,7 +58,7 @@ class EnrollmentDocument extends Model {
         }
     }
 
-    public static function onupdateReceived($self) {
+    protected static function onupdateReceived($self) {
         $self->read(['enrollment_id']);
         foreach($self as $enrollment_doc) {
             // reset all documents received computed value

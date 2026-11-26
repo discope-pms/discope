@@ -111,7 +111,7 @@ class BookingPriceAdapter extends Model {
         return parent::canupdate($om, $oids, $values, $lang);
     }
 
-    public static function onupdateValue($om, $oids, $values, $lang) {
+    protected static function onupdateValue($om, $oids, $values, $lang) {
         // reset computed price for related bookings and booking_line_groups
         $discounts = $om->read(__CLASS__, $oids, ['booking_id', 'booking_line_id', 'booking_line_group_id']);
 

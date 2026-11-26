@@ -81,16 +81,16 @@ class PackLine extends Model {
         ];
     }
 
-    public static function onupdateChildProductId($om, $oids, $values, $lang) {
+    protected static function onupdateChildProductId($om, $oids, $values, $lang) {
         // #memo - disabled since one should use child_product_model_id instead of child_product_id
         // $om->update(__CLASS__, $oids, [ 'name' => null ], $lang);
     }
 
-    public static function onupdateChildProductModelId($om, $oids, $values, $lang) {
+    protected static function onupdateChildProductModelId($om, $oids, $values, $lang) {
         $om->update(__CLASS__, $oids, [ 'name' => null ], $lang);
     }
 
-    public static function calcName($om, $oids, $lang) {
+    protected static function calcName($om, $oids, $lang) {
         $result = [];
         $lines = $om->read(__CLASS__, $oids, ['child_product_model_id.name']);
         foreach($oids as $oid) {

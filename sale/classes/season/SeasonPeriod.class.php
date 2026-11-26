@@ -83,13 +83,13 @@ class SeasonPeriod extends Model {
         ];
     }
 
-    public static function onupdateDateFrom($om, $oids, $values, $lang) {
+    protected static function onupdateDateFrom($om, $oids, $values, $lang) {
         $om->update(__CLASS__, $oids, ['month' => null, 'year' => null]);
         // force immediate re-computing
         $om->read(__CLASS__, $oids, ['month', 'year']);
     }
 
-    public static function calcMonth($om, $oids, $lang) {
+    protected static function calcMonth($om, $oids, $lang) {
         $result = [];
         $periods = $om->read(__CLASS__, $oids, ['date_from']);
         foreach($periods as $oid => $odata) {
@@ -98,7 +98,7 @@ class SeasonPeriod extends Model {
         return $result;
     }
 
-    public static function calcYear($om, $oids, $lang) {
+    protected static function calcYear($om, $oids, $lang) {
         $result = [];
         $periods = $om->read(__CLASS__, $oids, ['date_from']);
         foreach($periods as $oid => $odata) {

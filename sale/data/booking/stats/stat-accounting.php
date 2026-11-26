@@ -38,7 +38,7 @@ list($params, $providers) = eQual::announce([
             'type'              => 'many2one',
             'foreign_object'    => 'finance\accounting\AccountingRule',
             'description'       => "Applied accounting rule.",
-            'require'           => true
+            'required'          => true
         ],
 
         'center_office' => [

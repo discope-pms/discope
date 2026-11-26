@@ -98,7 +98,7 @@ class Repairing extends Model {
         ];
     }
 
-    public static function calcName($om, $oids, $lang) {
+    protected static function calcName($om, $oids, $lang) {
         $result = [];
         $repairings = $om->read(self::getType(), $oids, ['description'], $lang);
         if($repairings > 0) {
@@ -109,7 +109,7 @@ class Repairing extends Model {
         return $result;
     }
 
-    public static function calcTimeFrom($om, $oids, $lang) {
+    protected static function calcTimeFrom($om, $oids, $lang) {
         $result = [];
         $repairings = $om->read(self::getType(), $oids, ['repairs_ids']);
         if($repairings > 0) {
@@ -131,7 +131,7 @@ class Repairing extends Model {
         return $result;
     }
 
-    public static function calcTimeTo($om, $oids, $lang) {
+    protected static function calcTimeTo($om, $oids, $lang) {
         $result = [];
         $repairings = $om->read(self::getType(), $oids, ['repairs_ids']);
         if($repairings > 0) {
@@ -153,20 +153,20 @@ class Repairing extends Model {
         return $result;
     }
 
-    public static function onupdateRentalUnitsIds($om, $ids, $values, $lang) {
+    protected static function onupdateRentalUnitsIds($om, $ids, $values, $lang) {
         $om->callonce(self::getType(), '_updateRepairs', $ids, [], $lang);
     }
 
-    public static function onupdateDescription($om, $oids, $values, $lang) {
+    protected static function onupdateDescription($om, $oids, $values, $lang) {
         $om->update(self::getType(), $oids, ['name' => null]);
         $om->read(self::getType(), $oids, ['name']);
     }
 
-    public static function onupdateDateFrom($om, $ids, $values, $lang) {
+    protected static function onupdateDateFrom($om, $ids, $values, $lang) {
         $om->callonce(self::getType(), '_updateRepairs', $ids, [], $lang);
     }
 
-    public static function onupdateDateTo($om, $ids, $values, $lang) {
+    protected static function onupdateDateTo($om, $ids, $values, $lang) {
         $om->callonce(self::getType(), '_updateRepairs', $ids, [], $lang);
     }
 

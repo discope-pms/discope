@@ -57,7 +57,7 @@ class Condition extends Model {
         ];
     }
 
-    public static function calcDisplayName($self) {
+    protected static function calcDisplayName($self) {
         $result = [];
         $self->read(['operand', 'operator', 'value']);
         foreach($self as $id => $condition) {

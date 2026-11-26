@@ -331,7 +331,7 @@ class BookingActivity extends Model {
         ];
     }
 
-    public static function calcName($self): array {
+    protected static function calcName($self): array {
         $result = [];
         $self->read(['product_id' => ['name']]);
         foreach($self as $id => $booking_activity) {
@@ -367,7 +367,7 @@ class BookingActivity extends Model {
         return $result;
     }
 
-    public static function calcTotal($self): array {
+    protected static function calcTotal($self): array {
         $result = [];
         $self->read(['booking_lines_ids' => ['total']]);
         foreach($self as $id => $booking_activity) {
@@ -381,7 +381,7 @@ class BookingActivity extends Model {
         return $result;
     }
 
-    public static function calcPrice($self): array {
+    protected static function calcPrice($self): array {
         $result = [];
         $self->read(['booking_lines_ids' => ['price']]);
         foreach($self as $id => $booking_activity) {
@@ -395,7 +395,7 @@ class BookingActivity extends Model {
         return $result;
     }
 
-    public static function calcQty($self): array {
+    protected static function calcQty($self): array {
         $result = [];
         $self->read(['activity_booking_line_id' => ['qty_accounting_method', 'qty']]);
         foreach($self as $id => $booking_activity) {
@@ -410,7 +410,7 @@ class BookingActivity extends Model {
         return $result;
     }
 
-    public static function calcScheduleFrom($self): array {
+    protected static function calcScheduleFrom($self): array {
         $result = [];
         $self->read(['time_slot_id' => ['schedule_from']]);
         foreach($self as $id => $booking_activity) {
@@ -422,7 +422,7 @@ class BookingActivity extends Model {
         return $result;
     }
 
-    public static function calcScheduleTo($self): array {
+    protected static function calcScheduleTo($self): array {
         $result = [];
         $self->read(['time_slot_id' => ['schedule_to']]);
         foreach($self as $id => $booking_activity) {
@@ -434,7 +434,7 @@ class BookingActivity extends Model {
         return $result;
     }
 
-    public static function calcGroupNum($self): array {
+    protected static function calcGroupNum($self): array {
         $result = [];
         $self->read([
             'booking_line_group_id' => ['activity_group_num'],
@@ -452,7 +452,7 @@ class BookingActivity extends Model {
         return $result;
     }
 
-    public static function onupdateProductId($self) {
+    protected static function onupdateProductId($self) {
         $self->read(['camp_group_id', 'partner_event_id', 'product_id' => ['name']]);
         foreach($self as $id => $booking_activity) {
             if(is_null($booking_activity['camp_group_id'])) {
@@ -464,7 +464,7 @@ class BookingActivity extends Model {
         }
     }
 
-    public static function onupdateActivityDate($self) {
+    protected static function onupdateActivityDate($self) {
         $self->do('update-counters');
 
         $self->read(['camp_group_id']);
@@ -481,7 +481,7 @@ class BookingActivity extends Model {
         }
     }
 
-    public static function onupdateTimeSlotId($self) {
+    protected static function onupdateTimeSlotId($self) {
         $self->do('update-counters');
 
         $self->read(['camp_group_id']);
@@ -498,7 +498,7 @@ class BookingActivity extends Model {
         }
     }
 
-    public static function onupdateRentalUnitId($self) {
+    protected static function onupdateRentalUnitId($self) {
         $self->read(['activity_booking_line_id', 'rental_unit_id']);
         foreach($self as $booking_activity) {
             BookingLine::id($booking_activity['activity_booking_line_id'])
@@ -506,12 +506,12 @@ class BookingActivity extends Model {
         }
     }
 
-    public static function doResetPrices($self) {
+    protected static function doResetPrices($self) {
         // reset computed fields related to price
         $self->update(['total' => null, 'price' => null]);
     }
 
-    public static function doUpdateCounters($self) {
+    protected static function doUpdateCounters($self) {
         $self->read(['booking_id', 'camp_id']);
 
         $booking_activities_ids = [];

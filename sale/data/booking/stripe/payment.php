@@ -21,9 +21,9 @@ list($params, $providers) = eQual::announce([
         ],
         'psp_reference' =>  [
             'description'   => 'Stripe payment intent identifier.',
+            'help'          => 'Example: `pi_3Ng07TJkzhOGpR2F066oJxMi`',
             'type'          => 'string',
-            'required'      => true,
-            'example'       => 'pi_3Ng07TJkzhOGpR2F066oJxMi'
+            'required'      => true
         ]
     ],
     'response'      => [

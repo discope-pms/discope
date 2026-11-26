@@ -206,7 +206,7 @@ class Payment extends Model {
         return $result;
     }
 
-    public static function calcEnrollmentId($om, $ids, $lang) {
+    protected static function calcEnrollmentId($om, $ids, $lang) {
         $result = [];
         $payments = $om->read(self::getType(), $ids, ['funding_id.enrollment_id']);
         foreach($payments as $id => $payment) {
@@ -217,7 +217,7 @@ class Payment extends Model {
         return $result;
     }
 
-    public static function calcCenterOfficeId($om, $ids, $lang) {
+    protected static function calcCenterOfficeId($om, $ids, $lang) {
         $result = [];
         $payments = $om->read(self::getType(), $ids, ['enrollment_id.camp_id.center_id.center_office_id', 'statement_line_id.center_office_id']);
         if($payments > 0 && count($payments)) {
@@ -238,7 +238,7 @@ class Payment extends Model {
      * Force recomputing of target funding computed fields (is_paid and paid_amount).
      *
      */
-    public static function onupdateFundingId($om, $ids, $values, $lang) {
+    protected static function onupdateFundingId($om, $ids, $values, $lang) {
         trigger_error("ORM::calling sale\pay\Payment::onupdateFundingId", QN_REPORT_DEBUG);
 
         $payments = $om->read(self::getType(), $ids, ['funding_id', 'funding_id.invoice_id', 'funding_id.enrollment_id.camp_id.date_from', 'funding_id.type', 'partner_id']);
@@ -286,7 +286,7 @@ class Payment extends Model {
         }
     }
 
-    public static function onupdateStatementLineId($om, $ids, $values, $lang) {
+    protected static function onupdateStatementLineId($om, $ids, $values, $lang) {
         $payments = $om->read(self::getType(), $ids, ['state', 'statement_line_id', 'statement_line_id.bank_statement_id', 'statement_line_id.remaining_amount']);
         if($payments > 0 && count($payments)) {
             foreach($payments as $id => $payment) {
