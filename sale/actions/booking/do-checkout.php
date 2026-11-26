@@ -21,9 +21,8 @@ use sale\booking\SojournProductModelRentalUnitAssignement;
         ]
     ],
     'access'        => [
-        'visibility'    => 'public',
-        // 'public' (default) or 'private' (can be invoked by CLI only)
-        'groups'            => ['booking.default.user']
+        'visibility'    => 'public',    // 'public' (default) or 'private' (can be invoked by CLI only)
+        'groups'        => ['booking.default.user']
     ],
     'response'      => [
         'content-type'  => 'application/json',
