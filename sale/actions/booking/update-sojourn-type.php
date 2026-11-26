@@ -5,48 +5,49 @@
     Original author(s): Yesbabylon SRL
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
+
 use sale\booking\Booking;
 use sale\booking\BookingLineGroup;
 
 // announce script and fetch parameters values
-list($params, $providers) = eQual::announce([
-    'description'	=>	"Updates a sojourn based on partial patch of the main product. This script is meant to be called by the `booking/services` UI.",
-    'params' 		=>	[
-        'id' =>  [
-            'description'       => 'Identifier of the targeted sojourn.',
+[$params, $providers] = eQual::announce([
+    'description'   => "Updates a sojourn based on partial patch of the main product. This script is meant to be called by the `booking/services` UI.",
+    'params'        => [
+        'id' => [
             'type'              => 'many2one',
             'foreign_object'    => BookingLineGroup::getType(),
+            'description'       => 'Identifier of the targeted sojourn.',
             'required'          => true
         ],
-        'group_type' =>  [
+        'group_type' => [
             'type'              => 'string',
+            'description'       => 'New type the group must be assigned to.',
             'selection'         => [
                 'simple',
                 'sojourn',
                 'event',
                 'camp'
             ],
-            'description'       => 'New type the group must be assigned to.',
             'required'          => true
         ]
     ],
-    'access' => [
-        'visibility'        => 'protected',
-        'groups'            => ['booking.default.user']
+    'access'        => [
+        'visibility'    => 'protected',
+        'groups'        => ['booking.default.user']
     ],
-    'response' => [
-        'content-type'      => 'application/json',
-        'charset'           => 'utf-8',
-        'accept-origin'     => '*'
+    'response'      => [
+        'content-type'  => 'application/json',
+        'charset'       => 'utf-8',
+        'accept-origin' => '*'
     ],
-    'providers' => ['context', 'orm']
+    'providers'     => ['context', 'orm']
 ]);
 
 /**
  * @var \equal\php\Context          $context
  * @var \equal\orm\ObjectManager    $orm
  */
-list($context, $orm) = [ $providers['context'], $providers['orm']];
+['context' => $context, 'orm' => $orm] = $providers;
 
 // read BookingLineGroup object
 $group = BookingLineGroup::id($params['id'])
@@ -91,6 +92,7 @@ $orm->enableEvents();
 
 Booking::id($group['booking_id']['id'])->do('refresh_groups_activity_number');
 
-$context->httpResponse()
-        ->status(204)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(204)
+    ->send();

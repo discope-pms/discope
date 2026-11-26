@@ -30,19 +30,18 @@ use sale\catalog\Product;
 use sale\price\Price;
 use sale\price\PriceList;
 
-list($params, $providers) = eQual::announce([
+[$params, $providers] = eQual::announce([
     'description'   => "Pull reservations from Cubilis not yet marked as acknowledged.",
-    'params'        => [
+    'params'        => [],
+    'access'        => [
+        'visibility'    => 'protected'
     ],
-    'access' => [
-        'visibility'    => 'protected',
-    ],
-    'constants'     => ['ROOT_APP_URL', 'EMAIL_REPORT_RECIPIENT', 'EMAIL_ERRORS_RECIPIENT'],
     'response'      => [
         'content-type'  => 'application/json',
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
+    'constants'     => ['ROOT_APP_URL', 'EMAIL_REPORT_RECIPIENT', 'EMAIL_ERRORS_RECIPIENT'],
     'providers'     => ['context', 'orm', 'cron', 'dispatch']
 ]);
 
@@ -1229,6 +1228,7 @@ else {
 }
 
 
-$context->httpResponse()
-        ->body($result)
-        ->send();
+$context
+    ->httpResponse()
+    ->body($result)
+    ->send();

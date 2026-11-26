@@ -17,41 +17,40 @@ use sale\booking\Funding;
 use sale\pay\PaymentPlan;
 
 
-list($params, $providers) = announce([
+[$params, $providers] = eQual::announce([
     'description'   => "Sets booking as confirmed, creates contract and generates payment plan.",
     'params'        => [
-        'id' =>  [
-            'description'   => 'Identifier of the booking to mark as confirmed.',
+        'id' => [
             'type'          => 'integer',
+            'description'   => 'Identifier of the booking to mark as confirmed.',
             'min'           => 1,
             'required'      => true
         ],
-        'instant_payment' =>  [
-            'description'   => 'No funding plan will be generated.',
+        'instant_payment' => [
             'type'          => 'boolean',
+            'description'   => 'No funding plan will be generated.',
             'default'       => false
         ]
     ],
-    'access' => [
-        'visibility'        => 'protected',
-        'groups'            => ['booking.default.user'],
+    'access'        => [
+        'visibility'    => 'protected',
+        'groups'        => ['booking.default.user']
     ],
     'response'      => [
         'content-type'  => 'application/json',
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'     => ['context', 'orm', 'cron', 'dispatch', 'report']
+    'providers'     => ['context', 'cron', 'dispatch', 'report']
 ]);
 
 /**
- * @var \equal\php\Context                  $context
- * @var \equal\orm\ObjectManager            $orm
- * @var \equal\cron\Scheduler               $cron
- * @var \equal\dispatch\Dispatcher          $dispatch
- * @var \equal\error\Reporter               $reporter
+ * @var \equal\php\Context          $context
+ * @var \equal\cron\Scheduler       $cron
+ * @var \equal\dispatch\Dispatcher  $dispatch
+ * @var \equal\error\Reporter       $reporter
  */
-list($context, $orm, $cron, $dispatch, $reporter) = [$providers['context'], $providers['orm'], $providers['cron'], $providers['dispatch'], $providers['report']];
+['context' => $context, 'cron' => $cron, 'dispatch' => $dispatch, 'report' => $reporter] = $providers;
 
 // read booking object
 $booking = Booking::id($params['id'])
@@ -119,23 +118,23 @@ $booking = Booking::id($params['id'])
     ->first(true);
 
 if(!$booking) {
-    throw new Exception("unknown_booking", QN_ERROR_UNKNOWN_OBJECT);
+    throw new Exception("unknown_booking", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
 if($booking['status'] != 'option') {
-    throw new Exception("incompatible_status", QN_ERROR_INVALID_PARAM);
+    throw new Exception("incompatible_status", EQ_ERROR_INVALID_PARAM);
 }
 
 // #deprecated #memo - we allow setting a booking to 'confirmed' even if is has is_price_tbc set to true, but contracts will not be generated for these
 // #memo - setting a booking to 'confirmed' while having `is_price_tbc` set to true breaks the booking workflow and is not allowed.
 if($booking['is_price_tbc']) {
-    throw new Exception("incompatible_status", QN_ERROR_INVALID_PARAM);
+    throw new Exception("incompatible_status", EQ_ERROR_INVALID_PARAM);
 }
 
 // check contact consistency
 $data = eQual::run('do', 'sale_booking_check-contacts', ['id' => $booking['id']]);
 if(is_array($data) && count($data)) {
-    throw new Exception('missing_contact_phone', QN_ERROR_INVALID_PARAM);
+    throw new Exception('missing_contact_phone', EQ_ERROR_INVALID_PARAM);
 }
 
 
@@ -147,7 +146,7 @@ if(is_array($data) && count($data)) {
 $data = eQual::run('do', 'sale_booking_check-prices-assignments', ['id' => $booking['id']]);
 // raise an exception with first error (alerts should have been issued in the check controllers)
 if(is_array($data) && count($data)) {
-    throw new Exception('missing_price_assignment', QN_ERROR_INVALID_PARAM);
+    throw new Exception('missing_price_assignment', EQ_ERROR_INVALID_PARAM);
 }
 
 // check customer details completeness
@@ -369,7 +368,7 @@ else {
         ->get();
 
     if(!count($payment_plans)) {
-        throw new Exception("missing_payment_plan", QN_ERROR_INVALID_CONFIG);
+        throw new Exception("missing_payment_plan", EQ_ERROR_INVALID_CONFIG);
     }
 
     // #memo - we assume that there is always one payment plan that matches the booking
@@ -418,7 +417,7 @@ else {
     }
 
     if($payment_plan < 0) {
-        throw new Exception("cannot_read_object", QN_ERROR_UNKNOWN_OBJECT);
+        throw new Exception("cannot_read_object", EQ_ERROR_UNKNOWN_OBJECT);
     }
 
     $reporter->debug("Selected payment plan: {$payment_plan['name']}");
@@ -580,6 +579,7 @@ foreach($booking['contacts_ids'] as $contact) {
     }
 }
 
-$context->httpResponse()
-        ->status(204)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(204)
+    ->send();

@@ -11,28 +11,26 @@ use sale\camp\Enrollment;
 [$params, $providers] = eQual::announce([
     'description'   => "Unconfirms the confirmed enrollment to alter it.",
     'params'        => [
-
         'id' => [
             'type'          => 'integer',
             'description'   => "Identifier of the enrollment we want to unconfirm.",
             'required'      => true
         ]
-
     ],
     'access'        => [
-        'visibility'        => 'protected',
-        'groups'            => ['camp.default.administrator', 'camp.default.user'],
+        'visibility'    => 'protected',
+        'groups'        => ['camp.default.administrator', 'camp.default.user']
     ],
     'response'      => [
-        'content-type'      => 'application/json',
-        'charset'           => 'utf-8',
-        'accept-origin'     => '*'
+        'content-type'  => 'application/json',
+        'charset'       => 'utf-8',
+        'accept-origin' => '*'
     ],
     'providers'     => ['context']
 ]);
 
 /**
- * @var \equal\php\Context  $context
+ * @var \equal\php\Context $context
  */
 ['context' => $context] = $providers;
 
@@ -50,6 +48,7 @@ if($enrollment['status'] !== 'confirmed') {
 
 Enrollment::id($enrollment['id'])->transition('unconfirm');
 
-$context->httpResponse()
-        ->status(200)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(200)
+    ->send();

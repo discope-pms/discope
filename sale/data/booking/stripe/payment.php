@@ -9,7 +9,7 @@
 use equal\http\HttpRequest;
 use sale\booking\channelmanager\Property;
 
-list($params, $providers) = eQual::announce([
+[$params, $providers] = eQual::announce([
     'description'   => 'Sends a request to Stripe for retrieving the payment details from a payment intent reference.',
     'params'        => [
         'property_id' => [
@@ -19,11 +19,11 @@ list($params, $providers) = eQual::announce([
             'help'              => 'The (local) property_id is needed in order to retrieve the PSP account to which the reference refers to',
             'required'          => true
         ],
-        'psp_reference' =>  [
-            'description'   => 'Stripe payment intent identifier.',
-            'help'          => 'Example: `pi_3Ng07TJkzhOGpR2F066oJxMi`',
-            'type'          => 'string',
-            'required'      => true
+        'psp_reference' => [
+            'type'              => 'string',
+            'description'       => 'Stripe payment intent identifier.',
+            'help'              => 'Example: `pi_3Ng07TJkzhOGpR2F066oJxMi`',
+            'required'          => true
         ]
     ],
     'response'      => [
@@ -31,14 +31,13 @@ list($params, $providers) = eQual::announce([
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'     => [ 'context', 'orm' ]
+    'providers'     => ['context']
 ]);
 
 /**
  * @var \equal\php\Context $context
- * @var \equal\orm\ObjectManager $orm
  */
-list($context, $orm) = [ $providers['context'], $providers['orm'] ];
+['context' => $context] = $providers;
 
 
 /*
@@ -144,11 +143,11 @@ Array
 // retrieve secret key associated with the Center Office
 $property = Property::id($params['property_id'])->read(['psp_provider', 'psp_key'])->first(true);
 if(!$property) {
-    throw new Exception("unknown_property", QN_ERROR_UNKNOWN);
+    throw new Exception("unknown_property", EQ_ERROR_UNKNOWN);
 }
 
 if(!isset($property['psp_key']) || strlen($property['psp_key']) <= 0) {
-    throw new Exception("empty_psp_key", QN_ERROR_UNKNOWN);
+    throw new Exception("empty_psp_key", EQ_ERROR_UNKNOWN);
 }
 
 $private_key = $property['psp_key'];
@@ -163,12 +162,12 @@ $response = $request
 $intent = $response->body();
 
 if(!is_array($intent) || !isset($intent['latest_charge'])) {
-    throw new Exception("error_processing_request", QN_ERROR_UNKNOWN);
+    throw new Exception("error_processing_request", EQ_ERROR_UNKNOWN);
 }
 
 if($intent['status'] != 'succeeded') {
     // possible values are 'canceled', 'available', 'succeeded'
-    throw new Exception("invalid_status", QN_ERROR_UNKNOWN);
+    throw new Exception("invalid_status", EQ_ERROR_UNKNOWN);
 }
 
 $result = [
@@ -178,6 +177,7 @@ $result = [
     'net'       => floatval($intent['latest_charge']['balance_transaction']['net']) / 100.0
 ];
 
-$context->httpResponse()
-        ->body($result)
-        ->send();
+$context
+    ->httpResponse()
+    ->body($result)
+    ->send();

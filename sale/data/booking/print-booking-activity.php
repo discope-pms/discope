@@ -29,25 +29,25 @@ use Twig\Loader\FilesystemLoader as TwigFilesystemLoader;
         ],
         'type' => [
             'type'              => 'string',
-            'selection'         => ['global', 'weekly'],
             'description'       => 'The type of activities planning.',
+            'selection'         => ['global', 'weekly'],
             'default'           => 'global'
         ],
-        'mode' =>  [
+        'mode' => [
             'type'              => 'string',
-            'selection'         => ['simple', 'grouped', 'detailed'],
             'description'       => 'Mode in which document has to be rendered: simple or detailed.',
+            'selection'         => ['simple', 'grouped', 'detailed'],
             'default'           => 'grouped'
         ],
-        'lang' =>  [
+        'lang' => [
             'type'              => 'string',
             'description'       => 'Language in which labels and multilang field have to be returned (2 letters ISO 639-1).',
             'default'           => constant('DEFAULT_LANG')
         ],
-        'output' =>  [
+        'output' => [
             'type'              => 'string',
-            'selection'         => ['pdf', 'html'],
             'description'       => 'Output format of the document.',
+            'selection'         => ['pdf', 'html'],
             'default'           => 'pdf'
         ],
         'booking_line_group_id' => [
@@ -58,7 +58,7 @@ use Twig\Loader\FilesystemLoader as TwigFilesystemLoader;
     ],
     'access'        => [
         'visibility'    => 'protected',
-        'groups'        => ['booking.default.user'],
+        'groups'        => ['booking.default.user']
     ],
     'response'      => [
         'content-type'  => 'application/pdf',
@@ -69,6 +69,9 @@ use Twig\Loader\FilesystemLoader as TwigFilesystemLoader;
 ]);
 
 
+/**
+ * @var \equal\php\Context $context
+ */
 ['context' => $context] = $providers;
 
 $type = $params['type'];

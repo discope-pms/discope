@@ -8,13 +8,13 @@
 
 use equal\orm\Domain;
 
-list($params, $providers) = eQual::announce([
+[$params, $providers] = eQual::announce([
     'description'   => 'Advanced search for Reports: returns a collection of Reports according to extra paramaters.',
     'extends'       => 'core_model_collect',
     'params'        => [
-        'entity' =>  [
-            'description'       => 'name',
+        'entity' => [
             'type'              => 'string',
+            'description'       => 'name',
             'default'           => 'sale\booking\BankStatement'
         ],
         'name' => [
@@ -42,13 +42,13 @@ list($params, $providers) = eQual::announce([
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'     => [ 'context', 'orm' ]
+    'providers'     => ['context']
 ]);
+
 /**
  * @var \equal\php\Context $context
- * @var \equal\orm\ObjectManager $orm
  */
-list($context, $orm) = [ $providers['context'], $providers['orm'] ];
+['context' => $context] = $providers;
 
 $domain = $params['domain'];
 
@@ -71,6 +71,7 @@ if(isset($params['date_to']) && $params['date_to'] > 0) {
 $params['domain'] = $domain;
 $result = eQual::run('get', 'model_collect', $params, true);
 
-$context->httpResponse()
-        ->body($result)
-        ->send();
+$context
+    ->httpResponse()
+    ->body($result)
+    ->send();

@@ -5,12 +5,13 @@
     Original author(s): Yesbabylon SRL
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
+
 use sale\booking\Booking;
 
-list($params, $providers) = announce([
+[$params, $providers] = eQual::announce([
     'description'   => "Update the payment status of all non-balanced bookings. This controller is meant to be run by CRON on a daily basis.",
-    'access' => [
-        'visibility'        => 'protected'
+    'access'        => [
+        'visibility'    => 'protected'
     ],
     'response'      => [
         'content-type'  => 'application/json',
@@ -21,15 +22,16 @@ list($params, $providers) = announce([
 ]);
 
 /**
- * @var \equal\php\Context    $context
+ * @var \equal\php\Context $context
  */
-list($context) = [$providers['context']];
+['context' => $context] = $providers;
 
 /*
     Update booking status for all bookings that are not balanced yet.
 */
 Booking::search([['state', '=', 'instance'], ['status', 'not in', ['balanced', 'cancelled']]])->update(['payment_status' => null]);
 
-$context->httpResponse()
-        ->status(204)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(204)
+    ->send();

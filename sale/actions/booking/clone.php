@@ -22,13 +22,11 @@ use sale\provider\Provider;
 [$params, $providers] = eQual::announce([
     'description'   => "Clone a specific booking.",
     'params'        => [
-
         'id' => [
             'type'              => 'integer',
             'description'       => "Identifier of the booking to clone.",
             'required'          => true
         ],
-
         'customer_id' => [
             'type'              => 'many2one',
             'foreign_object'    => 'sale\customer\Customer',
@@ -36,13 +34,11 @@ use sale\provider\Provider;
             'domain'            => ['relationship', '=', 'customer'],
             'required'          => true
         ],
-
         'date_from' => [
             'type'              => 'date',
             'description'       => "Start date of the time interval.",
             'required'          => true
         ]
-
     ],
     'access'        => [
         'visibility'    => 'protected',
@@ -429,6 +425,7 @@ foreach($booking['booking_lines_groups_ids'] as $group) {
 
 $orm->enableEvents($event_mask);
 
-$context->httpResponse()
-        ->status(201)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(201)
+    ->send();

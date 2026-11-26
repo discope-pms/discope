@@ -11,7 +11,7 @@ use sale\booking\channelmanager\Property;
 use sale\booking\channelmanager\RoomType;
 use sale\booking\Consumption;
 
-list($params, $providers) = announce([
+[$params, $providers] = eQual::announce([
     'description'   => "Resolve a Rental Unit based on a given property and room type. \
                         If the there are one or more candidates, the first available rental unit is returned. \
                         If no rental unit is available, an error is raised.",
@@ -38,8 +38,8 @@ list($params, $providers) = announce([
             'required'          => true
         ]
     ],
-    'access' => [
-        'visibility'    => 'protected',
+    'access'        => [
+        'visibility'    => 'protected'
     ],
     'response'      => [
         'content-type'  => 'application/json',
@@ -50,17 +50,17 @@ list($params, $providers) = announce([
 ]);
 
 /**
- * @var \equal\php\Context $context
- * @var \equal\orm\ObjectManager $orm
+ * @var \equal\php\Context          $context
+ * @var \equal\orm\ObjectManager    $orm
  */
-list($context, $orm) = [ $providers['context'], $providers['orm'] ];
+['context' => $context, 'orm' => $orm] = $providers;
 
 $property = Property::id($params['property_id'])
     ->read(['id', 'extref_property_id', 'center_id', 'center_office_id'])
     ->first(true);
 
 if(!$property) {
-    throw new Exception('unknown_property', QN_ERROR_UNKNOWN_OBJECT);
+    throw new Exception('unknown_property', EQ_ERROR_UNKNOWN_OBJECT);
 }
 
 $room_type = RoomType::search(['extref_roomtype_id', '=', $params['extref_room_type_id']])
@@ -68,7 +68,7 @@ $room_type = RoomType::search(['extref_roomtype_id', '=', $params['extref_room_t
     ->first(true);
 
 if(!$room_type) {
-    throw new Exception('unknown_room_type', QN_ERROR_UNKNOWN_OBJECT);
+    throw new Exception('unknown_room_type', EQ_ERROR_UNKNOWN_OBJECT);
 }
 
 $existing_consumptions_map = Consumption::getExistingConsumptions($orm, [$property['center_id']], $params['date_from'], $params['date_to']);
@@ -92,7 +92,7 @@ foreach($existing_consumptions_map as $rental_unit_id => $dates) {
 $rental_units_ids = array_diff($room_type['rental_units_ids'], $booked_rental_units_ids);
 
 if(!count($rental_units_ids)) {
-    throw new Exception('no_rentalunit_candidate', QN_ERROR_CONFLICT_OBJECT);
+    throw new Exception('no_rentalunit_candidate', EQ_ERROR_CONFLICT_OBJECT);
 }
 
 $result = RentalUnit::ids($rental_units_ids)
@@ -104,6 +104,7 @@ $result = RentalUnit::ids($rental_units_ids)
     ])
     ->get(true);
 
-$context->httpResponse()
-        ->body($result)
-        ->send();
+$context
+    ->httpResponse()
+    ->body($result)
+    ->send();

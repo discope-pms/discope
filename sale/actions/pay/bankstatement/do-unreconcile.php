@@ -11,18 +11,16 @@ use sale\booking\BankStatement;
 [$params, $providers] = eQual::announce([
     'description'   => "Un-reconcile a bank statement to allow the modification of its lines.",
     'params'        => [
-
-        'id' =>  [
+        'id' => [
             'type'          => 'integer',
-            'min'           => 1,
             'description'   => "Identifier of the BankStatement to un-reconcile.",
+            'min'           => 1,
             'required'      => true
         ]
-
     ],
     'access'        => [
         'visibility'    => 'protected',
-        'groups'        => ['finance.default.administrator'],
+        'groups'        => ['finance.default.administrator']
     ],
     'response'      => [
         'content-type'  => 'application/json',
@@ -33,7 +31,7 @@ use sale\booking\BankStatement;
 ]);
 
 /**
- * @var \equal\php\Context  $context
+ * @var \equal\php\Context $context
  */
 ['context' => $context] = $providers;
 
@@ -52,6 +50,7 @@ if($bank_statement['status'] !== 'reconciled') {
 BankStatement::id($bank_statement['id'])
     ->update(['status' => 'pending']);
 
-$context->httpResponse()
-        ->status(204)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(204)
+    ->send();

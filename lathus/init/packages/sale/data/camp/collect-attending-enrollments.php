@@ -13,11 +13,10 @@ use sale\camp\Camp;
 [$params, $providers] = eQual::announce([
     'description'   => "Manage children that are attending the current camps.",
     'params'        => [
-
         'date_from' => [
-            'type'              => 'date',
-            'description'       => "Date interval lower limit (defaults to first day of the current week).",
-            'default'           => function() {
+            'type'          => 'date',
+            'description'   => "Date interval lower limit (defaults to first day of the current week).",
+            'default'       => function() {
                 $date_from = strtotime('last Sunday');
 
                 $first_camp = Camp::search(
@@ -41,48 +40,40 @@ use sale\camp\Camp;
                 return $date_from;
             }
         ],
-
         'sojourn_number' => [
-            'type'              => 'string',
-            'description'       => "Sojourn number."
+            'type'          => 'string',
+            'description'   => "Sojourn number."
         ],
-
         'only_weekend' => [
-            'type'              => 'boolean',
-            'description'       => "Show only the children present during the weekend.",
-            'default'           => false
+            'type'          => 'boolean',
+            'description'   => "Show only the children present during the weekend.",
+            'default'       => false
         ],
-
         'only_saturday' => [
-            'type'              => 'boolean',
-            'description'       => "Show only the children present during the Saturday morning.",
-            'default'           => false
+            'type'          => 'boolean',
+            'description'   => "Show only the children present during the Saturday morning.",
+            'default'       => false
         ],
-
         'only_birthday' => [
-            'type'              => 'boolean',
-            'description'       => "Show only the children with birthday during camp.",
-            'default'           => false
+            'type'          => 'boolean',
+            'description'   => "Show only the children with birthday during camp.",
+            'default'       => false
         ],
-
         'confirmed' => [
-            'type'              => 'boolean',
-            'description'       => "Display enrollments with confirmed status.",
-            'default'           => true
+            'type'          => 'boolean',
+            'description'   => "Display enrollments with confirmed status.",
+            'default'       => true
         ],
-
         'validated' => [
-            'type'              => 'boolean',
-            'description'       => "Display enrollments with validated status.",
-            'default'           => true
+            'type'          => 'boolean',
+            'description'   => "Display enrollments with validated status.",
+            'default'       => true
         ],
-
         'params' => [
-            'description'   => 'Additional params to relay to the data controller.',
             'type'          => 'array',
+            'description'   => 'Additional params to relay to the data controller.',
             'default'       => []
         ]
-
     ],
     'response'      => [
         'content-type'  => 'application/json',
@@ -93,7 +84,7 @@ use sale\camp\Camp;
 ]);
 
 /**
- * @var \equal\php\Context  $context
+ * @var \equal\php\Context $context
  */
 ['context' => $context] = $providers;
 
@@ -209,7 +200,8 @@ if(isset($params['params']['order'])) {
     usort($result, fn($a, $b) => $sortResult($a, $b, $order, $sort));
 }
 
-$context->httpResponse()
-        ->header('X-Total-Count', count($result))
-        ->body(array_values($result))
-        ->send();
+$context
+    ->httpResponse()
+    ->header('X-Total-Count', count($result))
+    ->body(array_values($result))
+    ->send();

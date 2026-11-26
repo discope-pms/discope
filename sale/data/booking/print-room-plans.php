@@ -17,17 +17,17 @@ use sale\booking\Booking;
             'description'   => 'Identifier of the concerned booking.',
             'required'      => true
         ],
-        'view_id' =>  [
+        'view_id' => [
             'type'          => 'string',
             'description'   => 'The identifier of the view <type.name>.',
             'default'       => 'print.room-plans'
         ],
-        'lang' =>  [
+        'lang' => [
             'type'          => 'string',
             'description'   => 'Language in which labels and multilang field have to be returned (2 letters ISO 639-1).',
             'default'       => constant('DEFAULT_LANG')
         ],
-        'output' =>  [
+        'output' => [
             'type'          => 'string',
             'description'   => 'Output format of the document.',
             'selection'     => ['pdf', 'html'],
@@ -36,7 +36,7 @@ use sale\booking\Booking;
     ],
     'access'        => [
         'visibility'    => 'protected',
-        'groups'        => ['booking.default.user'],
+        'groups'        => ['booking.default.user']
     ],
     'response'      => [
         'content-type'  => 'application/pdf',
@@ -46,6 +46,9 @@ use sale\booking\Booking;
     'providers'     => ['context']
 ]);
 
+/**
+ * @var \equal\php\Context $context
+ */
 ['context' => $context] = $providers;
 
 $getCustomPackageOutput = function() use($context, $params) {
@@ -106,7 +109,7 @@ $getTemplateFilePath = function($entity, $view_id) {
         $template_file = EQ_BASEDIR."/packages/{$package}/views/{$class_path}.{$view_id}.html";
 
         if(!file_exists($template_file)) {
-            throw new Exception("unknown_view_id", QN_ERROR_UNKNOWN_OBJECT);
+            throw new Exception("unknown_view_id", EQ_ERROR_UNKNOWN_OBJECT);
         }
     }
 

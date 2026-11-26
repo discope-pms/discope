@@ -7,28 +7,28 @@
 */
 
 use discope\setting\Setting;
+use realestate\RentalUnit;
 use sale\booking\BookingLineGroup;
 use sale\booking\channelmanager\RoomType;
 use sale\booking\CompositionItem;
 use sale\booking\Consumption;
-use realestate\RentalUnit;
 use sale\booking\SojournProductModel;
 use sale\booking\SojournProductModelRentalUnitAssignement;
 use sale\catalog\ProductModel;
 
 [$params, $providers] = eQual::announce([
-    'description'	=>	"Update the assignments of a given sojourn for a specific product model.",
-    'params' 		=>	[
-        'product_model_id' =>  [
+    'description'   => "Update the assignments of a given sojourn for a specific product model.",
+    'params'        => [
+        'product_model_id' => [
             'type'              => 'many2one',
-            'description'       => "Identifier of the Product Model the assignments relate to.",
             'foreign_object'    => 'sale\catalog\ProductModel',
+            'description'       => "Identifier of the Product Model the assignments relate to.",
             'required'          => true
         ],
-        'booking_line_group_id' =>  [
+        'booking_line_group_id' => [
             'type'              => 'many2one',
-            'description'       => "Identifier of the sojourn (services group) the assignments relate to.",
             'foreign_object'    => 'sale\booking\BookingLineGroup',
+            'description'       => "Identifier of the sojourn (services group) the assignments relate to.",
             'required'          => true
         ],
         'assignments' => [
@@ -149,7 +149,7 @@ foreach($params['assignments'] as $assignment) {
                 $consumption_to = $consumption['date_to'] + $consumption['schedule_to'];
                 // #memo - we don't allow instant transition (i.e. checkin time of a booking equals checkout time of a previous booking)
                 if(max($date_from, $consumption_from) < min($date_to, $consumption_to)) {
-                    throw new Exception("booked_rental_unit: {$rental_unit_id} in booking {$consumption['booking_id']}", QN_ERROR_CONFLICT_OBJECT);
+                    throw new Exception("booked_rental_unit: {$rental_unit_id} in booking {$consumption['booking_id']}", EQ_ERROR_CONFLICT_OBJECT);
                 }
             }
         }
@@ -179,7 +179,7 @@ $original_consumptions_ids = Consumption::search([
 
 $model = $orm->getModel(SojournProductModelRentalUnitAssignement::getType());
 if(!$model) {
-    throw new Exception("unknown_entity", QN_ERROR_INVALID_PARAM);
+    throw new Exception("unknown_entity", EQ_ERROR_INVALID_PARAM);
 }
 
 $schema = $model->getSchema();
@@ -250,7 +250,7 @@ catch(Exception $e) {
     // delete newly created assignments
     SojournProductModelRentalUnitAssignement::ids($new_spm_assignments_ids)->delete(true);
 
-    throw new Exception('unexpected: '.$e->getMessage(), QN_ERROR_UNKNOWN);
+    throw new Exception('unexpected: '.$e->getMessage(), EQ_ERROR_UNKNOWN);
 }
 
 $is_channelmanager_enabled = Setting::get_value('sale', 'features', 'booking.channel_manager', false);

@@ -11,10 +11,9 @@ use hr\employee\Employee;
 [$params, $providers] = eQual::announce([
     'description'   => "Deactivates employees that don't have a pending contract.",
     'help'          => "Can be used as a recurring task, triggered at the start of every day.",
-    'params'        => [
-    ],
+    'params'        => [],
     'access'        => [
-        'visibility'    => 'private',
+        'visibility'    => 'private'
     ],
     'response'      => [
         'content-type'  => 'application/json',

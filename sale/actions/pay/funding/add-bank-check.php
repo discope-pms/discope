@@ -11,33 +11,29 @@ use sale\booking\Funding;
 
 [$params, $providers] = eQual::announce([
     'description'   => "Creates a bank check and associates it with a funding record.",
-    'help'          => "This action generates a new bank check and links it to an existing funding record, updating its status accordingly.  
-                    No actual payment transaction is processed. The association can be reversed as long as the booking has not been invoiced.",
+    'help'          => "This action generates a new bank check and links it to an existing funding record, updating its status accordingly.\n"
+                    ."No actual payment transaction is processed. The association can be reversed as long as the booking has not been invoiced.",
     'params'        => [
-
-        'id' =>  [
-            'type'              => 'integer',
-            'min'               => 1,
-            'description'       => "Identifier of the targeted funding.",
-            'required'          => true
+        'id' => [
+            'type'          => 'integer',
+            'description'   => "Identifier of the targeted funding.",
+            'min'           => 1,
+            'required'      => true
         ],
-
         'has_signature' => [
-            'type'              => 'boolean',
-            'description'       => "Has the bank check  the signature?",
-            'required'           => true,
+            'type'          => 'boolean',
+            'description'   => "Has the bank check  the signature?",
+            'required'      => true
         ],
-
         'bank_check_number' => [
-            'type'              => 'string',
-            'description'       => "The official unique number assigned to the bank check by the issuing bank."
+            'type'          => 'string',
+            'description'   => "The official unique number assigned to the bank check by the issuing bank."
         ],
-
         'amount' => [
-            'type'              => 'float',
-            'usage'             => 'amount/money:2',
-            'description'       => "The monetary value of the bank check.",
-            'default'           => function($id = 0){
+            'type'          => 'float',
+            'usage'         => 'amount/money:2',
+            'description'   => "The monetary value of the bank check.",
+            'default'       => function($id = 0){
                 $funding = Funding::id($id)
                     ->read(['due_amount', 'paid_amount'])
                     ->first();
@@ -45,13 +41,11 @@ use sale\booking\Funding;
                 return !is_null($funding) ? (abs($funding['due_amount']) - abs($funding['paid_amount'])) : 0;
             }
         ],
-
         'instant_payment' => [
-            'type'              => 'boolean',
-            'description'       => "If selected, a payment will be directly added to the funding.",
-            'default'           => false
+            'type'          => 'boolean',
+            'description'   => "If selected, a payment will be directly added to the funding.",
+            'default'       => false
         ]
-
     ],
     'access'        => [
         'groups'        => ['booking.default.user', 'camp.default.administrator', 'camp.default.user', 'finance.default.administrator', 'finance.default.user']
@@ -65,7 +59,7 @@ use sale\booking\Funding;
 ]);
 
 /**
- * @var \equal\php\Context  $context
+ * @var \equal\php\Context $context
  */
 ['context' => $context] = $providers;
 
@@ -108,6 +102,7 @@ if($params['instant_payment']) {
     ]);
 }
 
-$context->httpResponse()
-        ->status(205)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(205)
+    ->send();

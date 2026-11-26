@@ -68,4 +68,3 @@ $orm->update(PriceAdapter::getType(), $price_adapter['id'], [
 $context
     ->httpResponse()
     ->send();
-

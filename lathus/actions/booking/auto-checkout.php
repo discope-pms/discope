@@ -8,24 +8,24 @@
 
 use sale\booking\Booking;
 
-[$params, $provider] = eQual::announce([
+[$params, $providers] = eQual::announce([
     'description'   => "Auto checkout all bookings that are checkedin but have already ended.",
     'params'        => [],
     'access'        => [
-        'visibility'        => 'protected'
+        'visibility'    => 'protected'
     ],
     'response'      => [
-        'content-type'      => 'application/json',
-        'charset'           => 'utf-8',
-        'accept-origin'     => '*'
+        'content-type'  => 'application/json',
+        'charset'       => 'utf-8',
+        'accept-origin' => '*'
     ],
     'providers'     => ['context']
 ]);
 
 /**
- * @var \equal\php\Context  $context
+ * @var \equal\php\Context $context
  */
-['context' => $context] = $provider;
+['context' => $context] = $providers;
 
 $bookings = Booking::search([
     ['date_to', '<', strtotime('midnight')],
@@ -50,7 +50,8 @@ foreach($bookings as $id =>  $booking) {
     }
 }
 
-$context->httpResponse()
-        ->body($result)
-        ->status(200)
-        ->send();
+$context
+    ->httpResponse()
+    ->body($result)
+    ->status(200)
+    ->send();

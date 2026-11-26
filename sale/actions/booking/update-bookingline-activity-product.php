@@ -12,36 +12,36 @@ use sale\booking\BookingLine;
 use sale\catalog\Product;
 
 [$params, $providers] = eQual::announce([
-    'description'	=> "Updates an Activity's transport/supply Booking Line by changing its product.",
-    'params' 		=> [
+    'description'   => "Updates an Activity's transport/supply Booking Line by changing its product.",
+    'params'        => [
         'id' => [
-            'description'       => "Identifier of the targeted booking line.",
             'type'              => 'many2one',
             'foreign_object'    => 'sale\booking\BookingLine',
+            'description'       => "Identifier of the targeted booking line.",
             'required'          => true
         ],
         'product_id' => [
-            'description'       => "Identifier of the product to assign the line to.",
             'type'              => 'many2one',
             'foreign_object'    => 'sale\catalog\Product',
+            'description'       => "Identifier of the product to assign the line to.",
             'default'           => false
         ],
         'booking_activity_id' => [
-            'description'       => "Identifier of the booking activity this transport/supply should be linked to.",
             'type'              => 'many2one',
+            'description'       => "Identifier of the booking activity this transport/supply should be linked to.",
             'required'          => true
         ]
     ],
     'access'        => [
-        'visibility'        => 'protected',
-        'groups'            => ['booking.default.user']
+        'visibility'    => 'protected',
+        'groups'        => ['booking.default.user']
     ],
     'response'      => [
-        'content-type'      => 'application/json',
-        'charset'           => 'utf-8',
-        'accept-origin'     => '*'
+        'content-type'  => 'application/json',
+        'charset'       => 'utf-8',
+        'accept-origin' => '*'
     ],
-    'providers' => ['context', 'orm']
+    'providers'     => ['context', 'orm']
 ]);
 
 /**
@@ -129,6 +129,7 @@ $orm->enableEvents($events_mask);
  * Response
  */
 
-$context->httpResponse()
-        ->status(204)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(204)
+    ->send();

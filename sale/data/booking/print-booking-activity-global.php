@@ -57,7 +57,7 @@ use Twig\Loader\FilesystemLoader as TwigFilesystemLoader;
     ],
     'access'        => [
         'visibility'    => 'protected',
-        'groups'        => ['booking.default.user'],
+        'groups'        => ['booking.default.user']
     ],
     'response'      => [
         'content-type'  => 'application/pdf',
@@ -68,7 +68,7 @@ use Twig\Loader\FilesystemLoader as TwigFilesystemLoader;
 ]);
 
 /**
- * @var \equal\php\Context  $context
+ * @var \equal\php\Context $context
  */
 ['context' => $context] = $providers;
 
@@ -149,7 +149,7 @@ $getTemplateFilePath = function($entity, $view_id) {
         $template_file = EQ_BASEDIR."/packages/{$package}/views/{$class_path}.{$view_id}.html";
 
         if(!file_exists($template_file)) {
-            throw new Exception("unknown_view_id", QN_ERROR_UNKNOWN_OBJECT);
+            throw new Exception("unknown_view_id", EQ_ERROR_UNKNOWN_OBJECT);
         }
     }
 
@@ -237,7 +237,7 @@ if(is_null($output)) {
     $booking = Booking::id($params['id'])->read($fields, $params['lang'])->first(true);
 
     if(!$booking) {
-        throw new Exception("unknown_contract", QN_ERROR_UNKNOWN_OBJECT);
+        throw new Exception("unknown_contract", EQ_ERROR_UNKNOWN_OBJECT);
     }
 
     $logo_document_data = $booking['center_id']['organisation_id']['logo_document_id']['data'] ?? null;

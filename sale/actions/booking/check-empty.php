@@ -5,41 +5,39 @@
     Original author(s): Yesbabylon SRL
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
-use sale\booking\Consumption;
-use sale\booking\BookingLine;
-use sale\booking\Booking;
 
-list($params, $providers) = announce([
+use sale\booking\Booking;
+use sale\booking\BookingLine;
+use sale\booking\Consumption;
+
+[$params, $providers] = eQual::announce([
     'description'   => "Checks if there is at least one service attached to the given booking.",
     'params'        => [
-        'id' =>  [
-            'description'   => 'Identifier of the booking the check against emptyness.',
+        'id' => [
             'type'          => 'integer',
+            'description'   => 'Identifier of the booking the check against emptyness.',
             'required'      => true
-        ],
-
+        ]
     ],
     'response'      => [
         'content-type'  => 'application/json',
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'     => ['context', 'orm', 'auth', 'dispatch']
+    'providers'     => ['context', 'dispatch']
 ]);
 
 /**
- * @var \equal\php\Context                  $context
- * @var \equal\orm\ObjectManager            $orm
- * @var \equal\auth\AuthenticationManager   $auth
- * @var \equal\dispatch\Dispatcher          $dispatch
+ * @var \equal\php\Context          $context
+ * @var \equal\dispatch\Dispatcher  $dispatch
  */
-list($context, $orm, $auth, $dispatch) = [ $providers['context'], $providers['orm'], $providers['auth'], $providers['dispatch']];
+['context' => $context, 'dispatch' => $dispatch] = $providers;
 
 // ensure booking object exists and is readable
 $booking = Booking::id($params['id'])->read(['id', 'name', 'center_office_id', 'booking_lines_ids', 'price', 'is_cancelled'])->first(true);
 
 if(!$booking) {
-    throw new Exception("unknown_booking", QN_ERROR_UNKNOWN_OBJECT);
+    throw new Exception("unknown_booking", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
 /*
@@ -55,7 +53,7 @@ if(!$booking['is_cancelled'] && !count($booking['booking_lines_ids'])) {
     // by convention we dispatch an alert that relates to the controller itself.
     $dispatch->dispatch('lodging.booking.empty', 'sale\booking\Booking', $params['id'], 'important', 'sale_booking_check-empty', ['id' => $params['id']], [], null, $booking['center_office_id']);
 
-    $httpResponse->status(qn_error_http(QN_ERROR_MISSING_PARAM));
+    $httpResponse->status(qn_error_http(EQ_ERROR_MISSING_PARAM));
 }
 else {
     // symmetrical removal of the alert (if any)

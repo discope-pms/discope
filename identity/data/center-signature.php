@@ -10,31 +10,31 @@ use identity\Center;
 
 // announce script and fetch parameters values
 [$params, $providers] = eQual::announce([
-    'description' => "Generate the HTML email signature for a Center, in a given language.",
-    'params'      => [
+    'description'   => "Generate the HTML email signature for a Center, in a given language.",
+    'params'        => [
         'center_id' => [
-            'description'   => 'Identifier of the center for which the signature is requested.',
             'type'          => 'integer',
+            'description'   => 'Identifier of the center for which the signature is requested.',
             'required'      => true
         ],
         'lang' => [
-            'description'   => 'Language to use for multilang contents.',
             'type'          => 'string',
             'usage'         => 'language/iso-639',
+            'description'   => 'Language to use for multilang contents.',
             'default'       => constant('DEFAULT_LANG')
         ]
     ],
-    'constants'   => ['DEFAULT_LANG'],
-    'access'      => [
-      'visibility'          => 'public',
-      'groups'              => ['booking.default.user'],
+    'access'        => [
+        'visibility'    => 'public',
+        'groups'        => ['booking.default.user']
     ],
-    'response'    => [
-        'content-type'      => 'application/json',
-        'charset'           => 'utf-8',
-        'accept-origin'     => '*'
+    'response'      => [
+        'content-type'  => 'application/json',
+        'charset'       => 'utf-8',
+        'accept-origin' => '*'
     ],
-    'providers'   => ['context']
+    'constants'     => ['DEFAULT_LANG'],
+    'providers'     => ['context']
 ]);
 
 /**

@@ -25,47 +25,47 @@ use Twig\Loader\FilesystemLoader as TwigFilesystemLoader;
     'description'   => "Render a booking quote as a PDF document, given its id.",
     'params'        => [
         'id' => [
-            'description'   => 'Identifier of the booking to print.',
             'type'          => 'integer',
+            'description'   => 'Identifier of the booking to print.',
             'required'      => true
         ],
         'view_id' => [
-            'description'   => 'The identifier of the view <type.name>.',
             'type'          => 'string',
+            'description'   => 'The identifier of the view <type.name>.',
             'default'       => 'print.default'
         ],
         'mode' => [
-            'description'   => 'Mode in which document has to be rendered: simple or detailed.',
             'type'          => 'string',
+            'description'   => 'Mode in which document has to be rendered: simple or detailed.',
             'selection'     => ['simple', 'grouped', 'detailed'],
             'default'       => 'grouped'
         ],
         'lang' => [
-            'description'   => 'Language in which labels and multilang field have to be returned (2 letters ISO 639-1).',
             'type'          => 'string',
+            'description'   => 'Language in which labels and multilang field have to be returned (2 letters ISO 639-1).',
             'default'       => constant('DEFAULT_LANG')
         ],
         'output' => [
-            'description'   => 'Output format of the document.',
             'type'          => 'string',
+            'description'   => 'Output format of the document.',
             'selection'     => ['pdf', 'html'],
             'default'       => 'pdf'
         ]
     ],
-    'constants'     => ['DEFAULT_LANG'],
     'access'        => [
         'visibility'    => 'protected',
-        'groups'        => ['booking.default.user'],
+        'groups'        => ['booking.default.user']
     ],
     'response'      => [
         'content-type'  => 'application/pdf',
         'accept-origin' => '*'
     ],
+    'constants'     => ['DEFAULT_LANG'],
     'providers'     => ['context']
 ]);
 
 /**
- * @var \equal\php\Context               $context
+ * @var \equal\php\Context $context
  */
 ['context' => $context] = $providers;
 
@@ -150,7 +150,7 @@ $getTemplateFilePath = function($entity, $view_id) {
         $template_file = EQ_BASEDIR."/packages/{$package}/views/{$class_path}.{$view_id}.html";
 
         if(!file_exists($template_file)) {
-            throw new Exception("unknown_view_id", QN_ERROR_UNKNOWN_OBJECT);
+            throw new Exception("unknown_view_id", EQ_ERROR_UNKNOWN_OBJECT);
         }
     }
 

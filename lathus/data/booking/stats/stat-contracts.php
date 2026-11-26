@@ -41,6 +41,7 @@ use sale\customer\Customer;
         ],
         'status' => [
             'type'              => 'string',
+            'description'       => 'Status of the booking.',
             'selection'         => [
                 'all'               => 'Tous',
                 'quote'             => 'Devis',
@@ -56,7 +57,6 @@ use sale\customer\Customer;
                 'balanced'          => 'Clôturée',
                 'cancelled'         => 'Annulée'
             ],
-            'description'       => 'Status of the booking.',
             'default'           => 'all'
         ],
         'type_id' => [
@@ -67,27 +67,25 @@ use sale\customer\Customer;
         'rate_class_id' => [
             'type'              => 'many2one',
             'foreign_object'    => 'sale\customer\RateClass',
-            'description'       => "The rate class of the customer.",
+            'description'       => "The rate class of the customer."
         ],
         'customer_type_id' => [
             'type'              => 'many2one',
             'foreign_object'    => 'identity\IdentityType',
             'description'       => "Identity type of the customer."
         ],
-
         /* parameters used as properties of virtual entity */
-
         'center' => [
             'type'              => 'string',
             'description'       => 'Name of the center.'
         ],
         'center_type' => [
             'type'              => 'string',
+            'description'       => 'Type of the center.',
             'selection'         => [
                 'GA',
                 'GG'
-            ],
-            'description'       => 'Type of the center.'
+            ]
         ],
         'booking' => [
             'type'              => 'string',
@@ -159,6 +157,7 @@ use sale\customer\Customer;
         ],
         'customer_area' => [
             'type'              => 'string',
+            'description'       => 'Customer country area (for France \'Département\').',
             'selection'         => [
                 'all'       => 'Tous',
                 'FR-01'     => 'Ain (01)',
@@ -263,12 +262,12 @@ use sale\customer\Customer;
                 'FR-974'    => 'La Réunion (974)',
                 'FR-976'    => 'Mayotte (976)',
             ],
-            'description'       => 'Customer country area (for France \'Département\').',
             'default'           => 'all'
         ],
         'customer_country' => [
             'type'              => 'string',
             'usage'             => 'country/iso-3166:2',
+            'description'       => 'Country.',
             'selection'         => [
                 'all'   => 'Tous',
                 'AF'    => 'Afghanistan',
@@ -517,7 +516,6 @@ use sale\customer\Customer;
                 'ZM'    => 'Zambia',
                 'ZW'    => 'Zimbabwe'
             ],
-            'description'       => 'Country.',
             'default'           => 'all'
         ],
         'price_vate' => [
@@ -534,15 +532,14 @@ use sale\customer\Customer;
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'     => ['context', 'orm', 'adapt']
+    'providers'     => ['context', 'adapt']
 ]);
 
 /**
  * @var \equal\php\Context                      $context
- * @var \equal\orm\ObjectManager                $orm
  * @var \equal\data\adapt\DataAdapterProvider   $dap
  */
-['context' => $context, 'orm' => $orm, 'adapt' => $dap] = $providers;
+['context' => $context, 'adapt' => $dap] = $providers;
 
 /** @var \equal\data\adapt\DataAdapterJson $adapter */
 $adapter = $dap->get('json');
@@ -788,7 +785,8 @@ foreach($bookings as $booking) {
     ];
 }
 
-$context->httpResponse()
-        ->header('X-Total-Count', count($result))
-        ->body($result)
-        ->send();
+$context
+    ->httpResponse()
+    ->header('X-Total-Count', count($result))
+    ->body($result)
+    ->send();

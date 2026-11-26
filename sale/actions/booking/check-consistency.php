@@ -5,20 +5,21 @@
     Original author(s): Yesbabylon SRL
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
+
 use sale\booking\Booking;
 use sale\booking\Consumption;
 
-list($params, $providers) = announce([
+[$params, $providers] = eQual::announce([
     'description'   => "Checks the consistency of a booking, according to its status and booked services that must match consumptions.",
     'params'        => [
-        'id' =>  [
-            'description'   => 'Identifier of the booking for which the consistency must be checked.',
+        'id' => [
             'type'          => 'integer',
+            'description'   => 'Identifier of the booking for which the consistency must be checked.',
             'required'      => true
         ]
     ],
-    'access' => [
-        'visibility'        => 'protected'
+    'access'        => [
+        'visibility'    => 'protected'
     ],
     'response'      => [
         'content-type'  => 'application/json',
@@ -29,10 +30,10 @@ list($params, $providers) = announce([
 ]);
 
 /**
- * @var \equal\php\Context                  $context
- * @var \equal\dispatch\Dispatcher          $dispatch
+ * @var \equal\php\Context          $context
+ * @var \equal\dispatch\Dispatcher  $dispatch
  */
-list($context, $dispatch) = [ $providers['context'], $providers['dispatch']];
+['context' => $context, 'dispatch' => $dispatch] = $providers;
 
 // ensure booking object exists and is readable
 $booking = Booking::id($params['id'])

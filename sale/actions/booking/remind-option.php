@@ -37,19 +37,21 @@ use sale\booking\Booking;
             'required'      => true
         ]
     ],
-    'constants'     => ['DEFAULT_LANG'],
     'access'        => [
-        'visibility' => 'private'
+        'visibility'    => 'private'
     ],
     'response'      => [
         'content-type'  => 'application/json',
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
+    'constants'     => ['DEFAULT_LANG'],
     'providers'     => ['context']
 ]);
 
-/** @var \equal\php\Context $context */
+/**
+ * @var \equal\php\Context $context
+ */
 ['context' => $context] = $providers;
 
 $booking = Booking::id($params['id'])
@@ -77,7 +79,10 @@ if(
     || $date_expiry !== $params['expected_date_expiry']
     || $date_expiry <= time()
 ) {
-    $context->httpResponse()->status(204)->send();
+    $context
+        ->httpResponse()
+        ->status(204)
+        ->send();
     return;
 }
 
@@ -90,8 +95,11 @@ $template = Template::search([
     ->first(true);
 
 if(!$template) {
-    trigger_error("APP::missing option reminder template for booking {$booking['id']}", QN_REPORT_WARNING);
-    $context->httpResponse()->status(204)->send();
+    trigger_error("APP::missing option reminder template for booking {$booking['id']}", EQ_REPORT_WARNING);
+    $context
+        ->httpResponse()
+        ->status(204)
+        ->send();
     return;
 }
 
@@ -144,4 +152,7 @@ if(strlen($bcc)) {
 
 Mail::queue($message, 'sale\booking\Booking', $booking['id']);
 
-$context->httpResponse()->status(204)->send();
+$context
+    ->httpResponse()
+    ->status(204)
+    ->send();

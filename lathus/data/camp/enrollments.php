@@ -28,21 +28,20 @@ use equal\http\HttpRequest;
         ]
     ],
     'access'        => [
-        'visibility'    => 'protected',
+        'visibility'    => 'protected'
     ],
     'response'      => [
         'content-type'  => 'application/json',
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'     => ['context', 'auth']
+    'providers'     => ['context']
 ]);
 
 /**
- * @var \equal\php\Context                  $context
- * @var \equal\auth\AuthenticationManager   $auth
+ * @var \equal\php\Context $context
  */
-['context' => $context, 'auth' => $auth] = $providers;
+['context' => $context] = $providers;
 
 $api_uri = Setting::get_value('sale', 'integration', 'camp.enrollments.api_uri');
 if(is_null($api_uri)) {
@@ -92,11 +91,12 @@ $response = $request->send();
 $status = $response->getStatusCode();
 if($status != 200) {
     // upon request rejection, we stop the whole job
-    throw new Exception("request_rejected", QN_ERROR_INVALID_PARAM);
+    throw new Exception("request_rejected", EQ_ERROR_INVALID_PARAM);
 }
 
 $data = $response->body();
 
-$context->httpResponse()
-        ->body($data)
-        ->send();
+$context
+    ->httpResponse()
+    ->body($data)
+    ->send();

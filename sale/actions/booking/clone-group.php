@@ -16,7 +16,7 @@ use sale\booking\SojournProductModel;
 [$params, $providers] = eQual::announce([
     'description'   => "Clone a specific booking line group.",
     'params'        => [
-        'id' =>  [
+        'id' => [
             'type'          => 'integer',
             'description'   => "Identifier of the booking line group to clone.",
             'required'      => true
@@ -258,6 +258,7 @@ $orm->enableEvents();
 
 Booking::id($group['booking_id']['id'])->do('refresh_groups_activity_number');
 
-$context->httpResponse()
-        ->status(201)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(201)
+    ->send();

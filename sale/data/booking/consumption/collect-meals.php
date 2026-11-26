@@ -17,9 +17,9 @@ use sale\booking\TimeSlot;
     'extends'       => 'core_model_collect',
     'params'        => [
         // inherited params
-        'entity' =>  [
-            'description'       => 'Full name (including namespace) of the class to look into.',
+        'entity' => [
             'type'              => 'string',
+            'description'       => 'Full name (including namespace) of the class to look into.',
             'default'           => 'sale\booking\Consumption'
         ],
         'date_from' => [
@@ -43,12 +43,12 @@ use sale\booking\TimeSlot;
         'time_slot_id' => [
             'type'              => 'many2one',
             'foreign_object'    => 'sale\booking\TimeSlot',
-            'description'       => 'Indicator of the moment of the day when the consumption occurs (from schedule).',
+            'description'       => 'Indicator of the moment of the day when the consumption occurs (from schedule).'
         ],
         'is_not_option' => [
             'type'              => 'boolean',
             'description'       => 'Discard quote and option bookings.',
-            'default'           =>  true
+            'default'           => true
         ],
         'consumption_type' => [
             'type'              => 'string',
@@ -58,22 +58,21 @@ use sale\booking\TimeSlot;
                 'snack'
             ],
             'default'           => 'meal'
-        ],
+        ]
     ],
     'response'      => [
         'content-type'  => 'application/json',
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'     => [ 'context', 'orm', 'auth' ]
+    'providers'     => ['context', 'auth']
 ]);
 
 /**
  * @var \equal\php\Context                  $context
- * @var \equal\orm\ObjectManager            $orm
  * @var \equal\auth\AuthenticationManager   $auth
  */
-['context' => $context, 'orm' => $orm, 'auth' => $auth] = $providers;
+['context' => $context, 'auth' => $auth] = $providers;
 
 /*
     Add conditions to the domain to consider advanced parameters
@@ -146,6 +145,7 @@ if(in_array('time_slot_id.name', $params['fields'])) {
     array_multisort($dates, SORT_ASC, $time_slots, SORT_ASC, $result);
 }
 
-$context->httpResponse()
-        ->body($result)
-        ->send();
+$context
+    ->httpResponse()
+    ->body($result)
+    ->send();

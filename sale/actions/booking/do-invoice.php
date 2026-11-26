@@ -5,46 +5,46 @@
     Original author(s): Yesbabylon SRL
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
+
+use identity\Partner;
 use sale\booking\Booking;
 use sale\booking\Funding;
 use sale\booking\Invoice;
-use identity\Partner;
 
-list($params, $providers) = eQual::announce([
+[$params, $providers] = eQual::announce([
     'description'   => "Generates the proforma for the balance invoice for a booking.",
     'params'        => [
-        'id' =>  [
-            'description'       => 'Identifier of the booking for which the invoice has to be generated.',
+        'id' => [
             'type'              => 'integer',
+            'description'       => 'Identifier of the booking for which the invoice has to be generated.',
             'min'               => 1,
             'required'          => true
         ],
-        'partner_id' =>  [
-            'description'       => 'Partner to who address the invoice, if distinct from customer.',
+        'partner_id' => [
             'type'              => 'many2one',
             'foreign_object'    => 'sale\customer\Customer',
+            'description'       => 'Partner to who address the invoice, if distinct from customer.',
             'domain'            => [['relationship', '=', 'customer'], ['is_active', '=', true]]
         ]
     ],
-    'access' => [
-        'visibility'        => 'protected',
-        'groups'            => ['booking.default.user']
+    'access'        => [
+        'visibility'    => 'protected',
+        'groups'        => ['booking.default.user']
     ],
     'response'      => [
         'content-type'  => 'application/json',
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'     => ['context', 'orm', 'cron', 'dispatch']
+    'providers'     => ['context', 'cron', 'dispatch']
 ]);
 
 /**
- * @var \equal\php\Context                  $context
- * @var \equal\orm\ObjectManager            $orm
- * @var \equal\cron\Scheduler               $cron
- * @var \equal\dispatch\Dispatcher          $dispatch
+ * @var \equal\php\Context          $context
+ * @var \equal\cron\Scheduler       $cron
+ * @var \equal\dispatch\Dispatcher  $dispatch
  */
-list($context, $orm, $cron, $dispatch) = [$providers['context'], $providers['orm'], $providers['cron'], $providers['dispatch']];
+['context' => $context, 'cron' => $cron, 'dispatch' => $dispatch] = $providers;
 
 
 
@@ -54,11 +54,11 @@ $booking = Booking::id($params['id'])
     ->first(true);
 
 if(!$booking) {
-    throw new Exception("unknown_booking", QN_ERROR_UNKNOWN_OBJECT);
+    throw new Exception("unknown_booking", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
 if($booking['status'] != 'checkedout') {
-    throw new Exception("incompatible_status", QN_ERROR_INVALID_PARAM);
+    throw new Exception("incompatible_status", EQ_ERROR_INVALID_PARAM);
 }
 
 $has_invalid_line = false;
@@ -70,7 +70,7 @@ foreach($booking['booking_lines_ids'] as $line) {
 }
 
 if($has_invalid_line) {
-    throw new Exception("invalid_line", QN_ERROR_INVALID_PARAM);
+    throw new Exception("invalid_line", EQ_ERROR_INVALID_PARAM);
 }
 
 if(isset($params['partner_id']) && $params['partner_id'] > 0 ){
@@ -80,11 +80,11 @@ if(isset($params['partner_id']) && $params['partner_id'] > 0 ){
                 ->first(true);
 
     if(!$partner) {
-        throw new Exception("unknown_partner", QN_ERROR_UNKNOWN_OBJECT);
+        throw new Exception("unknown_partner", EQ_ERROR_UNKNOWN_OBJECT);
     }
 
     if(!$partner['partner_identity_id']) {
-        throw new Exception("invalid_partner", QN_ERROR_UNKNOWN_OBJECT);
+        throw new Exception("invalid_partner", EQ_ERROR_UNKNOWN_OBJECT);
     }
 
     if($partner['id'] == $booking['customer_id'] ) {
@@ -102,7 +102,7 @@ $deposit_invoices = Invoice::search([['booking_id', '=', $booking['id']], ['is_d
 
 foreach($deposit_invoices as $deposit_invoice) {
     if($deposit_invoice['status'] == 'proforma') {
-        throw new Exception("non_emitted_deposit_invoice", QN_ERROR_INVALID_PARAM);
+        throw new Exception("non_emitted_deposit_invoice", EQ_ERROR_INVALID_PARAM);
     }
 }
 
@@ -138,6 +138,7 @@ eQual::run('do', 'sale_booking_invoice_generate', $params);
 // update booking status
 Booking::id($params['id'])->update(['status' => 'proforma']);
 
-$context->httpResponse()
-        ->status(204)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(204)
+    ->send();

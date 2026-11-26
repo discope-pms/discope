@@ -11,13 +11,13 @@ use identity\Center;
 use identity\Identity;
 use sale\booking\Booking;
 
-list($params, $providers) = eQual::announce([
+[$params, $providers] = eQual::announce([
     'description'   => 'Advanced search for the Funding: returns a collection of Reports according to extra paramaters.',
     'extends'       => 'core_model_collect',
     'params'        => [
-        'entity' =>  [
-            'description'       => 'name',
+        'entity' => [
             'type'              => 'string',
+            'description'       => 'name',
             'default'           => 'sale\booking\Funding'
         ],
         /**
@@ -68,14 +68,13 @@ list($params, $providers) = eQual::announce([
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'     => [ 'context', 'orm' ]
+    'providers'     => ['context']
 ]);
 
 /**
- * @var \equal\php\Context          $context
- * @var \equal\orm\ObjectManager    $orm
+ * @var \equal\php\Context $context
  */
-['context' => $context, 'orm' => $orm] = $providers;
+['context' => $context] = $providers;
 
 // Force domain on fundings linked to bookings
 $domain = Domain::conditionAdd($params['domain'], ['booking_id', '<>', null]);
@@ -127,6 +126,7 @@ if(!empty($booking_domain)) {
 $params['domain'] = $domain;
 $result = eQual::run('get', 'model_collect', $params, true);
 
-$context->httpResponse()
-        ->body($result)
-        ->send();
+$context
+    ->httpResponse()
+    ->body($result)
+    ->send();

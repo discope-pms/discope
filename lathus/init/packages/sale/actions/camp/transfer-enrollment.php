@@ -13,25 +13,22 @@ use sale\camp\Enrollment;
     'description'   => "Transfer an enrollment from one camp to another.",
     'help'          => "Usually used when a camp is cancelled.",
     'params'        => [
-
         'id' => [
             'type'              => 'integer',
             'description'       => "Identifier of the enrollment to transfer.",
             'min'               => 1,
             'required'          => true
         ],
-
         'camp_id' => [
             'type'              => 'many2one',
             'foreign_object'    => 'sale\camp\Camp',
             'description'       => "The transfer targeted camp.",
             'required'          => true
         ]
-
     ],
     'access'        => [
         'visibility'    => 'protected',
-        'groups'        => ['camp.default.administrator', 'camp.default.user'],
+        'groups'        => ['camp.default.administrator', 'camp.default.user']
     ],
     'response'      => [
         'content-type'  => 'application/json',
@@ -87,6 +84,7 @@ if($was_locked) {
     Enrollment::id($enrollment['id'])->update(['is_locked' => true]);
 }
 
-$context->httpResponse()
-        ->status(204)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(204)
+    ->send();

@@ -11,7 +11,7 @@ use equal\orm\Domain;
     'description'   => 'Advanced search for Messages: returns a collection of Message according to extra parameters.',
     'extends'       => 'core_model_collect',
     'params'        => [
-        'entity' =>  [
+        'entity' => [
             'type'              => 'string',
             'description'       => 'Full name (including namespace) of the class to look into (e.g. \'core\\User\').',
             'default'           => 'discope\core\alert\Message'
@@ -25,7 +25,7 @@ use equal\orm\Domain;
             'type'              => 'many2one',
             'foreign_object'    => 'sale\camp\Enrollment',
             'description'       => 'Enrollment to filter on.'
-        ],
+        ]
     ],
     'response'      => [
         'content-type'  => 'application/json',

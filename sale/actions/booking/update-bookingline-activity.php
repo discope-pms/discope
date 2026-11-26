@@ -15,15 +15,15 @@ use sale\catalog\Product;
     'help'          => "This script is meant to be called by the `booking/services` UI.",
     'params'        => [
         'id' => [
-            'description'       => 'Identifier of the targeted Booking Line.',
             'type'              => 'many2one',
             'foreign_object'    => 'sale\booking\BookingLine',
+            'description'       => 'Identifier of the targeted Booking Line.',
             'required'          => true
         ],
         'product_id' => [
             'type'              => 'many2one',
-            'description'       => 'Identifier of the product to assign the line to.',
             'foreign_object'    => 'sale\catalog\Product',
+            'description'       => 'Identifier of the product to assign the line to.',
             'default'           => false
         ],
         'service_date' => [
@@ -132,6 +132,7 @@ $orm->enableEvents();
  * Response
  */
 
-$context->httpResponse()
-        ->status(204)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(204)
+    ->send();

@@ -12,11 +12,11 @@ use sale\booking\Funding;
     'description'   => "Removes a refund funding.",
     'help'          => "Refund funding are expected to be created manually and are therefore allowed for removal.",
     'params'        => [
-        'id' =>  [
-            'description'    => 'Identifier of the targeted funding.',
-            'type'           => 'many2one',
-            'foreign_object' => 'sale\booking\Funding',
-            'required'       => true
+        'id' => [
+            'type'              => 'many2one',
+            'foreign_object'    => 'sale\booking\Funding',
+            'description'       => 'Identifier of the targeted funding.',
+            'required'          => true
         ]
     ],
     'access'        => [
@@ -31,7 +31,7 @@ use sale\booking\Funding;
 ]);
 
 /**
- * @var \equal\php\Context  $context
+ * @var \equal\php\Context $context
  */
 ['context' => $context] = $providers;
 
@@ -64,6 +64,7 @@ if($funding['type'] == 'invoice') {
 
 Funding::id($funding['id'])->delete(true);
 
-$context->httpResponse()
-        ->status(204)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(204)
+    ->send();

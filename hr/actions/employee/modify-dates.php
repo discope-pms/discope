@@ -12,14 +12,12 @@ use hr\employee\Employee;
 [$params, $providers] = eQual::announce([
     'description'   => "Modifies employee contracts dates.",
     'params'        => [
-
         'id' => [
             'type'              => 'many2one',
             'foreign_object'    => 'hr\employee\Employee',
             'description'       => 'Identifier of the employee.',
             'required'          => true
         ],
-
         'date_start' => [
             'type'              => 'date',
             'description'       => 'Date of the first day of work.',
@@ -36,7 +34,6 @@ use hr\employee\Employee;
                 return $employee['date_start'] ?? null;
             }
         ],
-
         'has_date_end' => [
             'type'              => 'boolean',
             'description'       => 'Has an end date.',
@@ -53,12 +50,12 @@ use hr\employee\Employee;
                 return (bool) $employee['date_end'] ?? null;
             }
         ],
-
         'date_end' => [
             'type'              => 'date',
             'description'       => 'Date of the last day of work.',
             'help'              => 'Date at which the contract ends (known in advance for fixed-term or unknown for permanent).',
             'required'          => true,
+            'visible'           => ['has_date_end', '=', true],
             'default'           => function($id = 0) {
                 if($id <= 0) {
                     return null;
@@ -69,21 +66,18 @@ use hr\employee\Employee;
                     ->first();
 
                 return $employee['date_end'] ?? null;
-            },
-            'visible'           => ['has_date_end', '=', true]
+            }
         ],
-
         'unassign_activities' => [
             'type'              => 'boolean',
             'description'       => 'Unassign the future activities outside of the dates interval.',
-            'default'           => false,
             'required'          => true,
-            'visible'           => Setting::get_value('sale','features', 'booking.activity', false)
+            'visible'           => Setting::get_value('sale','features', 'booking.activity', false),
+            'default'           => false
         ]
-
     ],
     'access'        => [
-        'visibility'    => 'protected',
+        'visibility'    => 'protected'
     ],
     'response'      => [
         'content-type'  => 'application/json',

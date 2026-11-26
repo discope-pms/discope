@@ -9,23 +9,20 @@
 use sale\booking\BankCheck;
 
 [$params, $providers] = eQual::announce([
-    'description' => "Deletes the specified bank check. If it is associated with a payment, the payment will first be detached and then deleted before resetting the corresponding funding status to 'pending'. This operation requires explicit confirmation and cannot be performed if the related booking is already balanced.",
-    'help'        => "This action removes a bank check from the system. If the check is linked to a payment, the payment will first be detached and then deleted before the check itself is removed. The funding status will be reset to 'pending' if applicable.
-                     This operation requires explicit confirmation and cannot be executed if the related booking is already marked as balanced.",
+    'description'   => "Deletes the specified bank check. If it is associated with a payment, the payment will first be detached and then deleted before resetting the corresponding funding status to 'pending'. This operation requires explicit confirmation and cannot be performed if the related booking is already balanced.",
+    'help'          => "This action removes a bank check from the system. If the check is linked to a payment, the payment will first be detached and then deleted before the check itself is removed. The funding status will be reset to 'pending' if applicable.\n"
+                    ."This operation requires explicit confirmation and cannot be executed if the related booking is already marked as balanced.",
     'params'        => [
-
-        'id' =>  [
+        'id' => [
             'type'          => 'integer',
             'description'   => "Unique identifier of the target bank check.",
             'required'      => true
         ],
-
-        'confirm' =>  [
+        'confirm' => [
             'type'          => 'boolean',
             'description'   => "Explicit confirmation required to proceed.",
             'required'      => true
         ]
-
     ],
     'access'        => [
         'groups'        => ['finance.default.administrator', 'finance.default.user']
@@ -39,7 +36,7 @@ use sale\booking\BankCheck;
 ]);
 
 /**
- * @var \equal\php\Context  $context
+ * @var \equal\php\Context $context
  */
 ['context' => $context] = $providers;
 
@@ -69,6 +66,7 @@ if(!is_null($bank_check['payment_id'])) {
 
 BankCheck::id($bank_check['id'])->delete(true);
 
-$context->httpResponse()
-        ->status(205)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(205)
+    ->send();

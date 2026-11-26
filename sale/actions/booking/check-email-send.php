@@ -5,32 +5,31 @@
     Original author(s): Yesbabylon SRL
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
+
 use sale\booking\Booking;
 
-list($params, $providers) = announce([
+[$params, $providers] = eQual::announce([
     'description'   => "Check that the emails have been sent correctly.",
     'params'        => [
-        'id' =>  [
-            'description'   => 'Identifier of the booking the check against emptiness.',
+        'id' => [
             'type'          => 'integer',
+            'description'   => 'Identifier of the booking the check against emptiness.',
             'required'      => true
-        ],
-
+        ]
     ],
     'response'      => [
         'content-type'  => 'application/json',
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'     => ['context', 'orm', 'auth','cron','dispatch']
+    'providers'     => ['context', 'orm', 'auth', 'dispatch']
 ]);
 
 /**
- * @var \equal\php\Context                  $context
- * @var \equal\cron\Scheduler               $cron
- * @var \equal\dispatch\Dispatcher          $dispatch
+ * @var \equal\php\Context          $context
+ * @var \equal\dispatch\Dispatcher  $dispatch
  */
-list($context, $cron, $dispatch) = [ $providers['context'], $providers['cron'], $providers['dispatch']];
+['context' => $context, 'dispatch' => $dispatch] = $providers;
 
 
 // read booking object
@@ -39,7 +38,7 @@ $booking = Booking::id($params['id'])
                   ->first(true);
 
 if(!$booking) {
-    throw new Exception("unknown_booking", QN_ERROR_UNKNOWN_OBJECT);
+    throw new Exception("unknown_booking", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
 $result = [];

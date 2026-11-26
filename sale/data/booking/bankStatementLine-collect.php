@@ -5,60 +5,61 @@
     Original author(s): Yesbabylon SRL
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
+
 use equal\orm\Domain;
 
-list($params, $providers) = eQual::announce([
+[$params, $providers] = eQual::announce([
     'description'   => 'Advanced search for Reports: returns a collection of Reports according to extra parameters.',
     'extends'       => 'core_model_collect',
     'params'        => [
-        'entity' =>  [
-            'description'       => 'name',
-            'type'              => 'string',
-            'default'           => 'sale\booking\BankStatementLine'
+        'entity' => [
+            'type'          => 'string',
+            'description'   => 'name',
+            'default'       => 'sale\booking\BankStatementLine'
         ],
         'id' => [
-            'type'              => 'integer',
-            'description'       => 'Identifier of the BankStatementLine.'
+            'type'          => 'integer',
+            'description'   => 'Identifier of the BankStatementLine.'
         ],
         'account_holder' => [
-            'type'              => 'string',
-            'description'       => 'Name of the Person whom the payment originates.'
+            'type'          => 'string',
+            'description'   => 'Name of the Person whom the payment originates.'
         ],
         'structured_message' => [
-            'type'              => 'string',
-            'description'       => 'Structured message, if any.'
+            'type'          => 'string',
+            'description'   => 'Structured message, if any.'
         ],
         'date_from' => [
-            'type'              => 'date',
-            'description'       => "First date of the time interval.",
-            'default'           => null
+            'type'          => 'date',
+            'description'   => "First date of the time interval.",
+            'default'       => null
         ],
         'date_to' => [
-            'type'              => 'date',
-            'description'       => "Last date of the time interval.",
-            'default'           => time()
+            'type'          => 'date',
+            'description'   => "Last date of the time interval.",
+            'default'       => time()
         ],
         'amount_min' => [
-            'type'              => 'integer',
-            'description'       => 'Minimal amount expected for the Bank Statement Line.'
+            'type'          => 'integer',
+            'description'   => 'Minimal amount expected for the Bank Statement Line.'
         ],
         'amount_max' => [
-            'type'              => 'integer',
-            'description'       => 'Maximum amount expected for the Bank Statement Line.'
-        ],
+            'type'          => 'integer',
+            'description'   => 'Maximum amount expected for the Bank Statement Line.'
+        ]
     ],
     'response'      => [
         'content-type'  => 'application/json',
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'     => [ 'context', 'orm' ]
+    'providers'     => ['context']
 ]);
+
 /**
  * @var \equal\php\Context $context
- * @var \equal\orm\ObjectManager $orm
  */
-list($context, $orm) = [ $providers['context'], $providers['orm'] ];
+['context' => $context] = $providers;
 
 $domain = $params['domain'];
 
@@ -95,6 +96,7 @@ $params['domain'] = $domain;
 
 $result = eQual::run('get', 'model_collect', $params, true);
 
-$context->httpResponse()
-        ->body($result)
-        ->send();
+$context
+    ->httpResponse()
+    ->body($result)
+    ->send();

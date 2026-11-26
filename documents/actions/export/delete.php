@@ -17,10 +17,10 @@ use documents\Export;
             'description'       => "Identifier of the targeted export.",
             'required'          => true
         ],
-        'confirm' =>  [
-            'type'          => 'boolean',
-            'description'   => "Confirm the deletion of the export.",
-            'required'      => true
+        'confirm' => [
+            'type'              => 'boolean',
+            'description'       => "Confirm the deletion of the export.",
+            'required'          => true
         ]
     ],
     'access'        => [
@@ -35,7 +35,7 @@ use documents\Export;
 ]);
 
 /**
- * @var \equal\php\Context  $context
+ * @var \equal\php\Context $context
  */
 ['context' => $context] = $providers;
 

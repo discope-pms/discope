@@ -10,40 +10,40 @@ use sale\booking\Booking;
 use sale\booking\BookingLine;
 use sale\booking\BookingLineGroup;
 use sale\booking\channelmanager\RoomType;
-use sale\booking\Contract;
 use sale\booking\Consumption;
+use sale\booking\Contract;
 
 [$params, $providers] = eQual::announce([
     'description'   => "Reverts a booking to 'quote' status. Booking status of rental units is maintained unless there is an explicit request for releasing them.",
     'params'        => [
         'id' => [
-            'type'              => 'integer',
-            'description'       => "Identifier of the targeted booking.",
-            'min'               => 1,
-            'required'          => true
+            'type'          => 'integer',
+            'description'   => "Identifier of the targeted booking.",
+            'min'           => 1,
+            'required'      => true
         ],
         'free_rental_units' => [
-            'type'              => 'boolean',
-            'description'       => "Flag for marking reserved rental units to be release immediately, if any.",
-            'default'           => false
+            'type'          => 'boolean',
+            'description'   => "Flag for marking reserved rental units to be release immediately, if any.",
+            'default'       => false
         ]
     ],
     'access'        => [
-        'groups'            => ['booking.default.user']
+        'groups'        => ['booking.default.user']
     ],
     'response'      => [
-        'content-type'      => 'application/json',
-        'charset'           => 'utf-8',
-        'accept-origin'     => '*'
+        'content-type'  => 'application/json',
+        'charset'       => 'utf-8',
+        'accept-origin' => '*'
     ],
     'providers'     => ['context', 'orm', 'cron', 'dispatch']
 ]);
 
 /**
- * @var \equal\php\Context                  $context
- * @var \equal\orm\ObjectManager            $orm
- * @var \equal\cron\Scheduler               $cron
- * @var \equal\dispatch\Dispatcher          $dispatch
+ * @var \equal\php\Context          $context
+ * @var \equal\orm\ObjectManager    $orm
+ * @var \equal\cron\Scheduler       $cron
+ * @var \equal\dispatch\Dispatcher  $dispatch
  */
 ['context' => $context, 'orm' => $orm, 'cron' => $cron, 'dispatch' => $dispatch] = $providers;
 
@@ -201,6 +201,7 @@ $dispatch->cancel('lodging.booking.contract.unsigned', 'sale\booking\Booking', $
 $dispatch->cancel('lodging.booking.payments', 'sale\booking\Booking', $booking['id']);
 $dispatch->cancel('lodging.booking.prices_assignment', 'sale\booking\Booking', $booking['id']);
 
-$context->httpResponse()
-        ->status(204)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(204)
+    ->send();

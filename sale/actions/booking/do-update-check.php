@@ -5,14 +5,15 @@
     Original author(s): Yesbabylon SRL
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
+
 use sale\booking\Booking;
 
-list($params, $providers) = eQual::announce([
+[$params, $providers] = eQual::announce([
     'description'   => "Checks if given booking is balanced and, if so, removes all checks relating to it.",
     'params'        => [
-        'id' =>  [
-            'description'   => 'Identifier of the booking the check against emptyness.',
+        'id' => [
             'type'          => 'integer',
+            'description'   => 'Identifier of the booking the check against emptyness.',
             'required'      => true
         ]
     ],
@@ -25,10 +26,10 @@ list($params, $providers) = eQual::announce([
 ]);
 
 /**
- * @var \equal\php\Context                  $context
- * @var \equal\dispatch\Dispatcher          $dispatch
+ * @var \equal\php\Context          $context
+ * @var \equal\dispatch\Dispatcher  $dispatch
  */
-list($context, $dispatch) = [ $providers['context'], $providers['dispatch']];
+['context' => $context, 'dispatch' => $dispatch] = $providers;
 
 $booking = Booking::search([
         ['id', '=', $params['id']],
@@ -50,6 +51,7 @@ if($booking) {
     $dispatch->cancel('lodging.booking.debtor_customer', 'sale\booking\Booking', $booking['id']);
 }
 
-$context->httpResponse()
-        ->status(204)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(204)
+    ->send();

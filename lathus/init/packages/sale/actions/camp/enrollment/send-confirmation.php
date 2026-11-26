@@ -8,91 +8,81 @@
 
 use communication\TemplateAttachment;
 use core\Mail;
+use documents\Document;
 use equal\email\Email;
 use equal\email\EmailAttachment;
-use documents\Document;
 use sale\camp\Enrollment;
 use sale\camp\EnrollmentMail;
 
 [$params, $providers] = eQual::announce([
     'description'   => "Send an instant enrollment confirmation email with the given details.",
     'params'        => [
-
         'enrollment_id' => [
             'type'          => 'integer',
             'description'   => "Identifier of the enrollment we want to send the email for.",
             'required'      => true
         ],
-
-        'title' =>  [
-            'description'   => 'Title of the message.',
+        'title' => [
             'type'          => 'string',
+            'description'   => 'Title of the message.',
             'required'      => true
         ],
-
         'message' => [
-            'description'   => 'Body of the message.',
             'type'          => 'string',
             'usage'         => 'text/html',
+            'description'   => 'Body of the message.',
             'required'      => true
         ],
-
         'sender_email' => [
+            'type'          => 'string',
+            'usage'         => 'email',
             'description'   => 'Email address FROM.',
-            'type'          => 'string',
-            'usage'         => 'email',
             'required'      => true
         ],
-
         'recipient_email' => [
-            'description'   => 'TO email address.',
             'type'          => 'string',
             'usage'         => 'email',
+            'description'   => 'TO email address.',
             'required'      => true
         ],
-
         'recipients_emails' => [
-            'description'   => 'CC email addresses.',
             'type'          => 'array',
+            'description'   => 'CC email addresses.',
             // #todo - wait for support for "array of" usage
             // 'usage'         => 'email'
         ],
-
         'attachments_ids' => [
+            'type'          => 'array',
             'description'   => 'List of identifiers of attachments to join.',
-            'type'          => 'array',
             'default'       => []
         ],
-
         'documents_ids' => [
-            'description'   => 'List of identifiers of documents to join.',
             'type'          => 'array',
+            'description'   => 'List of identifiers of documents to join.',
             'default'       => []
         ],
-
-        'lang' =>  [
-            'description'   => 'Language to use for multilang contents.',
+        'lang' => [
             'type'          => 'string',
             'usage'         => 'language/iso-639',
+            'description'   => 'Language to use for multilang contents.',
             'default'       => constant('DEFAULT_LANG')
         ]
-
     ],
-    'constants'             => ['DEFAULT_LANG'],
     'access'        => [
         'visibility'    => 'protected',
-        'groups'        => ['camp.default.administrator', 'camp.default.user'],
+        'groups'        => ['camp.default.administrator', 'camp.default.user']
     ],
-    'response' => [
-        'content-type'      => 'application/json',
-        'charset'           => 'utf-8',
-        'accept-origin'     => '*'
+    'response'      => [
+        'content-type'  => 'application/json',
+        'charset'       => 'utf-8',
+        'accept-origin' => '*'
     ],
-    'providers' => ['context']
+    'constants'     => ['DEFAULT_LANG'],
+    'providers'     => ['context']
 ]);
 
 /**
- * @var \equal\php\Context  $context
+ * @var \equal\php\Context $context
  */
 ['context' => $context] = $providers;
 
@@ -194,6 +184,7 @@ EnrollmentMail::create([
 
 Enrollment::id($enrollment['id'])->update(['confirmation_sent' => true]);
 
-$context->httpResponse()
-        ->status(204)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(204)
+    ->send();

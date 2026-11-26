@@ -9,38 +9,35 @@
 use discope\setting\Setting;
 use equal\http\HttpRequest;
 
-[$params, $provider] = eQual::announce([
+[$params, $providers] = eQual::announce([
     'description'   => "Syncs Lathus website with camps and/or tariffs data.",
     'params'        => [
-
         'sync_camps' => [
             'type'          => 'boolean',
             'description'   => "Sync the camps.",
             'default'       => false
         ],
-
         'sync_tariffs' => [
             'type'          => 'boolean',
             'description'   => "Sync the tariffs.",
             'default'       => false
         ]
-
     ],
     'access'        => [
-        'visibility'        => 'protected'
+        'visibility'    => 'protected'
     ],
     'response'      => [
-        'content-type'      => 'application/json',
-        'charset'           => 'utf-8',
-        'accept-origin'     => '*'
+        'content-type'  => 'application/json',
+        'charset'       => 'utf-8',
+        'accept-origin' => '*'
     ],
     'providers'     => ['context']
 ]);
 
 /**
- * @var \equal\php\Context  $context
+ * @var \equal\php\Context $context
  */
-['context' => $context] = $provider;
+['context' => $context] = $providers;
 
 if(!$params['sync_camps'] && !$params['sync_tariffs']) {
     throw new Exception("nothing_to_sync", EQ_ERROR_INVALID_PARAM);
@@ -72,8 +69,7 @@ if($status < 200 || $status >= 400) {
     throw new Exception("request_rejected", EQ_ERROR_INVALID_PARAM);
 }
 
-$context->httpResponse()
-        ->status(200)
-        ->send();
-
-
+$context
+    ->httpResponse()
+    ->status(200)
+    ->send();

@@ -10,42 +10,35 @@ use sale\booking\BookingLineGroup;
 use sale\booking\BookingLineGroupAgeRangeAssignment;
 
 [$params, $providers] = eQual::announce([
-    'description'	=> "Update activity group information, even if status is not quote.",
+    'description'   => "Update activity group information, even if status is not quote.",
     'help'          => "To only use for activities groups that do not contain products but only activities. To use form activities planning.",
-    'params' 		=>	[
-
-        'id' =>  [
+    'params'        => [
+        'id' => [
             'type'          => 'integer',
-            'min'           => 1,
             'description'   => "Identifier of the booking line group.",
+            'min'           => 1,
             'required'      => true
         ],
-
         'nb_pers' => [
             'type'          => 'integer',
             'description'   => "Qty of people in the group."
         ],
-
         'age_from' => [
             'type'          => 'integer',
             'description'   => "Age min of participants of the children activity group."
         ],
-
         'age_to' => [
             'type'          => 'integer',
             'description'   => "Age max of participants of the children activity group."
         ],
-
         'has_person_with_disability' => [
             'type'          => 'boolean',
             'description'   => "Has a person with disability."
         ],
-
         'person_disability_description' => [
             'type'          => 'string',
             'description'   => "Description about group's people disability."
         ]
-
     ],
     'access'        => [
         'visibility'    => 'protected'
@@ -118,6 +111,7 @@ if(isset($params['nb_pers']) || isset($params['age_from']) || isset($params['age
 
 $orm->enableEvents($event_mask);
 
-$context->httpResponse()
-        ->status(200)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(200)
+    ->send();

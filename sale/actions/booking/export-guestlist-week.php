@@ -14,21 +14,18 @@ use sale\booking\Booking;
 [$params, $providers] = eQual::announce([
     'description'   => "Creates an export task to generate XLS guest lists for all bookings from last week.",
     'params'        => [
-
         'exporting_task_name' => [
             'type'          => 'string',
             'description'   => "Name of the generated exporting task.",
             'help'          => "Use {week} for week number and {year} for year.",
             'default'       => "%4d{year}-W%2d{week}_guests_lists"
         ],
-
         'exporting_task_line_name' => [
             'type'          => 'string',
             'description'   => "Name of the generated exporting task lines.",
             'help'          => "Use {booking} for booking name.",
             'default'       => "%6d{booking}_guests_list"
         ]
-
     ],
     'access'        => [
         'visibility'    => 'protected',
@@ -44,7 +41,7 @@ use sale\booking\Booking;
 ]);
 
 /**
- * @var \equal\php\Context  $context
+ * @var \equal\php\Context $context
  */
 ['context' => $context] = $providers;
 
@@ -94,7 +91,8 @@ foreach($bookings as $id => $booking) {
     ]);
 }
 
-$context->httpResponse()
-        ->body($exporting_task['id'])
-        ->status(201)
-        ->send();
+$context
+    ->httpResponse()
+    ->body($exporting_task['id'])
+    ->status(201)
+    ->send();

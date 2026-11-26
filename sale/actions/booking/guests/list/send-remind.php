@@ -5,29 +5,29 @@
     License: GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 
+use communication\Template;
+use core\Mail;
 use equal\email\EmailMessage;
 use sale\booking\Booking;
-use core\Mail;
-use communication\Template;
 
 [$params, $providers] = eQual::announce([
     'description'   => "Send an email to remind them to send the guest list.",
     'params'        => [
-        'id' =>  [
-            'description'   => 'Identifier of the booking for the send reminder.',
+        'id' => [
             'type'          => 'integer',
+            'description'   => 'Identifier of the booking for the send reminder.',
             'required'      => true
         ],
-        'email' =>  [
+        'email' => [
+            'type'          => 'string',
             'description'   => 'Email of the person who is responsible for the guest List.',
-            'type'          => 'string',
             'required'      => true
         ],
-        'lang' =>  [
-            'description'   => 'Language of the reminder which is defined by the responsible.',
+        'lang' => [
             'type'          => 'string',
+            'description'   => 'Language of the reminder which is defined by the responsible.',
             'default'       => constant('DEFAULT_LANG')
-        ],
+        ]
     ],
     'response'      => [
         'content-type'  => 'application/json',
@@ -40,7 +40,7 @@ use communication\Template;
 /**
  * @var \equal\php\Context $context
  */
-['context' => $context] = $providers['context'];
+['context' => $context] = $providers;
 
 $booking = Booking::id($params['id'])
     ->read([
@@ -55,7 +55,7 @@ $booking = Booking::id($params['id'])
     ->first(true);
 
 if(!$booking) {
-    throw new Exception("unknown_booking", QN_ERROR_UNKNOWN_OBJECT);
+    throw new Exception("unknown_booking", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
 $template = Template::search([

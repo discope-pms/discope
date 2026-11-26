@@ -20,39 +20,42 @@ use Twig\Loader\FilesystemLoader as TwigFilesystemLoader;
     We use this controller as a "print" controller, for printing the result of a "Checkin" Consumption search.
     We ignore domain, ids and controller and entity : we deal with Booking entity and fetch relevant booking without additional "data" controller.
 */
-list($params, $providers) = announce([
+[$params, $providers] = eQual::announce([
     'description'   => "Generates a list of arrival data as a PDF document, given a center and a date range.",
     'params'        => [
-        'id' =>  [
-            'description'   => 'Identifier of the cashdeskSession the check against emptiness.',
+        'id' => [
             'type'          => 'integer',
+            'description'   => 'Identifier of the cashdeskSession the check against emptiness.',
             'required'      => true
         ],
-        'view_id' =>  [
-            'description'   => 'The identifier of the view <type.name>.',
+        'view_id' => [
             'type'          => 'string',
+            'description'   => 'The identifier of the view <type.name>.',
             'default'       => 'print.day'
         ],
-        'lang' =>  [
-            'description'   => 'Language in which labels and multilang field have to be returned (2 letters ISO 639-1).',
+        'lang' => [
             'type'          => 'string',
+            'description'   => 'Language in which labels and multilang field have to be returned (2 letters ISO 639-1).',
             'default'       => constant('DEFAULT_LANG')
         ]
     ],
-    'constants'             => ['DEFAULT_LANG', 'L10N_LOCALE'],
-    'access' => [
-        'visibility'        => 'protected',
-        'groups'            => ['pos.default.user'],
+    'access'        => [
+        'visibility'    => 'protected',
+        'groups'        => ['pos.default.user']
     ],
     'response'      => [
-        'content-type'      => 'application/pdf',
-        'accept-origin'     => '*'
+        'content-type'  => 'application/pdf',
+        'accept-origin' => '*'
     ],
-    'providers'     => ['context', 'orm', 'auth']
+    'constants'     => ['DEFAULT_LANG', 'L10N_LOCALE'],
+    'providers'     => ['context']
 ]);
 
 
-list($context, $orm, $auth) = [$providers['context'], $providers['orm'], $providers['auth']];
+/**
+ * @var \equal\php\Context $context
+ */
+['context' => $context] = $providers;
 
 $entity = 'sale\pos\CashdeskSession';
 $parts = explode('\\', $entity);
@@ -60,10 +63,10 @@ $package = array_shift($parts);
 $class_path = implode('/', $parts);
 $parent = get_parent_class($entity);
 
-$file = QN_BASEDIR."/packages/{$package}/views/{$class_path}.{$params['view_id']}.html";
+$file = EQ_BASEDIR."/packages/{$package}/views/{$class_path}.{$params['view_id']}.html";
 
 if(!file_exists($file)) {
-    throw new Exception("unknown_view_id", QN_ERROR_UNKNOWN_OBJECT);
+    throw new Exception("unknown_view_id", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
 $cashdeskSession = CashdeskSession::id($params['id'])
@@ -99,7 +102,7 @@ $cashdeskSession = CashdeskSession::id($params['id'])
         ->first(true);
 
 if(!$cashdeskSession) {
-    throw new Exception("unknown_cashdeskSession", QN_ERROR_UNKNOWN_OBJECT);
+    throw new Exception("unknown_cashdeskSession", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
 // #todo #settings - fetch from settings
@@ -115,7 +118,7 @@ $time += $tz_offset;
 $orders_ids = Order::search(['session_id', '=' , $cashdeskSession['id']])->ids();
 
 if(!count($orders_ids)) {
-    throw new Exception("no_match", QN_ERROR_UNKNOWN_OBJECT);
+    throw new Exception("no_match", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
 
@@ -302,7 +305,7 @@ usort($values['cashdesk_log_entries'], function ($a, $b) {
 
 try {
 
-    $loader = new TwigFilesystemLoader(QN_BASEDIR."/packages/{$package}/views/");
+    $loader = new TwigFilesystemLoader(EQ_BASEDIR."/packages/{$package}/views/");
 
     $twig = new TwigEnvironment($loader);
     $extension  = new IntlExtension();
@@ -317,8 +320,8 @@ try {
 
 }
 catch(Exception $e) {
-    trigger_error("ORM::error while parsing template - ".$e->getMessage(), QN_REPORT_DEBUG);
-    throw new Exception("template_parsing_issue", QN_ERROR_INVALID_CONFIG);
+    trigger_error("ORM::error while parsing template - ".$e->getMessage(), EQ_REPORT_DEBUG);
+    throw new Exception("template_parsing_issue", EQ_ERROR_INVALID_CONFIG);
 }
 
 
@@ -344,8 +347,9 @@ $canvas->page_text(530, $canvas->get_height() - 35, "p. {PAGE_NUM} / {PAGE_COUNT
 // get generated PDF raw binary
 $output = $dompdf->output();
 
-$context->httpResponse()
-        // ->header('Content-Disposition', 'attachment; filename="document.pdf"')
-        ->header('Content-Disposition', 'inline; filename="document.pdf"')
-        ->body($output)
-        ->send();
+$context
+    ->httpResponse()
+    // ->header('Content-Disposition', 'attachment; filename="document.pdf"')
+    ->header('Content-Disposition', 'inline; filename="document.pdf"')
+    ->body($output)
+    ->send();

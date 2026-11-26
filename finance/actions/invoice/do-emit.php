@@ -10,16 +10,16 @@ use finance\accounting\Invoice;
 [$params, $providers] = eQual::announce([
     'description'   => "Sets booking as checked out.",
     'params'        => [
-        'id' =>  [
+        'id' => [
             'type'          => 'integer',
             'description'   => 'Identifier of the booking for which the composition has to be generated.',
             'min'           => 1,
             'required'      => true
         ]
     ],
-    'access' => [
+    'access'        => [
         'visibility'    => 'protected',
-        'groups'        => ['finance.default.user'],
+        'groups'        => ['finance.default.user']
     ],
     'response'      => [
         'content-type'  => 'application/json',

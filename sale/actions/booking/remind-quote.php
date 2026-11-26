@@ -6,9 +6,9 @@
 */
 
 [$params, $providers] = eQual::announce([
-    'deprecated'    => true,
     'description'   => "Deprecated quote reminder controller kept to neutralize legacy scheduled tasks.",
     'help'          => "No followup notification is planned for quotes (customer details might still be incomplete).",
+    'deprecated'    => true,
     'params'        => [
         'id' => [
             'type'          => 'integer',
@@ -21,19 +21,24 @@
             'default'       => constant('DEFAULT_LANG')
         ]
     ],
-    'constants'     => ['DEFAULT_LANG'],
     'access'        => [
-        'visibility' => 'private'
+        'visibility'    => 'private'
     ],
     'response'      => [
         'content-type'  => 'application/json',
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
+    'constants'     => ['DEFAULT_LANG'],
     'providers'     => ['context']
 ]);
 
-/** @var \equal\php\Context $context */
+/**
+ * @var \equal\php\Context $context
+ */
 ['context' => $context] = $providers;
 
-$context->httpResponse()->status(204)->send();
+$context
+    ->httpResponse()
+    ->status(204)
+    ->send();

@@ -5,20 +5,21 @@
     Original author(s): Yesbabylon SRL
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
+
 use sale\booking\Booking;
 use sale\booking\Contract;
 
-list($params, $providers) = eQual::announce([
+[$params, $providers] = eQual::announce([
     'description'   => "Checks if a signed version of the contract has been received.",
     'params'        => [
-        'id' =>  [
-            'description'   => 'Identifier of the booking the check against unit contract validity.',
+        'id' => [
             'type'          => 'integer',
+            'description'   => 'Identifier of the booking the check against unit contract validity.',
             'required'      => true
         ]
     ],
-    'access' => [
-        'visibility'        => 'protected'
+    'access'        => [
+        'visibility'    => 'protected'
     ],
     'response'      => [
         'content-type'  => 'application/json',
@@ -29,17 +30,17 @@ list($params, $providers) = eQual::announce([
 ]);
 
 /**
- * @var \equal\php\Context                  $context
- * @var \equal\dispatch\Dispatcher          $dispatch
+ * @var \equal\php\Context          $context
+ * @var \equal\dispatch\Dispatcher  $dispatch
  */
-list($context, $dispatch) = [ $providers['context'], $providers['dispatch']];
+['context' => $context, 'dispatch' => $dispatch] = $providers;
 
 // ensure booking object exists and is readable
 $booking = Booking::id($params['id'])
     ->read(['id', 'name', 'center_office_id', 'is_cancelled', 'status', 'has_contract', 'contracts_ids'])->first(true);
 
 if(!$booking) {
-    throw new Exception("unknown_booking", QN_ERROR_UNKNOWN_OBJECT);
+    throw new Exception("unknown_booking", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
 /*
@@ -76,7 +77,7 @@ if($status != 'signed') {
     // by convention we dispatch an alert that relates to the controller itself.
     $dispatch->dispatch('lodging.booking.contract.unsigned', 'sale\booking\Booking', $params['id'], 'important', 'sale_booking_check-contract', ['id' => $params['id']], $links, null, $booking['center_office_id']);
 
-    $httpResponse->status(qn_error_http(QN_ERROR_MISSING_PARAM));
+    $httpResponse->status(qn_error_http(EQ_ERROR_MISSING_PARAM));
 }
 else {
     // symmetrical removal of the alert (if any)

@@ -11,24 +11,23 @@ use sale\booking\ConsumptionMeter;
 use sale\booking\ConsumptionMeterReading;
 
 
-list($params, $providers) = announce([
+[$params, $providers] = eQual::announce([
     'description'   => 'Provides data for the mandatory UREBA statistics for the center.',
     'params'        => [
         'all_centers' => [
             'type'              => 'boolean',
-            'default'           => false,
-            'description'       => "Mark all the centers of the consumption meter."
+            'description'       => "Mark all the centers of the consumption meter.",
+            'default'           => false
         ],
-
         'center_id' => [
             'type'              => 'many2one',
             'foreign_object'    => 'identity\Center',
             'description'       => "Center for the consumption meter."
         ],
-
         'type_meter' => [
-                'type'              => 'string',
-                'selection'         => [
+            'type'              => 'string',
+            'description'       => 'The type of meter consumption.',
+            'selection'         => [
                     'all',
                     'water',
                     'gas',
@@ -36,8 +35,7 @@ list($params, $providers) = announce([
                     'gas tank',
                     'oil tank'
                 ],
-                'default'           => 'all',
-                'description'       => 'The type of meter consumption.'
+            'default'           => 'all'
         ],
         'date_from' => [
             'type'              => 'date',
@@ -49,7 +47,6 @@ list($params, $providers) = announce([
             'description'       => 'Date interval upper limit (defaults to last day of the current month).',
             'default'           => mktime(23, 59, 59, date("m") + 1, 0)
         ],
-
         /* parameters used as properties of virtual entity */
         'center' => [
             'type'              => 'string',
@@ -85,16 +82,14 @@ list($params, $providers) = announce([
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'     => [ 'context', 'orm', 'adapt' ,'auth' ]
+    'providers'     => ['context', 'auth']
 ]);
 
 /**
- * @var \equal\php\Context          $context
- * @var \equal\orm\ObjectManager    $orm
- * @var \equal\data\DataAdapter     $adapter
- * @var \equal\auth\AuthenticationManager $auth
+ * @var \equal\php\Context                  $context
+ * @var \equal\auth\AuthenticationManager   $auth
  */
-list($context, $orm, $adapter, $auth) = [ $providers['context'], $providers['orm'], $providers['adapt'], $providers['auth'] ];
+['context' => $context, 'auth' => $auth] = $providers;
 
 $domain = [];
 
@@ -109,11 +104,11 @@ $center_ids = [];
 if($params['all_centers']) {
     $user_id = $auth->userId();
     if($user_id <= 0) {
-        throw new Exception('user_unknown', QN_ERROR_NOT_ALLOWED);
+        throw new Exception('user_unknown', EQ_ERROR_NOT_ALLOWED);
     }
     $user = User::id($user_id)->read(['centers_ids'])->first();
     if(!$user) {
-        throw new Exception('unexpected_error', QN_ERROR_INVALID_USER);
+        throw new Exception('unexpected_error', EQ_ERROR_INVALID_USER);
     }
     $center_ids = $user['centers_ids'];
     $domain[] = ['center_id', 'in', $user['centers_ids'] ];
@@ -246,6 +241,7 @@ if($params['all_centers']) {
 }
 
 
-$context->httpResponse()
-        ->body($result)
-        ->send();
+$context
+    ->httpResponse()
+    ->body($result)
+    ->send();

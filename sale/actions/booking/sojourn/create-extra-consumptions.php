@@ -7,17 +7,17 @@
 */
 
 use discope\setting\Setting;
+use realestate\RentalUnit;
 use sale\booking\BookingLineGroup;
 use sale\booking\Consumption;
-use realestate\RentalUnit;
 use sale\booking\SojournProductModelRentalUnitAssignement;
 
-list($params, $providers) = eQual::announce([
+[$params, $providers] = eQual::announce([
     'description'   => "Create consumptions for a given extra services group.",
     'params'        => [
-        'id' =>  [
-            'description'   => 'Identifier of the targeted sojourn (BookingLineGroup).',
+        'id' => [
             'type'          => 'integer',
+            'description'   => 'Identifier of the targeted sojourn (BookingLineGroup).',
             'min'           => 1,
             'required'      => true
         ]
@@ -31,16 +31,15 @@ list($params, $providers) = eQual::announce([
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'     => ['context', 'orm', 'cron', 'dispatch']
+    'providers'     => ['context', 'orm', 'cron']
 ]);
 
 /**
- * @var \equal\php\Context                  $context
- * @var \equal\orm\ObjectManager            $orm
- * @var \equal\cron\Scheduler               $cron
- * @var \equal\dispatch\Dispatcher          $dispatch
+ * @var \equal\php\Context          $context
+ * @var \equal\orm\ObjectManager    $orm
+ * @var \equal\cron\Scheduler       $cron
  */
-list($context, $orm, $cron, $dispatch) = [$providers['context'], $providers['orm'], $providers['cron'], $providers['dispatch']];
+['context' => $context, 'orm' => $orm, 'cron' => $cron] = $providers;
 
 $group = BookingLineGroup::id($params['id'])
     ->read([
@@ -51,17 +50,17 @@ $group = BookingLineGroup::id($params['id'])
     ->first(true);
 
 if(!$group) {
-    throw new Exception("unknown_sojourn", QN_ERROR_UNKNOWN_OBJECT);
+    throw new Exception("unknown_sojourn", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
 if(!$group['is_extra']) {
     // this controller is mean for extra services groups only
-    throw new Exception("incompatible_group", QN_ERROR_INVALID_PARAM);
+    throw new Exception("incompatible_group", EQ_ERROR_INVALID_PARAM);
 }
 
 if($group['has_consumptions']) {
     // consumptions cannot be re-created
-    throw new Exception("invalid_status", QN_ERROR_INVALID_PARAM);
+    throw new Exception("invalid_status", EQ_ERROR_INVALID_PARAM);
 }
 
 // check assignments consistency
@@ -75,19 +74,19 @@ foreach($assignments as $assignment) {
     $total_qty += $assignment['qty'];
     $rental_unit = RentalUnit::id($assignment['rental_unit_id'])->read(['is_accomodation', 'capacity', 'extra'])->first(true);
     if(!$rental_unit) {
-        throw new Exception('unknown_rental_unit', QN_ERROR_UNKNOWN_OBJECT);
+        throw new Exception('unknown_rental_unit', EQ_ERROR_UNKNOWN_OBJECT);
     }
     if($group['nb_pers'] < $assignment['qty']) {
-        throw new Exception('quantity_exceeds_group', QN_ERROR_INVALID_PARAM);
+        throw new Exception('quantity_exceeds_group', EQ_ERROR_INVALID_PARAM);
     }
     if(($rental_unit['capacity'] + $rental_unit['extra']) < $assignment['qty']) {
-        throw new Exception('quantity_exceed_accommodation', QN_ERROR_INVALID_PARAM);
+        throw new Exception('quantity_exceed_accommodation', EQ_ERROR_INVALID_PARAM);
     }
 }
 
 if(count($assignments) > 0 && $group['nb_pers'] != $total_qty) {
     // assignment count mismatch
-    throw new Exception('group_assignment_quantity_mismatch', QN_ERROR_INVALID_PARAM);
+    throw new Exception('group_assignment_quantity_mismatch', EQ_ERROR_INVALID_PARAM);
 }
 
 // check overbooking
@@ -116,7 +115,7 @@ foreach($params['assignments'] as $assignment) {
                 $consumption_to = $consumption['date_to'] + $consumption['schedule_to'];
                 // #memo - we don't allow instant transition (i.e. checkin time of a booking equals checkout time of a previous booking)
                 if(max($date_from, $consumption_from) < min($date_to, $consumption_to)) {
-                    throw new Exception('booked_rental_unit', QN_ERROR_CONFLICT_OBJECT);
+                    throw new Exception('booked_rental_unit', EQ_ERROR_CONFLICT_OBJECT);
                 }
             }
         }
@@ -162,6 +161,7 @@ if($channelmanager_enabled) {
     }
 }
 
-$context->httpResponse()
-        ->status(204)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(204)
+    ->send();

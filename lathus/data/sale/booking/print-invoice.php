@@ -15,72 +15,64 @@ use sale\booking\Booking;
 use sale\booking\Invoice;
 use sale\booking\InvoiceLine;
 use Twig\Environment as TwigEnvironment;
-use Twig\Loader\FilesystemLoader as TwigFilesystemLoader;
 use Twig\Extra\Intl\IntlExtension;
-use Twig\Extension\ExtensionInterface;
+use Twig\Loader\FilesystemLoader as TwigFilesystemLoader;
 
-use SepaQr\Data;
 use Endroid\QrCode\Builder\Builder;
 use Endroid\QrCode\ErrorCorrectionLevel\ErrorCorrectionLevelMedium;
+use SepaQr\Data;
 
-use equal\data\DataFormatter;
 use discope\setting\Setting;
+use equal\data\DataFormatter;
 use Twig\TwigFilter;
 
 [$params, $providers] = eQual::announce([
     'description'   => "Render an invoice given its ID as a PDF document, for Lathus.",
     'params'        => [
-
         'id' => [
-            'description'   => 'Identifier of the invoice to print.',
             'type'          => 'integer',
+            'description'   => 'Identifier of the invoice to print.',
             'required'      => true
         ],
-
-        'view_id' =>  [
-            'description'   => 'The identifier of the view <type.name>.',
+        'view_id' => [
             'type'          => 'string',
+            'description'   => 'The identifier of the view <type.name>.',
             'default'       => 'print.default'
         ],
-
-        'mode' =>  [
-            'description'   => 'Mode in which document has to be rendered: simple (default) or detailed.',
+        'mode' => [
             'type'          => 'string',
+            'description'   => 'Mode in which document has to be rendered: simple (default) or detailed.',
             'selection'     => ['grouped', 'detailed'],
             'default'       => 'grouped'
         ],
-
-        'lang' =>  [
-            'description'   => 'Language in which labels and multilang field have to be returned (2 letters ISO 639-1).',
+        'lang' => [
             'type'          => 'string',
+            'description'   => 'Language in which labels and multilang field have to be returned (2 letters ISO 639-1).',
             'default'       => constant('DEFAULT_LANG')
         ],
-
-        'output' =>  [
-            'description'   => 'Output format of the document.',
+        'output' => [
             'type'          => 'string',
+            'description'   => 'Output format of the document.',
             'selection'     => ['pdf', 'html'],
             'default'       => 'pdf'
         ]
-
     ],
-    'constants'     => ['DEFAULT_LANG', 'L10N_LOCALE'],
     'access'        => [
-        'visibility'        => 'protected',
-        'groups'            => ['booking.default.user'],
+        'visibility'    => 'protected',
+        'groups'        => ['booking.default.user']
     ],
     'response'      => [
-        'content-type'      => 'application/pdf',
-        'accept-origin'     => '*'
+        'content-type'  => 'application/pdf',
+        'accept-origin' => '*'
     ],
-    'providers'     => ['context', 'orm']
+    'constants'     => ['DEFAULT_LANG', 'L10N_LOCALE'],
+    'providers'     => ['context']
 ]);
 
 /**
- * @var \equal\php\Context          $context
- * @var \equal\orm\ObjectManager    $orm
+ * @var \equal\php\Context $context
  */
-['context' => $context, 'orm' => $orm] = $providers;
+['context' => $context] = $providers;
 
 /**
  * Methods
@@ -641,12 +633,13 @@ try {
     $html = $template->render($values);
 }
 catch(Exception $e) {
-    trigger_error("ORM::error while parsing template - ".$e->getMessage(), QN_REPORT_DEBUG);
-    throw new Exception("template_parsing_issue", QN_ERROR_INVALID_CONFIG);
+    trigger_error("ORM::error while parsing template - ".$e->getMessage(), EQ_REPORT_DEBUG);
+    throw new Exception("template_parsing_issue", EQ_ERROR_INVALID_CONFIG);
 }
 
 if($params['output'] == 'html') {
-    $context->httpResponse()
+    $context
+        ->httpResponse()
         ->header('Content-Type', 'text/html')
         ->body($html)
         ->send();
@@ -678,8 +671,9 @@ $canvas->page_text(530, $canvas->get_height() - 35, "p. {PAGE_NUM} / {PAGE_COUNT
 
 $output = $dompdf->output();
 
-$context->httpResponse()
-        // ->header('Content-Disposition', 'attachment; filename="document.pdf"')
-        ->header('Content-Disposition', 'inline; filename="document.pdf"')
-        ->body($output)
-        ->send();
+$context
+    ->httpResponse()
+    // ->header('Content-Disposition', 'attachment; filename="document.pdf"')
+    ->header('Content-Disposition', 'inline; filename="document.pdf"')
+    ->body($output)
+    ->send();

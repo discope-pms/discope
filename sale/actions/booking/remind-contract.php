@@ -5,28 +5,29 @@
     Original author(s): Yesbabylon SRL
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
-use sale\booking\Booking;
+
+use communication\Template;
 use core\Mail;
 use equal\email\Email;
-use communication\Template;
+use sale\booking\Booking;
 
-list($params, $providers) = eQual::announce([
+[$params, $providers] = eQual::announce([
     'description'   => "Send an email to remind them about the signed contract.",
     'params'        => [
-        'id' =>  [
-            'description'   => 'Identifier of the booking for the send reminder.',
+        'id' => [
             'type'          => 'integer',
+            'description'   => 'Identifier of the booking for the send reminder.',
             'required'      => true
         ],
-        'email' =>  [
-            'description'   => 'Email of the person who is responsible for the contract.',
+        'email' => [
             'type'          => 'string',
+            'description'   => 'Email of the person who is responsible for the contract.',
             'required'      => true
         ],
-        'lang' =>  [
-            'description'   => 'Language of the contract which is defined by the responsible.',
-            'type'          => 'string'
-        ],
+        'lang' => [
+            'type'          => 'string',
+            'description'   => 'Language of the contract which is defined by the responsible.'
+        ]
     ],
     'response'      => [
         'content-type'  => 'application/json',
@@ -37,10 +38,10 @@ list($params, $providers) = eQual::announce([
 ]);
 
 /**
- * @var \equal\php\Context                  $context
- * @var \equal\dispatch\Dispatcher          $dispatch
+ * @var \equal\php\Context          $context
+ * @var \equal\dispatch\Dispatcher  $dispatch
  */
-list($context, $dispatch) = [ $providers['context'], $providers['dispatch']];
+['context' => $context, 'dispatch' => $dispatch] = $providers;
 
 $booking = Booking::id($params['id'])
             ->read([
@@ -56,7 +57,7 @@ $booking = Booking::id($params['id'])
             ->first(true);
 
 if(!$booking) {
-    throw new Exception("unknown_booking", QN_ERROR_UNKNOWN_OBJECT);
+    throw new Exception("unknown_booking", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
 $result = [];
@@ -84,7 +85,7 @@ $template = Template::search([
 if(!$template){
     $result[] = $booking['id'];
     $dispatch->dispatch('lodging.booking.contract.reminder.failed', 'sale\booking\Booking', $booking['id'], 'important', 'sale_booking_check-contract-reminder', ['id' => $booking['id']], [], null, $booking['center_office_id']['id']);
-    $httpResponse->status(qn_error_http(QN_ERROR_MISSING_PARAM));
+    $httpResponse->status(qn_error_http(EQ_ERROR_MISSING_PARAM));
 }
 // ignore sending if an identical message has been sent within last 24H
 elseif(!$previous_emails) {

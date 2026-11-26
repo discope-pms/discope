@@ -10,8 +10,8 @@
     'description'   => "Provides data about current Centers capacities (according to configuration).",
     'params'        => [
         'params' => [
-            'description'   => 'Additional params to relay to the data controller.',
             'type'          => 'array',
+            'description'   => 'Additional params to relay to the data controller.',
             'default'       => []
         ]
     ],
@@ -25,10 +25,12 @@
 ]);
 
 /**
- * @var \equal\php\Context  $context
+ * @var \equal\php\Context                      $context
+ * @var \equal\data\adapt\DataAdapterProvider   $dap
  */
 ['context' => $context, 'adapt' => $dap] = $providers;
 
+/** @var \equal\data\adapt\DataAdapterJson $adapter */
 $adapter = $dap->get('json');
 
 $output = eQual::run('get', 'lathus_sale_booking_occupancy-by-sojourns-csv', [

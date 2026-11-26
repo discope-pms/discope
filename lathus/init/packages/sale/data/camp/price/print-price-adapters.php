@@ -12,7 +12,6 @@ use Dompdf\Options as DompdfOptions;
 use sale\camp\Enrollment;
 use sale\camp\price\PriceAdapter;
 use Twig\Environment as TwigEnvironment;
-use Twig\Extension\ExtensionInterface;
 use Twig\Extra\Intl\IntlExtension;
 use Twig\Loader\FilesystemLoader as TwigFilesystemLoader;
 use Twig\TwigFilter;
@@ -20,36 +19,32 @@ use Twig\TwigFilter;
 [$params, $providers] = eQual::announce([
     'description'   => "Print list of price adapters.",
     'params'        => [
-
-        'view_id' =>  [
-            'description'       => 'The identifier of the view <type.name>.',
-            'type'              => 'string',
-            'default'           => 'print.list'
+        'view_id' => [
+            'type'          => 'string',
+            'description'   => 'The identifier of the view <type.name>.',
+            'default'       => 'print.list'
         ],
-
         'date_from' => [
-            'type'              => 'date',
-            'description'       => "Date interval lower limit.",
-            'default'           => fn() => strtotime('first day of january this year')
+            'type'          => 'date',
+            'description'   => "Date interval lower limit.",
+            'default'       => fn() => strtotime('first day of january this year')
         ],
-
         'date_to' => [
-            'type'              => 'date',
-            'description'       => "Date interval upper limit.",
-            'default'           => fn() => strtotime('last day of december this year')
+            'type'          => 'date',
+            'description'   => "Date interval upper limit.",
+            'default'       => fn() => strtotime('last day of december this year')
         ]
-
+    ],
+    'response'      => [
+        'content-type'  => 'application/pdf',
+        'accept-origin' => '*'
     ],
     'constants'     => ['L10N_LOCALE', 'L10N_TIMEZONE'],
-    'response'      => [
-        'content-type'      => 'application/pdf',
-        'accept-origin'     => '*'
-    ],
     'providers'     => ['context']
 ]);
 
 /**
- * @var \equal\php\Context  $context
+ * @var \equal\php\Context $context
  */
 ['context' => $context] = $providers;
 
@@ -165,8 +160,9 @@ $font = $dompdf->getFontMetrics()->getFont("helvetica", "regular");
     Response
 */
 
-$context->httpResponse()
-        // ->header('Content-Disposition', 'attachment; filename="document.pdf"')
-        ->header('Content-Disposition', 'inline; filename="facture.pdf"')
-        ->body($dompdf->output())
-        ->send();
+$context
+    ->httpResponse()
+    // ->header('Content-Disposition', 'attachment; filename="document.pdf"')
+    ->header('Content-Disposition', 'inline; filename="facture.pdf"')
+    ->body($dompdf->output())
+    ->send();

@@ -11,23 +11,20 @@ use sale\pay\Funding;
 [$params, $providers] = eQual::announce([
     'description'   => "Mark fundings as paid even if not all payments received.",
     'params'        => [
-
-        'id' =>  [
+        'id' => [
             'type'          => 'integer',
             'description'   => "Identifier of the Funding to mark as paid.",
             'min'           => 1
         ],
-
-        'ids' =>  [
-            'description'   => "List of identifiers of the Fundings to mark as paid.",
+        'ids' => [
             'type'          => 'array',
+            'description'   => "List of identifiers of the Fundings to mark as paid.",
             'default'       => []
         ]
-
     ],
-    'access' => [
-        'visibility'        => 'protected',
-        'groups'            => ['finance.default.user', 'sale.default.user'],
+    'access'        => [
+        'visibility'    => 'protected',
+        'groups'        => ['finance.default.user', 'sale.default.user']
     ],
     'response'      => [
         'content-type'  => 'application/json',
@@ -38,7 +35,7 @@ use sale\pay\Funding;
 ]);
 
 /**
- * @var \equal\php\Context  $context
+ * @var \equal\php\Context $context
  */
 ['context' => $context] = $providers;
 
@@ -74,6 +71,7 @@ foreach($fundings as $id => $funding) {
     ]);
 }
 
-$context->httpResponse()
-        ->status(204)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(204)
+    ->send();

@@ -5,36 +5,40 @@
     Original author(s): Yesbabylon SRL
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
+
+use identity\Partner;
 use sale\booking\Booking;
 use sale\booking\Funding;
 use sale\booking\Invoice;
-use identity\Partner;
 
 
-list($params, $providers) = announce([
+[$params, $providers] = eQual::announce([
     'description'   => "Generates the proforma for the balance invoice for a booking.",
     'params'        => [
-        'id' =>  [
-            'description'       => 'Identifier of the booking for which the invoice has to be generated.',
-            'type'              => 'integer',
-            'min'               => 1,
-            'required'          => true
+        'id' => [
+            'type'          => 'integer',
+            'description'   => 'Identifier of the booking for which the invoice has to be generated.',
+            'min'           => 1,
+            'required'      => true
         ]
     ],
-    'access' => [
-        'visibility'        => 'protected',
-        'groups'            => ['booking.default.user']
+    'access'        => [
+        'visibility'    => 'protected',
+        'groups'        => ['booking.default.user']
     ],
     'response'      => [
         'content-type'  => 'application/json',
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'     => ['context', 'orm', 'auth']
+    'providers'     => ['context']
 ]);
 
 
-list($context, $orm, $auth) = [$providers['context'], $providers['orm'], $providers['auth']];
+/**
+ * @var \equal\php\Context $context
+ */
+['context' => $context] = $providers;
 
 
 
@@ -44,15 +48,15 @@ $booking = Booking::id($params['id'])
     ->first(true);
 
 if(!$booking) {
-    throw new Exception("unknown_booking", QN_ERROR_UNKNOWN_OBJECT);
+    throw new Exception("unknown_booking", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
 if($booking['status'] != 'checkedout') {
-    throw new Exception("incompatible_status", QN_ERROR_INVALID_PARAM);
+    throw new Exception("incompatible_status", EQ_ERROR_INVALID_PARAM);
 }
 
 if($booking['is_from_channelmanager'] !== true && $booking['type_id'] !== 1) {
-    throw new Exception("incompatible_booking", QN_ERROR_INVALID_PARAM);
+    throw new Exception("incompatible_booking", EQ_ERROR_INVALID_PARAM);
 }
 
 $has_invalid_line = false;
@@ -64,7 +68,7 @@ foreach($booking['booking_lines_ids'] as $line) {
 }
 
 if($has_invalid_line) {
-    throw new Exception("invalid_line", QN_ERROR_INVALID_PARAM);
+    throw new Exception("invalid_line", EQ_ERROR_INVALID_PARAM);
 }
 
 
@@ -78,11 +82,12 @@ $invoice = Invoice::search([ ['booking_id', '=', $booking['id']], ['type', '=', 
     ->first(true);
 
 if(!$invoice) {
-    throw new Exception("invoice_not_found", QN_ERROR_MISSING_PARAM);
+    throw new Exception("invoice_not_found", EQ_ERROR_MISSING_PARAM);
 }
 
 eQual::run('do', 'sale_booking_invoice_do-emit', $invoice);
 
-$context->httpResponse()
-        ->status(204)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(204)
+    ->send();

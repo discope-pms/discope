@@ -7,35 +7,38 @@
 */
 
 use sale\booking\Booking;
-use sale\booking\BookingLineGroup;
 use sale\booking\BookingLine;
+use sale\booking\BookingLineGroup;
 use sale\booking\Funding;
 use sale\booking\Payment;
-use sale\pos\Order;
 use sale\pos\Operation;
+use sale\pos\Order;
 
-list($params, $providers) = announce([
+[$params, $providers] = eQual::announce([
     'description'   => "This will mark the order as paid, and update fundings and bookings involved in order lines, if any.",
     'params'        => [
-        'id' =>  [
-            'description'   => 'Identifier of the order that has been paid.',
+        'id' => [
             'type'          => 'integer',
+            'description'   => 'Identifier of the order that has been paid.',
             'min'           => 1,
             'required'      => true
         ]
     ],
-    'access' => [
-        'groups'            => ['booking.default.user', 'pos.default.user'],
+    'access'        => [
+        'groups'        => ['booking.default.user', 'pos.default.user']
     ],
     'response'      => [
         'content-type'  => 'application/json',
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'     => ['context', 'orm', 'auth']
+    'providers'     => ['context']
 ]);
 
-list($context, $orm, $auth) = [$providers['context'], $providers['orm'], $providers['auth']];
+/**
+ * @var \equal\php\Context $context
+ */
+['context' => $context] = $providers;
 
 // read order object
 $order = Order::id($params['id'])
@@ -69,12 +72,12 @@ $order = Order::id($params['id'])
     ->first(true);
 
 if(!$order) {
-    throw new Exception("unknown_order", QN_ERROR_UNKNOWN_OBJECT);
+    throw new Exception("unknown_order", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
 // order already paid
 if($order['status'] == 'paid') {
-    throw new Exception("incompatible_status", QN_ERROR_INVALID_PARAM);
+    throw new Exception("incompatible_status", EQ_ERROR_INVALID_PARAM);
 }
 
 /*
@@ -225,11 +228,12 @@ if(!$order['has_funding']) {
         }
         catch(Exception $e) {
             // ignore errors when trying to issue an invoice (some restrictions apply)
-            trigger_error("ORM::".$e->getMessage(), QN_REPORT_WARNING);
+            trigger_error("ORM::".$e->getMessage(), EQ_REPORT_WARNING);
         }
     }
 }
 
-$context->httpResponse()
-        ->status(204)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(204)
+    ->send();

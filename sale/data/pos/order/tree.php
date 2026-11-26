@@ -7,33 +7,33 @@
 
 use sale\pos\Order;
 
-list($params, $providers) = eQual::announce([
-    'description'   =>	"Provide a fully loaded tree for a given order.",
-    'params'        =>	[
+[$params, $providers] = eQual::announce([
+    'description'   => "Provide a fully loaded tree for a given order.",
+    'params'        => [
         'id' => [
-            'description'   => "Identifier of the order for which the tree is requested.",
             'type'          => 'integer',
+            'description'   => "Identifier of the order for which the tree is requested.",
             'required'      => true
         ],
-        'variant' =>  [
-            'description'   => "Type of tree being requested.",
+        'variant' => [
             'type'          => 'string',
+            'description'   => "Type of tree being requested.",
             'selection'     => [
-                'lines',        // tree with order lines
-                'payments',     // tree with order payments
+                'lines',    // tree with order lines
+                'payments', // tree with order payments
                 'ticket'
             ],
             'default'       => 'lines'
         ]
     ],
     'access'        => [
-        'visibility'        => 'protected',
-        'groups'            => ['pos.default.user'],
+        'visibility'    => 'protected',
+        'groups'        => ['pos.default.user']
     ],
     'response'      => [
-        'content-type'      => 'application/json',
-        'charset'           => 'utf-8',
-        'accept-origin'     => '*'
+        'content-type'  => 'application/json',
+        'charset'       => 'utf-8',
+        'accept-origin' => '*'
     ],
     'providers'     => ['context']
 ]);
@@ -232,6 +232,7 @@ if(is_null($order)) {
     throw new Exception("unknown_order", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
-$context->httpResponse()
-        ->body($order)
-        ->send();
+$context
+    ->httpResponse()
+    ->body($order)
+    ->send();

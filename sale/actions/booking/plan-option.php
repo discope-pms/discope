@@ -6,75 +6,66 @@
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 
+use realestate\RentalUnit;
 use sale\booking\Booking;
 use sale\booking\BookingLine;
 use sale\booking\BookingLineGroup;
-use realestate\RentalUnit;
 use sale\booking\SojournProductModel;
 use sale\booking\SojournProductModelRentalUnitAssignement;
 use sale\catalog\Product;
 use sale\catalog\ProductModel;
 use sale\customer\Customer;
 
-list($params, $providers) = announce([
+[$params, $providers] = eQual::announce([
     'description'   => "Create an option from the planning, by providing date range, customer and rental unit.",
     'params'        => [
-
-        'date_from' =>  [
+        'date_from' => [
+            'type'          => 'date',
             'description'   => 'Start of the date range.',
-            'type'          => 'date',
             'required'      => true
         ],
-
-        'date_to' =>  [
+        'date_to' => [
+            'type'          => 'date',
             'description'   => 'End of the date range.',
-            'type'          => 'date',
             'required'      => true
         ],
-
-        'customer_identity_id' =>  [
+        'customer_identity_id' => [
+            'type'          => 'integer',
             'description'   => 'Identifier of the identity of the targeted customer.',
-            'type'          => 'integer',
             'required'      => true
         ],
-
-        'rental_unit_id' =>  [
+        'rental_unit_id' => [
+            'type'          => 'integer',
             'description'   => 'Identifier of the targeted rental unit.',
-            'type'          => 'integer',
             'required'      => true
         ],
-
-        'no_expiry' =>  [
-            'description'   => 'The option will remain active without time limit.',
+        'no_expiry' => [
             'type'          => 'boolean',
+            'description'   => 'The option will remain active without time limit.',
             'default'       => false
         ],
-
-        'free_rental_units' =>  [
-            'description'   => 'At expiration of the option, automatically release reserved rental units, if any.',
+        'free_rental_units' => [
             'type'          => 'boolean',
+            'description'   => 'At expiration of the option, automatically release reserved rental units, if any.',
             'default'       => false
         ]
     ],
-    'access' => [
-        'visibility'        => 'protected',
-        'groups'            => ['booking.default.user']
+    'access'        => [
+        'visibility'    => 'protected',
+        'groups'        => ['booking.default.user']
     ],
     'response'      => [
         'content-type'  => 'application/json',
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'     => ['context', 'orm', 'cron', 'dispatch']
+    'providers'     => ['context']
 ]);
 
 /**
- * @var \equal\php\Context                  $context
- * @var \equal\orm\ObjectManager            $orm
- * @var \equal\cron\Scheduler               $cron
- * @var \equal\dispatch\Dispatcher          $dispatch
+ * @var \equal\php\Context $context
  */
-list($context, $orm, $cron, $dispatch) = [$providers['context'], $providers['orm'], $providers['cron'], $providers['dispatch']];
+['context' => $context] = $providers;
 
 
 /*
@@ -87,7 +78,7 @@ $rental_unit = RentalUnit::id($params['rental_unit_id'])
     ->first(true);
 
 if(!$rental_unit) {
-    throw new Exception("unknown_booking", QN_ERROR_UNKNOWN_OBJECT);
+    throw new Exception("unknown_booking", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
 // look for an existing customer for given identity
@@ -119,7 +110,7 @@ if(!count($product_models_ids)) {
         $product_models_ids = ProductModel::search($domain)->ids();
     }
     if(!count($product_models_ids)) {
-        throw new Exception("no_product_match", QN_ERROR_UNKNOWN_OBJECT);
+        throw new Exception("no_product_match", EQ_ERROR_UNKNOWN_OBJECT);
     }
 }
 
@@ -128,7 +119,7 @@ $product = Product::search([ ['can_sell', '=', true], ['product_model_id', 'in',
     ->first(true);
 
 if(!$product) {
-    throw new Exception("no_product_match", QN_ERROR_UNKNOWN_OBJECT);
+    throw new Exception("no_product_match", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
 /*
@@ -205,6 +196,7 @@ SojournProductModelRentalUnitAssignement::create([
 eQual::run('do', 'sale_booking_do-option', ['id' => $booking['id']]);
 
 
-$context->httpResponse()
-        ->status(204)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(204)
+    ->send();

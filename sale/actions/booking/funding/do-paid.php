@@ -5,44 +5,43 @@
     Original author(s): Yesbabylon SRL
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
-use sale\booking\Funding;
-use sale\booking\Booking;
 
-list($params, $providers) = eQual::announce([
+use sale\booking\Booking;
+use sale\booking\Funding;
+
+[$params, $providers] = eQual::announce([
     'description'   => "Arbitrary mark a funding as paid for the booking. Applies only on bookings that are not from channel manager.",
     'help'          => "This breaks consistency between booking and payments. Avoid using it an prefer `add-manual-payment`",
     'deprecated'    => true,
     'params'        => [
-        'id' =>  [
-            'description'   => 'Identifier of the targeted funding.',
+        'id' => [
             'type'          => 'integer',
+            'description'   => 'Identifier of the targeted funding.',
             'min'           => 1,
             'required'      => true
         ],
-        'confirm' =>  [
-            'description'   => 'Manual confirmation.',
+        'confirm' => [
             'type'          => 'boolean',
+            'description'   => 'Manual confirmation.',
             'required'      => true
         ]
     ],
-    'access' => [
-        'groups'            => ['admins', 'finance.accounting.administrator']
+    'access'        => [
+        'groups'        => ['admins', 'finance.accounting.administrator']
     ],
     'response'      => [
         'content-type'  => 'application/json',
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'     => ['context', 'orm', 'cron', 'dispatch']
+    'providers'     => ['context', 'orm']
 ]);
 
 /**
- * @var \equal\php\Context                  $context
- * @var \equal\orm\ObjectManager            $om
- * @var \equal\cron\Scheduler               $cron
- * @var \equal\dispatch\Dispatcher          $dispatch
+ * @var \equal\php\Context          $context
+ * @var \equal\orm\ObjectManager    $om
  */
-list($context, $om, $cron, $dispatch) = [$providers['context'], $providers['orm'], $providers['cron'], $providers['dispatch']];
+['context' => $context, 'orm' => $om] = $providers;
 
 if(!$params['confirm']) {
     throw new Exception('missing_confirmation', EQ_ERROR_MISSING_PARAM);
@@ -62,25 +61,25 @@ $funding = Funding::id($params['id'])
     ->first(true);
 
 if(!$funding) {
-    throw new Exception("unknown_funding", QN_ERROR_UNKNOWN_OBJECT);
+    throw new Exception("unknown_funding", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
 if($funding['is_paid']) {
-    throw new Exception("funding_already_paid", QN_ERROR_INVALID_PARAM);
+    throw new Exception("funding_already_paid", EQ_ERROR_INVALID_PARAM);
 }
 
 $delta = abs(round($funding['due_amount'], 2) - round($funding['paid_amount'], 2));
 if($delta <= 0) {
-    throw new Exception("nothing_to_pay", QN_ERROR_INVALID_PARAM);
+    throw new Exception("nothing_to_pay", EQ_ERROR_INVALID_PARAM);
 }
 
 $booking = $funding['booking_id'];
 if(!$booking) {
-    throw new Exception("unknown_booking", QN_ERROR_UNKNOWN_OBJECT);
+    throw new Exception("unknown_booking", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
 if($booking['is_from_channelmanager']) {
-    throw new Exception("invalid_booking_type", QN_ERROR_INVALID_PARAM);
+    throw new Exception("invalid_booking_type", EQ_ERROR_INVALID_PARAM);
 }
 
 Funding::id($params['id'])
@@ -92,6 +91,7 @@ Funding::id($params['id'])
 
 Booking::updateStatusFromFundings($om, (array) $booking['id'], [], 'en');
 
-$context->httpResponse()
-        ->status(204)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(204)
+    ->send();

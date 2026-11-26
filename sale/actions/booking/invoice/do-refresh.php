@@ -5,40 +5,40 @@
     Original author(s): Yesbabylon SRL
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
+
 use sale\booking\Invoice;
 
-list($params, $providers) = announce([
+[$params, $providers] = eQual::announce([
     'description'   => "Force refresh of the paid status of an invoice.",
     'params'        => [
-        'id' =>  [
-            'description'   => 'Identifier of the invoice to reverse.',
+        'id' => [
             'type'          => 'integer',
+            'description'   => 'Identifier of the invoice to reverse.',
             'min'           => 1,
             'required'      => true
-        ],
+        ]
     ],
-    'access' => [
-        'visibility'        => 'protected',
-        'groups'            => ['finance.default.user', 'booking.default.user'],
+    'access'        => [
+        'visibility'    => 'protected',
+        'groups'        => ['finance.default.user', 'booking.default.user']
     ],
     'response'      => [
         'content-type'  => 'application/json',
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'     => ['context', 'orm', 'auth']
+    'providers'     => ['context']
 ]);
 
 /**
- * @var \equal\php\Context                  $context
- * @var \equal\orm\ObjectManager            $orm
- * @var \equal\auth\AuthenticationManager   $auth
+ * @var \equal\php\Context $context
  */
-list($context, $orm, $auth) = [$providers['context'], $providers['orm'], $providers['auth']];
+['context' => $context] = $providers;
 
 Invoice::id($params['id'])->update(['is_paid' => null]);
 
 
-$context->httpResponse()
-        ->status(204)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(204)
+    ->send();

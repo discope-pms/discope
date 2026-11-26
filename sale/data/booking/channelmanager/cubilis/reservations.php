@@ -9,31 +9,30 @@
 use equal\http\HttpRequest;
 use sale\booking\channelmanager\Property;
 
-list($params, $providers) = announce([
+[$params, $providers] = eQual::announce([
     'description'   => "Retrieve a batch of the latest reservations and their statuses, as provided from Cubilis in response to `OTA_HotelResRQ`.",
     'params'        => [
         'property_id' => [
-            'description'   => 'Identifier of the property (from Cubilis).',
             'type'          => 'integer',
+            'description'   => 'Identifier of the property (from Cubilis).',
             'required'      => true
         ]
     ],
-    'access' => [
-        'visibility'    => 'protected',
+    'access'        => [
+        'visibility'    => 'protected'
     ],
     'response'      => [
         'content-type'  => 'application/json',
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'     => ['context', 'auth']
+    'providers'     => ['context']
 ]);
 
 /**
- * @var \equal\php\Context                  $context
- * @var \equal\auth\AuthenticationManager   $auth
+ * @var \equal\php\Context $context
  */
-list($context, $auth) = [ $providers['context'], $providers['auth'] ];
+['context' => $context] = $providers;
 
 /*
 XML payload response example :
@@ -367,7 +366,7 @@ $extractSingleReservation = function($xml_content, $res_id) {
 $property = Property::search(['extref_property_id', '=', $params['property_id']])->read(['id', 'username', 'password', 'api_id'])->first(true);
 
 if(!$property) {
-    throw new Exception('unknown_property', QN_ERROR_UNKNOWN_OBJECT);
+    throw new Exception('unknown_property', EQ_ERROR_UNKNOWN_OBJECT);
 }
 
 $xml = Property::cubilis_HotelResRQ_generateXmlPayload($params['property_id'], $property['username'], $property['password'], $property['api_id']);
@@ -383,7 +382,7 @@ $status = $response->getStatusCode();
 
 if($status != 200) {
     // upon request rejection, we stop the whole job
-    throw new Exception('request_rejected', QN_ERROR_INVALID_PARAM);
+    throw new Exception('request_rejected', EQ_ERROR_INVALID_PARAM);
 }
 
 // we should have received a text/xml response, if so HttpMessage::body() contains a parsed version of the XML data
@@ -394,7 +393,7 @@ $raw_xml = $response->getBody(true);
 
 // check response consistency
 if(!isset($envelope['name']) || $envelope['name'] != 'OTA_HotelResRS') {
-    throw new Exception('Invalid response received (valid XML but unexpected format).', QN_ERROR_UNKNOWN);
+    throw new Exception('Invalid response received (valid XML but unexpected format).', EQ_ERROR_UNKNOWN);
 }
 
 if(!isset($envelope['children']['Success'])) {
@@ -405,9 +404,9 @@ if(!isset($envelope['children']['Success'])) {
                 $errors[] = $child['attributes']['Code'].' - '.$child['attributes']['ShortText'];
             }
         }
-        throw new Exception('errors: '.implode(',', $errors), QN_ERROR_INVALID_PARAM);
+        throw new Exception('errors: '.implode(',', $errors), EQ_ERROR_INVALID_PARAM);
     }
-    throw new Exception('unknown_error', QN_ERROR_UNKNOWN);
+    throw new Exception('unknown_error', EQ_ERROR_UNKNOWN);
 }
 
 /*
@@ -662,6 +661,7 @@ if(isset($envelope['children'][0])) {
     }
 }
 
-$context->httpResponse()
-        ->body($result)
-        ->send();
+$context
+    ->httpResponse()
+    ->body($result)
+    ->send();

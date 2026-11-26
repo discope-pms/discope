@@ -7,13 +7,13 @@
 
 use sale\booking\GuestList;
 
-list($params, $providers) = eQual::announce([
+[$params, $providers] = eQual::announce([
     'description'   => "Submit the guest list.",
     'params'        => [
         'id' => [
-            'description'       => "Identifier of the targeted Guest List.",
             'type'              => 'many2one',
             'foreign_object'    => 'sale\booking\GuestList',
+            'description'       => "Identifier of the targeted Guest List.",
             'required'          => true
         ]
     ],
@@ -62,15 +62,15 @@ $guest_list = GuestList::id($params['id'])
     ->first(true);
 
 if(!$guest_list) {
-    throw new Exception("unknown_guest_list", QN_ERROR_UNKNOWN_OBJECT);
+    throw new Exception("unknown_guest_list", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
 if($guest_list['status'] != 'pending') {
-    throw new Exception('not_a_pending_guest_list', QN_ERROR_INVALID_PARAM);
+    throw new Exception('not_a_pending_guest_list', EQ_ERROR_INVALID_PARAM);
 }
 
 if(!is_null($guest_user) && $guest_user['booking_id'] !== $guest_list['booking_id']) {
-    throw new Exception("not_allowed", QN_ERROR_NOT_ALLOWED);
+    throw new Exception("not_allowed", EQ_ERROR_NOT_ALLOWED);
 }
 
 // generate items for Composition
@@ -106,13 +106,14 @@ try {
 }
 catch(Exception $e) {
     // ignore errors at this stage
-    trigger_error('APP::error at composition generation'.$e->getMessage(), QN_REPORT_WARNING);
+    trigger_error('APP::error at composition generation'.$e->getMessage(), EQ_REPORT_WARNING);
 }
 
 // mark Guest List as sent (cannot be modified anymore)
 GuestList::id($params['id'])
     ->update(['status' => 'sent']);
 
-$context->httpResponse()
-        ->status(204)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(204)
+    ->send();

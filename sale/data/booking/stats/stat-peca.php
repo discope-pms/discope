@@ -11,11 +11,11 @@ use identity\User;
 use sale\booking\Booking;
 use sale\booking\BookingLine;
 use sale\booking\BookingLineGroup;
+use sale\catalog\Category;
 use sale\catalog\Product;
 use sale\catalog\ProductModel;
-use sale\catalog\Category;
 
-list($params, $providers) = announce([
+[$params, $providers] = eQual::announce([
     'description'   => 'Lists all animations and their related details for a given period.',
     'params'        => [
         'center_id' => [
@@ -26,8 +26,8 @@ list($params, $providers) = announce([
         ],
         'all_centers' => [
             'type'              => 'boolean',
-            'default'           =>  false,
-            'description'       => "Mark the all Center of the sojourn."
+            'description'       => "Mark the all Center of the sojourn.",
+            'default'           => false
         ],
         'date_from' => [
             'type'              => 'date',
@@ -39,47 +39,38 @@ list($params, $providers) = announce([
             'description'       => 'Output: Day of departure / Input: Date interval upper limit (defaults to last day of previous month).',
             'default'           => strtotime('+1 month')
         ],
-
         'center' => [
             'type'              => 'string',
             'description'       => 'Name of the center.'
         ],
-
         'client' => [
             'type'              => 'string',
             'description'       => 'Full name of the client making the reservation.'
         ],
-
         'code_postal' => [
             'type'              => 'string',
             'description'       => 'Postal code of the client.'
         ],
-
         'category_animation' => [
             'type'              => 'string',
             'description'       => 'The name of the category of the product model.'
         ],
-
         'nb_3_6' => [
             'type'              => 'integer',
             'description'       => 'Number of children who are between 3 and 6 years old'
         ],
-
         'nb_6_12' => [
             'type'              => 'integer',
             'description'       => 'Number of children who are between 6 and 12 years old'
         ],
-
         'nb_12_26' => [
             'type'              => 'integer',
             'description'       => 'Number of teenagers who are between 12 and 26 years old'
         ],
-
         'total' => [
             'type'              => 'integer',
             'description'       => 'Total number of participants across all age ranges'
-        ],
-
+        ]
     ],
     'response'      => [
         'content-type'  => 'application/json',
@@ -90,10 +81,10 @@ list($params, $providers) = announce([
 ]);
 
 /**
- * @var \equal\php\Context          $context
- * @var \equal\auth\AuthenticationManager $auth
+ * @var \equal\php\Context                  $context
+ * @var \equal\auth\AuthenticationManager   $auth
  */
-list($context, $auth) = [ $providers['context'], $providers['auth']];
+['context' => $context, 'auth' => $auth] = $providers;
 
 $date_from = $params['date_from'];
 $date_to = $params['date_to'];
@@ -104,12 +95,12 @@ if ($params['all_centers']){
 
     $user_id = $auth->userId();
     if($user_id <= 0) {
-        throw new Exception('user_unknown', QN_ERROR_NOT_ALLOWED);
+        throw new Exception('user_unknown', EQ_ERROR_NOT_ALLOWED);
     }
 
     $user = User::id($user_id)->read(['centers_ids'])->first(true);
     if(!$user) {
-        throw new Exception('unexpected_error', QN_ERROR_INVALID_USER);
+        throw new Exception('unexpected_error', EQ_ERROR_INVALID_USER);
     }
 
     $domain = ['center_id', 'in', $user['centers_ids'] ];
@@ -305,7 +296,8 @@ elseif ($params['center_id']) {
     });
 }
 
-$context->httpResponse()
-        ->header('X-Total-Count', count($result))
-        ->body($result)
-        ->send();
+$context
+    ->httpResponse()
+    ->header('X-Total-Count', count($result))
+    ->body($result)
+    ->send();

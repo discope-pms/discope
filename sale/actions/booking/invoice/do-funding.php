@@ -7,38 +7,36 @@
 */
 
 use discope\setting\Setting;
+use sale\booking\Booking;
 use sale\booking\Funding;
 use sale\booking\Invoice;
-use sale\booking\Booking;
 
-list($params, $providers) = announce([
+[$params, $providers] = eQual::announce([
     'description'   => "Generate the funding for the (non-proforma) given invoice. And, in case of balance invoice, attaches non-invoiced (partially) paid fundings to it.",
     'params'        => [
-        'id' =>  [
-            'description'   => 'Identifier of the invoice for which to create the funding(s).',
+        'id' => [
             'type'          => 'integer',
+            'description'   => 'Identifier of the invoice for which to create the funding(s).',
             'min'           => 1,
             'required'      => true
-        ],
+        ]
     ],
-    'access' => [
-        'visibility'        => 'protected',
-        'groups'            => ['finance.default.user', 'booking.default.user'],
+    'access'        => [
+        'visibility'    => 'protected',
+        'groups'        => ['finance.default.user', 'booking.default.user']
     ],
     'response'      => [
         'content-type'  => 'application/json',
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'     => ['context', 'orm', 'cron', 'auth']
+    'providers'     => ['context']
 ]);
+
 /**
- * @var \equal\php\Context                  $context
- * @var \equal\orm\ObjectManager            $orm
- * @var \equal\cron\Scheduler               $cron
- * @var \equal\auth\AuthenticationManager   $auth
+ * @var \equal\php\Context $context
  */
-list($context, $orm, $cron, $auth) = [$providers['context'], $providers['orm'], $providers['cron'], $providers['auth']];
+['context' => $context] = $providers;
 
 $getLabels = function($lang, $default_labels = []) {
     $view_i18n_file_path = sprintf('%s/packages/sale/i18n/%s/_parts/labels.json', EQ_BASEDIR, $lang);
@@ -187,6 +185,7 @@ Booking::id($invoice['booking_id'])->update(['paid_amount' => null]);
 Booking::updateStatusFromFundings($orm, (array) $invoice['booking_id'], [], 'en');
 */
 
-$context->httpResponse()
-        ->status(204)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(204)
+    ->send();

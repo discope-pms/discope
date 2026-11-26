@@ -10,40 +10,38 @@ use sale\booking\Booking;
 use sale\booking\Invoice;
 use sale\booking\SojournProductModelRentalUnitAssignement;
 
-list($params, $providers) = eQual::announce([
+[$params, $providers] = eQual::announce([
     'description'   => "Sets booking as checked out.",
     'params'        => [
-        'id' =>  [
-            'description'   => 'Identifier of the booking for which the composition has to be generated.',
+        'id' => [
             'type'          => 'integer',
+            'description'   => 'Identifier of the booking for which the composition has to be generated.',
             'min'           => 1,
             'required'      => true
-        ],
+        ]
     ],
-    'access' => [
-        'visibility'        => 'public',		// 'public' (default) or 'private' (can be invoked by CLI only)
-        'groups'            => ['booking.default.user'],// list of groups ids or names granted
+    'access'        => [
+        'visibility'    => 'public',                    // 'public' (default) or 'private' (can be invoked by CLI only)
+        'groups'        => ['booking.default.user'],    // list of groups ids or names granted
     ],
     'response'      => [
         'content-type'  => 'application/json',
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'     => ['context', 'orm', 'auth', 'dispatch']
+    'providers'     => ['context', 'dispatch']
 ]);
 
 /**
- * @var \equal\php\Context                  $context
- * @var \equal\orm\ObjectManager            $orm
- * @var \equal\auth\AuthenticationManager   $auth
- * @var \equal\dispatch\Dispatcher          $dispatch
+ * @var \equal\php\Context          $context
+ * @var \equal\dispatch\Dispatcher  $dispatch
  */
-list($context, $orm, $auth, $dispatch) = [$providers['context'], $providers['orm'], $providers['auth'],  $providers['dispatch']];
+['context' => $context, 'dispatch' => $dispatch] = $providers;
 
 $booking = Booking::id($params['id'])->read(['id'])->first(true);
 
 if(!$booking) {
-    throw new Exception("unknown_booking", QN_ERROR_UNKNOWN_OBJECT);
+    throw new Exception("unknown_booking", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
 // a booking cannot switch back to "checkedout" if it has a non-cancelled balance invoice
@@ -57,7 +55,7 @@ $balance_invoice = Invoice::search([
     ->first(true);
 
 if($balance_invoice) {
-    throw new Exception("emitted_balance_invoice", QN_ERROR_INVALID_PARAM);
+    throw new Exception("emitted_balance_invoice", EQ_ERROR_INVALID_PARAM);
 }
 
 // mark booking as checked-out
@@ -83,6 +81,7 @@ $dispatch->cancel('lodging.booking.sojourns_accomodations', 'sale\booking\Bookin
 $dispatch->cancel('lodging.booking.date.checkin', 'sale\booking\Booking', $booking['id']);
 $dispatch->cancel('lodging.booking.rental_units_ready', 'sale\booking\Booking', $booking['id']);
 
-$context->httpResponse()
-        ->status(204)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(204)
+    ->send();

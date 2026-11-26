@@ -8,22 +8,22 @@
 use sale\booking\Booking;
 
 [$params, $providers] = eQual::announce([
-    'description'	=> "Checks if there are some quote Bookings that were reverted from checkedin or checkedout. ",
+    'description'   => "Checks if there are some quote Bookings that were reverted from checkedin or checkedout. ",
     'access'        => [
-        'visibility'        => 'protected',
-        'groups'            => ['booking.default.user'],
+        'visibility'    => 'protected',
+        'groups'        => ['booking.default.user']
     ],
     'response'      => [
-        'content-type'      => 'application/json',
-        'charset'           => 'utf-8',
-        'accept-origin'     => '*'
+        'content-type'  => 'application/json',
+        'charset'       => 'utf-8',
+        'accept-origin' => '*'
     ],
     'providers'     => ['context', 'dispatch']
 ]);
 
 /**
- * @var equal\php\Context           $context
- * @var equal\dispatch\Dispatcher   $dispatcher
+ * @var \equal\php\Context          $context
+ * @var \equal\dispatch\Dispatcher  $dispatcher
  */
 ['context' => $context, 'dispatch' => $dispatcher] = $providers;
 
@@ -57,8 +57,7 @@ foreach($bookings as $booking) {
     $result[] = $booking['id'];
 }
 
-$context->httpResponse()
-        ->body(['result' => $result])
-        ->send();
-
-
+$context
+    ->httpResponse()
+    ->body(['result' => $result])
+    ->send();

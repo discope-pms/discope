@@ -10,42 +10,42 @@ use equal\php\Context;
 use sale\booking\Booking;
 use sale\booking\Funding;
 
-list($params, $providers) = eQual::announce([
-    'description' => 'PoS search for Bookings, based on a given clue. Returns a collection of Booking candidates based on booking number of customer name.',
-    'params'      => [
+[$params, $providers] = eQual::announce([
+    'description'   => 'PoS search for Bookings, based on a given clue. Returns a collection of Booking candidates based on booking number of customer name.',
+    'params'        => [
         'clue' => [
-            'description' => 'The direction  (i.e. \'asc\' or \'desc\').',
-            'type'        => 'string',
-            'default'     => 'desc'
+            'type'          => 'string',
+            'description'   => 'The direction  (i.e. \'asc\' or \'desc\').',
+            'default'       => 'desc'
         ],
         'domain' => [
-            'description'   => 'Criterias that results have to match (serie of conjunctions)',
             'type'          => 'array',
+            'description'   => 'Criterias that results have to match (serie of conjunctions)',
             'default'       => []
         ],
         'limit' => [
-            'description'   => 'The maximum number of results.',
             'type'          => 'integer',
+            'description'   => 'The maximum number of results.',
             'min'           => 1,
             'max'           => 500,
             'default'       => 25
         ]
     ],
-    'access' => [
-        'groups' => ['booking.default.user']
+    'access'        => [
+        'groups'        => ['booking.default.user']
     ],
-    'response'    => [
+    'response'      => [
         'content-type'  => 'application/json',
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'   => ['context']
+    'providers'     => ['context']
 ]);
 
 /**
- * @var Context $context
+ * @var \equal\php\Context $context
  */
-$context = $providers['context'];
+['context' => $context] = $providers;
 
 
 $domain = $params['domain'];
@@ -73,6 +73,7 @@ else {
     $result = $bookings;
 }
 
-$context->httpResponse()
-        ->body($result)
-        ->send();
+$context
+    ->httpResponse()
+    ->body($result)
+    ->send();

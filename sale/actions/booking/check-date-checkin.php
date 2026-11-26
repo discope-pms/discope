@@ -9,43 +9,40 @@
 use identity\CenterOffice;
 use sale\booking\Booking;
 
-list($params, $providers) = announce([
+[$params, $providers] = eQual::announce([
     'description'   => "Checks if the  date of the check-in is the same as the booking.",
     'params'        => [
-        'id' =>  [
-            'description'   => 'Identifier of the booking the check against emptyness.',
+        'id' => [
             'type'          => 'integer',
+            'description'   => 'Identifier of the booking the check against emptyness.',
             'required'      => true
-        ],
-
+        ]
     ],
     'response'      => [
         'content-type'  => 'application/json',
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'     => ['context', 'orm', 'auth', 'dispatch']
+    'providers'     => ['context', 'dispatch']
 ]);
 
 /**
- * @var \equal\php\Context                  $context
- * @var \equal\orm\ObjectManager            $orm
- * @var \equal\auth\AuthenticationManager   $auth
- * @var \equal\dispatch\Dispatcher          $dispatch
+ * @var \equal\php\Context          $context
+ * @var \equal\dispatch\Dispatcher  $dispatch
  */
-list($context, $orm, $auth, $dispatch) = [ $providers['context'], $providers['orm'], $providers['auth'], $providers['dispatch']];
+['context' => $context, 'dispatch' => $dispatch] = $providers;
 
 // ensure booking object exists and is readable
 $booking = Booking::id($params['id'])->read(['id', 'status','date_from', 'date_to', 'is_cancelled','center_office_id'])->first(true);
 
 if(!$booking) {
-    throw new Exception("unknown_booking", QN_ERROR_UNKNOWN_OBJECT);
+    throw new Exception("unknown_booking", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
 $center_office = CenterOffice::id($booking['center_office_id'])->read(['id', 'name'])->first(true);
 
 if(!$center_office) {
-    throw new Exception("unknown_center_office", QN_ERROR_UNKNOWN_OBJECT);
+    throw new Exception("unknown_center_office", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
 /*

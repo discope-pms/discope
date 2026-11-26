@@ -6,23 +6,23 @@
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 
-use sale\booking\Funding;
 use sale\booking\Booking;
+use sale\booking\Funding;
 use sale\booking\Payment;
 
-list($params, $providers) = eQual::announce([
+[$params, $providers] = eQual::announce([
     'description'   => "Remove the manual payment attached to the funding, if any, and unmark funding as paid.",
     'help'          => "Manual payments can be undone while the booking is not fully balanced (and invoiced).",
     'params'        => [
-        'id' =>  [
-            'description'   => 'Identifier of the targeted funding.',
+        'id' => [
             'type'          => 'integer',
+            'description'   => 'Identifier of the targeted funding.',
             'min'           => 1,
             'required'      => true
         ]
     ],
-    'access' => [
-        'groups'            => ['finance.default.administrator', 'finance.default.user']
+    'access'        => [
+        'groups'        => ['finance.default.administrator', 'finance.default.user']
     ],
     'response'      => [
         'content-type'  => 'application/json',
@@ -36,18 +36,18 @@ list($params, $providers) = eQual::announce([
  * @var \equal\php\Context          $context
  * @var \equal\orm\ObjectManager    $om
  */
-list($context, $om) = [ $providers['context'], $providers['orm'] ];
+['context' => $context, 'orm' => $om] = $providers;
 
 $funding = Funding::id($params['id'])
     ->read(['paid_amount', 'booking_id' => ['status']])
     ->first(true);
 
 if(!$funding) {
-    throw new Exception("unknown_funding", QN_ERROR_UNKNOWN_OBJECT);
+    throw new Exception("unknown_funding", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
 if($funding['paid_amount'] === 0.0) {
-    throw new Exception("funding_not_paid", QN_ERROR_INVALID_PARAM);
+    throw new Exception("funding_not_paid", EQ_ERROR_INVALID_PARAM);
 }
 
 if(is_null($funding['booking_id'])) {
@@ -55,11 +55,11 @@ if(is_null($funding['booking_id'])) {
 }
 
 if($funding['booking_id']['status'] == 'balanced') {
-    throw new Exception("booking_balanced", QN_ERROR_INVALID_PARAM);
+    throw new Exception("booking_balanced", EQ_ERROR_INVALID_PARAM);
 }
 
 if($funding['booking_id']['status'] == 'cancelled') {
-    throw new Exception("booking_cancelled", QN_ERROR_INVALID_PARAM);
+    throw new Exception("booking_cancelled", EQ_ERROR_INVALID_PARAM);
 }
 
 // remove manual payments, if any
@@ -76,6 +76,7 @@ Funding::id($params['id'])
 
 Booking::updateStatusFromFundings($om, (array) $funding['booking_id']['id'], [], 'en');
 
-$context->httpResponse()
-        ->status(205)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(205)
+    ->send();

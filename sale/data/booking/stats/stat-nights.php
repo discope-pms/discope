@@ -12,7 +12,7 @@ use sale\booking\BookingLine;
 use sale\booking\BookingLineGroup;
 use sale\catalog\Product;
 
-list($params, $providers) = eQual::announce([
+[$params, $providers] = eQual::announce([
     'description'   => 'Provides the count of all nights for a given period.',
     'params'        => [
         /* mixed-usage parameters: required both for fetching data (input) and property of virtual entity (output) */
@@ -22,11 +22,10 @@ list($params, $providers) = eQual::announce([
             'description'       => "Output: Center of the sojourn / Input: The center for which the stats are required.",
             'visible'           => ['all_centers', '=', false]
         ],
-
         'all_centers' => [
             'type'              => 'boolean',
-            'default'           =>  false,
-            'description'       => "Mark the all Center of the sojourn."
+            'description'       => "Mark the all Center of the sojourn.",
+            'default'           => false
         ],
         'date_from' => [
             'type'              => 'date',
@@ -38,7 +37,6 @@ list($params, $providers) = eQual::announce([
             'description'       => 'Output: Day of departure / Input: Date interval upper limit (defaults to last day of previous month).',
             'default'           => mktime(0, 0, 0, date("m"), 0)
         ],
-
         /* parameters used as properties of virtual entity */
         'center' => [
             'type'              => 'string',
@@ -54,16 +52,14 @@ list($params, $providers) = eQual::announce([
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'     => [ 'context', 'orm', 'adapt', 'auth' ]
+    'providers'     => ['context', 'auth']
 ]);
 
 /**
  * @var \equal\php\Context                  $context
- * @var \equal\orm\ObjectManager            $orm
- * @var \equal\data\DataAdapter             $adapter
  * @var \equal\auth\AuthenticationManager   $auth
  */
-list($context, $orm, $adapter, $auth) = [ $providers['context'], $providers['orm'], $providers['adapt'] , $providers['auth']];
+['context' => $context, 'auth' => $auth] = $providers;
 
 $domain = [];
 
@@ -81,13 +77,13 @@ if((isset($params['center_id']) && $params['center_id']) || $params['all_centers
 if($params['all_centers']) {
     $user_id = $auth->userId();
     if($user_id <= 0) {
-        throw new Exception('user_unknown', QN_ERROR_NOT_ALLOWED);
+        throw new Exception('user_unknown', EQ_ERROR_NOT_ALLOWED);
     }
 
     $user = User::id($user_id)->read(['centers_ids'])->first(true);
 
     if(!$user) {
-        throw new Exception('unexpected_error', QN_ERROR_INVALID_USER);
+        throw new Exception('unexpected_error', EQ_ERROR_INVALID_USER);
     }
 
     $domain[] = ['center_id', 'in', $user['centers_ids'] ];
@@ -199,10 +195,11 @@ if($params['all_centers']) {
     });
 }
 
-$context->httpResponse()
-        ->header('X-Total-Count', count($result))
-        ->body($result)
-        ->send();
+$context
+    ->httpResponse()
+    ->header('X-Total-Count', count($result))
+    ->body($result)
+    ->send();
 
 
 function stat_nights_intersection_days($start1, $end1, $start2, $end2) {

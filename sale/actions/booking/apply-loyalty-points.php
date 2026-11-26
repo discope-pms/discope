@@ -17,13 +17,11 @@ use sale\catalog\Product;
 [$params, $providers] = eQual::announce([
     'description'   => "Applies available loyalty points to the specified booking.",
     'params'        => [
-
         'id' => [
-            'type'              => 'integer',
-            'description'       => "Identifier of the booking which we want to apply the loyalty points.",
-            'required'          => true
+            'type'          => 'integer',
+            'description'   => "Identifier of the booking which we want to apply the loyalty points.",
+            'required'      => true
         ]
-
     ],
     'access'        => [
         'visibility'    => 'protected',
@@ -38,7 +36,7 @@ use sale\catalog\Product;
 ]);
 
 /**
- * @var Context                     $context
+ * @var \equal\php\Context          $context
  * @var \equal\orm\ObjectManager    $orm
  */
 ['context' => $context, 'orm' => $orm] = $providers;
@@ -132,6 +130,7 @@ BookingLine::id($loyalty_points_line['id'])
 BookingLine::refreshPrice($orm, $loyalty_points_line['id']);
 Booking::refreshPrice($orm, $booking['id']);
 
-$context->httpResponse()
-        ->status(200)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(200)
+    ->send();

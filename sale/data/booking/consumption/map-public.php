@@ -5,25 +5,26 @@
     Original author(s): Yesbabylon SRL
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
+
 use sale\booking\Consumption;
 
 
-list($params, $providers) = announce([
+[$params, $providers] = eQual::announce([
     'description'   => "This controller is meant for the public calendar (allowing visitors to see Centers availability). We expect only centers with a single rental unit (group lodges).",
     'params'        => [
-        'centers_ids' =>  [
-            'description'   => 'Identifiers of the centers for which the consumptions are requested.',
+        'centers_ids' => [
             'type'          => 'array',
+            'description'   => 'Identifiers of the centers for which the consumptions are requested.',
             'required'      => true
         ],
-        'rental_unit_id' =>  [
-            'description'   => 'Identifiers of the rental unit for which the consumptions are requested.',
+        'rental_unit_id' => [
             'type'          => 'integer',
-            'default'      => 0
+            'description'   => 'Identifiers of the rental unit for which the consumptions are requested.',
+            'default'       => 0
         ]
     ],
-    'access' => [
-        'visibility'        => 'public'
+    'access'        => [
+        'visibility'    => 'public'
     ],
     'response'      => [
         'content-type'  => 'application/json',
@@ -34,7 +35,12 @@ list($params, $providers) = announce([
 ]);
 
 
-list($context, $orm, $dap) = [$providers['context'], $providers['orm'], $providers['adapt']];
+/**
+ * @var \equal\php\Context                      $context
+ * @var \equal\orm\ObjectManager                $orm
+ * @var \equal\data\adapt\DataAdapterProvider   $dap
+ */
+['context' => $context, 'orm' => $orm, 'adapt' => $dap] = $providers;
 
 // #memo - this is a workaround to handle the change of logic between 'adapt' as DataAdapter (equal1.0) or DataAdapterProvider (equal2.0)
 if(is_a($dap, 'equal\data\DataAdapter')) {
@@ -82,6 +88,7 @@ foreach($result as $rental_unit_id => $dates) {
         ];
     }
 }
-$context->httpResponse()
-        ->body($output)
-        ->send();
+$context
+    ->httpResponse()
+    ->body($output)
+    ->send();

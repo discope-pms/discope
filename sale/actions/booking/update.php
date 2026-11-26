@@ -12,51 +12,52 @@ use sale\booking\Booking;
     'description'   => "Update hook for Booking creation: init values and makes additional checks.",
     'extends'       => 'core_model_update',
     'params'        => [
-        'entity' =>  [
-            'description'   => 'Full name (including namespace) of the class to return (e.g. \'core\\User\').',
+        'entity' => [
             'type'          => 'string',
+            'description'   => 'Full name (including namespace) of the class to return (e.g. \'core\\User\').',
             'required'      => true
         ],
-        'id' =>  [
-            'description'   => 'Unique identifier of the object to update.',
+        'id' => [
             'type'          => 'integer',
+            'description'   => 'Unique identifier of the object to update.',
             'default'       => 0
         ],
-        'ids' =>  [
+        'ids' => [
+            'type'          => 'array',
             'description'   => 'List of Unique identifiers of the objects to update.',
-            'type'          => 'array',
             'default'       => []
         ],
-        'fields' =>  [
+        'fields' => [
+            'type'          => 'array',
             'description'   => 'Associative array mapping fields to be updated with their related values.',
-            'type'          => 'array',
             'default'       => []
         ],
-        'force' =>  [
-            'description'   => 'Flag for forcing update in case a concurrent change is detected.',
+        'force' => [
             'type'          => 'boolean',
+            'description'   => 'Flag for forcing update in case a concurrent change is detected.',
             'default'       => false
         ],
         'lang' => [
-            'description'   => 'Specific language for multilang field.',
             'type'          => 'string',
+            'description'   => 'Specific language for multilang field.',
             'default'       => constant('DEFAULT_LANG')
         ]
     ],
-    'constants'     => ['DEFAULT_LANG'],
+    'access'        => [
+        'visibility'    => 'protected'
+    ],
     'response'      => [
         'content-type'  => 'application/json',
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'access'        => [
-        'visibility' => 'protected'
-    ],
+    'constants'     => ['DEFAULT_LANG'],
     'providers'     => ['context', 'orm']
 ]);
 
 /**
- * @var \equal\php\Context $context
+ * @var \equal\php\Context          $context
+ * @var \equal\orm\ObjectManager    $orm
  */
 ['context' => $context, 'orm' => $orm] = $providers;
 

@@ -5,61 +5,59 @@
     Original author(s): Yesbabylon SRL
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
+
 use sale\booking\Booking;
 use sale\booking\BookingActivity;
 use sale\booking\BookingLineGroup;
 use sale\booking\BookingMeal;
 
-list($params, $providers) = eQual::announce([
+[$params, $providers] = eQual::announce([
     'description'   => "Checks if the composition is complete for a given booking.",
     'params'        => [
-        'id' =>  [
-            'description'   => 'Identifier of targeted booking.',
+        'id' => [
             'type'          => 'integer',
+            'description'   => 'Identifier of targeted booking.',
             'required'      => true
         ],
         'booking_line_group_id' => [
-            'description'   => 'Identifier of the targeted group to remove.',
             'type'          => 'integer',
+            'description'   => 'Identifier of the targeted group to remove.',
             'required'      => true
-        ],
-
+        ]
     ],
-    'access' => [
-        'visibility'        => 'protected'
+    'access'        => [
+        'visibility'    => 'protected'
     ],
     'response'      => [
         'content-type'  => 'application/json',
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'     => ['context', 'orm', 'auth', 'dispatch']
+    'providers'     => ['context', 'orm']
 ]);
 
 /**
- * @var \equal\php\Context                  $context
- * @var \equal\orm\ObjectManager            $orm
- * @var \equal\auth\AuthenticationManager   $auth
- * @var \equal\dispatch\Dispatcher          $dispatch
+ * @var \equal\php\Context          $context
+ * @var \equal\orm\ObjectManager    $orm
  */
-['context'=> $context, 'orm' => $orm, 'auth' => $auth, 'dispatch' => $dispatch] = $providers;
+['context' => $context, 'orm' => $orm] = $providers;
 
 
 // ensure booking object exists and is readable
 $booking = Booking::id($params['id'])->read(['id', 'name', 'status'])->first(true);
 
 if(!$booking) {
-    throw new Exception("unknown_booking", QN_ERROR_UNKNOWN_OBJECT);
+    throw new Exception("unknown_booking", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
 $sojourn = BookingLineGroup::id($params['booking_line_group_id'])->read(['id', 'name', 'booking_id', 'group_type'])->first(true);
 
 if(!$sojourn) {
-    throw new Exception("unknown_sojourn", QN_ERROR_UNKNOWN_OBJECT);
+    throw new Exception("unknown_sojourn", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
 if($sojourn['booking_id'] != $booking['id']) {
-    throw new Exception("mismatch_booking", QN_ERROR_UNKNOWN_OBJECT);
+    throw new Exception("mismatch_booking", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
 // Callbacks are defined on Booking, BookingLine, and BookingLineGroup to ensure consistency across these entities.
@@ -95,6 +93,7 @@ if($sojourn['group_type'] === 'camp') {
     Booking::id($booking['id'])->do('refresh_groups_activity_number');
 }
 
-$context->httpResponse()
-        ->status(204)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(204)
+    ->send();

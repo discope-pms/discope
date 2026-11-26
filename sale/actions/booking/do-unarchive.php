@@ -11,13 +11,11 @@ use sale\booking\Booking;
 [$params, $providers] = eQual::announce([
     'description'   => "This unarchives the archived reservation.",
     'params'        => [
-
-        'id' =>  [
+        'id' => [
             'type'          => 'integer',
             'description'   => "Identifier of the booking the check against emptiness.",
             'required'      => true
         ]
-
     ],
     'response'      => [
         'content-type'  => 'application/json',
@@ -27,6 +25,9 @@ use sale\booking\Booking;
     'providers'     => ['context']
 ]);
 
+/**
+ * @var \equal\php\Context $context
+ */
 ['context' => $context] = $providers;
 
 $booking = Booking::id($params['id'])
@@ -43,6 +44,7 @@ if($booking['state'] !== 'archive') {
 
 Booking::id($booking['id'])->update(['state' => 'instance']);
 
-$context->httpResponse()
-        ->status(204)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(204)
+    ->send();

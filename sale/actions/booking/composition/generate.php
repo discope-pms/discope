@@ -5,42 +5,42 @@
     Original author(s): Yesbabylon SRL
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
+
+use sale\booking\Booking;
 use sale\booking\Composition;
 use sale\booking\CompositionItem;
-use sale\booking\Booking;
 
-list($params, $providers) = eQual::announce([
+[$params, $providers] = eQual::announce([
     'description'   => "Generate the composition (hosts listing) for a given booking. If a composition already exists, it is reset.",
     'params'        => [
-        'booking_id' =>  [
-            'description'   => 'Identifier of the booking for which the composition has to be generated.',
+        'booking_id' => [
             'type'          => 'integer',
+            'description'   => 'Identifier of the booking for which the composition has to be generated.',
             'min'           => 1,
             'required'      => true
         ],
         'data' => [
-            'description'   => 'Raw data to be used for filling in the hosts details.',
-            'type'          => 'array'
+            'type'          => 'array',
+            'description'   => 'Raw data to be used for filling in the hosts details.'
         ]
     ],
-    'access' => [
-        'visibility'        => 'protected',
-        'groups'            => ['booking.default.user']
+    'access'        => [
+        'visibility'    => 'protected',
+        'groups'        => ['booking.default.user']
     ],
     'response'      => [
         'content-type'  => 'application/json',
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'     => ['context', 'orm', 'auth']
+    'providers'     => ['context', 'auth']
 ]);
 
 /**
  * @var \equal\php\Context                  $context
- * @var \equal\orm\ObjectManager            $orm
  * @var \equal\auth\AuthenticationManager   $auth
  */
-['context' => $context, 'orm' => $orm, 'auth' => $auth] = $providers;
+['context' => $context, 'auth' => $auth] = $providers;
 
 $user_id = $auth->userId();
 
@@ -61,7 +61,7 @@ $booking = Booking::id($params['booking_id'])
     ->first(true);
 
 if(!$booking) {
-    throw new Exception('unknown_booking', QN_ERROR_INVALID_PARAM);
+    throw new Exception('unknown_booking', EQ_ERROR_INVALID_PARAM);
 }
 
 $auth->su();
@@ -157,6 +157,7 @@ catch(Exception $e) {
     throw new Exception($e->getMessage(), $e->getCode());
 }
 
-$context->httpResponse()
-        ->status(204)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(204)
+    ->send();

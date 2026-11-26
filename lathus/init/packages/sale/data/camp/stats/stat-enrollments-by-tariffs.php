@@ -49,7 +49,6 @@ use sale\camp\EnrollmentLine;
             ],
             'default'           => 'confirmed_validated'
         ],
-
         /* parameters used as properties of virtual entity */
         'center' => [
             'type'              => 'string',
@@ -86,15 +85,14 @@ use sale\camp\EnrollmentLine;
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'     => ['context', 'adapt' , 'auth']
+    'providers'     => ['context', 'auth']
 ]);
 
 /**
  * @var \equal\php\Context                  $context
- * @var \equal\data\adapt\AdapterProvider   $adapter_provider
  * @var \equal\auth\AuthenticationManager   $auth
  */
-['context' => $context, 'adapt' => $adapter_provider, 'auth' => $auth] = $providers;
+['context' => $context, 'auth' => $auth] = $providers;
 
 $domain = [
     ['date_from', '>=', $params['date_from']],
@@ -266,7 +264,8 @@ usort($result, function($a, $b) {
     return $result;
 });
 
-$context->httpResponse()
-        ->header('X-Total-Count', count($result))
-        ->body($result)
-        ->send();
+$context
+    ->httpResponse()
+    ->header('X-Total-Count', count($result))
+    ->body($result)
+    ->send();

@@ -8,23 +8,23 @@
 use sale\booking\BankStatementLine;
 
 [$params, $providers] = eQual::announce([
-    'description'	=>	"Mark a selection of BankStatementLine as ignored.",
-    'params' 		=>	[
+    'description'   => "Mark a selection of BankStatementLine as ignored.",
+    'params'        => [
         'ids' => [
             'type'              => 'one2many',
-            'description'       => "List of BankStatementLine identifiers  of the order for which the tree is requested.",
             'foreign_object'    => 'sale\booking\BankStatementLine',
+            'description'       => "List of BankStatementLine identifiers  of the order for which the tree is requested.",
             'required'          => true
         ]
     ],
     'access'        => [
-        'visibility'        => 'protected',
-        'groups'            => ['sale.default.user'],
+        'visibility'    => 'protected',
+        'groups'        => ['sale.default.user']
     ],
     'response'      => [
-        'content-type'      => 'application/json',
-        'charset'           => 'utf-8',
-        'accept-origin'     => '*'
+        'content-type'  => 'application/json',
+        'charset'       => 'utf-8',
+        'accept-origin' => '*'
     ],
     'providers'     => ['context']
 ]);
@@ -40,6 +40,7 @@ BankStatementLine::ids($params['ids'])
         'status'    => 'ignored'
     ]);
 
-$context->httpResponse()
-        ->status(204)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(204)
+    ->send();

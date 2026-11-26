@@ -11,17 +11,17 @@ use equal\orm\DomainCondition;
 use sale\camp\Camp;
 
 [$params, $providers] = eQual::announce([
-    'extends'       => 'core_model_collect',
-    'params'        => [
-        'entity' =>  [
-            'type'              => 'string',
-            'description'       => "Full name (including namespace) of the class to look into (e.g. 'core\\User').",
-            'default'           => 'sale\camp\Camp'
+    'extends'   => 'core_model_collect',
+    'params'    => [
+        'entity' => [
+            'type'          => 'string',
+            'description'   => "Full name (including namespace) of the class to look into (e.g. 'core\\User').",
+            'default'       => 'sale\camp\Camp'
         ],
         'date_from' => [
-            'type'              => 'date',
-            'description'       => "Date interval lower limit.",
-            'default'           => function() {
+            'type'          => 'date',
+            'description'   => "Date interval lower limit.",
+            'default'       => function() {
                 $date_from = strtotime('last Sunday');
 
                 $first_camp = Camp::search(
@@ -46,16 +46,16 @@ use sale\camp\Camp;
             }
         ],
         'sojourn_number' => [
-            'type'              => 'string',
-            'description'       => "Sojourn number."
+            'type'          => 'string',
+            'description'   => "Sojourn number."
         ]
     ],
-    'response'      => [
+    'response'  => [
         'content-type'  => 'application/json',
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'     => ['context']
+    'providers' => ['context']
 ]);
 
 /**
@@ -87,6 +87,7 @@ $params['domain'] = $domain->toArray();
 
 $result = eQual::run('get', 'model_collect', $params, true);
 
-$context->httpResponse()
-        ->body($result)
-        ->send();
+$context
+    ->httpResponse()
+    ->body($result)
+    ->send();

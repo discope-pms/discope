@@ -10,7 +10,7 @@ use identity\User;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 
-list($params, $providers) = eQual::announce([
+[$params, $providers] = eQual::announce([
     'description'   => 'Provides data for mandatory INS statistics declaration (Statbel).',
     'params'        => [
         /* mixed-usage parameters: required both for fetching data (input) and property of virtual entity (output) */
@@ -22,8 +22,8 @@ list($params, $providers) = eQual::announce([
         ],
         'all_centers' => [
             'type'              => 'boolean',
-            'default'           =>  false,
-            'description'       => "Mark the all Center of the sojourn."
+            'description'       => "Mark the all Center of the sojourn.",
+            'default'           => false
         ],
         'date_from' => [
             'type'              => 'date',
@@ -35,7 +35,6 @@ list($params, $providers) = eQual::announce([
             'description'       => 'Output: Day of departure / Input: Date interval upper limit (defaults to last day of previous month).',
             'default'           => mktime(0, 0, 0, date("m"), 0)
         ],
-
         /* parameters used as properties of virtual entity */
         'params' => [
             'type'              => 'array',
@@ -47,16 +46,14 @@ list($params, $providers) = eQual::announce([
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'     => [ 'context', 'orm', 'adapt', 'auth' ]
+    'providers'     => ['context', 'auth']
 ]);
 
 /**
  * @var \equal\php\Context                  $context
- * @var \equal\orm\ObjectManager            $orm
- * @var \equal\data\DataAdapter             $adapter
  * @var \equal\auth\AuthenticationManager   $auth
  */
-list($context, $orm, $adapter, $auth) = [ $providers['context'], $providers['orm'], $providers['adapt'], $providers['auth'] ];
+['context' => $context, 'auth' => $auth] = $providers;
 
 
 $user = User::id($auth->userId())->read(['id', 'login'])->first(true);
@@ -125,9 +122,10 @@ ob_start();
 $writer->save('php://output');
 $output = ob_get_clean();
 
-$context->httpResponse()
-        // #memo - charset must be specified to disable the default UTF8 (which adds a BOM header)
-        ->header('Content-Type', 'text/csv;charset=us-ascii')
-        ->header('Content-Disposition', 'inline; filename="export.csv"')
-        ->body($output)
-        ->send();
+$context
+    ->httpResponse()
+    // #memo - charset must be specified to disable the default UTF8 (which adds a BOM header)
+    ->header('Content-Type', 'text/csv;charset=us-ascii')
+    ->header('Content-Disposition', 'inline; filename="export.csv"')
+    ->body($output)
+    ->send();

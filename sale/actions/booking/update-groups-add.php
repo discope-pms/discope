@@ -10,33 +10,31 @@ use discope\setting\Setting;
 use sale\booking\Booking;
 use sale\booking\BookingLineGroup;
 
-list($params, $providers) = eQual::announce([
+[$params, $providers] = eQual::announce([
     'description'   => "Create a new Booking Lines Group ('Sojourn') for a given booking.",
     'params'        => [
-        'id' =>  [
-            'description'   => 'Identifier of the targeted booking.',
+        'id' => [
             'type'          => 'integer',
+            'description'   => 'Identifier of the targeted booking.',
             'required'      => true
-        ],
+        ]
     ],
-    'access' => [
-        'visibility'        => 'protected'
+    'access'        => [
+        'visibility'    => 'protected'
     ],
     'response'      => [
         'content-type'  => 'application/json',
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'     => ['context', 'orm', 'auth', 'dispatch']
+    'providers'     => ['context', 'orm']
 ]);
 
 /**
- * @var \equal\php\Context                  $context
- * @var \equal\orm\ObjectManager            $orm
- * @var \equal\auth\AuthenticationManager   $auth
- * @var \equal\dispatch\Dispatcher          $dispatch
+ * @var \equal\php\Context          $context
+ * @var \equal\orm\ObjectManager    $orm
  */
-list($context, $orm, $auth, $dispatch) = [ $providers['context'], $providers['orm'], $providers['auth'], $providers['dispatch']];
+['context' => $context, 'orm' => $orm] = $providers;
 
 
 
@@ -49,7 +47,7 @@ $booking = Booking::id($params['id'])->read([
     ->first(true);
 
 if(!$booking) {
-    throw new Exception("unknown_booking", QN_ERROR_UNKNOWN_OBJECT);
+    throw new Exception("unknown_booking", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
 // Callbacks are defined on Booking, BookingLine, and BookingLineGroup to ensure consistency across these entities.
@@ -137,6 +135,7 @@ if(!is_null($group_type_name_format)) {
 // restore events in case this controller is chained with others
 $orm->enableEvents();
 
-$context->httpResponse()
-        ->status(201)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(201)
+    ->send();

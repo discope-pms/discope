@@ -9,7 +9,7 @@
 use identity\Center;
 use realestate\RentalUnit;
 
-list($params, $providers) = announce([
+[$params, $providers] = eQual::announce([
     'description'   => 'Provides data about current Centers capacities (according to configuration).',
     'params'        => [
         /* mixed-usage parameters: required both for fetching data (input) and property of virtual entity (output) */
@@ -18,7 +18,6 @@ list($params, $providers) = announce([
             'foreign_object'    => 'identity\Center',
             'description'       => "Output: Center of the sojourn / Input: The center for which the stats are required."
         ],
-
         /* parameters used as properties of virtual entity */
         'center' => [
             'type'              => 'string',
@@ -34,15 +33,13 @@ list($params, $providers) = announce([
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'     => [ 'context', 'orm', 'adapt' ]
+    'providers'     => ['context']
 ]);
 
 /**
- * @var \equal\php\Context          $context
- * @var \equal\orm\ObjectManager    $orm
- * @var \equal\data\DataAdapter     $adapter
+ * @var \equal\php\Context $context
  */
-list($context, $orm, $adapter) = [ $providers['context'], $providers['orm'], $providers['adapt'] ];
+['context' => $context] = $providers;
 
 
 $map_centers = [];
@@ -81,7 +78,8 @@ usort($result, function ($a, $b) {
     return strcmp($a['center'], $b['center']);
 });
 
-$context->httpResponse()
-        ->header('X-Total-Count', count($result))
-        ->body($result)
-        ->send();
+$context
+    ->httpResponse()
+    ->header('X-Total-Count', count($result))
+    ->body($result)
+    ->send();

@@ -12,15 +12,14 @@ use sale\pay\Funding;
 [$params, $providers] = eQual::announce([
     'description'   => "Cancels the enrollment.",
     'params'        => [
-
         'id' => [
             'type'          => 'integer',
             'description'   => "Identifier of the enrollment we want to validate.",
             'required'      => true
         ],
-
         'reason' => [
             'type'          => 'string',
+            'description'   => "The reason of the cancellation of the enrollment.",
             'selection'     => [
                 'other',
                 'overbooking',
@@ -29,10 +28,8 @@ use sale\pay\Funding;
                 'external_impediment',
                 'health_impediment'
             ],
-            'description'   => "The reason of the cancellation of the enrollment.",
             'default'       => 'other'
         ],
-
         'fee' => [
             'type'          => 'float',
             'usage'         => 'amount/money:2',
@@ -68,22 +65,21 @@ use sale\pay\Funding;
                 return $default_fee;
             }
         ]
-
     ],
     'access'        => [
-        'visibility'        => 'protected',
-        'groups'            => ['camp.default.administrator', 'camp.default.user'],
+        'visibility'    => 'protected',
+        'groups'        => ['camp.default.administrator', 'camp.default.user']
     ],
-    'response' => [
-        'content-type'      => 'application/json',
-        'charset'           => 'utf-8',
-        'accept-origin'     => '*'
+    'response'      => [
+        'content-type'  => 'application/json',
+        'charset'       => 'utf-8',
+        'accept-origin' => '*'
     ],
-    'providers' => ['context', 'dispatch']
+    'providers'     => ['context', 'dispatch']
 ]);
 
 /**
- * @var \equal\php\Context  $context
+ * @var \equal\php\Context $context
  */
 ['context' => $context] = $providers;
 
@@ -159,6 +155,7 @@ if(!empty($funding_data)) {
     ));
 }
 
-$context->httpResponse()
-        ->status(200)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(200)
+    ->send();

@@ -13,15 +13,15 @@ use sale\booking\BankStatementLine;
     'description'   => "Import a Bank statements file and return the list of created statements. Already existing statements are ignored.",
     'help'          => "This controller must be called using POST requests (experience shows that HTTP header quickly reaches the nginx max-header limit).",
     'params'        => [
-        'data' =>  [
+        'data' => [
             'type'          => 'file',
             'description'   => 'TXT file holding the data to import as statements.',
             'required'      => true
         ]
     ],
-    'access' => [
-        'visibility'        => 'protected',
-        'groups'            => ['sale.default.user'],
+    'access'        => [
+        'visibility'    => 'protected',
+        'groups'        => ['sale.default.user']
     ],
     'response'      => [
         'content-type'  => 'application/json',

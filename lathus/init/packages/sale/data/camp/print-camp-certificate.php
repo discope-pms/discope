@@ -7,8 +7,10 @@
 */
 
 use communication\Template;
+use discope\setting\Setting;
 use Dompdf\Dompdf;
 use Dompdf\Options as DompdfOptions;
+use equal\data\DataFormatter;
 use identity\Center;
 use identity\Identity;
 use sale\camp\Camp;
@@ -17,25 +19,22 @@ use sale\camp\Enrollment;
 use sale\camp\Guardian;
 use sale\camp\Institution;
 use Twig\Environment as TwigEnvironment;
-use Twig\Loader\FilesystemLoader as TwigFilesystemLoader;
 use Twig\Extra\Intl\IntlExtension;
-use Twig\Extension\ExtensionInterface;
+use Twig\Loader\FilesystemLoader as TwigFilesystemLoader;
 use Twig\TwigFilter;
-use equal\data\DataFormatter;
-use discope\setting\Setting;
 
 [$params, $providers] = eQual::announce([
     'description'   => "Render an end of camp certificate given the child ID as a PDF document, for Lathus.",
     'params'        => [
         'child_id' => [
-            'type'          => 'integer',
-            'description'   => "Identifier of child concerned by the camp certificate.",
-            'required'      => true
+            'type'              => 'integer',
+            'description'       => "Identifier of child concerned by the camp certificate.",
+            'required'          => true
         ],
         'year' => [
-            'type'          => 'integer',
-            'description'   => "Year the certificate is needed for.",
-            'default'       => fn() => intval(date('Y'))
+            'type'              => 'integer',
+            'description'       => "Year the certificate is needed for.",
+            'default'           => fn() => intval(date('Y'))
         ],
         'center_id' => [
             'type'              => 'many2one',
@@ -45,32 +44,32 @@ use discope\setting\Setting;
                 return ($centers = Center::search())->count() === 1 ? current($centers->ids()) : null;
             }
         ],
-        'view_id' =>  [
-            'description'   => 'The identifier of the view <type.name>.',
-            'type'          => 'string',
-            'default'       => 'print.camp-certificate'
+        'view_id' => [
+            'type'              => 'string',
+            'description'       => 'The identifier of the view <type.name>.',
+            'default'           => 'print.camp-certificate'
         ],
-        'output' =>  [
-            'description'   => 'Output format of the document.',
-            'type'          => 'string',
-            'selection'     => ['pdf', 'html'],
-            'default'       => 'pdf'
+        'output' => [
+            'type'              => 'string',
+            'description'       => 'Output format of the document.',
+            'selection'         => ['pdf', 'html'],
+            'default'           => 'pdf'
         ]
     ],
-    'constants'     => [],
     'access'        => [
-        'visibility'        => 'protected',
-        'groups'            => ['camp.default.user'],
+        'visibility'    => 'protected',
+        'groups'        => ['camp.default.user']
     ],
     'response'      => [
-        'content-type'      => 'application/pdf',
-        'accept-origin'     => '*'
+        'content-type'  => 'application/pdf',
+        'accept-origin' => '*'
     ],
+    'constants'     => [],
     'providers'     => ['context']
 ]);
 
 /**
- * @var \equal\php\Context  $context
+ * @var \equal\php\Context $context
  */
 ['context' => $context] = $providers;
 
@@ -356,8 +355,8 @@ try {
     $html = $template->render($values);
 }
 catch(Exception $e) {
-    trigger_error("ORM::error while parsing template - ".$e->getMessage(), QN_REPORT_DEBUG);
-    throw new Exception("template_parsing_issue", QN_ERROR_INVALID_CONFIG);
+    trigger_error("ORM::error while parsing template - ".$e->getMessage(), EQ_REPORT_DEBUG);
+    throw new Exception("template_parsing_issue", EQ_ERROR_INVALID_CONFIG);
 }
 
 /*

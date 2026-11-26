@@ -12,9 +12,9 @@ use sale\booking\TimeSlot;
     'description'   => "Render booking activities planning for a specific date and time slot.",
     'params'        => [
         'params' => [
-            'type'          => 'array',
-            'description'   => "Additional params to relay to the data controller.",
-            'default'       => []
+            'type'              => 'array',
+            'description'       => "Additional params to relay to the data controller.",
+            'default'           => []
         ],
         'date_from' => [
             'type'              => 'date',
@@ -32,8 +32,8 @@ use sale\booking\TimeSlot;
             'type'              => 'many2one',
             'foreign_object'    => 'sale\booking\TimeSlot',
             'description'       => "Time slot of the planning.",
-            'required'          => true,
             'domain'            => ['code', 'in', ['AM', 'PM', 'EV']],
+            'required'          => true,
             'default'           => function($params = []) {
                 if(!isset($params['time_slot_id'])) {
                     return null;
@@ -54,19 +54,19 @@ use sale\booking\TimeSlot;
             }
         ]
     ],
-    'access' => [
-        'visibility'        => 'protected',
-        'groups'            => ['camp.default.user', 'booking.default.user'],
+    'access'        => [
+        'visibility'    => 'protected',
+        'groups'        => ['camp.default.user', 'booking.default.user']
     ],
     'response'      => [
-        'content-type'      => 'application/pdf',
-        'accept-origin'     => '*'
+        'content-type'  => 'application/pdf',
+        'accept-origin' => '*'
     ],
     'providers'     => ['context']
 ]);
 
 /**
- * @var \equal\php\Context  $context
+ * @var \equal\php\Context $context
  */
 ['context' => $context] = $providers;
 
@@ -75,7 +75,8 @@ $output = eQual::run('get', 'sale_booking_print-booking-activities', [
     'time_slot_id'  => $params['time_slot_id']
 ]);
 
-$context->httpResponse()
-        ->header('Content-Disposition', 'inline; filename="planning.pdf"')
-        ->body($output)
-        ->send();
+$context
+    ->httpResponse()
+    ->header('Content-Disposition', 'inline; filename="planning.pdf"')
+    ->body($output)
+    ->send();

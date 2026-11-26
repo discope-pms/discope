@@ -15,13 +15,13 @@
             'default'       => []
         ]
     ],
-    'access' => [
-        'visibility'        => 'protected',
-        'groups'            => ['camp.default.user'],
+    'access'        => [
+        'visibility'    => 'protected',
+        'groups'        => ['camp.default.user']
     ],
     'response'      => [
-        'content-type'      => 'application/pdf',
-        'accept-origin'     => '*'
+        'content-type'  => 'application/pdf',
+        'accept-origin' => '*'
     ],
     'providers'     => ['context', 'adapt']
 ]);
@@ -44,7 +44,8 @@ if(!empty($params['params'])) {
 
 $output = eQual::run('get', 'sale_camp_print-planning-condensed', ['date_from' => $date_from]);
 
-$context->httpResponse()
-        ->header('Content-Disposition', 'inline; filename="planning_condensed.pdf"')
-        ->body($output)
-        ->send();
+$context
+    ->httpResponse()
+    ->header('Content-Disposition', 'inline; filename="planning_condensed.pdf"')
+    ->body($output)
+    ->send();

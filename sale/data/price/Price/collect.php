@@ -15,56 +15,47 @@ use sale\price\PriceList;
     'description'   => "Advanced search for Prices: returns a collection of Price according to extra parameters.",
     'extends'       => 'core_model_collect',
     'params'        => [
-
-        'entity' =>  [
+        'entity' => [
             'type'              => 'string',
             'description'       => "Full name (including namespace) of the class to look into (e.g. 'core\\User').",
             'default'           => 'sale\price\Price'
         ],
-
         'name' => [
             'type'              => 'string',
             'description'       => "Search by non-contiguous keywords."
         ],
-
         'price_list_id' => [
             'type'              => 'many2one',
-            'description'       => "The Price List the price belongs to.",
-            'foreign_object'    => 'sale\price\PriceList'
+            'foreign_object'    => 'sale\price\PriceList',
+            'description'       => "The Price List the price belongs to."
         ],
-
         'center_id' => [
             'type'              => 'many2one',
-            'description'       => 'The Center of the Price (Product -> ProductModel -> Family).',
             'foreign_object'    => 'identity\Center',
+            'description'       => 'The Center of the Price (Product -> ProductModel -> Family).',
             'default'           => function() {
                 return ($centers = Center::search())->count() === 1 ? current($centers->ids()) : null;
             }
         ],
-
         'product_id' => [
             'type'              => 'many2one',
-            'description'       => "The Product (sku) the price applies to.",
             'foreign_object'    => 'sale\catalog\Product',
+            'description'       => "The Product (sku) the price applies to."
         ],
-
         'is_active' => [
             'type'              => 'boolean',
             'description'       => "Is the price currently applicable?"
         ],
-
         'rate_class_id' => [
             'type'              => 'many2one',
             'foreign_object'    => 'sale\customer\RateClass',
             'description'       => "The rate class that applies to the price, defining variations based on the target audience."
         ],
-
         'grouping_code_id' => [
             'type'              => 'many2one',
             'foreign_object'    => 'sale\catalog\GroupingCode',
             'description'       => "The GroupingCode of the Price (Product)."
         ]
-
     ],
     'response'      => [
         'content-type'  => 'application/json',
@@ -141,6 +132,7 @@ $params['domain'] = $domain;
 
 $result = eQual::run('get', 'model_collect', $params, true);
 
-$context->httpResponse()
-        ->body($result)
-        ->send();
+$context
+    ->httpResponse()
+    ->body($result)
+    ->send();

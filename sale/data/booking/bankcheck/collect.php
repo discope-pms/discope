@@ -12,36 +12,30 @@ use equal\orm\Domain;
     'description'   => "Advanced search for BankChecks: returns a collection of BankChecks according to extra parameters.",
     'extends'       => 'core_model_collect',
     'params'        => [
-
-        'entity' =>  [
-            'description'       => 'name',
+        'entity' => [
             'type'              => 'string',
+            'description'       => 'name',
             'default'           => 'sale\booking\BankCheck'
         ],
-
         'bank_check_number' => [
             'type'              => 'string',
             'description'       => 'The official unique number assigned to the bank check by the issuing bank.'
         ],
-
         'deposit_number' => [
             'type'              => 'string',
-            'description'       => 'The official deposit number provided by the bank, used to track all associated checks.',
+            'description'       => 'The official deposit number provided by the bank, used to track all associated checks.'
         ],
-
         'is_voucher' => [
             'type'              => 'string',
             'description'       => "The check is the voucher?",
             'selection'         => ['all', 'yes', 'no'],
             'default'           => 'all'
         ],
-
-        'booking_id'        => [
+        'booking_id' => [
             'type'              => 'many2one',
             'foreign_object'    => 'sale\booking\Booking',
             'description'       => 'The booking associated with the bank check, if applicable.'
         ]
-
     ],
     'response'      => [
         'content-type'  => 'application/json',
@@ -80,6 +74,7 @@ $params['domain'] = (new Domain($params['domain']))
 
 $result = eQual::run('get', 'model_collect', $params, true);
 
-$context->httpResponse()
-        ->body($result)
-        ->send();
+$context
+    ->httpResponse()
+    ->body($result)
+    ->send();

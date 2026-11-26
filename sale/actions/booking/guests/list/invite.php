@@ -15,44 +15,44 @@ use sale\booking\GuestList;
     'description'   => "Invite the customer to complete the guests list. If the guests list does not exist, it will be created.",
     'params'        => [
         'id' => [
-            'description'       => 'Identifier of the targeted booking.',
             'type'              => 'many2one',
             'foreign_object'    => 'sale\booking\GuestList',
+            'description'       => 'Identifier of the targeted booking.',
             'required'          => true
         ],
         'email' => [
+            'type'              => 'string',
+            'usage'             => 'email',
             'description'       => "(optional) The email address to which the invitation will be sent.",
-            'help'              => "The email address must match one of the booking contact addresses.",
-            'type'              => 'string',
-            'usage'             => 'email'
+            'help'              => "The email address must match one of the booking contact addresses."
         ],
-        'title' =>  [
-            'description'       => 'Title of the message.',
+        'title' => [
             'type'              => 'string',
+            'description'       => 'Title of the message.',
             'required'          => true
         ],
         'message' => [
-            'description'       => 'Body of the message.',
             'type'              => 'string',
             'usage'             => 'text/html',
+            'description'       => 'Body of the message.',
             'required'          => true
         ],
-        'lang' =>  [
-            'description'       => 'Language of the reminder which is defined by the responsible.',
+        'lang' => [
             'type'              => 'string',
+            'description'       => 'Language of the reminder which is defined by the responsible.',
             // #memo - lang impact the template selection and is set to DEFAULT_LANG if not provided and no lang is set on customer
             // 'default'           => constant('DEFAULT_LANG')
-        ],
+        ]
     ],
     'access'        => [
         'visibility'    => 'protected'
     ],
-    'constants'     => ['BACKEND_URL'],
     'response'      => [
         'content-type'  => 'application/json',
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
+    'constants'     => ['BACKEND_URL'],
     'providers'     => ['context' , 'cron']
 ]);
 
@@ -60,7 +60,7 @@ use sale\booking\GuestList;
  * @var \equal\php\Context      $context
  * @var \equal\cron\Scheduler   $cron
  */
-['context' => $context , 'cron' => $cron] = $providers;
+['context' => $context, 'cron' => $cron] = $providers;
 
 
 /**
@@ -120,7 +120,7 @@ $booking = Booking::id($params['id'])
     ->first(true);
 
 if(!$booking) {
-    throw new Exception("unknown_booking", QN_ERROR_UNKNOWN_OBJECT);
+    throw new Exception("unknown_booking", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
 if(!$booking['guest_list_id']) {
@@ -139,25 +139,25 @@ $guest_list = GuestList::id($guest_list_id)
     ->first(true);
 
 if(!$guest_list) {
-    throw new Exception("unknown_guest_list", QN_ERROR_UNKNOWN_OBJECT);
+    throw new Exception("unknown_guest_list", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
 $contact = null;
 if(isset($params['email'])) {
     $params['email'] = strtolower(trim($params['email']));
     if(!preg_match('/^([_a-z0-9-]+)(\.[_a-z0-9-]+)*@([a-z0-9-]+)(\.[a-z0-9-]+)*(\.[a-z]{2,13})$/', $params['email'])) {
-        throw new Exception('invalid_email_address', QN_ERROR_INVALID_PARAM);
+        throw new Exception('invalid_email_address', EQ_ERROR_INVALID_PARAM);
     }
 
     $contact = $getBookingContactByEmail($booking['contacts_ids'], $params['email']);
     if(is_null($contact)) {
-        throw new Exception('invalid_email_address', QN_ERROR_INVALID_PARAM);
+        throw new Exception('invalid_email_address', EQ_ERROR_INVALID_PARAM);
     }
 }
 else {
     $contact = $getBookingContact($booking['contacts_ids']);
     if(is_null($contact)) {
-        throw new Exception('missing_booking_contact_with_email', QN_ERROR_INVALID_PARAM);
+        throw new Exception('missing_booking_contact_with_email', EQ_ERROR_INVALID_PARAM);
     }
 }
 

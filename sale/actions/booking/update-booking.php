@@ -10,29 +10,29 @@ use discope\setting\Setting;
 use sale\booking\Booking;
 
 // announce script and fetch parameters values
-list($params, $providers) = eQual::announce([
-    'description'	=>	"Update a booking when its status is `option` and has reached expiry. This script is meant to be scheduled by `do-option` controller.",
-    'params' 		=>	[
-        'id' =>  [
-            'description'   => 'Identifier of the targeted booking.',
+[$params, $providers] = eQual::announce([
+    'description'   => "Update a booking when its status is `option` and has reached expiry. This script is meant to be scheduled by `do-option` controller.",
+    'params'        => [
+        'id' => [
             'type'          => 'integer',
+            'description'   => 'Identifier of the targeted booking.',
             'min'           => 1,
             'required'      => true
         ],
-        'free_rental_units' =>  [
-            'description'   => 'Flag for marking reserved rental units to be release immediately, if any.',
+        'free_rental_units' => [
             'type'          => 'boolean',
+            'description'   => 'Flag for marking reserved rental units to be release immediately, if any.',
             'default'       => false
         ],
         'expected_date_expiry' => [
-            'description'   => 'Option expiry date known when the deprecation was scheduled.',
             'type'          => 'integer',
+            'description'   => 'Option expiry date known when the deprecation was scheduled.',
             // keep compatibility with tasks scheduled before this parameter existed
             'default'       => 0
         ]
     ],
     'access'        => [
-        'visibility' => 'private'
+        'visibility'    => 'private'
     ],
     'response'      => [
         'content-type'  => 'application/json',
@@ -56,7 +56,7 @@ $booking = Booking::id($params['id'])
                   ->first(true);
 
 if(!$booking) {
-    throw new Exception("unknown_booking", QN_ERROR_UNKNOWN_OBJECT);
+    throw new Exception("unknown_booking", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
 $date_expiry = strtotime(date('Y-m-d', $booking['date_expiry']));
@@ -66,7 +66,10 @@ if(
     || $date_expiry > time()
     || ($params['expected_date_expiry'] && $date_expiry !== $params['expected_date_expiry'])
 ) {
-    $context->httpResponse()->status(204)->send();
+    $context
+        ->httpResponse()
+        ->status(204)
+        ->send();
     return;
 }
 
@@ -80,7 +83,7 @@ try {
     ]);
 }
 catch(Throwable $e) {
-    trigger_error("APP::option expiration notification failed: {$e->getMessage()}", QN_REPORT_WARNING);
+    trigger_error("APP::option expiration notification failed: {$e->getMessage()}", EQ_REPORT_WARNING);
 }
 
 $back_to_quote = Setting::get_value('sale', 'features', 'booking.expired_option.revert_to_quote', true);
@@ -108,6 +111,7 @@ else {
     $dispatch->dispatch('lodging.booking.option.expired.expired_only', 'sale\booking\Booking', $params['id'], 'important', null, [], [], null, $booking['center_office_id']);
 }
 
-$context->httpResponse()
-        ->status(204)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(204)
+    ->send();

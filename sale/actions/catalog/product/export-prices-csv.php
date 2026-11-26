@@ -10,19 +10,17 @@ use identity\User;
 use sale\catalog\Product;
 use sale\price\PriceList;
 
-[$params, $provider] = eQual::announce([
+[$params, $providers] = eQual::announce([
     'description'   => "Returns products list with prices in CSV format, the goal is to add the prices to it.",
     'params'        => [
-
         'price_list_id' => [
             'type'              => 'many2one',
             'foreign_object'    => 'sale\price\PriceList',
             'description'       => "Identifier of the targeted price list."
         ]
-
     ],
     'access'        => [
-        'visibility'            => 'protected'
+        'visibility'    => 'protected'
     ],
     'response'      => [
         'content-type'          => 'text/csv',
@@ -37,7 +35,7 @@ use sale\price\PriceList;
  * @var \equal\php\Context                  $context
  * @var \equal\auth\AuthenticationManager   $auth
  */
-['context' => $context, 'auth' => $auth] = $provider;
+['context' => $context, 'auth' => $auth] = $providers;
 
 $user = User::id($auth->userId())
     ->read(['id', 'login'])
@@ -101,6 +99,7 @@ fclose($fp);
 
 $output = file_get_contents($tmp_file);
 
-$context->httpResponse()
-        ->body($output)
-        ->send();
+$context
+    ->httpResponse()
+    ->body($output)
+    ->send();

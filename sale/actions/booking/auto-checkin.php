@@ -8,25 +8,25 @@
 
 use sale\booking\Booking;
 
-[$params, $provider] = eQual::announce([
+[$params, $providers] = eQual::announce([
     'description'   => "Auto checkin all bookings that are validated but have already started.",
     'params'        => [],
     'access'        => [
-        'visibility'        => 'protected'
+        'visibility'    => 'protected'
     ],
     'response'      => [
-        'content-type'      => 'application/json',
-        'charset'           => 'utf-8',
-        'accept-origin'     => '*'
+        'content-type'  => 'application/json',
+        'charset'       => 'utf-8',
+        'accept-origin' => '*'
     ],
     'constants'     => ['L10N_TIMEZONE'],
     'providers'     => ['context']
 ]);
 
 /**
- * @var \equal\php\Context  $context
+ * @var \equal\php\Context $context
  */
-['context' => $context] = $provider;
+['context' => $context] = $providers;
 
 $now = new DateTime('now', new DateTimeZone(constant('L10N_TIMEZONE')));
 
@@ -60,7 +60,8 @@ foreach($bookings as $id => $booking) {
     }
 }
 
-$context->httpResponse()
-        ->body($result)
-        ->status(200)
-        ->send();
+$context
+    ->httpResponse()
+    ->body($result)
+    ->status(200)
+    ->send();

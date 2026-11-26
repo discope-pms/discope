@@ -8,24 +8,24 @@
 
 use discope\setting\Setting;
 
-[$params, $provider] = eQual::announce([
+[$params, $providers] = eQual::announce([
     'description'   => "Uploads the camps csv files to Lathus website for synchronisation.",
     'params'        => [],
     'access'        => [
-        'visibility'        => 'protected'
+        'visibility'    => 'protected'
     ],
     'response'      => [
-        'content-type'      => 'application/json',
-        'charset'           => 'utf-8',
-        'accept-origin'     => '*'
+        'content-type'  => 'application/json',
+        'charset'       => 'utf-8',
+        'accept-origin' => '*'
     ],
     'providers'     => ['context']
 ]);
 
 /**
- * @var \equal\php\Context  $context
+ * @var \equal\php\Context $context
  */
-['context' => $context] = $provider;
+['context' => $context] = $providers;
 
 $camps_csv = eQual::run('get', 'lathus_camp_export-camps-csv');
 
@@ -72,6 +72,7 @@ else {
 fclose($tmp_file);
 ftp_close($conn_id);
 
-$context->httpResponse()
-        ->status(200)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(200)
+    ->send();

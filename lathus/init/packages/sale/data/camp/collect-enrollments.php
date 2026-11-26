@@ -10,15 +10,13 @@ use equal\orm\Domain;
 use equal\orm\DomainCondition;
 
 [$params, $providers] = eQual::announce([
-    'extends'       => 'core_model_collect',
-    'params'        => [
-
-        'entity' =>  [
+    'extends'   => 'core_model_collect',
+    'params'    => [
+        'entity' => [
             'type'              => 'string',
             'description'       => "Full name (including namespace) of the class to look into (e.g. 'core\\User').",
             'default'           => 'sale\camp\Enrollment'
         ],
-
         'date_from' => [
             'type'              => 'date',
             'description'       => "Date interval lower limit.",
@@ -27,7 +25,6 @@ use equal\orm\DomainCondition;
                 return strtotime("first day of January {$year}");
             }
         ],
-
         'date_to' => [
             'type'              => 'date',
             'description'       => "Date interval upper limit.",
@@ -36,9 +33,9 @@ use equal\orm\DomainCondition;
                 return strtotime("last day of December {$year}");
             }
         ],
-
         'status' => [
             'type'              => 'string',
+            'description'       => "Status of the enrollment.",
             'selection'         => [
                 'all',
                 'pending',
@@ -46,51 +43,45 @@ use equal\orm\DomainCondition;
                 'validated',
                 'cancelled'
             ],
-            'description'       => "Status of the enrollment.",
             'default'           => 'all'
         ],
-
         'payment_status' => [
             'type'              => 'string',
+            'description'       => "Payment status of the enrollment.",
             'selection'         => [
                 'all',
                 'due',
                 'paid'
             ],
-            'description'       => "Payment status of the enrollment.",
             'default'           => 'all'
         ],
-
         'camp_id' => [
             'type'              => 'many2one',
             'foreign_object'    => 'sale\camp\Camp',
             'description'       => "The camp of the enrollment."
         ],
-
         'is_ase' => [
             'type'              => 'string',
+            'description'       => "The camp of the enrollment.",
             'selection'         => [
                 'all',
                 'yes',
                 'no'
             ],
-            'description'       => "The camp of the enrollment.",
             'default'           => 'all'
         ],
-
         'domain' => [
-            'type'          => 'array',
-            'description'   => "Criteria that results have to match (series of conjunctions)",
-            'default'       => []
+            'type'              => 'array',
+            'description'       => "Criteria that results have to match (series of conjunctions)",
+            'default'           => []
         ]
-
     ],
-    'response'      => [
+    'response'  => [
         'content-type'  => 'application/json',
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'     => ['context']
+    'providers' => ['context']
 ]);
 
 /**
@@ -148,6 +139,7 @@ if(in_array('child_lastname', $params['fields'])) {
     });
 }
 
-$context->httpResponse()
-        ->body($result)
-        ->send();
+$context
+    ->httpResponse()
+    ->body($result)
+    ->send();

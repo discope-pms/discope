@@ -12,13 +12,13 @@ use identity\User;
 use realestate\RentalUnit;
 use sale\booking\Booking;
 
-[$params, $providers] = announce([
+[$params, $providers] = eQual::announce([
     'description'   => 'Advanced search for Consumptions of the clean rooms: returns a collection of Consumptions according to extra parameters.',
     'extends'       => 'core_model_collect',
     'params'        => [
-        'entity' =>  [
-            'description'       => 'Full name (including namespace) of the class to look into.',
+        'entity' => [
             'type'              => 'string',
+            'description'       => 'Full name (including namespace) of the class to look into.',
             'default'           => 'sale\booking\Consumption'
         ],
         'date_from' => [
@@ -52,7 +52,7 @@ use sale\booking\Booking;
         'is_not_option' => [
             'type'              => 'boolean',
             'description'       => 'Discard quote and option bookings.',
-            'default'           =>  true
+            'default'           => true
         ]
     ],
     'response'      => [
@@ -60,15 +60,14 @@ use sale\booking\Booking;
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'     => [ 'context', 'orm', 'auth' ]
+    'providers'     => ['context', 'auth']
 ]);
 
 /**
- * @var \equal\php\Context                   $context
- * @var \equal\orm\ObjectManager             $orm
- * @var \equal\auth\AuthenticationManager    $auth
+ * @var \equal\php\Context                  $context
+ * @var \equal\auth\AuthenticationManager   $auth
  */
-['context' => $context, 'orm' => $orm, 'auth' => $auth] = $providers;
+['context' => $context, 'auth' => $auth] = $providers;
 
 $domain = $params['domain'];
 
@@ -134,6 +133,7 @@ if(in_array('rental_unit_id.name', $params['fields'])) {
 
 }
 
-$context->httpResponse()
-        ->body($result)
-        ->send();
+$context
+    ->httpResponse()
+    ->body($result)
+    ->send();

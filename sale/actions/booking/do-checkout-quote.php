@@ -14,14 +14,12 @@ use sale\booking\Contract;
 [$params, $providers] = eQual::announce([
     'description'   => "Update the status of given booking from 'quote' to its previous 'checkedout' status.",
     'params'        => [
-
         'id' => [
-            'description'       => 'Identifier of the targeted booking.',
-            'type'              => 'integer',
-            'min'               => 1,
-            'required'          => true
+            'type'          => 'integer',
+            'description'   => 'Identifier of the targeted booking.',
+            'min'           => 1,
+            'required'      => true
         ]
-
     ],
     'access'        => [
         'visibility'    => 'protected',
@@ -73,7 +71,7 @@ eQual::run('do', 'sale_booking_do-checkout', ['id' => $params['id']]);
 
 Booking::id($booking['id'])->update(['status_before_revert_to_quote' => null]);
 
-$context->httpResponse()
-        ->status(204)
-        ->send();
-
+$context
+    ->httpResponse()
+    ->status(204)
+    ->send();

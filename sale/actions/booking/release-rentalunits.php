@@ -12,7 +12,7 @@ use sale\booking\Consumption;
 [$params, $providers] = eQual::announce([
     'description'   => "Release any previously assigned rental unit, by removing all consumptions.",
     'params'        => [
-        'id' =>  [
+        'id' => [
             'type'          => 'integer',
             'description'   => "Identifier of the targeted booking.",
             'min'           => 1,
@@ -42,11 +42,11 @@ $booking = Booking::id($params['id'])
     ->first(true);
 
 if(!$booking) {
-    throw new Exception("unknown_booking", QN_ERROR_UNKNOWN_OBJECT);
+    throw new Exception("unknown_booking", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
 if($booking['status'] != 'quote') {
-    throw new Exception("invalid_status", QN_ERROR_INVALID_PARAM);
+    throw new Exception("invalid_status", EQ_ERROR_INVALID_PARAM);
 }
 
 $channelmanager_enabled = Setting::get_value('sale', 'features', 'booking.channel_manager', false);
@@ -81,6 +81,7 @@ if($channelmanager_enabled) {
 Consumption::search(['booking_id', '=', $params['id']])
     ->delete(true);
 
-$context->httpResponse()
-        ->status(204)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(204)
+    ->send();

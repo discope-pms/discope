@@ -10,17 +10,17 @@ use sale\booking\Booking;
 use sale\booking\SojournProductModelRentalUnitAssignement;
 use sale\catalog\ProductModel;
 
-list($params, $providers) = announce([
+[$params, $providers] = eQual::announce([
     'description'   => "Checks the consistency of rental units assignments for a given booking (number of persons).",
     'params'        => [
-        'id' =>  [
-            'description'   => 'Identifier of the booking for which the assignments are checked.',
+        'id' => [
             'type'          => 'integer',
+            'description'   => 'Identifier of the booking for which the assignments are checked.',
             'required'      => true
-        ],
+        ]
     ],
-    'access' => [
-        'visibility'        => 'protected'
+    'access'        => [
+        'visibility'    => 'protected'
     ],
     'response'      => [
         'content-type'  => 'application/json',
@@ -31,10 +31,10 @@ list($params, $providers) = announce([
 ]);
 
 /**
- * @var \equal\php\Context                  $context
- * @var \equal\dispatch\Dispatcher          $dispatch
+ * @var \equal\php\Context          $context
+ * @var \equal\dispatch\Dispatcher  $dispatch
  */
-list($context, $dispatch) = [ $providers['context'], $providers['dispatch']];
+['context' => $context, 'dispatch' => $dispatch] = $providers;
 
 // ensure booking object exists and is readable
 $booking = Booking::id($params['id'])
@@ -66,7 +66,7 @@ $booking = Booking::id($params['id'])
     ->first(true);
 
 if(!$booking) {
-    throw new Exception("unknown_booking", QN_ERROR_UNKNOWN_OBJECT);
+    throw new Exception("unknown_booking", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
 $booking_line_groups = $booking['booking_lines_groups_ids'];
@@ -156,7 +156,7 @@ if(!$booking['is_cancelled'] && $booking_line_groups) {
             // check the total assigned persons against the group nb_pers
             $total_capacity = array_reduce($assignments, function($c, $a) {return $c + $a['rental_unit_id']['capacity'] + $a['rental_unit_id']['extra'];}, 0);
             if($spms_max[$product_model_id] > $total_capacity) {
-                trigger_error("ORM::max {$spms_max[$product_model_id]} for $product_model_id is greater than total capacity $total_capacity", QN_REPORT_DEBUG);
+                trigger_error("ORM::max {$spms_max[$product_model_id]} for $product_model_id is greater than total capacity $total_capacity", EQ_REPORT_DEBUG);
                 $mismatch = true;
                 break 2;
             }
@@ -178,7 +178,7 @@ if($mismatch) {
     $result[] = $params['id'];
     // by convention we dispatch an alert that relates to the controller itself.
     $dispatch->dispatch('lodging.booking.rental_units_assignment', 'sale\booking\Booking', $params['id'], 'important', 'sale_booking_check-units-assignments', ['id' => $params['id']], [], null, $booking['center_office_id']);
-    $httpResponse->status(qn_error_http(QN_ERROR_NOT_ALLOWED));
+    $httpResponse->status(qn_error_http(EQ_ERROR_NOT_ALLOWED));
 }
 else {
     // symmetrical removal of the alert (if any)

@@ -24,7 +24,7 @@ use sale\catalog\Product;
         ]
     ],
     'access'        => [
-        'groups'        => ['finance.default.user'],
+        'groups'        => ['finance.default.user']
     ],
     'response'      => [
         'charset'       => 'utf-8',

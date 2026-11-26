@@ -6,20 +6,20 @@
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
 
+use communication\TemplatePart;
+use discope\setting\Setting;
 use Dompdf\Dompdf;
 use Dompdf\Options as DompdfOptions;
-use Twig\Environment as TwigEnvironment;
-use Twig\Loader\FilesystemLoader as TwigFilesystemLoader;
-use Twig\Extra\Intl\IntlExtension;
-use Twig\Extension\ExtensionInterface;
-use SepaQr\Data;
 use Endroid\QrCode\Builder\Builder;
 use Endroid\QrCode\ErrorCorrectionLevel\ErrorCorrectionLevelMedium;
-use sale\booking\Invoice;
-use communication\TemplatePart;
 use equal\data\DataFormatter;
-use discope\setting\Setting;
+use sale\booking\Invoice;
 use sale\catalog\Product;
+use SepaQr\Data;
+use Twig\Environment as TwigEnvironment;
+use Twig\Extension\ExtensionInterface;
+use Twig\Extra\Intl\IntlExtension;
+use Twig\Loader\FilesystemLoader as TwigFilesystemLoader;
 
 [$params, $providers] = eQual::announce([
     'description'   => "Render an invoice given its ID as a PDF document.",
@@ -29,23 +29,23 @@ use sale\catalog\Product;
             'description'   => 'Identifier of the invoice to print.',
             'required'      => true
         ],
-        'view_id' =>  [
+        'view_id' => [
             'type'          => 'string',
             'description'   => 'The identifier of the view <type.name>.',
             'default'       => 'print.default'
         ],
-        'mode' =>  [
+        'mode' => [
             'type'          => 'string',
             'description'   => 'Mode in which document has to be rendered: simple (default) or detailed.',
             'selection'     => ['simple', 'grouped', 'detailed'],
             'default'       => 'grouped'
         ],
-        'lang' =>  [
+        'lang' => [
             'type'          => 'string',
             'description'   => 'Language in which labels and multilang field have to be returned (2 letters ISO 639-1).',
             'default'       => constant('DEFAULT_LANG')
         ],
-        'output' =>  [
+        'output' => [
             'type'          => 'string',
             'description'   => 'Output format of the document.',
             'selection'     => ['pdf', 'html'],
@@ -54,7 +54,7 @@ use sale\catalog\Product;
     ],
     'access'        => [
         'visibility'    => 'protected',
-        'groups'        => ['booking.default.user'],
+        'groups'        => ['booking.default.user']
     ],
     'response'      => [
         'content-type'  => 'application/pdf',
@@ -65,7 +65,7 @@ use sale\catalog\Product;
 ]);
 
 /**
- * @var \equal\php\Context  $context
+ * @var \equal\php\Context $context
  */
 ['context' => $context] = $providers;
 
@@ -144,7 +144,7 @@ $getTemplateFilePath = function($entity, $view_id) {
         $template_file = EQ_BASEDIR."/packages/{$package}/views/{$class_path}.{$view_id}.html";
 
         if(!file_exists($template_file)) {
-            throw new Exception("unknown_view_id", QN_ERROR_UNKNOWN_OBJECT);
+            throw new Exception("unknown_view_id", EQ_ERROR_UNKNOWN_OBJECT);
         }
     }
 
@@ -307,7 +307,7 @@ if(is_null($output)) {
     $invoice = Invoice::id($params['id'])->read($fields, $params['lang'])->first(true);
 
     if(!$invoice) {
-        throw new Exception("unknown_invoice", QN_ERROR_UNKNOWN_OBJECT);
+        throw new Exception("unknown_invoice", EQ_ERROR_UNKNOWN_OBJECT);
     }
 
 
@@ -827,8 +827,8 @@ if(is_null($output)) {
         $html = $template->render($values);
     }
     catch(Exception $e) {
-        trigger_error("ORM::error while parsing template - ".$e->getMessage(), QN_REPORT_DEBUG);
-        throw new Exception("template_parsing_issue", QN_ERROR_INVALID_CONFIG);
+        trigger_error("ORM::error while parsing template - ".$e->getMessage(), EQ_REPORT_DEBUG);
+        throw new Exception("template_parsing_issue", EQ_ERROR_INVALID_CONFIG);
     }
 
     if($params['output'] === 'html') {
@@ -844,7 +844,7 @@ if(is_null($output)) {
         $options->set('isRemoteEnabled', true);
         $dompdf = new Dompdf($options);
         // if external fonts are involved, tell dompdf to store them in /bin
-        $options->setFontDir(QN_BASEDIR.'/bin');
+        $options->setFontDir(EQ_BASEDIR.'/bin');
         $dompdf->setPaper('A4', 'portrait');
 
         // remove utf8mb4 chars (emojis)

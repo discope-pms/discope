@@ -27,13 +27,13 @@ use sale\booking\BookingLine;
         ],
         'all_centers' => [
             'type'              => 'boolean',
-            'default'           =>  false,
-            'description'       => "Mark the all Center of the sojourn."
+            'description'       => "Mark the all Center of the sojourn.",
+            'default'           => false
         ],
         'is_not_option' => [
             'type'              => 'boolean',
             'description'       => 'Discard quote and option bookings.',
-            'default'           =>  false
+            'default'           => false
         ],
         'date_from' => [
             'type'              => 'date',
@@ -45,9 +45,7 @@ use sale\booking\BookingLine;
             'description'       => 'Output: Day of departure / Input: Date interval upper limit (defaults to last day of previous month).',
             'default'           => strtotime('+1 month')
         ],
-
         /* parameters used as properties of virtual entity */
-
         'center' => [
             'type'              => 'string',
             'description'       => 'Name of the center.'
@@ -79,7 +77,7 @@ use sale\booking\BookingLine;
         'meals' => [
             'type'              => 'float',
             'description'       => 'Total revenue from meals.'
-        ],
+        ]
     ],
     'response'      => [
         'content-type'  => 'application/json',
@@ -113,12 +111,12 @@ if($params['center_id'] || $params['all_centers']) {
 if($params['all_centers']) {
     $user_id = $auth->userId();
     if($user_id <= 0) {
-        throw new Exception("unknown_user", QN_ERROR_NOT_ALLOWED);
+        throw new Exception("unknown_user", EQ_ERROR_NOT_ALLOWED);
     }
 
     $user = User::id($user_id)->read(['centers_ids'])->first(true);
     if(!$user) {
-        throw new Exception("unexpected_error", QN_ERROR_INVALID_USER);
+        throw new Exception("unexpected_error", EQ_ERROR_INVALID_USER);
     }
 
     $domain[] = ['center_id', 'in', $user['centers_ids']];
@@ -220,7 +218,8 @@ foreach($map_center_values as $center => $dates) {
     }
 }
 
-$context->httpResponse()
-        ->header('X-Total-Count', count($result))
-        ->body($result)
-        ->send();
+$context
+    ->httpResponse()
+    ->header('X-Total-Count', count($result))
+    ->body($result)
+    ->send();

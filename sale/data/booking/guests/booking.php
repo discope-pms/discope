@@ -8,18 +8,18 @@
 use sale\booking\Booking;
 use sale\booking\GuestList;
 
-list($params, $providers) = eQual::announce([
+[$params, $providers] = eQual::announce([
     'description'   => "Return the booking with the booking line groups and guest line. If the guests list does not exist, it will be created.",
     'params'        => [
-        'id' =>  [
-            'description'       => 'Identifier of the targeted booking.',
+        'id' => [
             'type'              => 'many2one',
             'foreign_object'    => 'sale\booking\Booking',
+            'description'       => 'Identifier of the targeted booking.',
             'required'          => true
         ]
     ],
-    'access' => [
-        'visibility'        => 'public'
+    'access'        => [
+        'visibility'    => 'public'
     ],
     'response'      => [
         'content-type'  => 'application/json',
@@ -33,18 +33,18 @@ list($params, $providers) = eQual::announce([
  * @var \equal\php\Context                  $context
  * @var \equal\auth\AuthenticationManager   $auth
  */
-list('context' => $context, 'auth' => $auth) = $providers;
+['context' => $context, 'auth' => $auth] = $providers;
 
 $current_user_id = $auth->userId();
-if($current_user_id != QN_ROOT_USER_ID) {
+if($current_user_id != EQ_ROOT_USER_ID) {
     $guest_user = eQual::run('get','sale_booking_guests_userinfo');
 
     if(!$guest_user) {
-        throw new Exception("unknown_guest_user", QN_ERROR_UNKNOWN_OBJECT);
+        throw new Exception("unknown_guest_user", EQ_ERROR_UNKNOWN_OBJECT);
     }
 
     if($guest_user['booking_id'] !== $params['id']) {
-        throw new Exception("not_allowed_guest_user_access_to_booking", QN_ERROR_NOT_ALLOWED);
+        throw new Exception("not_allowed_guest_user_access_to_booking", EQ_ERROR_NOT_ALLOWED);
     }
     // switch to root user (to avoid permissions restrictions)
     $auth->su();
@@ -55,7 +55,7 @@ $booking = Booking::id($params['id'])
     ->first(true);
 
 if(!$booking) {
-    throw new Exception("unknown_booking", QN_ERROR_UNKNOWN_OBJECT);
+    throw new Exception("unknown_booking", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
 if(!$booking['guest_list_id']) {
@@ -88,6 +88,7 @@ $booking = Booking::id($params['id'])
         ->adapt('json')
         ->first(true);
 
-$context->httpResponse()
-        ->body($booking)
-        ->send();
+$context
+    ->httpResponse()
+    ->body($booking)
+    ->send();

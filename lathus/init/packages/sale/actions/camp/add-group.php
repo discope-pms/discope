@@ -13,18 +13,16 @@ use sale\camp\CampGroup;
     'description'   => "Add a new group to the given camp.",
     'help'          => "Usually the max camp group quantity is two.",
     'params'        => [
-
         'id' => [
-            'type'              => 'integer',
-            'description'       => "Identifier of the camp that needs a new group.",
-            'min'               => 1,
-            'required'          => true
+            'type'          => 'integer',
+            'description'   => "Identifier of the camp that needs a new group.",
+            'min'           => 1,
+            'required'      => true
         ]
-
     ],
     'access'        => [
         'visibility'    => 'protected',
-        'groups'        => ['camp.default.administrator'],
+        'groups'        => ['camp.default.administrator']
     ],
     'response'      => [
         'content-type'  => 'application/json',
@@ -51,6 +49,7 @@ CampGroup::create(['camp_id' => $camp['id']])
     ->read(['id'])
     ->first();
 
-$context->httpResponse()
-        ->status(204)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(204)
+    ->send();

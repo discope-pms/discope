@@ -10,27 +10,25 @@ use sale\booking\Booking;
 use sale\booking\BookingLineGroup;
 
 [$params, $providers] = eQual::announce([
-    'description'	=> "Refresh all meals of a specific booking.",
-    'params' 		=> [
-
+    'description'   => "Refresh all meals of a specific booking.",
+    'params'        => [
         'id' => [
-            'type'              => 'integer',
-            'description'       => "Identifier of the targeted booking.",
-            'min'               => 1,
-            'required'          => true
+            'type'          => 'integer',
+            'description'   => "Identifier of the targeted booking.",
+            'min'           => 1,
+            'required'      => true
         ]
-
     ],
     'access'        => [
-        'visibility'        => 'protected',
-        'groups'            => ['booking.default.user']
+        'visibility'    => 'protected',
+        'groups'        => ['booking.default.user']
     ],
     'response'      => [
-        'content-type'      => 'application/json',
-        'charset'           => 'utf-8',
-        'accept-origin'     => '*'
+        'content-type'  => 'application/json',
+        'charset'       => 'utf-8',
+        'accept-origin' => '*'
     ],
-    'providers' => ['context', 'orm']
+    'providers'     => ['context', 'orm']
 ]);
 
 /**
@@ -59,6 +57,7 @@ foreach($booking['booking_lines_groups_ids'] as $group_id) {
 
 $orm->enableEvents();
 
-$context->httpResponse()
-        ->status(204)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(204)
+    ->send();

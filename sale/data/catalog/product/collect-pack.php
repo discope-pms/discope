@@ -17,14 +17,14 @@ use sale\price\PriceList;
     'description'   => 'Retrieves all packs products that are currently sellable for a given center and, if related Center Office has defined Product Favorites, return those first.',
     'extends'       => 'core_model_collect',
     'params'        => [
-        'entity' =>  [
-            'description'       => 'Full name (including namespace) of the class to look into (e.g. \'core\\User\').',
+        'entity' => [
             'type'              => 'string',
+            'description'       => 'Full name (including namespace) of the class to look into (e.g. \'core\\User\').',
             'default'           => 'sale\catalog\Product'
         ],
         'domain' => [
-            'description'       => 'Criterias that searched products have to match (series of conjunctions)',
             'type'              => 'array',
+            'description'       => 'Criterias that searched products have to match (series of conjunctions)',
             'default'           => []
         ],
         'center_id' => [
@@ -55,14 +55,13 @@ use sale\price\PriceList;
         'cache-vary'    => ['uri'],
         'expires'       => 1 * (60*60)
     ],
-    'providers'     => [ 'context', 'orm' ]
+    'providers'     => ['context']
 ]);
 
 /**
  * @var \equal\php\Context $context
- * @var \equal\orm\ObjectManager $orm
  */
-['context' => $context, 'orm' => $orm] = $providers;
+['context' => $context] = $providers;
 
 $result = [];
 
@@ -138,6 +137,7 @@ $filtered_products = array_filter($products, function($product) use ($center_gro
 // 4) sort products by name (on ascending order)
 usort($filtered_products, function($a, $b) {return strcmp($a['name'], $b['name']);});
 
-$context->httpResponse()
-        ->body($filtered_products)
-        ->send();
+$context
+    ->httpResponse()
+    ->body($filtered_products)
+    ->send();

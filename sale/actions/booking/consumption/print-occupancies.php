@@ -10,8 +10,8 @@
     'description'   => "Render rooms occupancies.",
     'params'        => [
         'domain' => [
-            'description'   => 'Criterias that results have to match (serie of conjunctions)',
             'type'          => 'array',
+            'description'   => 'Criterias that results have to match (serie of conjunctions)',
             'default'       => []
         ],
         'params' => [
@@ -20,19 +20,19 @@
             'default'       => []
         ]
     ],
-    'access' => [
-        'visibility'        => 'protected',
-        'groups'            => ['booking.default.user'],
+    'access'        => [
+        'visibility'    => 'protected',
+        'groups'        => ['booking.default.user']
     ],
     'response'      => [
-        'content-type'      => 'application/pdf',
-        'accept-origin'     => '*'
+        'content-type'  => 'application/pdf',
+        'accept-origin' => '*'
     ],
     'providers'     => ['context']
 ]);
 
 /**
- * @var \equal\php\Context  $context
+ * @var \equal\php\Context $context
  */
 ['context' => $context] = $providers;
 
@@ -64,7 +64,8 @@ if(isset($params['params']['is_not_option'])) {
 
 $output = eQual::run('get', 'sale_booking_consumption_print-occupancies', $data);
 
-$context->httpResponse()
-        ->header('Content-Disposition', 'inline; filename="room_occupancies.pdf"')
-        ->body($output)
-        ->send();
+$context
+    ->httpResponse()
+    ->header('Content-Disposition', 'inline; filename="room_occupancies.pdf"')
+    ->body($output)
+    ->send();

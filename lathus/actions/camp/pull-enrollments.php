@@ -9,15 +9,15 @@
 use core\Mail;
 use discope\setting\Setting;
 use equal\email\Email;
-use sale\camp\EnrollmentImported;
-use sale\camp\GuardianImported;
-use sale\camp\InstitutionImported;
 use sale\camp\Camp;
 use sale\camp\Child;
 use sale\camp\Enrollment;
+use sale\camp\EnrollmentImported;
 use sale\camp\followup\Task;
 use sale\camp\Guardian;
+use sale\camp\GuardianImported;
 use sale\camp\Institution;
+use sale\camp\InstitutionImported;
 use sale\camp\price\PriceAdapter;
 use sale\camp\Sponsor;
 use sale\camp\WorksCouncil;
@@ -27,6 +27,7 @@ use sale\pay\Payment;
 [$params, $providers] = eQual::announce([
     'description'   => "Pull enrollments from CPA Lathus API.",
     'params'        => [
+        /* #memo - `page_count` cannot be implemented since there is a req_limit of 60s */
         'page' => [
             'type'          => 'integer',
             'description'   => 'Page to fetch from the remote API..',
@@ -40,26 +41,24 @@ use sale\pay\Payment;
             'max'           => 200,
             'default'       => 30
         ]
-        // #memo `page_count` cannot be implemented since there is a req_limit of 60s
     ],
     'access'        => [
         'visibility'    => 'protected'
     ],
-    'constants'     => ['EMAIL_ERRORS_RECIPIENT'],
     'response'      => [
         'content-type'  => 'application/json',
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'     => ['context', 'orm', 'dispatch']
+    'constants'     => ['EMAIL_ERRORS_RECIPIENT'],
+    'providers'     => ['context', 'dispatch']
 ]);
 
 /**
  * @var \equal\php\Context          $context
- * @var \equal\orm\ObjectManager    $orm
  * @var \equal\dispatch\Dispatcher  $dispatch
  */
-['context' => $context, 'orm' => $orm, 'dispatch' => $dispatch] = $providers;
+['context' => $context, 'dispatch' => $dispatch] = $providers;
 
 /**
  * Methods
@@ -880,7 +879,8 @@ if($result['errors'] > 0) {
     throw new Exception(serialize($result), EQ_ERROR_UNKNOWN);
 }
 
-$context->httpResponse()
-        ->body($result)
-        ->status(200)
-        ->send();
+$context
+    ->httpResponse()
+    ->body($result)
+    ->status(200)
+    ->send();

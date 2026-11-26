@@ -53,7 +53,6 @@ use sale\camp\WorksCouncil;
             ],
             'default'           => 'confirmed_validated'
         ],
-
         /* parameters used as properties of virtual entity */
         'center' => [
             'type'              => 'string',
@@ -61,13 +60,13 @@ use sale\camp\WorksCouncil;
         ],
         'sojourn_type' => [
             'type'              => 'string',
+            'description'       => "The camp sojourn type that was used with the enrollment.",
             'selection'         => [
                 'camp',
                 'clsh',
                 'clsh-4-days',
                 'clsh-5-days',
-            ],
-            'description'       => "The camp sojourn type that was used with the enrollment."
+            ]
         ],
         'qty' => [
             'type'              => 'integer',
@@ -83,9 +82,9 @@ use sale\camp\WorksCouncil;
 ]);
 
 /**
- * @var \equal\php\Context                  $context
- * @var \equal\data\adapt\AdapterProvider   $adapter_provider
- * @var \equal\auth\AuthenticationManager   $auth
+ * @var \equal\php\Context                      $context
+ * @var \equal\data\adapt\DataAdapterProvider   $adapter_provider
+ * @var \equal\auth\AuthenticationManager       $auth
  */
 ['context' => $context, 'adapt' => $adapter_provider, 'auth' => $auth] = $providers;
 
@@ -175,7 +174,8 @@ foreach($map_center_sojourn_types_enrollments_qty as $center_id => $map_sojourn_
     }
 }
 
-$context->httpResponse()
-        ->header('X-Total-Count', count($result))
-        ->body($result)
-        ->send();
+$context
+    ->httpResponse()
+    ->header('X-Total-Count', count($result))
+    ->body($result)
+    ->send();

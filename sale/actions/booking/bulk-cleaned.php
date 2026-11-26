@@ -1,6 +1,6 @@
 <?php
-use sale\booking\Consumption;
 use realestate\RentalUnit;
+use sale\booking\Consumption;
 /*
     This file is part of the Discope property management software <https://github.com/discope-pms/discope>
     Some Rights Reserved, Discope PMS, 2020-2024
@@ -10,36 +10,37 @@ use realestate\RentalUnit;
 
 
 // announce script and fetch parameters values
-list($params, $providers) = eQual::announce([
-    'description'	=>	"Mark a selection of Rental Units as cleaned.",
-    'params' 		=>	[
+[$params, $providers] = eQual::announce([
+    'description'   => "Mark a selection of Rental Units as cleaned.",
+    'params'        => [
         'ids' => [
-            'description'       => 'List of rental unit consumption identifiers to check for emptiness.',
-            'type'              => 'array'
+            'type'          => 'array',
+            'description'   => 'List of rental unit consumption identifiers to check for emptiness.'
         ]
     ],
-    'access' => [
-        'visibility'        => 'protected',
-        'groups'            => ['booking.default.user'],
+    'access'        => [
+        'visibility'    => 'protected',
+        'groups'        => ['booking.default.user']
     ],
-    'response' => [
-        'content-type'      => 'application/json',
-        'charset'           => 'utf-8',
-        'accept-origin'     => '*'
+    'response'      => [
+        'content-type'  => 'application/json',
+        'charset'       => 'utf-8',
+        'accept-origin' => '*'
     ],
-    'providers' => ['context']
+    'providers'     => ['context']
 ]);
 
 /**
- * @var \equal\php\Context                  $context
+ * @var \equal\php\Context $context
  */
-list($context) = [ $providers['context']];
+['context' => $context] = $providers;
 
 $consumptions = Consumption::ids($params['ids'])->read(['id', 'rental_unit_id'])->get(true);
 foreach($consumptions as $consumption) {
     RentalUnit::id($consumption['rental_unit_id'])->update(['action_required' => 'none']);
 }
 
-$context->httpResponse()
-        ->status(204)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(204)
+    ->send();

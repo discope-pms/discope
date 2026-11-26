@@ -8,59 +8,51 @@
 
 use sale\booking\Invoice;
 
-list($params, $providers) = eQual::announce([
+[$params, $providers] = eQual::announce([
     'description'   => 'Provides the quantities and prices for a given accounting rule over a specific period',
     'params'        => [
         'organisation_id' => [
             'type'              => 'many2one',
             'foreign_object'    => 'identity\Identity',
-            'description'       => 'Center filter',
+            'description'       => 'Center filter'
         ],
         'center_office_id' => [
             'type'              => 'many2one',
             'foreign_object'    => 'identity\CenterOffice',
-            'description'       => "Center to which the booking is assigned. Input: Used to filter by center.",
+            'description'       => "Center to which the booking is assigned. Input: Used to filter by center."
         ],
-
         'date_from' => [
             'type'              => 'date',
             'description'       => 'Start date for filtering',
-            'default'           =>  mktime(0, 0, 0, date('m')-1, 1)
+            'default'           => mktime(0, 0, 0, date('m')-1, 1)
         ],
-
         'date_to' => [
             'type'              => 'date',
             'description'       => 'End date for filtering.',
             'default'           => mktime(0, 0, 0, date('m')+2, 0)
         ],
-
         'accounting_rule_id' => [
             'type'              => 'many2one',
             'foreign_object'    => 'finance\accounting\AccountingRule',
             'description'       => "Applied accounting rule.",
             'required'          => true
         ],
-
         'center_office' => [
             'type'              => 'string',
             'description'       => 'Unique identifier of the center.'
         ],
-
         'invoice' => [
             'type'              => 'string',
             'description'       => 'Unique identifier of the invoice.'
         ],
-
         'qty' => [
             'type'              => 'integer',
             'description'       => 'Quantity of accounting rule invoiced.'
         ],
-
         'total' => [
             'type'              => 'float',
             'description'       => 'Total amount invoiced, excluding tax.'
         ],
-
         'price' => [
             'type'              => 'float',
             'description'       => 'Total amount invoiced, including tax.'
@@ -77,7 +69,7 @@ list($params, $providers) = eQual::announce([
 /**
  * @var \equal\php\Context $context
  */
-$context = $providers['context'];
+['context' => $context] = $providers;
 
 
 $domain = [];
@@ -172,7 +164,8 @@ foreach($map_organisation_accounting as $organisation_id => $center_offices) {
     }
 }
 
-$context->httpResponse()
-        ->header('X-Total-Count', count($result))
-        ->body($result)
-        ->send();
+$context
+    ->httpResponse()
+    ->header('X-Total-Count', count($result))
+    ->body($result)
+    ->send();

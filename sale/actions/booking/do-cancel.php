@@ -10,10 +10,10 @@ use discope\setting\Setting;
 use sale\booking\Booking;
 use sale\booking\BookingActivity;
 use sale\booking\BookingLine;
+use sale\booking\BookingLineGroup;
 use sale\booking\BookingPoint;
 use sale\booking\channelmanager\RoomType;
 use sale\booking\Consumption;
-use sale\booking\BookingLineGroup;
 use sale\booking\Contract;
 use sale\booking\Invoice;
 use sale\catalog\Product;
@@ -21,42 +21,42 @@ use sale\catalog\Product;
 [$params, $providers] = eQual::announce([
     'description'   => "This will cancel the booking, whatever its current status. Balance will be adjusted if cancellation fees apply.",
     'params'        => [
-        'id' =>  [
-            'type'              => 'integer',
-            'min'               => 1,
-            'description'       => "Identifier of the targeted booking.",
-            'required'          => true
+        'id' => [
+            'type'          => 'integer',
+            'description'   => "Identifier of the targeted booking.",
+            'min'           => 1,
+            'required'      => true
         ],
         // this must remain synced with field definition Booking::cancellation_reason and translations in do-cancel.json
-        'reason' =>  [
-            'type'              => 'string',
-            'description'       => "Reason of the booking cancellation.",
-            'selection'         => [
-                'other',                    // customer cancelled for a non-listed reason or without mentioning the reason (cancellation fees might apply)
-                'overbooking',              // the booking was cancelled due to failure in delivery of the service
-                'duplicate',                // several contacts of the same group made distinct bookings for the same sojourn
-                'internal_impediment',      // cancellation due to an incident impacting the rental units
-                'external_impediment',      // cancellation due to external delivery failure (organization, means of transport, ...)
-                'health_impediment',        // cancellation for medical or mourning reason
-                'ota'                       // cancellation was made through the channel manager
+        'reason' => [
+            'type'          => 'string',
+            'description'   => "Reason of the booking cancellation.",
+            'selection'     => [
+                'other',                // customer cancelled for a non-listed reason or without mentioning the reason (cancellation fees might apply)
+                'overbooking',          // the booking was cancelled due to failure in delivery of the service
+                'duplicate',            // several contacts of the same group made distinct bookings for the same sojourn
+                'internal_impediment',  // cancellation due to an incident impacting the rental units
+                'external_impediment',  // cancellation due to external delivery failure (organization, means of transport, ...)
+                'health_impediment',    // cancellation for medical or mourning reason
+                'ota'                   // cancellation was made through the channel manager
             ],
-            'required'          => true
+            'required'      => true
         ],
         'with_fee' => [
-            'type'              => "boolean",
-            'description'       => "Should a fee be invoiced to the customer because of the cancellation?",
-            'default'           => false
+            'type'          => "boolean",
+            'description'   => "Should a fee be invoiced to the customer because of the cancellation?",
+            'default'       => false
         ],
         'fee_amount' => [
-            'type'              => 'float',
-            'usage'             => 'amount/money:2',
-            'description'       => "The amount of the cancellation fee.",
-            'help'              => "If the cancellation fee is 0 then the status of the booking will be set to \"cancelled\", because it doesn't need to be invoiced.",
-            'default'           => 0
+            'type'          => 'float',
+            'usage'         => 'amount/money:2',
+            'description'   => "The amount of the cancellation fee.",
+            'help'          => "If the cancellation fee is 0 then the status of the booking will be set to \"cancelled\", because it doesn't need to be invoiced.",
+            'default'       => 0
         ]
     ],
     'access'        => [
-        'groups'        => ['booking.default.user'],
+        'groups'        => ['booking.default.user']
     ],
     'response'      => [
         'content-type'  => 'application/json',
@@ -324,6 +324,7 @@ $dispatch->cancel('sale.booking.followup.task.reminder', 'sale\booking\Booking',
 
 $cron->cancel("booking.option.reminder.{$booking['id']}");
 
-$context->httpResponse()
-        ->status(200)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(200)
+    ->send();

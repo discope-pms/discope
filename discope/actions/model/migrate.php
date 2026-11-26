@@ -4,14 +4,14 @@
     'description'   => 'Run every model discriminator migration in a deterministic order.',
     'params'        => [
         'confirm' => [
-            'description'   => 'Explicit confirmation required to execute all model migrations.',
             'type'          => 'boolean',
-            'required'      => true,
-        ],
+            'description'   => 'Explicit confirmation required to execute all model migrations.',
+            'required'      => true
+        ]
     ],
     'access'        => [
         'visibility'    => 'protected',
-        'groups'        => ['admins'],
+        'groups'        => ['admins']
     ],
     'response'      => [
         'content-type'  => 'application/json',
@@ -22,6 +22,9 @@
     'providers'     => ['context']
 ]);
 
+/**
+ * @var \equal\php\Context $context
+ */
 ['context' => $context] = $providers;
 
 if(($params['confirm'] ?? false) !== true) {

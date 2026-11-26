@@ -5,31 +5,35 @@
     Original author(s): Yesbabylon SRL
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
+
 use sale\booking\Booking;
 
 
-list($params, $providers) = announce([
+[$params, $providers] = eQual::announce([
     'description'   => "This will generate an invoice for the given order. Order is expected to be paid already.",
     'params'        => [
-        'id' =>  [
-            'description'   => 'Identifier of the Booking to test.',
+        'id' => [
             'type'          => 'integer',
+            'description'   => 'Identifier of the Booking to test.',
             'min'           => 1,
             'required'      => true
         ]
     ],
-    'access' => [
-        'groups'            => ['booking.default.user', 'pos.default.user'],
+    'access'        => [
+        'groups'        => ['booking.default.user', 'pos.default.user']
     ],
     'response'      => [
         'content-type'  => 'application/json',
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'     => ['context', 'orm', 'auth']
+    'providers'     => ['context']
 ]);
 
-list($context, $orm, $auth) = [$providers['context'], $providers['orm'], $providers['auth']];
+/**
+ * @var \equal\php\Context $context
+ */
+['context' => $context] = $providers;
 
 $booking = Booking::id($params['id'])
     ->read([
@@ -39,7 +43,7 @@ $booking = Booking::id($params['id'])
     ->first();
 
 if(!$booking) {
-    throw new Exception("unknown_booking", QN_ERROR_UNKNOWN_OBJECT);
+    throw new Exception("unknown_booking", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
 $code_ref = '150';
@@ -52,10 +56,9 @@ $booking_code = intval($booking['name']);
 
 
 
-$context->httpResponse()
-        ->body([
+$context
+    ->httpResponse()
+    ->body([
             'reference_value' => $reference_value
         ])
-        ->send();
-
-
+    ->send();

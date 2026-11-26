@@ -7,27 +7,28 @@
 */
 
 [$params, $providers] = eQual::announce([
-    'description'	=> "Mark a selection of Booking as unarchive.",
-    'params' 		=> [
-
+    'description'   => "Mark a selection of Booking as unarchive.",
+    'params'        => [
         'ids' => [
-            'type'              => 'array',
-            'description'       => "List of Booking identifiers the check against emptiness."
+            'type'          => 'array',
+            'description'   => "List of Booking identifiers the check against emptiness."
         ]
-
     ],
-    'access' => [
+    'access'        => [
         'visibility'    => 'protected',
-        'groups'        => ['booking.default.user'],
+        'groups'        => ['booking.default.user']
     ],
-    'response' => [
+    'response'      => [
         'content-type'  => 'application/json',
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers' => ['context']
+    'providers'     => ['context']
 ]);
 
+/**
+ * @var \equal\php\Context $context
+ */
 ['context' => $context] = $providers;
 
 $errors = [];
@@ -41,6 +42,7 @@ foreach($params['ids'] as $id) {
     }
 }
 
-$context->httpResponse()
-        ->status(204)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(204)
+    ->send();

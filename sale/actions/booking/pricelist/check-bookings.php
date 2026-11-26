@@ -12,18 +12,18 @@ use sale\booking\BookingLine;
 use sale\booking\BookingLineGroup;
 use sale\price\PriceList;
 
-list($params, $providers) = eQual::announce([
+[$params, $providers] = eQual::announce([
     'description'   => "Searches for bookings that are waiting for the pricelist to be published, and updates their TBC status.",
     'help'          => "This controller is scheduled when a PriceList has its status updated to 'published'.",
     'params'        => [
-        'id' =>  [
-            'description'   => 'Identifier of the pricelist whose status has changed.',
+        'id' => [
             'type'          => 'integer',
+            'description'   => 'Identifier of the pricelist whose status has changed.',
             'required'      => true
         ]
     ],
-    'access' => [
-        'visibility'        => 'private'
+    'access'        => [
+        'visibility'    => 'private'
     ],
     'response'      => [
         'content-type'  => 'application/json',
@@ -39,7 +39,7 @@ list($params, $providers) = eQual::announce([
  * @var \equal\auth\AuthenticationManager   $auth
  * @var \equal\dispatch\Dispatcher          $dispatch
  */
-list($context, $orm, $auth, $dispatch) = [ $providers['context'], $providers['orm'], $providers['auth'], $providers['dispatch']];
+['context' => $context, 'orm' => $orm, 'auth' => $auth, 'dispatch' => $dispatch] = $providers;
 
 // switch to root account (access is 'private')
 $auth->su();
@@ -47,7 +47,7 @@ $auth->su();
 $pricelist = PriceList::id($params['id'])->read(['id', 'status', 'price_list_category_id', 'date_from', 'date_to'])->first(true);
 
 if(!$pricelist) {
-    throw new Exception("unknown_pricelist", QN_ERROR_UNKNOWN_OBJECT);
+    throw new Exception("unknown_pricelist", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
 if($pricelist['status'] == 'published') {
@@ -108,6 +108,7 @@ if($pricelist['status'] == 'published') {
     $orm->enableEvents();
 }
 
-$context->httpResponse()
-        ->status(204)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(204)
+    ->send();

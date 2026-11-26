@@ -18,37 +18,37 @@ use Twig\Loader\FilesystemLoader as TwigFilesystemLoader;
 [$params, $providers] = eQual::announce([
     'description'   => "Render pending bookings planning for a specific.",
     'params'        => [
-        'view_id' =>  [
+        'view_id' => [
             'type'          => 'string',
             'description'   => "The identifier of the view <type.name>.",
             'default'       => 'print.pending'
         ],
-        'lang' =>  [
+        'lang' => [
             'type'          => 'string',
             'description'   => "Language in which labels and multilang field have to be returned (2 letters ISO 639-1).",
             'default'       => constant('DEFAULT_LANG')
         ],
-        'output' =>  [
+        'output' => [
             'type'          => 'string',
             'description'   => "Output format of the document.",
             'selection'     => ['pdf', 'html'],
             'default'       => 'pdf'
         ]
     ],
-    'constants'             => ['DEFAULT_LANG', 'L10N_LOCALE'],
     'access'        => [
-        'visibility'        => 'protected',
-        'groups'            => ['booking.default.user', 'camp.default.user'],
+        'visibility'    => 'protected',
+        'groups'        => ['booking.default.user', 'camp.default.user']
     ],
     'response'      => [
-        'content-type'      => 'application/pdf',
-        'accept-origin'     => '*'
+        'content-type'  => 'application/pdf',
+        'accept-origin' => '*'
     ],
+    'constants'     => ['DEFAULT_LANG', 'L10N_LOCALE'],
     'providers'     => ['context']
 ]);
 
 /**
- * @var \equal\php\Context  $context
+ * @var \equal\php\Context $context
  */
 ['context' => $context] = $providers;
 

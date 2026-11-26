@@ -8,21 +8,24 @@
 use sale\booking\Booking;
 
 // announce script and fetch parameters values
-list($params, $providers) = announce([
-    'description'	=>	"Batch for the updated Booking bulk.",
-    'access' => [
-        'visibility'        => 'protected',
-        'groups'            => ['booking.default.user'],
+[$params, $providers] = eQual::announce([
+    'description'   => "Batch for the updated Booking bulk.",
+    'access'        => [
+        'visibility'    => 'protected',
+        'groups'        => ['booking.default.user']
     ],
-    'response' => [
-        'content-type'      => 'application/json',
-        'charset'           => 'utf-8',
-        'accept-origin'     => '*'
+    'response'      => [
+        'content-type'  => 'application/json',
+        'charset'       => 'utf-8',
+        'accept-origin' => '*'
     ],
-    'providers' => ['context']
+    'providers'     => ['context']
 ]);
 
-list($context) = [$providers['context']];
+/**
+ * @var \equal\php\Context $context
+ */
+['context' => $context] = $providers;
 
 $bookings = Booking::search(['status', 'in', ['invoiced', 'credit_balance', 'debit_balance']])->ids();
 
@@ -30,6 +33,7 @@ if($bookings){
     eQual::run('do', 'sale_booking_bulk-update-status', ['ids' => $bookings]);
 }
 
-$context->httpResponse()
-        ->status(204)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(204)
+    ->send();

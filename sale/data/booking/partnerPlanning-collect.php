@@ -35,7 +35,6 @@ use sale\booking\BookingActivity;
             'description'       => "Criteria that results have to match.",
             'default'           => []
         ],
-
         /**
          * Virtual model columns
          */
@@ -77,7 +76,7 @@ use sale\booking\BookingActivity;
 ]);
 
 /**
- * @var \equal\php\Context  $context
+ * @var \equal\php\Context $context
  */
 ['context' => $context] = $providers;
 
@@ -171,7 +170,8 @@ foreach($activities as $activity) {
     }
 }
 
-$context->httpResponse()
-        ->header('X-Total-Count', count($map_partner_planning))
-        ->body(array_values($map_partner_planning))
-        ->send();
+$context
+    ->httpResponse()
+    ->header('X-Total-Count', count($map_partner_planning))
+    ->body(array_values($map_partner_planning))
+    ->send();

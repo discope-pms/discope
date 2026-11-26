@@ -10,51 +10,50 @@ use identity\Partner;
 use sale\booking\Funding;
 
 
-list($params, $providers) = eQual::announce([
+[$params, $providers] = eQual::announce([
     'description'   => "Convert given funding to a downpayment invoice.",
     'params'        => [
-        'id' =>  [
+        'id' => [
+            'type'          => 'integer',
             'description'   => 'Identifier of the funding to be converted.',
-            'type'          => 'integer',
             'min'           => 1,
             'required'      => true
         ],
-        'partner_id' =>  [
+        'partner_id' => [
+            'type'          => 'integer',
             'description'   => 'Identifier of the partner (organisation) to who the invoice must be emitted (can be arbitrary).',
-            'type'          => 'integer',
             'min'           => 1,
             'required'      => true
         ],
-        'payment_terms_id' =>  [
-            'description'   => 'Identifier of the payment terms to apply.',
+        'payment_terms_id' => [
             'type'          => 'integer',
+            'description'   => 'Identifier of the payment terms to apply.',
             'min'           => 1,
             'default'       => 1
         ]
     ],
-    'access' => [
-        'groups'            => ['booking.default.user'],
+    'access'        => [
+        'groups'        => ['booking.default.user']
     ],
     'response'      => [
         'content-type'  => 'application/json',
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'     => ['context', 'orm', 'auth']
+    'providers'     => ['context', 'orm']
 ]);
 
 /**
- * @var \equal\php\Context                  $context
- * @var \equal\orm\ObjectManager            $orm
- * @var \equal\auth\AuthenticationManager   $auth
+ * @var \equal\php\Context          $context
+ * @var \equal\orm\ObjectManager    $orm
  */
-list($context, $orm, $auth) = [$providers['context'], $providers['orm'], $providers['auth']];
+['context' => $context, 'orm' => $orm] = $providers;
 
 
 $partners = Partner::search(['id', '=', $params['partner_id']])->get();
 
 if(!count($partners)) {
-    throw new Exception("unknown_partner", QN_ERROR_UNKNOWN_OBJECT);
+    throw new Exception("unknown_partner", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
 $funding = Funding::id($params['id'])
@@ -66,18 +65,18 @@ $funding = Funding::id($params['id'])
 
 if(!$funding) {
     // unknown funding
-    throw new Exception("unknown_funding", QN_ERROR_UNKNOWN_OBJECT);
+    throw new Exception("unknown_funding", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
 if($funding['type'] == 'invoice') {
     // already an invoice
-    throw new Exception("incompatible_status", QN_ERROR_INVALID_PARAM);
+    throw new Exception("incompatible_status", EQ_ERROR_INVALID_PARAM);
 }
 
 
 if(in_array($funding['booking_id']['status'], ['proforma', 'invoiced', 'debit_balance', 'credit_balance', 'balanced', 'cancelled'])) {
     // deposit invoice cannot be emitted after balance invoice
-    throw new Exception("incompatible_booking_status", QN_ERROR_INVALID_PARAM);
+    throw new Exception("incompatible_booking_status", EQ_ERROR_INVALID_PARAM);
 }
 
 // convert the installment to a proforma invoice
@@ -93,6 +92,7 @@ if($res !== true) {
 
 // #memo - we avoid emitting invoices automatically because it prevents choosing the date for newer invoices
 
-$context->httpResponse()
-        ->status(204)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(204)
+    ->send();

@@ -7,7 +7,7 @@
 
 use identity\Center;
 
-list($params, $providers) = eQual::announce([
+[$params, $providers] = eQual::announce([
     'description'   => 'Lists all+historic contracts and their related details for a given period.',
     'params'        => [
         /* mixed-usage parameters: required both for fetching data (input) and property of virtual entity (output) */
@@ -35,20 +35,18 @@ list($params, $providers) = eQual::announce([
             'description'       => "The organisation the establishment belongs to.",
             'domain'            => ['id', '<', 6]
         ],
-
         /* parameters used as properties of virtual entity */
-
         'center' => [
             'type'              => 'string',
             'description'       => 'Name of the center.'
         ],
         'center_type' => [
             'type'              => 'string',
+            'description'       => 'Type of the center.',
             'selection'         => [
                 'GA',
                 'GG'
-            ],
-            'description'       => 'Type of the center.'
+            ]
         ],
         'booking' => [
             'type'              => 'string',
@@ -128,15 +126,18 @@ list($params, $providers) = eQual::announce([
     'providers'     => ['context']
 ]);
 
-/** @var \equal\php\Context $context */
-$context = $providers['context'];
+/**
+ * @var \equal\php\Context $context
+ */
+['context' => $context] = $providers;
 
 $result = array_merge(
     eQual::run('get', 'sale_booking_stats_stat-contracts-history', $params),
     eQual::run('get', 'sale_booking_stats_stat-contracts-discope', $params)
 );
 
-$context->httpResponse()
-        ->header('X-Total-Count', count($result))
-        ->body($result)
-        ->send();
+$context
+    ->httpResponse()
+    ->header('X-Total-Count', count($result))
+    ->body($result)
+    ->send();

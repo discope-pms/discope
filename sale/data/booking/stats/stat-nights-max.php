@@ -11,14 +11,14 @@ use identity\User;
 use realestate\RentalUnit;
 use sale\booking\Consumption;
 
-list($params, $providers) = announce([
+[$params, $providers] = eQual::announce([
     'description'   => 'Returns the theoretical capacity (in nights) for a given period, according to actual state of the accommodations.',
     'params'        => [
         /* mixed-usage parameters: required both for fetching data (input) and property of virtual entity (output) */
         'all_centers' => [
             'type'              => 'boolean',
             'description'       => "Mark the all Center of the sojourn.",
-            'default'           =>  false
+            'default'           => false
         ],
         'center_id' => [
             'type'              => 'many2one',
@@ -36,7 +36,6 @@ list($params, $providers) = announce([
             'description'       => 'Output: Day of departure / Input: Date interval upper limit (defaults to last day of previous month).',
             'default'           => mktime(0, 0, 0, date("m"), 0)
         ],
-
         /* parameters used as properties of virtual entity */
         'center' => [
             'type'              => 'string',
@@ -52,16 +51,14 @@ list($params, $providers) = announce([
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'     => [ 'context', 'orm', 'adapt','auth' ]
+    'providers'     => ['context', 'auth']
 ]);
 
 /**
- * @var \equal\php\Context          $context
- * @var \equal\orm\ObjectManager    $orm
- * @var \equal\data\DataAdapter     $adapter
- * @var \equal\auth\AuthenticationManager $auth
+ * @var \equal\php\Context                  $context
+ * @var \equal\auth\AuthenticationManager   $auth
  */
-list($context, $orm, $adapter, $auth) = [ $providers['context'], $providers['orm'], $providers['adapt'] , $providers['auth']];
+['context' => $context, 'auth' => $auth] = $providers;
 
 $result = [];
 
@@ -73,12 +70,12 @@ if(isset($params['center_id']) || $params['all_centers']) {
 
         $user_id = $auth->userId();
         if($user_id <= 0) {
-            throw new Exception('user_unknown', QN_ERROR_NOT_ALLOWED);
+            throw new Exception('user_unknown', EQ_ERROR_NOT_ALLOWED);
         }
 
         $user = User::id($user_id)->read(['centers_ids'])->first(true);
         if(!$user) {
-            throw new Exception('unexpected_error', QN_ERROR_INVALID_USER);
+            throw new Exception('unexpected_error', EQ_ERROR_INVALID_USER);
         }
         $centers_ids = (array) $user['centers_ids'];
     }
@@ -132,7 +129,8 @@ if(isset($params['center_id']) || $params['all_centers']) {
     }
 }
 
-$context->httpResponse()
-        ->header('X-Total-Count', count($result))
-        ->body($result)
-        ->send();
+$context
+    ->httpResponse()
+    ->header('X-Total-Count', count($result))
+    ->body($result)
+    ->send();

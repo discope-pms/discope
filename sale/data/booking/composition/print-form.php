@@ -4,43 +4,44 @@
     Some Rights Reserved, Cedric Francoys, 2010-2021
     Licensed under GNU LGPL 3 license <http://www.gnu.org/licenses/>
 */
+
 use Dompdf\Dompdf;
 use Dompdf\Options as DompdfOptions;
 
 use sale\booking\CompositionItem;
 
 
-list($params, $providers) = announce([
+[$params, $providers] = eQual::announce([
     'description'   => "Returns a view populated with a collection of objects and outputs it as a PDF document.",
     'params'        => [
-        'view_id' =>  [
-            'description'   => 'The identifier of the view <type.name>.',
+        'view_id' => [
             'type'          => 'string',
+            'description'   => 'The identifier of the view <type.name>.',
             'default'       => 'list.print_form'
         ],
-        'domain' =>  [
-            'description'   => 'List of unique identifiers of the objects to read.',
+        'domain' => [
             'type'          => 'array',
+            'description'   => 'List of unique identifiers of the objects to read.',
             'default'       => []
         ],
-        'lang' =>  [
-            'description'   => 'Language in which labels and multilang field have to be returned (2 letters ISO 639-1).',
+        'lang' => [
             'type'          => 'string',
+            'description'   => 'Language in which labels and multilang field have to be returned (2 letters ISO 639-1).',
             'default'       => constant('DEFAULT_LANG')
         ],
         'params' => [
-            'description'   => 'Additional params to use for retrieving data.',
             'type'          => 'array',
+            'description'   => 'Additional params to use for retrieving data.',
             'default'       => []
         ]
     ],
-    'constants'     => ['DEFAULT_LANG'],
     'access'        => [
-        'visibility'        => 'protected'
+        'visibility'    => 'protected'
     ],
     'response'      => [
         'accept-origin' => '*'
     ],
+    'constants'     => ['DEFAULT_LANG'],
     'providers'     => ['context', 'orm']
 ]);
 
@@ -48,7 +49,7 @@ list($params, $providers) = announce([
  * @var \equal\php\Context          $context
  * @var \equal\orm\ObjectManager    $orm
  */
-list($context, $orm) = [$providers['context'], $providers['orm']];
+['context' => $context, 'orm' => $orm] = $providers;
 
 $entity = $orm->getModel(CompositionItem::getType());
 
@@ -72,7 +73,7 @@ if(isset($data['errors'])) {
 }
 
 if(!isset($data['layout']['items'])) {
-    throw new Exception('invalid_view', QN_ERROR_INVALID_CONFIG);
+    throw new Exception('invalid_view', EQ_ERROR_INVALID_CONFIG);
 }
 
 $view_schema = $data;
@@ -259,12 +260,13 @@ $canvas->page_text(30, 30, $view_title, $font, 14, array(0,0,0));
 // get generated PDF raw binary
 $output = $dompdf->output();
 
-$context->httpResponse()
-        ->header('Content-Type', 'application/pdf')
-        // ->header('Content-Disposition', 'attachment; filename="document.pdf"')
-        ->header('Content-Disposition', 'inline; filename="document.pdf"')
-        ->body($output)
-        ->send();
+$context
+    ->httpResponse()
+    ->header('Content-Type', 'application/pdf')
+    // ->header('Content-Disposition', 'attachment; filename="document.pdf"')
+    ->header('Content-Disposition', 'inline; filename="document.pdf"')
+    ->body($output)
+    ->send();
 
 
 function createHeaderRow($doc, &$view_items, &$translations) {

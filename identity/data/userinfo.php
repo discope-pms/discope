@@ -10,9 +10,9 @@ use identity\User;
 [$params, $providers] = eQual::announce([
     'description'   => "Returns descriptor of current User, based on received access_token",
     'response'      => [
-        'content-type'      => 'application/json',
-        'charset'           => 'UTF-8',
-        'accept-origin'     => '*'
+        'content-type'  => 'application/json',
+        'charset'       => 'UTF-8',
+        'accept-origin' => '*'
     ],
     'providers'     => ['context', 'orm', 'auth']
 ]);

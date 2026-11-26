@@ -11,65 +11,58 @@ use Dompdf\Options as DompdfOptions;
 use sale\booking\InvoiceLine;
 use sale\catalog\Product;
 use Twig\Environment as TwigEnvironment;
-use Twig\Loader\FilesystemLoader as TwigFilesystemLoader;
 use Twig\Extra\Intl\IntlExtension;
-use Twig\Extension\ExtensionInterface;
+use Twig\Loader\FilesystemLoader as TwigFilesystemLoader;
 
-use SepaQr\Data;
 use Endroid\QrCode\Builder\Builder;
 use Endroid\QrCode\ErrorCorrectionLevel\ErrorCorrectionLevelMedium;
+use SepaQr\Data;
 
-use sale\booking\Invoice;
 use communication\TemplatePart;
-use equal\data\DataFormatter;
 use discope\setting\Setting;
+use equal\data\DataFormatter;
+use sale\booking\Invoice;
 
 [$params, $providers] = eQual::announce([
     'description'   => "Render an invoice given its ID as a PDF document, for Valrance.",
     'params'        => [
-
         'id' => [
-            'description'   => 'Identifier of the invoice to print.',
             'type'          => 'integer',
+            'description'   => 'Identifier of the invoice to print.',
             'required'      => true
         ],
-
         'view_id' => [
-            'description'   => 'The identifier of the view <type.name>.',
             'type'          => 'string',
+            'description'   => 'The identifier of the view <type.name>.',
             'default'       => 'print.default'
         ],
-
         'mode' => [
-            'description'   => 'Mode in which document has to be rendered: simple (default) or detailed.',
             'type'          => 'string',
+            'description'   => 'Mode in which document has to be rendered: simple (default) or detailed.',
             'selection'     => ['simple', 'grouped', 'detailed'],
             'default'       => 'grouped'
         ],
-
         'lang' => [
-            'description'   => 'Language in which labels and multilang field have to be returned (2 letters ISO 639-1).',
             'type'          => 'string',
+            'description'   => 'Language in which labels and multilang field have to be returned (2 letters ISO 639-1).',
             'default'       => constant('DEFAULT_LANG')
         ],
-
         'output' => [
-            'description'   => 'Output format of the document.',
             'type'          => 'string',
+            'description'   => 'Output format of the document.',
             'selection'     => ['pdf', 'html'],
             'default'       => 'pdf'
         ]
-
     ],
-    'constants'     => ['DEFAULT_LANG', 'L10N_LOCALE'],
     'access'        => [
-        'visibility'        => 'protected',
-        'groups'            => ['booking.default.user'],
+        'visibility'    => 'protected',
+        'groups'        => ['booking.default.user']
     ],
     'response'      => [
-        'content-type'      => 'application/pdf',
-        'accept-origin'     => '*'
+        'content-type'  => 'application/pdf',
+        'accept-origin' => '*'
     ],
+    'constants'     => ['DEFAULT_LANG', 'L10N_LOCALE'],
     'providers'     => ['context']
 ]);
 

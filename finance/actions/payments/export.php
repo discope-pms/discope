@@ -10,10 +10,9 @@ use discope\setting\Setting;
 [$params, $providers] = eQual::announce([
     'description'   => "Creates export archives with newly available data from invoices and payments.",
     'help'          => "Creates either BOB or EBP exports depending on Setting 'finance.invoice.export_type'.",
-    'params'        => [
-    ],
+    'params'        => [],
     'access'        => [
-        'groups'        => ['finance.default.user'],
+        'groups'        => ['finance.default.user']
     ],
     'response'      => [
         'charset'       => 'utf-8',
@@ -23,7 +22,7 @@ use discope\setting\Setting;
 ]);
 
 /**
- * @var \equal\php\Context  $context
+ * @var \equal\php\Context $context
  */
 ['context' => $context] = $providers;
 

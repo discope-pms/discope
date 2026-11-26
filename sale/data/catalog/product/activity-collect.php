@@ -16,7 +16,7 @@ use sale\catalog\ProductModel;
     'description'   => "Retrieves all activities products filtered by given domain. Is used by the activities-planning",
     'extends'       => 'core_model_collect',
     'params'        => [
-        'entity' =>  [
+        'entity' => [
             'type'              => 'string',
             'description'       => "Full name (including namespace) of the class to look into (e.g. 'core\\User').",
             'default'           => 'sale\catalog\Product'
@@ -114,6 +114,7 @@ $filtered_products = array_filter($products, function($product) use ($center_gro
 // 3) sort products by name (on ascending order)
 usort($filtered_products, fn ($a, $b) => strcmp($a['name'], $b['name']));
 
-$context->httpResponse()
-        ->body($filtered_products)
-        ->send();
+$context
+    ->httpResponse()
+    ->body($filtered_products)
+    ->send();

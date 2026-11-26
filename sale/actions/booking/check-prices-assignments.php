@@ -5,20 +5,21 @@
     Original author(s): Yesbabylon SRL
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
+
 use sale\booking\Booking;
 
 
-list($params, $providers) = eQual::announce([
+[$params, $providers] = eQual::announce([
     'description'   => "Checks consistency of hosts composition (age ranges) for a given booking.",
     'params'        => [
-        'id' =>  [
-            'description'   => 'Identifier of the booking for which the composition must be checked.',
+        'id' => [
             'type'          => 'integer',
+            'description'   => 'Identifier of the booking for which the composition must be checked.',
             'required'      => true
-        ],
+        ]
     ],
-    'access' => [
-        'visibility'        => 'protected'
+    'access'        => [
+        'visibility'    => 'protected'
     ],
     'response'      => [
         'content-type'  => 'application/json',
@@ -29,10 +30,10 @@ list($params, $providers) = eQual::announce([
 ]);
 
 /**
- * @var \equal\php\Context                  $context
- * @var \equal\dispatch\Dispatcher          $dispatch
+ * @var \equal\php\Context          $context
+ * @var \equal\dispatch\Dispatcher  $dispatch
  */
-list($context, $dispatch) = [ $providers['context'], $providers['dispatch']];
+['context' => $context, 'dispatch' => $dispatch] = $providers;
 
 // ensure booking object exists and is readable
 $booking = Booking::id($params['id'])
@@ -50,7 +51,7 @@ $booking = Booking::id($params['id'])
     ->first(true);
 
 if(!$booking) {
-    throw new Exception("unknown_booking", QN_ERROR_UNKNOWN_OBJECT);
+    throw new Exception("unknown_booking", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
 $mismatch = false;
@@ -84,7 +85,7 @@ if($mismatch) {
     $result[] = $params['id'];
     // by convention we dispatch an alert that relates to the controller itself.
     $dispatch->dispatch('lodging.booking.prices_assignment', 'sale\booking\Booking', $params['id'], 'important', 'sale_booking_check-prices-assignments', ['id' => $params['id']], [], null, $booking['center_office_id']);
-    $httpResponse->status(qn_error_http(QN_ERROR_NOT_ALLOWED));
+    $httpResponse->status(qn_error_http(EQ_ERROR_NOT_ALLOWED));
 }
 else {
     // symmetrical removal of the alert (if any)

@@ -11,20 +11,17 @@ use sale\booking\followup\Task;
 [$params, $providers] = eQual::announce([
     'description'   => "Dismisses an alert related to given task if it is done.",
     'params'        => [
-
         'id' => [
             'type'              => 'many2one',
             'foreign_object'    => 'sale\booking\followup\Task',
             'description'       => "Identifier of the task that needs a check.",
             'required'          => true
         ],
-
         'message_model' => [
             'type'              => 'string',
             'description'       => "The name of the message model to use for the alert.",
             'default'           => 'sale.booking.followup.task.reminder'
         ],
-
         'severity' => [
             'type'              => 'string',
             'description'       => "Severity of the created alerts.",
@@ -36,15 +33,14 @@ use sale\booking\followup\Task;
             ],
             'default'           => 'important'
         ]
-
     ],
     'access'        => [
-        'visibility'        => 'protected'
+        'visibility'    => 'protected'
     ],
     'response'      => [
-        'content-type'      => 'application/json',
-        'charset'           => 'utf-8',
-        'accept-origin'     => '*'
+        'content-type'  => 'application/json',
+        'charset'       => 'utf-8',
+        'accept-origin' => '*'
     ],
     'providers'     => ['context', 'dispatch']
 ]);
@@ -85,6 +81,7 @@ if(!$task['is_done']) {
     );
 }
 
-$context->httpResponse()
-        ->status(200)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(200)
+    ->send();

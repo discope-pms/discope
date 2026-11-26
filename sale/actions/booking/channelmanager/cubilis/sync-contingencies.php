@@ -35,7 +35,7 @@ use sale\booking\channelmanager\Property;
 ]);
 
 /**
- * @var \equal\php\Context  $context
+ * @var \equal\php\Context $context
  */
 ['context' => $context] = $providers;
 
@@ -65,6 +65,7 @@ $result = eQual::run('do', 'sale_booking_check-contingencies', [
     'rental_units_ids'  => array_keys($map_rental_units_ids)
 ]);
 
-$context->httpResponse()
-        ->body($result)
-        ->send();
+$context
+    ->httpResponse()
+    ->body($result)
+    ->send();

@@ -11,31 +11,34 @@ use equal\email\Email;
 use sale\booking\channelmanager\Property;
 use sale\booking\Payment;
 
-list($params, $providers) = announce([
+[$params, $providers] = eQual::announce([
     'description'   => "Enriches a Payment entity with fee amount from PSP, if available.",
     'help'          => "This controller is meant to be scheduled after the creation of a reservation imported from Cubilis.",
     'params'        => [
-        'id' =>  [
-            'description'       => 'Identifier of the Payment for which data is requested.',
+        'id' => [
             'type'              => 'many2one',
             'foreign_object'    => 'sale\booking\Payment',
+            'description'       => 'Identifier of the Payment for which data is requested.',
             'required'          => true
         ]
     ],
-    'constants'     => ['ROOT_APP_URL', 'EMAIL_REPORT_RECIPIENT', 'EMAIL_ERRORS_RECIPIENT'],
-    'access' => [
-        'visibility'        => 'protected'
+    'access'        => [
+        'visibility'    => 'protected'
     ],
     'response'      => [
         'content-type'  => 'application/json',
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'     => ['context', 'orm', 'auth']
+    'constants'     => ['ROOT_APP_URL', 'EMAIL_REPORT_RECIPIENT', 'EMAIL_ERRORS_RECIPIENT'],
+    'providers'     => ['context']
 ]);
 
 
-list($context, $orm, $auth) = [$providers['context'], $providers['orm'], $providers['auth']];
+/**
+ * @var \equal\php\Context $context
+ */
+['context' => $context] = $providers;
 
 $result = [];
 
@@ -44,14 +47,14 @@ $payment = Payment::id($params['id'])
     ->first(true);
 
 if(!$payment) {
-    throw new Exception('unknown_payment', QN_ERROR_UNKNOWN_OBJECT);
+    throw new Exception('unknown_payment', EQ_ERROR_UNKNOWN_OBJECT);
 }
 
 try {
     $property = Property::search(['center_office_id', '=', $payment['center_office_id']])->read(['id'])->first(true);
 
     if(!$property) {
-        throw new Exception('missing_parent_property', QN_ERROR_UNKNOWN_OBJECT);
+        throw new Exception('missing_parent_property', EQ_ERROR_UNKNOWN_OBJECT);
     }
 
     if($payment['has_psp']) {
@@ -65,7 +68,7 @@ try {
                 ]);
             }
             else {
-                throw new Exception('invalid_psp_response', QN_ERROR_UNKNOWN);
+                throw new Exception('invalid_psp_response', EQ_ERROR_UNKNOWN);
             }
         }
     }
@@ -88,7 +91,8 @@ catch(Exception $e) {
     Mail::queue($message);
 }
 
-$context->httpResponse()
-        ->status(200)
-        ->body($result)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(200)
+    ->body($result)
+    ->send();

@@ -7,18 +7,18 @@
 
 use sale\booking\Booking;
 
-list($params, $providers) = eQual::announce([
+[$params, $providers] = eQual::announce([
     'description'   => 'Returns descriptor of current User, based on received guest_access_token (no user_id).',
-    'response'      => [
-        'content-type'      => 'application/json',
-        'charset'           => 'UTF-8',
-        'accept-origin'     => '*',
-        'errors'            => ['invalid_token', 'malformed_token', 'expired_token']
-    ],
-    'constants'     => ['AUTH_SECRET_KEY', 'DEFAULT_LANG'],
     'access'        => [
         'visibility'    => 'public'
     ],
+    'response'      => [
+        'content-type'  => 'application/json',
+        'charset'       => 'UTF-8',
+        'accept-origin' => '*',
+        'errors'        => ['invalid_token', 'malformed_token', 'expired_token']
+    ],
+    'constants'     => ['AUTH_SECRET_KEY', 'DEFAULT_LANG'],
     'providers'     => ['context', 'auth']
 ]);
 
@@ -44,7 +44,7 @@ if(!isset($payload['exp']) || !isset($payload['booking_id']) || !isset($payload[
 }
 
 if($payload['exp'] < time()) {
-    throw new Exception('expired_token', QN_ERROR_INVALID_USER);
+    throw new Exception('expired_token', EQ_ERROR_INVALID_USER);
 }
 
 $identity_fields = ['email', 'lang_id' => ['code']];
@@ -76,6 +76,7 @@ $user = [
     'lang'          => $lang
 ];
 
-$context->httpResponse()
-        ->body($user)
-        ->send();
+$context
+    ->httpResponse()
+    ->body($user)
+    ->send();

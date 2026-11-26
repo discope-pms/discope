@@ -7,39 +7,43 @@
 */
 
 use discope\setting\Setting;
-use identity\Center;
 use finance\accounting\Invoice;
 use finance\accounting\InvoiceLine;
 use finance\accounting\InvoiceLineGroup;
+use identity\Center;
 use sale\catalog\Product;
 use sale\pos\Order;
 
-list($params, $providers) = eQual::announce([
+[$params, $providers] = eQual::announce([
     'description'   => "Generates an invoice with all cashdesk orders made by the given Center for a given month.",
     'params'        => [
-        'domain' =>  [
-            'description'   => 'Domain to limit the result set (specifying a month is mandatory).',
+        'domain' => [
             'type'          => 'array',
+            'description'   => 'Domain to limit the result set (specifying a month is mandatory).',
             'default'       => []
         ],
-        'params' =>  [
-            'description'   => 'Additional params, if any',
+        'params' => [
             'type'          => 'array',
+            'description'   => 'Additional params, if any',
             'default'       => []
         ]
     ],
-    'access' => [
-        'groups'            => ['pos.default.user', 'pos.default.administrator', 'admins'],
+    'access'        => [
+        'groups'        => ['pos.default.user', 'pos.default.administrator', 'admins']
     ],
     'response'      => [
         'content-type'  => 'application/json',
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'     => ['context', 'orm', 'adapt']
+    'providers'     => ['context', 'adapt']
 ]);
 
-list($context, $orm, $dap) = [$providers['context'], $providers['orm'], $providers['adapt']];
+/**
+ * @var \equal\php\Context                      $context
+ * @var \equal\data\adapt\DataAdapterProvider   $dap
+ */
+['context' => $context, 'adapt' => $dap] = $providers;
 
 /** @var \equal\data\adapt\DataAdapter */
 $adapter = $dap->get('json');
@@ -270,6 +274,7 @@ if(in_array($center_id, [27, 30, 28, 24, 26, 32]) && $date >= strtotime('2024-04
         ]);
 }
 
-$context->httpResponse()
-        ->status(204)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(204)
+    ->send();

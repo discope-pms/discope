@@ -8,11 +8,11 @@
 
 use sale\booking\channelmanager\Property;
 
-list($params, $providers) = eQual::announce([
+[$params, $providers] = eQual::announce([
     'description'   => 'Synchronize discope rental units availabilities to cubilis, only for cubilis last updatable calendar day.',
     'help'          => 'Is meant to run on a daily basis, to sync cubilis calendar as much as possible.',
     'access'        => [
-        'groups' => ['admins'],
+        'groups'        => ['admins']
     ],
     'response'      => [
         'content-type'  => 'application/json',
@@ -22,8 +22,10 @@ list($params, $providers) = eQual::announce([
     'providers'     => ['context']
 ]);
 
-/** @var \equal\php\Context $context */
-$context = $providers['context'];
+/**
+ * @var \equal\php\Context $context
+ */
+['context' => $context] = $providers;
 
 $result = [
     'errors'                => 0,
@@ -50,13 +52,14 @@ foreach($properties as $property) {
         $msg = $e->getMessage();
         trigger_error(
             "APP::error while sync-last-updatable-day for property {$property['name']} ".$msg,
-            QN_REPORT_ERROR
+            EQ_REPORT_ERROR
         );
         ++$result['errors'];
         $result['logs'][] = "ERR - Error while sync-all for property {$property['name']} [{$property['id']}]: {$msg}";
     }
 }
 
-$context->httpResponse()
-        ->body($result)
-        ->send();
+$context
+    ->httpResponse()
+    ->body($result)
+    ->send();

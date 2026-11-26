@@ -15,9 +15,9 @@ use sale\booking\channelmanager\Payment;
     'description'   => "Fully removes a booking along with all objects relating to it.",
     'help'          => "This action is made for booking that were erroneously imported while not yet validated at channelmanager side. WARNING: this cannot be undone (double-check with Channel Manager).",
     'params'        => [
-        'id' =>  [
-            'description'   => 'Identifier of the targeted booking.',
+        'id' => [
             'type'          => 'integer',
+            'description'   => 'Identifier of the targeted booking.',
             'min'           => 1,
             'required'      => true
         ]
@@ -34,7 +34,7 @@ use sale\booking\channelmanager\Payment;
 ]);
 
 /**
- * @var \equal\php\Context  $context
+ * @var \equal\php\Context $context
  */
 ['context' => $context] = $providers;
 
@@ -43,11 +43,11 @@ $booking = Booking::id($params['id'])
     ->first(true);
 
 if(!$booking) {
-    throw new Exception("unknown_booking", QN_ERROR_UNKNOWN_OBJECT);
+    throw new Exception("unknown_booking", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
 if(!$booking['is_from_channelmanager']) {
-    throw new Exception("non_applicable_booking", QN_ERROR_INVALID_PARAM);
+    throw new Exception("non_applicable_booking", EQ_ERROR_INVALID_PARAM);
 }
 
 // remove any pending alert
@@ -66,6 +66,7 @@ foreach($booking['fundings_ids'] as $funding_id) {
 // remove booking
 Booking::id($params['id'])->delete(true);
 
-$context->httpResponse()
-        ->status(205)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(205)
+    ->send();

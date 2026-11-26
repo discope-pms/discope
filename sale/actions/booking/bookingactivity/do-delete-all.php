@@ -12,18 +12,16 @@ use sale\booking\BookingActivitySet;
 [$params, $providers] = eQual::announce([
     'description'   => "Removes a booking activity and all activities within the same set.",
     'params'        => [
-
-        'id' =>  [
+        'id' => [
             'type'          => 'many2one',
             'description'   => "Identifier of the targeted booking activity.",
             'min'           => 1,
             'required'      => true
         ]
-
     ],
     'access'        => [
         'visibility'    => 'protected',
-        'groups'        => ['booking.default.user', 'camp.default.user'],
+        'groups'        => ['booking.default.user', 'camp.default.user']
     ],
     'response'      => [
         'content-type'  => 'application/json',
@@ -34,7 +32,7 @@ use sale\booking\BookingActivitySet;
 ]);
 
 /**
- * @var \equal\php\Context  $context
+ * @var \equal\php\Context $context
  */
 ['context' => $context] = $providers;
 
@@ -53,6 +51,7 @@ if(!is_null($bookingActivity['booking_id']) || !is_null($bookingActivity['camp_i
 // #memo - all related BookingActivity items will be deleted in cascade
 BookingActivitySet::id($bookingActivity['booking_activity_set_id'])->delete(true);
 
-$context->httpResponse()
-        ->status(205)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(205)
+    ->send();

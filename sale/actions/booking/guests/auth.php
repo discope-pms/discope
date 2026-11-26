@@ -4,35 +4,35 @@
     Author: Yesbabylon SRL, 2020-2024
     License: GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
+
 use sale\booking\Booking;
 
-list($params, $providers) = eQual::announce([
-    'description'	=>	"Attempts to temporarily log a user in with a nonce token.",
-    'params' 		=>	[
-        'nonce' =>  [
-            'description'   => "Nonce token to be used for authentication.",
+[$params, $providers] = eQual::announce([
+    'description'   => "Attempts to temporarily log a user in with a nonce token.",
+    'params'        => [
+        'nonce' => [
             'type'          => 'string',
+            'description'   => "Nonce token to be used for authentication.",
             'required'      => true
         ]
     ],
-    'access' => [
-        'visibility'        => 'public'
+    'access'        => [
+        'visibility'    => 'public'
     ],
     'response'      => [
-        'content-type'      => 'application/json',
-        'charset'           => 'utf-8',
-        'accept-origin'     => '*'
+        'content-type'  => 'application/json',
+        'charset'       => 'utf-8',
+        'accept-origin' => '*'
     ],
-    'providers'     => ['context', 'auth', 'orm'],
-    'constants'     => ['AUTH_ACCESS_TOKEN_VALIDITY', 'AUTH_TOKEN_HTTPS']
+    'constants'     => ['AUTH_ACCESS_TOKEN_VALIDITY', 'AUTH_TOKEN_HTTPS'],
+    'providers'     => ['context', 'auth']
 ]);
 
 /**
  * @var \equal\php\Context                  $context
- * @var \equal\orm\ObjectManager            $orm
  * @var \equal\auth\AuthenticationManager   $auth
  */
-['context' => $context, 'orm' => $orm, 'auth' => $auth] = $providers;
+['context' => $context, 'auth' => $auth] = $providers;
 
 $jwt = $params['nonce'];
 
@@ -88,11 +88,12 @@ $guest_access_token  = $auth->encode([
         'exp'        => time() + (15 * 86400)
     ]);
 
-$context->httpResponse()
-        ->cookie('guest_access_token',  $guest_access_token, [
+$context
+    ->httpResponse()
+    ->cookie('guest_access_token',  $guest_access_token, [
             'expires'   => time() + 86400,
             'httponly'  => true,
             'secure'    => constant('AUTH_TOKEN_HTTPS')
         ])
-        ->status(204)
-        ->send();
+    ->status(204)
+    ->send();

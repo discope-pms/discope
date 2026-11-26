@@ -9,35 +9,32 @@
 [$params, $providers] = eQual::announce([
     'description'   => "Print listing of price adapters with additional enrollment and camp data.",
     'params'        => [
-
         'date_from' => [
-            'type'              => 'date',
-            'description'       => "List price adapters of enrollments to camps after this date.",
-            'required'          => true,
-            'default'           => fn() => strtotime('first day of january this year')
+            'type'          => 'date',
+            'description'   => "List price adapters of enrollments to camps after this date.",
+            'required'      => true,
+            'default'       => fn() => strtotime('first day of january this year')
         ],
-
         'date_to' => [
-            'type'              => 'date',
-            'description'       => "List price adapters of enrollments to camps before this date.",
-            'required'          => true,
-            'default'           => fn() => strtotime('last day of december this year')
+            'type'          => 'date',
+            'description'   => "List price adapters of enrollments to camps before this date.",
+            'required'      => true,
+            'default'       => fn() => strtotime('last day of december this year')
         ]
-
     ],
     'access'        => [
-        'visibility'        => 'protected',
-        'groups'            => ['camp.default.administrator'],
+        'visibility'    => 'protected',
+        'groups'        => ['camp.default.administrator']
     ],
     'response'      => [
-        'content-type'      => 'application/pdf',
-        'accept-origin'     => '*'
+        'content-type'  => 'application/pdf',
+        'accept-origin' => '*'
     ],
     'providers'     => ['context']
 ]);
 
 /**
- * @var \equal\php\Context  $context
+ * @var \equal\php\Context $context
  */
 ['context' => $context] = $providers;
 
@@ -46,7 +43,8 @@ $output = eQual::run('get', 'sale_camp_price_print-price-adapters', [
     'date_to'   => $params['date_to']
 ]);
 
-$context->httpResponse()
-        ->header('Content-Disposition', 'inline; filename="document.pdf"')
-        ->body($output)
-        ->send();
+$context
+    ->httpResponse()
+    ->header('Content-Disposition', 'inline; filename="document.pdf"')
+    ->body($output)
+    ->send();

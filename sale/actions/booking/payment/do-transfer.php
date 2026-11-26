@@ -5,46 +5,45 @@
     Original author(s): Yesbabylon SRL
     Licensed under GNU AGPL 3 license <http://www.gnu.org/licenses/>
 */
-use sale\booking\Payment;
-use sale\booking\Funding;
-use sale\booking\Booking;
 
-list($params, $providers) = eQual::announce([
+use sale\booking\Booking;
+use sale\booking\Funding;
+use sale\booking\Payment;
+
+[$params, $providers] = eQual::announce([
     'description'   => "Transfers a payment from one funding to another, on the same booking or another booking from the same customer.",
     'help'          => "After the operation, status of involved fundings and bookings are updated. This action is intended to be exclusively called on `sale\booking\Payment` entities.",
     'params'        => [
-        'id' =>  [
-            'description'    => 'Identifier of the targeted payment.',
-            'type'           => 'many2one',
-            'foreign_object' => 'sale\booking\Payment',
-            'required'       => true
+        'id' => [
+            'type'              => 'many2one',
+            'foreign_object'    => 'sale\booking\Payment',
+            'description'       => 'Identifier of the targeted payment.',
+            'required'          => true
         ],
-        'funding_id' =>  [
-            'description'    => 'Target funding.',
-            'type'           => 'many2one',
-            'foreign_object' => 'sale\booking\Funding',
-            'domain'         => ['booking_id', 'in', 'object.booking_id.customer_id.bookings_ids'],
-            'required'       => true
+        'funding_id' => [
+            'type'              => 'many2one',
+            'foreign_object'    => 'sale\booking\Funding',
+            'description'       => 'Target funding.',
+            'domain'            => ['booking_id', 'in', 'object.booking_id.customer_id.bookings_ids'],
+            'required'          => true
         ]
     ],
-    'access' => [
-        'groups'            => ['booking.default.user', 'sale.default.administrator']
+    'access'        => [
+        'groups'        => ['booking.default.user', 'sale.default.administrator']
     ],
     'response'      => [
         'content-type'  => 'application/json',
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'     => ['context', 'orm', 'cron', 'dispatch']
+    'providers'     => ['context', 'orm']
 ]);
 
 /**
- * @var \equal\php\Context                  $context
- * @var \equal\orm\ObjectManager            $orm
- * @var \equal\cron\Scheduler               $cron
- * @var \equal\dispatch\Dispatcher          $dispatch
+ * @var \equal\php\Context          $context
+ * @var \equal\orm\ObjectManager    $orm
  */
-list($context, $orm, $cron, $dispatch) = [$providers['context'], $providers['orm'], $providers['cron'], $providers['dispatch']];
+['context' => $context, 'orm' => $orm] = $providers;
 
 $payment = Payment::id($params['id'])->read(['id', 'amount', 'funding_id', 'booking_id', 'center_office_id'])->first(true);
 
@@ -111,6 +110,7 @@ else {
     Booking::updateStatusFromFundings($orm, [$funding['booking_id'], $payment['booking_id']], [], 'en');
 }
 
-$context->httpResponse()
-        ->status(204)
-        ->send();
+$context
+    ->httpResponse()
+    ->status(204)
+    ->send();

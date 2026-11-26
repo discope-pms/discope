@@ -11,39 +11,37 @@ use sale\booking\BookingLineGroup;
 use sale\booking\SojournProductModelRentalUnitAssignement;
 
 
-list($params, $providers) = announce([
+[$params, $providers] = eQual::announce([
     'description'   => "Checks if the composition is complete for a given booking.",
     'params'        => [
-        'id' =>  [
-            'description'   => 'Identifier of the booking for which the composition is checked.',
+        'id' => [
             'type'          => 'integer',
+            'description'   => 'Identifier of the booking for which the composition is checked.',
             'required'      => true
-        ],
+        ]
     ],
-    'access' => [
-        'visibility'        => 'protected'
+    'access'        => [
+        'visibility'    => 'protected'
     ],
     'response'      => [
         'content-type'  => 'application/json',
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'     => ['context', 'orm', 'auth', 'dispatch']
+    'providers'     => ['context', 'dispatch']
 ]);
 
 /**
- * @var \equal\php\Context                  $context
- * @var \equal\orm\ObjectManager            $orm
- * @var \equal\auth\AuthenticationManager   $auth
- * @var \equal\dispatch\Dispatcher          $dispatch
+ * @var \equal\php\Context          $context
+ * @var \equal\dispatch\Dispatcher  $dispatch
  */
-list($context, $orm, $auth, $dispatch) = [ $providers['context'], $providers['orm'], $providers['auth'], $providers['dispatch']];
+['context' => $context, 'dispatch' => $dispatch] = $providers;
 
 // ensure booking object exists and is readable
 $booking = Booking::id($params['id'])->read(['id', 'name', 'center_office_id', 'composition_items_ids'])->first(true);
 
 if(!$booking) {
-    throw new Exception("unknown_booking", QN_ERROR_UNKNOWN_OBJECT);
+    throw new Exception("unknown_booking", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
 // retrieve the number of persons involved in sojourns with accomodation
@@ -84,7 +82,7 @@ if(count($booking['composition_items_ids']) < $nb_pers) {
     $result[] = $params['id'];
     // by convention we dispatch an alert that relates to the controller itself.
     $dispatch->dispatch('lodging.booking.composition', 'sale\booking\Booking', $params['id'], 'important', 'sale_booking_check-composition', ['id' => $params['id']], [], null, $booking['center_office_id']);
-    $httpResponse->status(qn_error_http(QN_ERROR_NOT_ALLOWED));
+    $httpResponse->status(qn_error_http(EQ_ERROR_NOT_ALLOWED));
 }
 else {
     // symetrical removal of the alert (if any)

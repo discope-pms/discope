@@ -38,7 +38,6 @@ use sale\customer\AgeRange;
             ],
             'default'           => 'is_not_option'
         ],
-
         /* parameters used as properties of virtual entity */
         'date' => [
             'type'              => 'date',
@@ -51,23 +50,23 @@ use sale\customer\AgeRange;
         ],
         'total' => [
             'type'              => 'integer',
-            'description'       => "Total of the consumption.",
+            'description'       => "Total of the consumption."
         ],
         'total_snack' => [
             'type'              => 'integer',
-            'description'       => "Total of the consumption for the snack.",
+            'description'       => "Total of the consumption for the snack."
         ],
         'total_breakfast' => [
             'type'              => 'integer',
-            'description'       => "Total of the consumption for the breakfast.",
+            'description'       => "Total of the consumption for the breakfast."
         ],
         'total_lunch' => [
             'type'              => 'integer',
-            'description'       => "Total of the consumption for the lunch.",
+            'description'       => "Total of the consumption for the lunch."
         ],
         'total_diner' => [
             'type'              => 'integer',
-            'description'       => "Total of the consumption for the diners.",
+            'description'       => "Total of the consumption for the diners."
         ]
     ],
     'response'      => [
@@ -79,7 +78,7 @@ use sale\customer\AgeRange;
 ]);
 
 /**
- * @var \equal\php\Context  $context
+ * @var \equal\php\Context $context
  */
 ['context' => $context] = $providers;
 
@@ -230,7 +229,8 @@ usort($result, function ($a, $b) {
     return strcmp($a['date'], $b['date']) ?: strcmp($a['age_range_id']['id'], $b['age_range_id']['id']);
 });
 
-$context->httpResponse()
-        ->header('X-Total-Count', count($result))
-        ->body($result)
-        ->send();
+$context
+    ->httpResponse()
+    ->header('X-Total-Count', count($result))
+    ->body($result)
+    ->send();

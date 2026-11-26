@@ -22,57 +22,61 @@ use Twig\Loader\FilesystemLoader as TwigFilesystemLoader;
     We use this controller as a "print" controller, for printing the result of a "Checkin" Consumption search.
     We ignore domain, ids and controller and entity : we deal with Bookin entity and fetch relevant booking without additional "data" controller.
 */
-list($params, $providers) = announce([
+[$params, $providers] = eQual::announce([
     'description'   => "Generates a list of arrival data as a PDF document, given a center and a date range.",
     'params'        => [
-        'view_id' =>  [
-            'description'   => 'The identifier of the view <type.name>.',
+        'view_id' => [
             'type'          => 'string',
+            'description'   => 'The identifier of the view <type.name>.',
             'default'       => 'print.arrivals'
         ],
         /*
         // #memo - these values are fetched from the 'params' parameter
         'date_from' => [
-            'type'              => 'date',
-            'description'       => "Date interval lower limit.",
-            'default'           => strtotime('first day of previous week')
+        'type'              => 'date',
+        'description'       => "Date interval lower limit.",
+        'default'           => strtotime('first day of previous week')
         ],
         'date_to' => [
-            'type'              => 'date',
-            'description'       => 'Date interval Upper limit.',
-            'default'           => strtotime('last day of next week')
+        'type'              => 'date',
+        'description'       => 'Date interval Upper limit.',
+        'default'           => strtotime('last day of next week')
         ],
         'center_id' => [
-            'type'              => 'many2one',
-            'foreign_object'    => 'identity\Center',
-            'description'       => "The center to which the booking relates to."
+        'type'              => 'many2one',
+        'foreign_object'    => 'identity\Center',
+        'description'       => "The center to which the booking relates to."
         ],
         */
         'params' => [
-            'description'   => 'Additional params to use for retrieving data.',
             'type'          => 'array',
+            'description'   => 'Additional params to use for retrieving data.',
             'default'       => []
         ],
-        'lang' =>  [
-            'description'   => 'Language in which labels and multilang field have to be returned (2 letters ISO 639-1).',
+        'lang' => [
             'type'          => 'string',
+            'description'   => 'Language in which labels and multilang field have to be returned (2 letters ISO 639-1).',
             'default'       => constant('DEFAULT_LANG')
         ]
     ],
-    'constants'             => ['DEFAULT_LANG', 'L10N_LOCALE'],
-    'access' => [
-        'visibility'        => 'protected',
-        'groups'            => ['booking.default.user'],
+    'access'        => [
+        'visibility'    => 'protected',
+        'groups'        => ['booking.default.user']
     ],
     'response'      => [
-        'content-type'      => 'application/pdf',
-        'accept-origin'     => '*'
+        'content-type'  => 'application/pdf',
+        'accept-origin' => '*'
     ],
-    'providers'     => ['context', 'orm', 'auth']
+    'constants'     => ['DEFAULT_LANG', 'L10N_LOCALE'],
+    'providers'     => ['context', 'auth']
 ]);
 
 
-list($context, $orm, $auth) = [$providers['context'], $providers['orm'], $providers['auth']];
+/**
+ * @var \equal\php\Context                  $context
+ * @var \equal\auth\AuthenticationManager   $auth
+ */
+['context' => $context, 'auth' => $auth] = $providers;
 
 $lodging_booking_print_booking_formatMember = function($booking) {
     $id = $booking['customer_identity_id']['id'];
@@ -100,7 +104,7 @@ if(!isset($params['params']['date_to'])) {
 if(!isset($params['params']['center_id']) || $params['params']['center_id'] == 0) {
     $user = User::id($auth->userId())->read(['centers_ids'])->first(true);
     if(count($user['centers_ids']) <= 0) {
-        throw new Exception("center_id", QN_ERROR_MISSING_PARAM);
+        throw new Exception("center_id", EQ_ERROR_MISSING_PARAM);
     }
     $params['params']['center_id'] = reset($user['centers_ids']);
 }
@@ -125,7 +129,7 @@ $domain
 $bookings_ids = Booking::search($domain->toArray(), ['sort'  => ['date_from' => 'asc']])->ids();
 
 if(!count($bookings_ids)) {
-    throw new Exception("no_match", QN_ERROR_UNKNOWN_OBJECT);
+    throw new Exception("no_match", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
 /*
@@ -138,10 +142,10 @@ $package = array_shift($parts);
 $class_path = implode('/', $parts);
 $parent = get_parent_class($entity);
 
-$file = QN_BASEDIR."/packages/{$package}/views/{$class_path}.{$params['view_id']}.html";
+$file = EQ_BASEDIR."/packages/{$package}/views/{$class_path}.{$params['view_id']}.html";
 
 if(!file_exists($file)) {
-    throw new Exception("unknown_view_id", QN_ERROR_UNKNOWN_OBJECT);
+    throw new Exception("unknown_view_id", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
 
@@ -206,7 +210,7 @@ $fields = [
 $bookings = Booking::ids($bookings_ids)->read($fields)->get(true);
 
 if(!$bookings) {
-    throw new Exception("unknown_contract", QN_ERROR_UNKNOWN_OBJECT);
+    throw new Exception("unknown_contract", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
 
@@ -357,7 +361,7 @@ foreach($bookings as $booking) {
 
 try {
 
-    $loader = new TwigFilesystemLoader(QN_BASEDIR."/packages/{$package}/views/");
+    $loader = new TwigFilesystemLoader(EQ_BASEDIR."/packages/{$package}/views/");
 
     $twig = new TwigEnvironment($loader);
     $extension  = new IntlExtension();
@@ -373,8 +377,8 @@ try {
     $html = $template->render($values);
 }
 catch(Exception $e) {
-    trigger_error("ORM::error while parsing template - ".$e->getMessage(), QN_REPORT_DEBUG);
-    throw new Exception("template_parsing_issue", QN_ERROR_INVALID_CONFIG);
+    trigger_error("ORM::error while parsing template - ".$e->getMessage(), EQ_REPORT_DEBUG);
+    throw new Exception("template_parsing_issue", EQ_ERROR_INVALID_CONFIG);
 }
 
 
@@ -400,8 +404,9 @@ $canvas->page_text(530, $canvas->get_height() - 35, "p. {PAGE_NUM} / {PAGE_COUNT
 // get generated PDF raw binary
 $output = $dompdf->output();
 
-$context->httpResponse()
-        // ->header('Content-Disposition', 'attachment; filename="document.pdf"')
-        ->header('Content-Disposition', 'inline; filename="document.pdf"')
-        ->body($output)
-        ->send();
+$context
+    ->httpResponse()
+    // ->header('Content-Disposition', 'attachment; filename="document.pdf"')
+    ->header('Content-Disposition', 'inline; filename="document.pdf"')
+    ->body($output)
+    ->send();

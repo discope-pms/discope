@@ -10,7 +10,7 @@ use sale\booking\Contract;
 [$params, $providers] = eQual::announce([
     'description'   => "Mark a contract as sent to the customer.",
     'params'        => [
-        'id' =>  [
+        'id' => [
             'type'          => 'integer',
             'description'   => "Identifier of the targeted contract.",
             'min'           => 1,
@@ -19,7 +19,7 @@ use sale\booking\Contract;
     ],
     'access'        => [
         'visibility'    => 'public',
-        'groups'        => ['booking.default.user'],
+        'groups'        => ['booking.default.user']
     ],
     'response'      => [
         'content-type'  => 'application/json',
@@ -30,7 +30,7 @@ use sale\booking\Contract;
 ]);
 
 /**
- * @var \equal\php\Context  $context
+ * @var \equal\php\Context $context
  */
 ['context' => $context] = $providers;
 
@@ -39,18 +39,19 @@ $contract = Contract::id($params['id'])
     ->first(true);
 
 if(!$contract) {
-    throw new Exception("unknown_contract", QN_ERROR_UNKNOWN_OBJECT);
+    throw new Exception("unknown_contract", EQ_ERROR_UNKNOWN_OBJECT);
 }
 
 if($contract['status'] != 'pending') {
-    throw new Exception("invalid_status", QN_ERROR_NOT_ALLOWED);
+    throw new Exception("invalid_status", EQ_ERROR_NOT_ALLOWED);
 }
 
 Contract::id($params['id'])->update(['status' => 'sent']);
 
 // #todo - check if required payment have been paid in the meantime
 
-$context->httpResponse()
-        ->status(200)
-        ->body([])
-        ->send();
+$context
+    ->httpResponse()
+    ->status(200)
+    ->body([])
+    ->send();

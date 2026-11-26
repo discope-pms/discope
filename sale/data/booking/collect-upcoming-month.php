@@ -12,50 +12,43 @@ use identity\Center;
     'description'   => 'Advanced search for Bookings: returns a collection of Booking according to extra parameters.',
     'extends'       => 'core_model_collect',
     'params'        => [
-        'entity' =>  [
-            'type'          => 'string',
-            'description'   => 'Full name (including namespace) of the class to look into (e.g. \'core\\User\').',
-            'default'       => 'sale\booking\Booking'
+        'entity' => [
+            'type'              => 'string',
+            'description'       => 'Full name (including namespace) of the class to look into (e.g. \'core\\User\').',
+            'default'           => 'sale\booking\Booking'
         ],
-
         'period_type' => [
-            'type'          => 'string',
-            'description'   => 'Upcoming week or month.',
-            'selection'     => [
+            'type'              => 'string',
+            'description'       => 'Upcoming week or month.',
+            'selection'         => [
                 'week',
                 'month'
             ],
-            'default'       => 'month'
+            'default'           => 'month'
         ],
-
         'bank_account_iban' => [
-            'type'          => 'string',
-            'usage'         => 'uri/urn:iban',
-            'description'   => "Number of the bank account of the Identity, if any."
+            'type'              => 'string',
+            'usage'             => 'uri/urn:iban',
+            'description'       => "Number of the bank account of the Identity, if any."
         ],
-
         'structured_message' => [
-            'type'          => 'string',
-            'description'   => "Structured message from bank statement."
+            'type'              => 'string',
+            'description'       => "Structured message from bank statement."
         ],
-
         'display_name' => [
-            'type'          => 'string',
-            'description'   => "Complete name of the booking."
+            'type'              => 'string',
+            'description'       => "Complete name of the booking."
         ],
-
         'customer_accounting_account' => [
-            'type'          => 'string',
-            'description'   => "Accounting account of the Identity of the customer."
+            'type'              => 'string',
+            'description'       => "Accounting account of the Identity of the customer."
         ],
-
         'identity_id' => [
             'type'              => 'many2one',
             'foreign_object'    => 'identity\Identity',
-            'domain'            => ["id", ">", 4],
-            'description'       => 'Customer identity.'
+            'description'       => 'Customer identity.',
+            'domain'            => ["id", ">", 4]
         ],
-
         'center_id' => [
             'type'              => 'many2one',
             'foreign_object'    => 'identity\Center',
@@ -64,65 +57,57 @@ use identity\Center;
                 return ($centers = Center::search())->count() === 1 ? current($centers->ids()) : null;
             }
         ],
-
         'rental_unit_id' => [
             'type'              => 'many2one',
             'foreign_object'    => 'realestate\RentalUnit',
             'description'       => 'Rental unit on which to perform the search.'
         ],
-
         'has_tour_operator' => [
             'type'              => 'boolean',
             'description'       => 'Mark the booking as completed by a Tour Operator.'
         ],
-
         'tour_operator_id' => [
             'type'              => 'many2one',
             'foreign_object'    => 'sale\customer\TourOperator',
-            'domain'            => ['is_tour_operator', '=', true],
             'description'       => 'Mark the booking as completed by a Tour Operator.',
+            'domain'            => ['is_tour_operator', '=', true],
             'visible'           => ['has_tour_operator', '=', true]
         ],
-
         'tour_operator_ref' => [
             'type'              => 'string',
             'description'       => 'Specific reference, voucher code, or booking ID from the TO.',
             'visible'           => ['has_tour_operator', '=', true]
         ],
-
         'extref_reservation_id' => [
             'type'              => 'string',
             'description'       => 'Identifier of the reservation at Channel Manager side.'
         ],
-
         'email' => [
             'type'              => 'string',
             'description'       => 'Email of the contacts of the booking.'
         ],
-
         'rental_unit_category_id' => [
             'type'              => 'many2one',
-            'description'       => "Category which current unit belongs to, if any.",
-            'foreign_object'    => 'realestate\RentalUnitCategory'
+            'foreign_object'    => 'realestate\RentalUnitCategory',
+            'description'       => "Category which current unit belongs to, if any."
         ]
-
     ],
     'response'      => [
         'content-type'  => 'application/json',
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'     => [ 'context', 'orm' ]
+    'providers'     => ['context']
 ]);
 
 /**
  * @var \equal\php\Context $context
- * @var \equal\orm\ObjectManager $orm
  */
-['context' => $context, 'orm' => $orm] = $providers;
+['context' => $context] = $providers;
 
 $result = eQual::run('get', 'sale_booking_collect-upcoming', $params, true);
 
-$context->httpResponse()
-        ->body($result)
-        ->send();
+$context
+    ->httpResponse()
+    ->body($result)
+    ->send();

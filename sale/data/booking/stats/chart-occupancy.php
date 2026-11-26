@@ -12,12 +12,12 @@ use realestate\RentalUnit;
 use sale\booking\Consumption;
 
 
-list($params, $providers) = announce([
+[$params, $providers] = eQual::announce([
     'description'   => 'Computes the occupancy rate for a given date range.',
     'extends'       => 'core_model_chart',
     'params'        => [
         /* overloaded params */
-        'entity'    => [
+        'entity' => [
             'type'              => 'string',
             'default'           => 'sale\booking\Consumption'
         ],
@@ -25,7 +25,7 @@ list($params, $providers) = announce([
         'all_centers' => [
             'type'              => 'boolean',
             'description'       => "Mark the all Center of the sojourn.",
-            'default'           =>  false
+            'default'           => false
         ],
         'center_id' => [
             'type'              => 'many2one',
@@ -44,14 +44,14 @@ list($params, $providers) = announce([
             'default'           => mktime(0, 0, 0, date("m"), 0)
         ],
         'range_interval' => [
-            'description'   => 'Time interval for grouping abscissa values.',
-            'type'          => 'string',
-            'selection'     => [
+            'type'              => 'string',
+            'description'       => 'Time interval for grouping abscissa values.',
+            'selection'         => [
                 'week',
                 'month',
                 'year'
             ],
-            'default'       => 'month'
+            'default'           => 'month'
         ]
     ],
     'response'      => [
@@ -59,15 +59,14 @@ list($params, $providers) = announce([
         'charset'       => 'utf-8',
         'accept-origin' => '*'
     ],
-    'providers'     => [ 'context', 'orm', 'adapt','auth' ]
+    'providers'     => ['context', 'auth']
 ]);
 
 /**
- * @var \equal\php\Context          $context
- * @var \equal\orm\ObjectManager    $orm
- * @var \equal\auth\AuthenticationManager $auth
+ * @var \equal\php\Context                  $context
+ * @var \equal\auth\AuthenticationManager   $auth
  */
-list($context, $orm, $adapter, $auth) = [ $providers['context'], $providers['orm'], $providers['adapt'] , $providers['auth']];
+['context' => $context, 'auth' => $auth] = $providers;
 
 $occupanciesGetDateIndex = function($date, $interval) {
     switch($interval) {
@@ -121,7 +120,7 @@ for each range
 
 $user_id = $auth->userId();
 if($user_id <= 0) {
-    throw new Exception('user_unknown', QN_ERROR_NOT_ALLOWED);
+    throw new Exception('user_unknown', EQ_ERROR_NOT_ALLOWED);
 }
 
 $results = [];
@@ -132,7 +131,7 @@ $centers_ids = [];
 if($params['all_centers']) {
     $user = User::id($user_id)->read(['centers_ids'])->first(true);
     if(!$user) {
-        throw new Exception('unexpected_error', QN_ERROR_INVALID_USER);
+        throw new Exception('unexpected_error', EQ_ERROR_INVALID_USER);
     }
     $centers_ids = (array) $user['centers_ids'];
 }
@@ -260,6 +259,7 @@ if($centers_ids) {
     }
 }
 
-$context->httpResponse()
-        ->body($results)
-        ->send();
+$context
+    ->httpResponse()
+    ->body($results)
+    ->send();
