@@ -311,5 +311,3 @@ $context
     ->header('Content-Disposition', 'inline; filename="planning-with-meals.pdf"')
     ->body($dompdf->output())
     ->send();
-
-

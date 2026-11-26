@@ -116,5 +116,3 @@ $context
     ->status(200)
     ->body($result)
     ->send();
-
-

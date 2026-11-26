@@ -77,5 +77,3 @@ else {
 
 $httpResponse->body($result)
              ->send();
-
-

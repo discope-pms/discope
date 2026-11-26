@@ -1602,6 +1602,3 @@ $context
     ->header('Content-Disposition', 'inline; filename="document.pdf"')
     ->body($output)
     ->send();
-
-
-

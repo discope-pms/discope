@@ -262,4 +262,3 @@ $context
     ->header('X-Total-Count', count($result))
     ->body($result)
     ->send();
-

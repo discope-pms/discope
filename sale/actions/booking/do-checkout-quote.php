@@ -75,4 +75,3 @@ $context
     ->httpResponse()
     ->status(204)
     ->send();
-

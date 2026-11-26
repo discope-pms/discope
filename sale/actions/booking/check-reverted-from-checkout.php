@@ -61,5 +61,3 @@ $context
     ->httpResponse()
     ->body(['result' => $result])
     ->send();
-
-
