@@ -13,21 +13,21 @@
             {
                 "type": "field",
                 "value": "organisation_id",
-                "label": "User",
+                "label": "Organisation",
                 "width": "25%",
                 "sortable": true
             },
             {
                 "type": "field",
                 "value": "center_office_id",
-                "label": "User",
+                "label": "Center office",
                 "width": "25%",
                 "sortable": true
             },
             {
                 "type": "field",
                 "value": "center_id",
-                "label": "User",
+                "label": "Center",
                 "width": "25%",
                 "sortable": true
             },
