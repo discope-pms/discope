@@ -694,6 +694,22 @@ $booking_options['insurance_amount'] = round(3.5 * $contract['price'] / 100, 2);
     retrieve templates
 */
 $has_contract_approved = false;
+
+$removeEmptyListItems = function($html) {
+    $result = preg_replace_callback(
+        '/<li\b[^>]*>.*?<\/li>/is',
+        function($matches) {
+            $text = html_entity_decode(strip_tags($matches[0]), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+            $text = preg_replace('/[\s\x{00A0}\x{200B}]+/u', '', $text);
+
+            return ($text === '') ? '' : $matches[0];
+        },
+        $html
+    );
+
+    return ($result === null) ? $html : $result;
+};
+
 if($booking['center_id']['template_category_id']) {
 
     $template = Template::search([
@@ -747,7 +763,7 @@ if($booking['center_id']['template_category_id']) {
             $date_from = $days_names[date('w', $booking['date_from'])] . ' '. date('d/m/Y', $booking['date_from']);
             $date_to = $days_names[date('w', $booking['date_to'])] . ' '. date('d/m/Y', $booking['date_to']);
 
-// 1) convert config to textual info for arrival day
+            // 1) convert config to textual info for arrival day
 
             // retrieve meals info for arrival day
             $has_breakfast = false;
@@ -959,7 +975,7 @@ if($booking['center_id']['template_category_id']) {
             }
 
             // remove empty list items, if any
-            $value = preg_replace('/<li>\s*<\/li>/i', '', $value);
+            $value = $removeEmptyListItems($value);
 
             $values['contract_service_html'] = $value;
         }
@@ -978,12 +994,14 @@ if($booking['center_id']['template_category_id']) {
 
             $service_transport_roundtrip = ($has_roundtrip_transport) ? '' : "assurer la prise en charge du transport aller et le retour du groupe";
             $service_transport_activities = ($has_activities_transport) ? '' : "assurer les éventuels déplacements tout au long du séjour";
+            $service_bed_linens = ($booking_options['has_bed_linens'] || $booking_options['has_make_beds']) ? '' : "apporter le linge de lit à savoir : un drap housse en 90 + un drap plat + une taie de traversin en 90 (NB : les alaises et les couettes sont fournies).";
 
             $value = str_replace('{transport_service}', $service_transport_roundtrip, $value);
             $value = str_replace('{transport_activity}', $service_transport_activities, $value);
+            $value = str_replace('{bed_linens}', $service_bed_linens, $value);
 
             // remove empty list items, if any
-            $value = preg_replace('/<li>\s*<\/li>/i', '', $value);
+            $value = $removeEmptyListItems($value);
 
             $values['contract_engage_html'] = $value;
         }
